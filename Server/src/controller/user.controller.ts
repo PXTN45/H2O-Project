@@ -9,10 +9,10 @@ dotenv.config();
 
 const Register = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
     const user = await UserModel.create({
-      username,
+      email,
       password: bcrypt.hashSync(password, salt),
     });
     res.status(201).json(user);
@@ -24,8 +24,8 @@ const Register = async (req: Request, res: Response): Promise<void> => {
 
 const Login = async (req: Request, res: Response): Promise<void> => {
   const secret = process.env.SECRET as string;
-  const { username, password } = req.body;
-  const user = await UserModel.findOne({ username });
+  const { email, password } = req.body;
+  const user = await UserModel.findOne({ email });
   
   if (!user) {
     res.status(400).json("Wrong credentials");
@@ -34,11 +34,11 @@ const Login = async (req: Request, res: Response): Promise<void> => {
 
   const isMatchedPassword = bcrypt.compareSync(password, user.password);
   if (isMatchedPassword) {
-    jwt.sign({ username, id: user._id }, secret, {}, (err, token) => {
+    jwt.sign({ email, id: user._id }, secret, {}, (err, token) => {
       if (err) throw err;
       res.cookie("token", token).json({
         id: user._id,
-        username,
+        email,
       });
     });
   } else {

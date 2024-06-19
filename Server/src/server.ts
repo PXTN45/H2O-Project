@@ -42,7 +42,7 @@ const swaggerDefinition = {
 // Swagger options
 const options = {
   swaggerDefinition,
-  apis: ["./routes/*.ts"], // Adjust this if the paths to the routes change
+  apis: ["src/routes/package.router.ts"], // Adjust this if the paths to the routes change
   connectTimeoutMS: 10000, // Set timeout for the connection
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -88,5 +88,5 @@ app.get("/", (req: Request, res: Response) => {
 // Server setup
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Server is running on http://localhost:" + PORT);
+  console.log("Server is running  on http://localhost:" + PORT);
 });
