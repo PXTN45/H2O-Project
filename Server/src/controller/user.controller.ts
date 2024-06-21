@@ -9,11 +9,15 @@ dotenv.config();
 
 const Register = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
-  const { email, password } = req.body;
+  const { fname, lname, email, password, phonenumber,role  } = req.body;
   try {
     const user = await UserModel.create({
+      fname,
+      lname,
       email,
       password: bcrypt.hashSync(password, salt),
+      phonenumber,
+      role,
     });
     res.status(201).json(user);
   } catch (error) {
