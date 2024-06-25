@@ -7,6 +7,8 @@ import swaggerUi from "swagger-ui-express";
 import packgeRouter from "./routes/package.router";
 import userRouter from "./routes/user.router";
 import jwt  from "jsonwebtoken";
+const cookieParser = require("cookie-parser");
+
 
 // Load environment variables from .env file
 dotenv.config();
@@ -57,9 +59,15 @@ const app = express();
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 
 // Middleware setup
-app.use(cors({ credentials: true, origin: CLIENT_URL }));
+app.use(cors({
+  credentials: true,
+  origin: CLIENT_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // ต้องการระบุเมธอดที่อนุญาต
+  allowedHeaders: ['Content-Type', 'Authorization'], // กำหนด header ที่อนุญาต
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // MongoDB connection
 const MONGODB_URL = process.env.MONGODB_URL || "";
