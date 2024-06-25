@@ -9,7 +9,7 @@ dotenv.config();
 
 const Register = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
-  const { fname, lname, email, password, phonenumber,role  } = req.body;
+  const { fname, lname, email, password, phonenumber, role } = req.body;
   try {
     const user = await UserModel.create({
       fname,
@@ -30,7 +30,7 @@ const Login = async (req: Request, res: Response): Promise<void> => {
   const secret = process.env.SECRET as string;
   const { email, password } = req.body;
   const user = await UserModel.findOne({ email });
-  
+
   if (!user) {
     res.status(400).json("Wrong credentials");
     return;
@@ -54,8 +54,4 @@ const Logout = (req: Request, res: Response): void => {
   res.cookie("token", "").json("ok");
 };
 
-export {
-  Register,
-  Login,
-  Logout,
-};
+export { Register, Login, Logout };

@@ -6,7 +6,7 @@ export interface User extends Document {
   password: string;
   fname: string;
   lname: string;
-  phonenumber: number;
+  phonenumber: string;
   image: string;
   role: string;
 }
@@ -29,7 +29,7 @@ const UserSchema = new Schema<User>({
     type: String,
   },
   phonenumber: {
-    type: Number,
+    type: String,
   },
   image: {
     type: String,

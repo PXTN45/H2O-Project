@@ -6,6 +6,7 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import packgeRouter from "./routes/package.router";
 import userRouter from "./routes/user.router";
+import jwt  from "jsonwebtoken";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -83,6 +84,14 @@ app.use("/user", userRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<h1> Welcome to H2O Project</h1>");
+});
+
+app.post("/jwt", async (req: Request, res: Response) => {
+  const user = req.body;
+  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET as string, {
+    expiresIn: "1h",
+  });
+  res.send({ token });
 });
 
 // Server setup
