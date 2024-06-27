@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import packgeRouter from "./routes/package.router";
+import homeStayRouter from "./routes/homestay.router"
 import userRouter from "./routes/user.router";
 import jwt  from "jsonwebtoken";
 const cookieParser = require("cookie-parser");
@@ -40,12 +41,44 @@ const swaggerDefinition = {
       description: "Development server",
     },
   ],
+  components: {
+    schemas: {
+      Location: {
+        type: 'object',
+        properties: {
+          _id: {
+            type: 'string',
+            description: 'ID of the location',
+          },
+          name: {
+            type: 'string',
+            description: 'Name of the location',
+          },
+          
+        },
+      },
+      Image: {
+        type: 'object',
+        properties: {
+          _id: {
+            type: 'string',
+            description: 'ID of the image',
+          },
+          url: {
+            type: 'string',
+            description: 'URL of the image',
+          },
+         
+        },
+      },
+    },
+  },  
 };
 
 // Swagger options
 const options = {
   swaggerDefinition,
-  apis: ["src/routes/package.router.ts"], // Adjust this if the paths to the routes change
+  apis: ["src/routes/package.router.ts", "src/routes/homestay.router.ts"], // Adjust this if the paths to the routes change
   connectTimeoutMS: 10000, // Set timeout for the connection
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -87,6 +120,7 @@ app.get("/swagger.json", (req: Request, res: Response) => {
 });
 
 // Routes
+app.use("/",homeStayRouter)
 app.use("/", packgeRouter);
 app.use("/user", userRouter);
 
