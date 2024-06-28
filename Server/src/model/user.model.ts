@@ -1,18 +1,4 @@
 import { Schema, model, Document } from "mongoose";
-<<<<<<< HEAD
-// import jwt from "jsonwebtoken";
-// import Joi, { ObjectSchema, ValidationResult } from "joi";
-// import passwordComplexity from "joi-password-complexity";
-
-export interface Address {
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}
-=======
->>>>>>> 3333c0426dff0e8a36a9f10581e711ec50617b7d
 
 export interface User extends Document {
   email: string;
