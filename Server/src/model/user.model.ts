@@ -1,15 +1,4 @@
 import { Schema, model, Document } from "mongoose";
-import jwt from "jsonwebtoken";
-import Joi, { ObjectSchema, ValidationResult } from "joi";
-import passwordComplexity from "joi-password-complexity";
-
-export interface Address {
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}
 
 export interface User extends Document {
   email: string;
@@ -20,30 +9,48 @@ export interface User extends Document {
   phonenumber: string;
   image?: string;
   addresses: Address[];
+  isVerified:boolean;
   role: string;
-  verified: Boolean;
+}
+
+export interface Address {
+  houseNumber:  string;
+  village: string;
+  district: string;
+  street: string;
+  city : string;
+  country: string;
+  postalCode: string;
 }
 
 const AddressSchema = new Schema<Address>({
+  houseNumber: {
+    type: String,
+    default: ""
+  },
+  village: {
+    type: String,
+    default: ""
+  },
+  district: {
+    type: String,
+    default: ""
+  },
   street: {
     type: String,
-    default: "",
+    default: ""
   },
   city: {
     type: String,
-    default: "",
-  },
-  state: {
-    type: String,
-    default: "",
-  },
-  postalCode: {
-    type: String,
-    default: "",
+    default: ""
   },
   country: {
     type: String,
-    default: "",
+    default: ""
+  },
+  postalCode: {
+    type: String,
+    default: ""
   },
 });
 
@@ -51,55 +58,54 @@ const UserSchema = new Schema<User>({
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   password: {
     type: String,
     minlength: 8,
-    required: true,
+    required: true
   },
   fname: {
     type: String,
-    required: true,
+    required: true
   },
   lname: {
     type: String,
-    required: true,
+    required: true
   },
   birthday: {
     type: Date,
-    default: null,
+    default: null
   },
   phonenumber: {
     type: String,
     minlength: 12,
     maxlength: 12,
     required: true,
-    trim: true,
+    trim: true
   },
   image: {
     type: String,
-    default:
-      "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg",
+    default: "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg"
   },
   addresses: {
     type: [AddressSchema],
-    default: [
-      {
-        street: "",
-        city: "",
-        state: "",
-        postalCode: "",
-        country: "",
-      },
-    ],
+    default: [{
+      houseNumber: "",
+      village: "",
+      district: "",
+      street: "",
+      city: "",
+      country: "",
+      postalCode: "",
+    }]
   },
+  isVerified: { type: Boolean, default: false },
   role: {
     type: String,
     enum: ["user"],
-    default: "user",
-  },
-  verified: { type: Boolean, default: false },
+    default: "user"
+  }
 });
 
 const UserModel = model<User>("User", UserSchema);
