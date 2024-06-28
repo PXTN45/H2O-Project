@@ -4,10 +4,10 @@ export interface Business extends Document {
   email: string;
   password: string;
   businessName:string;
-  fname: string;
-  lname: string;
+  name: string;
+  lastName: string;
   birthday:Date;
-  phonenumber: string;
+  phone: string;
   image: string;
   addresses: Address[];
   idcard:string;
@@ -75,11 +75,11 @@ const BusinessSchema = new Schema<Business>({
     type: String,
     required: true,
   },
-  fname: {
+  name: {
     type: String,
     default: ""
   },
-  lname: {
+  lastName: {
     type: String,
     default: ""
   },
@@ -87,7 +87,7 @@ const BusinessSchema = new Schema<Business>({
     type: Date,
     default: null
   },
-  phonenumber: {
+  phone: {
     type: String,
     minlength: 12,
     maxlength: 12,

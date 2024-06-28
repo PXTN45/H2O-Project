@@ -5,9 +5,9 @@ export interface Admin extends Document {
   email: string;
   password: string;
   name: string;
-  lastname: string;
+  lastName: string;
   birthday:Date;
-  phonenumber: string;
+  phone: string;
   image: string;
   role: string;
 }
@@ -27,7 +27,7 @@ const AdminSchema = new Schema<Admin>({
     type: String,
     required: true,
   },
-  lastname: {
+  lastName: {
     type: String,
     required: true,
   },
@@ -35,7 +35,7 @@ const AdminSchema = new Schema<Admin>({
     type: Date,
     default: null
   },
-  phonenumber: {
+  phone: {
     type: String,
     minlength: 12,
     maxlength: 12,
