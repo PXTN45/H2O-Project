@@ -5,7 +5,7 @@ const router = Router();
 
 router.get("/userData", getAll);
 
-router.post("/register", Register);
+router.post("/register" , Register);
 
 router.post("/login", Login);
 

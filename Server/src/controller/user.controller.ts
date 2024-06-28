@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import UserModel from "../model/user.model";
+import {sendEmail} from "../utils/sendEmail";
 
 dotenv.config();
 
@@ -18,7 +19,8 @@ const getAll = async (req: Request, res: Response): Promise<void> => {
 
 const Register = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
-  const { fname, lname, email, password, phonenumber , role } = req.body;
+  const secret = process.env.SECRET as string;
+  const { fname, lname, email, password, phonenumber, role } = req.body;
   try {
     const user = await UserModel.create({
       fname,
@@ -28,6 +30,10 @@ const Register = async (req: Request, res: Response): Promise<void> => {
       phonenumber,
       role,
     });
+    const token = jwt.sign({ userId: user.id, email: user.email }, secret, {
+      expiresIn: "1h",
+    });
+    await sendEmail(user.email, token, "verification Email");
     res.status(201).json(user);
   } catch (error) {
     console.log(error);
@@ -49,9 +55,9 @@ const Login = async (req: Request, res: Response): Promise<void> => {
   if (isMatchedPassword) {
     jwt.sign({ email, id: user._id }, secret, {}, (err, token) => {
       if (err) throw err;
-      res.cookie("token", token , { httpOnly: true }).json({
+      res.cookie("token", token, { httpOnly: true }).json({
         id: user._id,
-        email,      
+        email,
       });
       res.status(200).json(res.cookie);
     });
@@ -64,4 +70,4 @@ const Logout = (req: Request, res: Response): void => {
   res.cookie("token", "").json("ok");
 };
 
-export { Register, Login, Logout , getAll };
+export { Register, Login, Logout, getAll };

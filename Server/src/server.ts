@@ -7,7 +7,8 @@ import swaggerUi from "swagger-ui-express";
 import packgeRouter from "./routes/package.router";
 import userRouter from "./routes/user.router";
 import jwt  from "jsonwebtoken";
-const cookieParser = require("cookie-parser");
+// const cookieParser = require("cookie-parser");
+import cookieParser = require("cookie-parser");
 
 
 // Load environment variables from .env file
