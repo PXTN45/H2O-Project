@@ -1,16 +1,12 @@
-import { Schema, model, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
-// Define the interface for the Image schema
-export interface Image extends Document {
+export interface IImage extends Document {
   image_upload: string;
 }
 
-const ImagesSchema = new Schema<Image>({
-  image_upload: {
-    type: String,
-    required: true,
-  },
+const ImageSchema: Schema = new Schema({
+  image_upload: { type: String, required: true },
 });
 
-const ImageModel = model<Image>("Image", ImagesSchema);
-export default ImageModel;
+const Image: Model<IImage> = mongoose.model<IImage>('Image', ImageSchema);
+export default Image;

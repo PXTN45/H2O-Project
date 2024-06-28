@@ -1,7 +1,6 @@
-import { Schema, model, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
-// Define the interface for the Location schema
-export interface Location extends Document {
+export interface ILocation extends Document {
   name_location: string;
   province_location: string;
   district_location: string;
@@ -12,45 +11,21 @@ export interface Location extends Document {
   radius_location: number;
 }
 
-const LocationSchema = new Schema<Location>(
+const LocationSchema: Schema = new Schema(
   {
-    name_location: {
-      type: String,
-      required: true,
-    },
-    province_location: {
-      type: String,
-      required: true,
-    },
-    district_location: {
-      type: String,
-      required: true,
-    },
-    subdistrict_location: {
-      type: String,
-      required: true,
-    },
-    zipcode_location: {
-      type: Number,
-      required: true,
-    },
-    latitude_location: {
-      type: String,
-      required: true,
-    },
-    longitude_location: {
-      type: String,
-      required: true,
-    },
-    radius_location: {
-      type: Number,
-      required: true,
-    },
+    name_location: { type: String, required: true },
+    province_location: { type: String, required: true },
+    district_location: { type: String, required: true },
+    subdistrict_location: { type: String, required: true },
+    zipcode_location: { type: Number, required: true },
+    latitude_location: { type: String, required: true },
+    longitude_location: { type: String, required: true },
+    radius_location: { type: Number, required: true },
   },
   {
     timestamps: true,
   }
 );
 
-const LocationModel = model<Location>("Location", LocationSchema);
-export default LocationModel;
+const Location: Model<ILocation> = mongoose.model<ILocation>('Location', LocationSchema);
+export default Location;

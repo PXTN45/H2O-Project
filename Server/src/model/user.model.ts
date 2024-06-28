@@ -1,7 +1,7 @@
 import { Schema, model, Document } from "mongoose";
-import jwt from "jsonwebtoken";
-import Joi, { ObjectSchema, ValidationResult } from "joi";
-import passwordComplexity from "joi-password-complexity";
+// import jwt from "jsonwebtoken";
+// import Joi, { ObjectSchema, ValidationResult } from "joi";
+// import passwordComplexity from "joi-password-complexity";
 
 export interface Address {
   street: string;
