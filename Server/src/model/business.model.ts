@@ -15,18 +15,33 @@ export interface Business extends Document {
   BankingUsername:string;
   BankingUserlastname:string;
   BankingCode:string;
+  isVerified:boolean;
   role: string;
 }
 
 export interface Address {
+  houseNumber:  string;
+  village: string;
+  district: string;
   street: string;
-  city: string;
-  state: string;
-  postalCode: string;
+  city : string;
   country: string;
+  postalCode: string;
 }
 
 const AddressSchema = new Schema<Address>({
+  houseNumber: {
+    type: String,
+    default: ""
+  },
+  village: {
+    type: String,
+    default: ""
+  },
+  district: {
+    type: String,
+    default: ""
+  },
   street: {
     type: String,
     default: ""
@@ -35,15 +50,11 @@ const AddressSchema = new Schema<Address>({
     type: String,
     default: ""
   },
-  state: {
+  country: {
     type: String,
     default: ""
   },
   postalCode: {
-    type: String,
-    default: ""
-  },
-  country: {
     type: String,
     default: ""
   },
@@ -91,16 +102,17 @@ const BusinessSchema = new Schema<Business>({
   addresses: {
     type: [AddressSchema],
     default: [{
+      houseNumber: "",
+      village: "",
+      district: "",
       street: "",
       city: "",
-      state: "",
+      country: "",
       postalCode: "",
-      country: ""
     }]
   },
   idcard: {
     type: String,
-    minlength: 13,
     maxlength: 13,
     default: ""
   },
@@ -118,9 +130,9 @@ const BusinessSchema = new Schema<Business>({
   },
   BankingCode: {
     type: String,
-    minlength: 10,
     default: ""
   },
+  isVerified: { type: Boolean, default: false },
   role: { type: String, enum: ["business"], default: "business" },
 });
 
