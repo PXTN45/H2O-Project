@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer"
 
-const sendEmail = async (email: string, subject: string , text: string): Promise<void> => {
+const sendEmail = async (email: string , token: string): Promise<void> => {
 	try {
 		const transporter = nodemailer.createTransport({
 			host: process.env.HOST,
@@ -17,7 +17,7 @@ const sendEmail = async (email: string, subject: string , text: string): Promise
 			from: process.env.USER,
 			to: email,
 			subject: 'Email Verification',
-			text: `Please verify your email by clicking the following link: http://localhost:3000/user/verify?token=}`,
+			text: `Please verify your email by clicking the following link: http://localhost:3000/user/verify?token=${token}}`,
 		});
 		console.log("Email sent successfully");
 	} catch (error) {

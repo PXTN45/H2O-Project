@@ -6,7 +6,7 @@ export interface User extends Document {
   name: string;
   lastname: string;
   birthday?: Date;
-  phonenumber: string;
+  phone: string;
   image?: string;
   addresses: Address[];
   isVerified:boolean;
@@ -77,7 +77,7 @@ const UserSchema = new Schema<User>({
     type: Date,
     default: null
   },
-  phonenumber: {
+  phone: {
     type: String,
     minlength: 12,
     maxlength: 12,
