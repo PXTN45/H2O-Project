@@ -3,8 +3,8 @@ import { Schema, model, Document } from "mongoose";
 export interface User extends Document {
   email: string;
   password: string;
-  fname: string;
-  lname: string;
+  name: string;
+  lastname: string;
   birthday?: Date;
   phonenumber: string;
   image?: string;
@@ -65,11 +65,11 @@ const UserSchema = new Schema<User>({
     minlength: 8,
     required: true
   },
-  fname: {
+  name: {
     type: String,
     required: true
   },
-  lname: {
+  lastname: {
     type: String,
     required: true
   },

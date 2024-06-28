@@ -3,7 +3,7 @@ import { Schema, model, Document } from "mongoose";
 export interface Business extends Document {
   email: string;
   password: string;
-  bname:string;
+  businessName:string;
   fname: string;
   lname: string;
   birthday:Date;
@@ -71,7 +71,7 @@ const BusinessSchema = new Schema<Business>({
     minlength: 8,
     required: true,
   },
-  bname: {
+  businessName: {
     type: String,
     required: true,
   },

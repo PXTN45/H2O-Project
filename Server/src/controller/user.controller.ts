@@ -20,11 +20,11 @@ const getAll = async (req: Request, res: Response): Promise<void> => {
 const Register = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
   const secret = process.env.SECRET as string;
-  const { fname, lname, email, password, phonenumber, role } = req.body;
+  const { name, lastname, email, password, phonenumber, role } = req.body;
   try {
     const user = await UserModel.create({
-      fname,
-      lname,
+      name,
+      lastname,
       email,
       password: bcrypt.hashSync(password, salt),
       phonenumber,

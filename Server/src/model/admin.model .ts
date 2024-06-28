@@ -4,8 +4,8 @@ import { Schema, model, Document } from "mongoose";
 export interface Admin extends Document {
   email: string;
   password: string;
-  fname: string;
-  lname: string;
+  name: string;
+  lastname: string;
   birthday:Date;
   phonenumber: string;
   image: string;
@@ -23,11 +23,11 @@ const AdminSchema = new Schema<Admin>({
     minlength: 8,
     required: true,
   },
-  fname: {
+  name: {
     type: String,
     required: true,
   },
-  lname: {
+  lastname: {
     type: String,
     required: true,
   },
