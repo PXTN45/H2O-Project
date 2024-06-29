@@ -4,7 +4,8 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import UserModel from "../model/user.model";
 import { sendEmail } from "../utils/sendEmail";
-import Token, { ITokenDocument } from "../model/token.model";
+import BusinessModel from "../model/business.model";
+import AdminModel from "../model/admin.model ";
 
 dotenv.config();
 
@@ -17,12 +18,39 @@ const getAll = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const Register = async (req: Request, res: Response): Promise<void> => {
+const userRegister = async (req: Request, res: Response): Promise<void> => {
+  const salt = bcrypt.genSaltSync(10);
+  const secret = process.env.SECRET as string;
+  const { name, lastName, email, password, phone, role } = req.body;
+  try {
+    const user = await UserModel.create({
+      name,
+      lastName,
+      email,
+      password: bcrypt.hashSync(password, salt),
+      phone,
+      role,
+    });
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user },
+      secret,
+      {
+        expiresIn: "1h",
+      }
+    );
+    await sendEmail(user.email, token);
+    res.status(201).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json(error);
+  }
+};
+const adminRegister = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
   const secret = process.env.SECRET as string;
   const { name, lastname, email, password, phone, role } = req.body;
   try {
-    const user = await UserModel.create({
+    const user = await AdminModel.create({
       name,
       lastname,
       email,
@@ -30,9 +58,39 @@ const Register = async (req: Request, res: Response): Promise<void> => {
       phone,
       role,
     });
-    const token = jwt.sign({ userId: user.id, email: user.email }, secret, {
-      expiresIn: "1h",
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      secret,
+      {
+        expiresIn: "1h",
+      }
+    );
+    await sendEmail(user.email, token);
+    res.status(201).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json(error);
+  }
+};
+const businessRegister = async (req: Request, res: Response): Promise<void> => {
+  const salt = bcrypt.genSaltSync(10);
+  const secret = process.env.SECRET as string;
+  const { businessName, email, password, phone, role } = req.body;
+  try {
+    const user = await BusinessModel.create({
+      businessName,
+      email,
+      password: bcrypt.hashSync(password, salt),
+      phone,
+      role,
     });
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      secret,
+      {
+        expiresIn: "1h",
+      }
+    );
     await sendEmail(user.email, token);
     res.status(201).json(user);
   } catch (error) {
@@ -72,17 +130,38 @@ const verifyToken = async (req: Request, res: Response) => {
   const secret = process.env.SECRET as string;
   try {
     const decode: any = jwt.verify(token as string, secret);
-    const user = await UserModel.findById(decode.userId);
-    if (!user) {
-      res.status(400).json("invalid token");
+    const role = decode.role;
+    let verify : any;
+    if (decode.role === "user") {
+      const user = await UserModel.findById(decode.userId);
+      verify = user;
+    } else if (decode.role === "business") {
+      const business = await BusinessModel.findById(decode.userId);
+      verify = business;
+    } else if (decode.role === "admin") {
+      const admin = await AdminModel.findById(decode.userId);
+      verify = admin;
+    } else {
+      null;
+    }
+    if (!verify) {
+      res.status(400).json(role);
     }
 
-    user.isVerified = true;
-    const saveUser = await user.save();
+    verify.isVerified = true;
+    const saveverify = await verify.save();
     res.redirect("http://localhost:5173/verifySuccess");
   } catch {
     res.errored;
   }
 };
 
-export { Register, Login, Logout, getAll, verifyToken };
+export {
+  userRegister,
+  businessRegister,
+  adminRegister,
+  Login,
+  Logout,
+  getAll,
+  verifyToken,
+};

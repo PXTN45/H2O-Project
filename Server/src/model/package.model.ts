@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
-import { ILocation } from './location.model';
+import mongoose, { Schema, Document, Model } from "mongoose";
+import { ILocation } from "./location.model";
 // import { IImage } from './image.model';
 
 export interface IPackage extends Document {
@@ -11,8 +11,17 @@ export interface IPackage extends Document {
   time_start_package: Date;
   time_end_package: Date;
   policy_cancel_package: string;
-  location: ILocation[];
-  image: {image_upload : string}[];
+  location: {
+    name_location: string;
+    province_location: string;
+    district_location: string;
+    subdistrict_location: string;
+    zipcode_location: number;
+    latitude_location: string;
+    longitude_location: string;
+    radius_location: number;
+  }[];
+  image: { image_upload: string }[];
   price_package: number;
   homestay?: mongoose.Types.ObjectId[];
   business_user: mongoose.Types.ObjectId[];
@@ -31,20 +40,42 @@ const PackageSchema: Schema = new Schema({
   time_start_package: { type: Date, required: true },
   time_end_package: { type: Date, required: true },
   policy_cancel_package: { type: String, required: true },
-  location: { type: [Schema.Types.ObjectId], ref: 'Location', required: true },
-  image_upload: { type: [
-    {
-      image_upload : {
-        type : String,
-        required: true
-      }
-    }
-  ], required: true },
+  location: {
+    type: [
+      {
+        name_location: { type: String, required: true },
+        province_location: { type: String, required: true },
+        district_location: { type: String, required: true },
+        subdistrict_location: { type: String, required: true },
+        zipcode_location: { type: Number, required: true },
+        latitude_location: { type: String, required: true },
+        longitude_location: { type: String, required: true },
+        radius_location: { type: Number, required: true },
+      },
+    ],
+  },
+  image_upload: {
+    type: [
+      {
+        image_upload: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    required: true,
+  },
   price_package: { type: Number, required: true },
-  homestay: { type: [{ type: Schema.Types.ObjectId, ref: 'Homestay' }] },
-  business_user: { type: [{ type: Schema.Types.ObjectId, ref: 'Business_User' }], required: true },
+  homestay: { type: [{ type: Schema.Types.ObjectId, ref: "Homestay" }] },
+  business_user: {
+    type: [{ type: Schema.Types.ObjectId, ref: "Business_User" }],
+    required: true,
+  },
   review_rating_package: { type: Number, required: true },
 });
 
-const Package: Model<IPackage> = mongoose.model<IPackage>('Package', PackageSchema);
+const Package: Model<IPackage> = mongoose.model<IPackage>(
+  "Package",
+  PackageSchema
+);
 export default Package;
