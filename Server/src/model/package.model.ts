@@ -1,6 +1,4 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
-import { ILocation } from "./location.model";
-// import { IImage } from './image.model';
 
 export interface IPackage extends Document {
   name_package: string;

@@ -6,6 +6,7 @@ import UserModel from "../model/user.model";
 import { sendEmail } from "../utils/sendEmail";
 import BusinessModel from "../model/business.model";
 import AdminModel from "../model/admin.model ";
+import verifyToken from "../middlewares/verifyToken";
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ const userRegister = async (req: Request, res: Response): Promise<void> => {
       role,
     });
     const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user },
+      { userId: user.id, email: user.email, role: user.role },
       secret,
       {
         expiresIn: "1h",
@@ -125,36 +126,7 @@ const Logout = (req: Request, res: Response): void => {
   res.cookie("token", "").json("ok");
 };
 
-const verifyToken = async (req: Request, res: Response) => {
-  const { token } = req.query;
-  const secret = process.env.SECRET as string;
-  try {
-    const decode: any = jwt.verify(token as string, secret);
-    const role = decode.role;
-    let verify : any;
-    if (decode.role === "user") {
-      const user = await UserModel.findById(decode.userId);
-      verify = user;
-    } else if (decode.role === "business") {
-      const business = await BusinessModel.findById(decode.userId);
-      verify = business;
-    } else if (decode.role === "admin") {
-      const admin = await AdminModel.findById(decode.userId);
-      verify = admin;
-    } else {
-      null;
-    }
-    if (!verify) {
-      res.status(400).json(role);
-    }
 
-    verify.isVerified = true;
-    const saveverify = await verify.save();
-    res.redirect("http://localhost:5173/verifySuccess");
-  } catch {
-    res.errored;
-  }
-};
 
 export {
   userRegister,
@@ -163,5 +135,4 @@ export {
   Login,
   Logout,
   getAll,
-  verifyToken,
 };

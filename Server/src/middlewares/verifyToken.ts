@@ -1,24 +1,36 @@
-import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import BusinessModel from "../model/business.model";
+import UserModel from "../model/user.model";
+import AdminModel from "../model/admin.model ";
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
-interface CustomRequest extends Request {
-  decode?: string | JwtPayload;
-}
-
-const verifyToken = (req: CustomRequest, res: Response, next: NextFunction): Response | void => {
-  if (!req.headers.authorization) {
-    return res.status(401).send({ message: "Unauthorized Access1" });
-  }
-
-  const token = req.headers.authorization.split(" ")[1];
-
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err, decode) => {
-    if (err) {
-      return res.status(401).send({ message: "Unauthorized Access2" });
+const verifyToken = async (req: Request, res: Response) => {
+  const { token } = req.query;
+  const secret = process.env.SECRET as string;
+  try {
+    const decode: any = jwt.verify(token as string, secret);
+    const role = decode.role;
+    let verify;
+    if (decode.role === "user") {
+      const user = await UserModel.findById(decode.userId);
+      verify = user;
+    } else if (decode.role === "business") {
+      const business = await BusinessModel.findById(decode.userId);
+      verify = business;
+    } else if (decode.role === "admin") {
+      const admin = await AdminModel.findById(decode.userId);
+      verify = admin;
     }
-    req.decode = decode;
-    next();
-  });
+    if (!verify) {
+      res.status(400).json(decode);
+    }
+
+    verify.isVerified = true;
+    const saveverify = await verify.save();
+    res.redirect("http://localhost:5173/verifySuccess");
+  } catch {
+    res.errored;
+  }
 };
 
 export default verifyToken;
