@@ -1,10 +1,14 @@
 import { Request, Response, Router } from "express";
-import { userRegister,businessRegister, adminRegister, Login, Logout , getAll } from "../controller/user.controller";
+import { userRegister,businessRegister, adminRegister, Login, Logout , getAllUser , getAllBusiness , getAllAdmin } from "../controller/user.controller";
 import verifyToken from "../middlewares/verifyToken"
 
 const router = Router();
 
-router.get("/userData", getAll);
+router.get("/userData", getAllUser);
+
+router.get("/businessData", getAllBusiness);
+
+router.get("/adminData", getAllAdmin);
 
 router.post("/userRegister" , userRegister);
 

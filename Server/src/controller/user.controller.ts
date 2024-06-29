@@ -6,13 +6,30 @@ import UserModel from "../model/user.model";
 import { sendEmail } from "../utils/sendEmail";
 import BusinessModel from "../model/business.model";
 import AdminModel from "../model/admin.model ";
-import verifyToken from "../middlewares/verifyToken";
 
 dotenv.config();
 
-const getAll = async (req: Request, res: Response): Promise<void> => {
+const getAllUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData = await UserModel.find();
+    res.status(200).json(userData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getAllBusiness = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userData = await BusinessModel.find();
+    res.status(200).json(userData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getAllAdmin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userData = await AdminModel.find();
     res.status(200).json(userData);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -134,5 +151,7 @@ export {
   adminRegister,
   Login,
   Logout,
-  getAll,
+  getAllUser,
+  getAllBusiness,
+  getAllAdmin,
 };
