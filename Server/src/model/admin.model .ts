@@ -9,6 +9,7 @@ export interface Admin extends Document {
   birthday:Date;
   phone: string;
   image: string;
+  isVerified:boolean;
   role: string;
 }
 
@@ -46,6 +47,7 @@ const AdminSchema = new Schema<Admin>({
     default: "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg",
     required: true,
   },
+  isVerified: { type: Boolean, default: false },
   role: { type: String, enum: ["admin"], default: "admin" },
 });
 
