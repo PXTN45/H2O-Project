@@ -9,6 +9,7 @@ import {
   getAllBusiness,
   getAllAdmin,
   updateUser,
+  checkEmailExists
 } from "../controller/user.controller";
 import verifyToken from "../middlewares/verifyToken";
 
@@ -25,6 +26,8 @@ router.post("/userRegister", userRegister);
 router.post("/businessRegister", businessRegister);
 
 router.post("/adminRegister", adminRegister);
+
+router.post("/checkEmailExists", checkEmailExists);
 
 router.put("/updateUser/:id", updateUser);
 

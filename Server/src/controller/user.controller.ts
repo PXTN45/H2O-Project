@@ -157,23 +157,56 @@ const updateUser = async (req: Request, res: Response) => {
 
 const Login = async (req: Request, res: Response): Promise<void> => {
   const secret = process.env.SECRET as string;
-  const { email, password } = req.body;
-  const user = await UserModel.findOne({ email });
+  const { email, password, role } = req.body;
+  let userData;
+  if (role === "user") {
+    const user = await UserModel.findOne({ email });
+    userData = user;
+  } else if (role === "business") {
+    const user = await BusinessModel.findOne({ email });
+    userData = user;
+  } else if (role === "admin") {
+    const user = await AdminModel.findOne({ email });
+    userData = user;
+  }
 
-  if (!user) {
+  if (!userData) {
     res.status(400).json("Wrong credentials");
     return;
   }
 
-  const isMatchedPassword = bcrypt.compareSync(password, user.password);
+  const isMatchedPassword = bcrypt.compareSync(password, userData.password);
   if (isMatchedPassword) {
-    jwt.sign({ email, id: user._id }, secret, {}, (err, token) => {
+    jwt.sign({ email, id: userData._id }, secret, {}, (err, token) => {
       if (err) throw err;
       res.cookie("token", token, { httpOnly: true });
-      res.status(200).json({ id: user._id, email });
+      const { password, ...userWithOutPassword } = userData.toObject();
+      res.status(200).json({ ...userWithOutPassword });
     });
   } else {
     res.status(400).json("Wrong credentials");
+  }
+};
+
+const checkEmailExists = async(req: Request, res: Response): Promise<void> => {
+  const { email , role } = req.body;
+  try {
+    let userData;
+    if (role === "user") {
+      const user = await UserModel.findOne({ email });
+      userData = user;
+    } else if (role === "business") {
+      const user = await BusinessModel.findOne({ email });
+      userData = user;
+    } else if (role === "admin") {
+      const user = await AdminModel.findOne({ email });
+      userData = user;
+    }
+    
+    res.status(200).json(!!userData);
+  } catch (error) {
+    console.error('Error checking email existence:', error);
+    throw new Error('Failed to check email existence');
   }
 };
 
@@ -191,4 +224,5 @@ export {
   getAllBusiness,
   getAllAdmin,
   updateUser,
+  checkEmailExists
 };
