@@ -117,6 +117,44 @@ const businessRegister = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const updateUser = async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const updateData = req.body;
+
+  try {
+    let updateResult;
+    switch (updateData.role) {
+      case "user":
+        updateResult = await UserModel.findByIdAndUpdate(userId, updateData, {
+          new: true,
+        });
+        break;
+      case "business":
+        updateResult = await BusinessModel.findByIdAndUpdate(
+          userId,
+          updateData,
+          { new: true }
+        );
+        break;
+      case "admin":
+        updateResult = await AdminModel.findByIdAndUpdate(userId, updateData, {
+          new: true,
+        });
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid role specified" });
+    }
+
+    if (!updateResult) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(updateResult);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
+  }
+};
+
 const Login = async (req: Request, res: Response): Promise<void> => {
   const secret = process.env.SECRET as string;
   const { email, password } = req.body;
@@ -143,8 +181,6 @@ const Logout = (req: Request, res: Response): void => {
   res.cookie("token", "").json("ok");
 };
 
-
-
 export {
   userRegister,
   businessRegister,
@@ -154,4 +190,5 @@ export {
   getAllUser,
   getAllBusiness,
   getAllAdmin,
+  updateUser,
 };
