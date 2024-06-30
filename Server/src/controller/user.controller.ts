@@ -63,14 +63,15 @@ const userRegister = async (req: Request, res: Response): Promise<void> => {
     res.status(400).json(error);
   }
 };
+
 const adminRegister = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
   const secret = process.env.SECRET as string;
-  const { name, lastname, email, password, phone, role } = req.body;
+  const { name, lastName, email, password, phone, role } = req.body;
   try {
     const user = await AdminModel.create({
       name,
-      lastname,
+      lastName,
       email,
       password: bcrypt.hashSync(password, salt),
       phone,
@@ -90,6 +91,7 @@ const adminRegister = async (req: Request, res: Response): Promise<void> => {
     res.status(400).json(error);
   }
 };
+
 const businessRegister = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
   const secret = process.env.SECRET as string;
