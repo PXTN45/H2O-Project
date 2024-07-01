@@ -1,6 +1,5 @@
 import { Schema, model, Document } from "mongoose";
 import { Location } from "./location.model";
-import { Image } from "./image.model";
 
 interface HomeStay extends Document {
     name_homeStay: string;
@@ -11,7 +10,7 @@ interface HomeStay extends Document {
     time_checkOut_homeStay: Date;
     policy_cancel_homeStay: string;
     location: Location[];
-    image: Image[];
+    image: {image_upload : string}[];
     price_homeStay: number;
     business_user: Schema.Types.ObjectId[];
     review_rating_homeStay: number;
@@ -57,8 +56,14 @@ const HomeStaySchema = new Schema<HomeStay>({
     required: true,
   },
   image: {
-    type: [{ type: Schema.Types.ObjectId, ref: "Image" }],
-    required: true,
+    type: [
+      {
+        image_upload:{
+          type:String,
+          required:true,
+        }
+      }
+    ],
 },
   price_homeStay: {
     type: Number,
