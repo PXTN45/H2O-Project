@@ -152,6 +152,11 @@ const adminRegister = async (req: Request, res: Response): Promise<void> => {
 const updateUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
   const updateData = req.body;
+  const salt = bcrypt.genSaltSync(10);
+  
+  if(updateData.password){
+    updateData.password = bcrypt.hashSync(updateData.password, salt);
+  }
 
   try {
     let updateResult;
