@@ -106,12 +106,16 @@ const searchPackage = async (req: Request, res: Response): Promise<void> => {
   const name = req.query.name_package as string;
   const type = req.query.type_package as string;
   const detail = req.query.detail_package as string;
+  console.log(name);
+  console.log(type);
+  console.log(detail);
+  
   try {
     const data = await PackageModel.find({
       $or: [
-        { name_package: { $regex: new RegExp(name, "i") } },
-        { type_package: { $regex: new RegExp(type, "i") } },
-        { detail_package: { $regex: new RegExp(detail, "i") } },
+        { name_package: { $regex: name, $options: 'i' } },
+        { type_package: { $regex: type, $options: 'i' } },
+        { detail_package: { $regex: detail, $options: 'i' } },
       ],
     });
     res.status(200).json(data);
