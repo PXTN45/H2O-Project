@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import packgeRouter from "./routes/package.router";
+import homeStayRouter from "./routes/homestay.router"
+import bookingRouter from "./routes/booking.router"
 import userRouter from "./routes/user.router";
 import jwt  from "jsonwebtoken";
 // const cookieParser = require("cookie-parser");
@@ -89,6 +91,8 @@ app.get("/swagger.json", (req: Request, res: Response) => {
 
 // Routes
 app.use("/", packgeRouter);
+app.use("/", homeStayRouter)
+app.use("/", bookingRouter)
 app.use("/user", userRouter);
 
 app.get("/", (req: Request, res: Response) => {

@@ -1,17 +1,26 @@
 import { Schema, model, Document } from "mongoose";
-import UserModel from "./user.model";
+
 
 export interface Booking extends Document {
     booker : Schema.Types.ObjectId[],
+    homeStayDetail: Schema.Types.ObjectId[],
+    packageDetail :Schema.Types.ObjectId[],
     bookingDate : Date,
     bookingStatus : Boolean,
     paymentDetail: string,
-
 }
 
 const BookingSchema = new Schema<Booking>({
   booker : [{
     type:Schema.Types.ObjectId , ref:"User",
+    required:true
+  }],
+  homeStayDetail:[{
+    type:Schema.Types.ObjectId, ref:"HomeStay",
+    required: true,
+  }],
+  packageDetail:[{
+    type: Schema.Types.ObjectId , ref:"Package",
     required:true
   }],
   bookingDate:{
