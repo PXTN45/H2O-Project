@@ -6,7 +6,7 @@
  *      type: object
  *      required:
  *        - name_homeStay
- *        - type_homeStay
+ *        - room_type
  *        - max_people
  *        - detail_homeStay
  *        - time_checkIn_homeStay
@@ -14,21 +14,31 @@
  *        - policy_cancel_homeStay
  *        - location
  *        - image
- *        - price_homeStay
  *        - business_user
  *        - review_rating_homeStay
  *        - facilities
- *        - bathroom_homeStay
- *        - bedroom_homeStay
- *        - sizeBedroom_homeStay
  *        - status_sell_homeStay
  *      properties:
  *        name_homeStay:
  *          type: string
  *          description: The name of the home stay
- *        type_homeStay:
- *          type: string
- *          description: The type of the home stay
+ *        room_type:
+ *          type: array
+ *          items:
+ *            type: object
+ *            properties:
+ *              bathroom_homeStay:
+ *                type: number
+ *                description: The number of bathrooms
+ *              bedroom_homeStay:
+ *                type: number
+ *                description: The number of bedrooms
+ *              sizeBedroom_homeStay:
+ *                type: string
+ *                description: The size of the bedroom
+ *              price_homeStay:
+ *                type: number
+ *                description: The price of the home stay room
  *        max_people:
  *          type: integer
  *          description: The maximum number of people for the home stay
@@ -49,14 +59,40 @@
  *        location:
  *          type: array
  *          items:
- *            $ref: '#/components/schemas/Location'
+ *            type: object
+ *            properties:
+ *              name_location:
+ *                type: string
+ *                description: The name of the location
+ *              province_location:
+ *                type: string
+ *                description: The province of the location
+ *              district_location:
+ *                type: string
+ *                description: The district of the location
+ *              subdistrict_location:
+ *                type: string
+ *                description: The subdistrict of the location
+ *              zipcode_location:
+ *                type: number
+ *                description: The zipcode of the location
+ *              latitude_location:
+ *                type: string
+ *                description: The latitude of the location
+ *              longitude_location:
+ *                type: string
+ *                description: The longitude of the location
+ *              radius_location:
+ *                type: number
+ *                description: The radius of the location
  *        image:
  *          type: array
  *          items:
- *            $ref: '#/components/schemas/Image'
- *        price_homeStay:
- *          type: number
- *          description: The price of the home stay
+ *            type: object
+ *            properties:
+ *              image_upload:
+ *                type: string
+ *                description: The image URL of the home stay
  *        business_user:
  *          type: array
  *          items:
@@ -73,15 +109,6 @@
  *              facilities_name:
  *                type: string
  *                description: The name of the facility
- *        bathroom_homeStay:
- *          type: number
- *          description: The number of bathrooms
- *        bedroom_homeStay:
- *          type: number
- *          description: The number of bedrooms
- *        sizeBedroom_homeStay:
- *          type: string
- *          description: The size of the bedroom
  *        status_sell_homeStay:
  *          type: boolean
  *          description: The status of the home stay (available or not)
@@ -168,13 +195,11 @@ router.get("/homestay/type/:type_homeStay", searchByTypeHomeStay);
  *          description: The HomeStay ID
  *     responses:
  *       200:
- *          description: A list of HomeStay.
+ *          description: A HomeStay object.
  *          content:
  *              application/json:
  *                  schema:
- *                      type: array
- *                      items:
- *                          $ref:   '#/components/schemas/HomeStay'
+ *                      $ref:   '#/components/schemas/HomeStay'
  *       404:
  *          description: Not Found HomeStay ID
  *       500:
@@ -193,7 +218,7 @@ router.get("/homestay/:id", getByIdHomeStay);
  *          name: price
  *          required: true
  *          schema:
- *              type: string
+ *              type: number
  *          description: The HomeStay price
  *     responses:
  *       200:
@@ -308,10 +333,10 @@ router.delete("/homestay/:id", deleteHomeStay);
  *           type: string
  *         description: Search by name.
  *       - in: query
- *         name: type_homeStay
+ *         name: room_type
  *         schema:
  *           type: string
- *         description: Search by type.
+ *         description: Search by room type.
  *       - in: query
  *         name: detail_homeStay
  *         schema:
