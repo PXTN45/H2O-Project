@@ -28,6 +28,8 @@ interface HomeStay extends Document {
   review_rating_homeStay: number;
   facilities: { facilities_name: string }[];
   status_sell_homeStay: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const HomeStaySchema = new Schema<HomeStay>({
@@ -112,7 +114,14 @@ const HomeStaySchema = new Schema<HomeStay>({
   status_sell_homeStay: {
     type: Boolean,
     required: true,
+  }, createdAt: {
+    type: Date,
+    default: Date.now
   },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const HomeStayModel = model<HomeStay>("HomeStay", HomeStaySchema);

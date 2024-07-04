@@ -2,12 +2,14 @@ import { Schema, model, Document } from "mongoose";
 
 
 export interface Booking extends Document {
-    booker : Schema.Types.ObjectId[],
-    homeStayDetail: Schema.Types.ObjectId[],
-    packageDetail :Schema.Types.ObjectId[],
-    bookingDate : Date,
-    bookingStatus : Boolean,
-    paymentDetail: string,
+    booker : Schema.Types.ObjectId[];
+    homeStayDetail: Schema.Types.ObjectId[];
+    packageDetail :Schema.Types.ObjectId[];
+    bookingDate : Date;
+    bookingStatus : string;
+    paymentDetail: string; // เช่น "Credit Card", "PayPal", "Bank Transfer"
+    createdAt: Date;
+  updatedAt: Date;
 }
 
 const BookingSchema = new Schema<Booking>({
@@ -25,18 +27,28 @@ const BookingSchema = new Schema<Booking>({
   }],
   bookingDate:{
     type: Date,
-    required:true
+    default: Date.now
   },
   bookingStatus:{
-    type: Boolean,
+    type: String,
     required:true,
-    default: false
+    enum: ["Pending", "Confirmed", "Cancelled"],
+    default: "Pending",
     
   },
-  paymentDetail:{
+  paymentDetail: {
     type: String,
-    required:true
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
+
 });
 
 const BookingModel = model<Booking>("Booking", BookingSchema);
