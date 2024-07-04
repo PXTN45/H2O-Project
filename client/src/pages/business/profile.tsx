@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider"
 import { FaEdit } from "react-icons/fa";
-;
 
 const Profile: React.FC = () => {
   const authContext = useContext(AuthContext);

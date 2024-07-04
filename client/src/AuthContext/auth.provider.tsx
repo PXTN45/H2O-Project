@@ -42,6 +42,8 @@ interface User {
   password: string;
   phone: string | undefined;
   image: string;
+  address: string;
+  birthday: Date;
   role: string;
 }
 

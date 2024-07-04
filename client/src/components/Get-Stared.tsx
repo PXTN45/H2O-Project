@@ -402,7 +402,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                   )}
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   placeholder="email"
                   className="input input-bordered"
                   {...register("email", {
@@ -512,7 +512,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                   )}
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   placeholder="email"
                   className="input input-bordered"
                   {...register("email", {
@@ -664,7 +664,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                   )}
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   placeholder="email"
                   className="input input-bordered"
                   {...register("email", {
