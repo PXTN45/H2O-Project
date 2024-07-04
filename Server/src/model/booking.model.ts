@@ -29,7 +29,9 @@ const BookingSchema = new Schema<Booking>({
   },
   bookingStatus:{
     type: Boolean,
-    required:true
+    required:true,
+    default: false
+    
   },
   paymentDetail:{
     type: String,

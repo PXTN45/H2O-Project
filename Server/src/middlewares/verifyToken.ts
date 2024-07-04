@@ -28,8 +28,8 @@ const verifyToken = async (req: Request, res: Response) => {
     verify.isVerified = true;
     const saveverify = await verify.save();
     res.redirect("http://localhost:5173/verifySuccess");
-  } catch {
-    res.errored;
+  } catch(error) {
+    res.status(500).send(error);
   }
 };
 
