@@ -221,14 +221,14 @@ const Login = async (req: Request, res: Response): Promise<void> => {
   if (cheackPassword) {
     jwt.sign({ email, id: userData._id }, secret, {}, (err, token) => {
       if (err) throw err;
-      res.cookie("token", token, { httpOnly: true });
+      res.cookie("token", token);
       const { password, ...userWithOutPassword } = userData.toObject();
       res.status(200).json({ ...userWithOutPassword });
     });
   } else if(!password){
     jwt.sign({ email, id: userData._id }, secret, {}, (err, token) => {
       if (err) throw err;
-      res.cookie("token", token, { httpOnly: true });
+      res.cookie("token", token);
       res.status(200).json(userData);
     });
   }else {
