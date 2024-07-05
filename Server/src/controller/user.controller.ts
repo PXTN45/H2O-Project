@@ -39,28 +39,85 @@ const getAllAdmin = async (req: Request, res: Response): Promise<void> => {
 const userRegister = async (req: Request, res: Response): Promise<void> => {
   const salt = bcrypt.genSaltSync(10);
   const secret = process.env.SECRET as string;
-  const { name, lastName, email, password, phone, role } = req.body;
-  try {
-    const user = await UserModel.create({
-      name,
-      lastName,
-      email,
-      password: bcrypt.hashSync(password, salt),
-      phone,
-      role,
-    });
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      secret,
-      {
-        expiresIn: "1h",
+  const userReq = req.body;
+  const existingUser = await UserModel.findOne({ email: userReq.email });
+
+  if (existingUser) {
+    res.status(302).json({ message: "Email is already in use" });
+  }else{
+    if(userReq.password){
+      if(userReq.password.length < 8){
+        res.status(400).json({ message: "Password must be at least 8 characters long" });
+      }else{
+        try {
+          const user = await UserModel.create({
+            name : userReq.name,
+            lastName : userReq.lastName,
+            email : userReq.email,
+            password: bcrypt.hashSync(userReq.password, salt),
+            phone : userReq.phone,
+          });
+          const token = jwt.sign(
+            { userId: user.id, email: user.email, role: user.role },
+            secret,
+            {
+              expiresIn: "1h",
+            }
+          );
+          await sendEmail(user.email, token);
+          res.status(201).json(user);
+        } catch (error) {
+          console.log(error);
+          res.status(400).json(error);
+        }
       }
-    );
-    await sendEmail(user.email, token);
-    res.status(201).json(user);
-  } catch (error) {
-    console.log(error);
-    res.status(400).json(error);
+    }else if(!userReq.password){
+      const newUser = new UserModel(req.body);
+      const savedUser = await newUser.save();
+      res.status(201).json(savedUser);
+    }
+  }
+};
+
+const businessRegister = async (req: Request, res: Response): Promise<void> => {
+  const salt = bcrypt.genSaltSync(10);
+  const secret = process.env.SECRET as string;
+  const userReq = req.body;
+  const existingUser = await BusinessModel.findOne({ email: userReq.email });
+
+  if (existingUser) {
+    res.status(302).json({ message: "Email is already in use" });
+  }else{
+    if(userReq.password){
+      if(userReq.password.length < 8){
+        res.status(400).json({ message: "Password must be at least 8 characters long" });
+      }else{
+        try {
+          const user = await BusinessModel.create({
+            businessName: userReq.businessName,
+            email : userReq.email,
+            password: bcrypt.hashSync(userReq.password, salt),
+            phone : userReq.phone,
+          });
+          const token = jwt.sign(
+            { userId: user.id, email: user.email, role: user.role },
+            secret,
+            {
+              expiresIn: "1h",
+            }
+          );
+          await sendEmail(user.email, token);
+          res.status(201).json(user);
+        } catch (error) {
+          console.log(error);
+          res.status(400).json(error);
+        }
+      }
+    }else if(!userReq.password){
+      const newUser = new BusinessModel(req.body);
+      const savedUser = await newUser.save();
+      res.status(201).json(savedUser);
+    }
   }
 };
 
@@ -92,36 +149,14 @@ const adminRegister = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const businessRegister = async (req: Request, res: Response): Promise<void> => {
-  const salt = bcrypt.genSaltSync(10);
-  const secret = process.env.SECRET as string;
-  const { businessName, email, password, phone, role } = req.body;
-  try {
-    const user = await BusinessModel.create({
-      businessName,
-      email,
-      password: bcrypt.hashSync(password, salt),
-      phone,
-      role,
-    });
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      secret,
-      {
-        expiresIn: "1h",
-      }
-    );
-    await sendEmail(user.email, token);
-    res.status(201).json(user);
-  } catch (error) {
-    console.log(error);
-    res.status(400).json(error);
-  }
-};
-
 const updateUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
   const updateData = req.body;
+  const salt = bcrypt.genSaltSync(10);
+  
+  if(updateData.password){
+    updateData.password = bcrypt.hashSync(updateData.password, salt);
+  }
 
   try {
     let updateResult;
@@ -177,15 +212,26 @@ const Login = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const isMatchedPassword = bcrypt.compareSync(password, userData.password);
-  if (isMatchedPassword) {
-    jwt.sign({ email, id: userData._id , role }, secret, {}, (err, token) => {
+  let cheackPassword: boolean = false
+  if(password){
+    const isMatchedPassword = bcrypt.compareSync(password, userData.password);
+    cheackPassword = isMatchedPassword
+  }
+  
+  if (cheackPassword) {
+    jwt.sign({ email, id: userData._id }, secret, {}, (err, token) => {
       if (err) throw err;
-      res.cookie("token", token);
+      res.cookie("token", token, { httpOnly: true });
       const { password, ...userWithOutPassword } = userData.toObject();
       res.status(200).json({ ...userWithOutPassword });
     });
-  } else {
+  } else if(!password){
+    jwt.sign({ email, id: userData._id }, secret, {}, (err, token) => {
+      if (err) throw err;
+      res.cookie("token", token, { httpOnly: true });
+      res.status(200).json(userData);
+    });
+  }else {
     res.status(400).json("Wrong credentials");
   }
 };
