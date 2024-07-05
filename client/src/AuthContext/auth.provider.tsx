@@ -10,9 +10,7 @@ import {
   GoogleAuthProvider, 
   signInWithPopup,
   UserCredential,
-  storage
 } from "../Firebase/firebase.config";
-import { ref , getDownloadURL } from 'firebase/storage';
 
 type SignUpForm1Data = {
   type: "form1";
@@ -103,23 +101,6 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (userInfo) {
       localStorage.setItem("user", JSON.stringify(userInfo));
-      const fetchImageUrl = async () => {
-        try {
-          const filePath = userInfo?.image
-          const storageRef = ref(storage, filePath);
-          const url = await getDownloadURL(storageRef);
-          setUserInfo((prevUserInfo) => {
-            if (prevUserInfo) {
-              return { ...prevUserInfo, image: url };
-            } else {
-              return null;
-            }
-          });
-        } catch (error) {
-          console.error('Error fetching image URL:', error);
-        }
-      };  
-      fetchImageUrl();
     }
   }, [userInfo]);
 

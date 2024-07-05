@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../AuthContext/auth.provider";
 import { useContext } from "react";
 import { BsCamera } from "react-icons/bs";
-import { ref, uploadBytesResumable, getDownloadURL , deleteObject } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '../Firebase/firebase.config';
 import Swal from "sweetalert2";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
@@ -18,14 +18,24 @@ const Drawer: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { userInfo, handleLogout } = authContext;
+  const { userInfo, handleLogout , setUserInfo } = authContext;
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       const pathImage = `imagesAvatar/${userInfo?._id}`;
+      handleUpload(selectedFile, pathImage);
+      let imageURL: string = ""
       try {
-        await apiUpdateImage(pathImage);
+        const filePath = pathImage
+        const storageRef = ref(storage, filePath);
+        const url = await getDownloadURL(storageRef);
+        imageURL = url
+      } catch (error) {
+        console.error('Error fetching image URL:', error);
+      }
+      try {
+        await apiUpdateImage(imageURL);
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -33,19 +43,6 @@ const Drawer: React.FC = () => {
           text: `${error}`,
         });
         return;
-      }
-  
-      const storageRef = ref(storage, pathImage);
-      if (userInfo?.image === pathImage) {
-        try {
-          await deleteObject(storageRef);
-          console.log('ลบรูปภาพเก่าสำเร็จ');
-          await handleUpload(selectedFile, pathImage);
-        } catch (error) {
-          console.error('เกิดข้อผิดพลาดในการลบรูปภาพเก่า:', error);
-        }
-      } else {
-        await handleUpload(selectedFile, pathImage);
       }
     }
   };
@@ -103,10 +100,10 @@ const Drawer: React.FC = () => {
     }
   };
   
-  const apiUpdateImage = async(pathImage: string) => {
+  const apiUpdateImage = async(imageURL: string) => {
     if(userInfo){
       const updateImage = {
-        image : pathImage,
+        image : imageURL,
         role : userInfo.role
       }
 
@@ -128,6 +125,7 @@ const Drawer: React.FC = () => {
       if (!response) {
         throw new Error(`Error: ${response}`);
       } else if (response) {
+        setUserInfo(response.data)
         Swal.fire({
           icon: "success",
           title: "Success",
