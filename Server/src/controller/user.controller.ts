@@ -259,7 +259,8 @@ const checkEmailExists = async(req: Request, res: Response): Promise<void> => {
 };
 
 const Logout = (req: Request, res: Response): void => {
-  res.cookie("token", "").json("ok");
+  res.clearCookie('token', { path: '/' });
+  res.status(200).json({ message: 'Successfully logged out' });
 };
 
 export {
