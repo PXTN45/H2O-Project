@@ -22,9 +22,9 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
   const backdropRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [otp, setOtp] = useState(new Array(6).fill(""));
-  const [activeOTPIndex, setActiveOTPIndex] = useState(0);
-  const [invalidCounter, setInvalidCounter] = useState(0);
-  const [counter, setCounter] = useState(60);
+  const [activeOTPIndex, setActiveOTPIndex] = useState<number>(0);
+  const [invalidCounter, setInvalidCounter] = useState<number>(0);
+  const [counter, setCounter] = useState<number>(60);
 
   const handleOnChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = target;

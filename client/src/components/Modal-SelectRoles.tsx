@@ -34,7 +34,7 @@ const ModalSelectRoles = ({ name } : {name : string}) => {
 
   const apiLogin = async(userData: loginData) => {
     try {
-      const response = await axiosPublic.post("/user/login", userData, { withCredentials: true });
+      const response = await axiosPublic.post("/user/login", userData);
       const data = response.data;   
         if(data.isVerified){
           setUserInfo(data);

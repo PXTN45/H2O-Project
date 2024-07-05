@@ -144,7 +144,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           }
           
           try {
-            const response = await axiosPublic.post("/user/login", userData, { withCredentials: true });
+            const response = await axiosPublic.post("/user/login", userData);
             const data = response.data;
   
             if (data.isVerified) {
@@ -242,7 +242,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           };
   
           try {
-            const response = await axiosPublic.post("/user/login", userData, { withCredentials: true });
+            const response = await axiosPublic.post("/user/login", userData);
             const data = response.data;
   
             if (data.isVerified) {

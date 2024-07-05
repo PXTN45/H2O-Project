@@ -9,7 +9,7 @@ type SnackbarProps = {
 };
 //ใช้ state ในการจัดการ Show and Close
 const Snackbar: React.FC<SnackbarProps> = ({ message, show, onClose }) => {
-  const [isVisible, setIsVisible] = useState(show);
+  const [isVisible, setIsVisible] = useState<boolean>(show);
 
   useEffect(() => {
     setIsVisible(show);

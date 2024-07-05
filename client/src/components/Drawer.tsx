@@ -3,8 +3,15 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../AuthContext/auth.provider";
 import { useContext } from "react";
 import { BsCamera } from "react-icons/bs";
+import { ref, uploadBytesResumable, getDownloadURL , deleteObject } from 'firebase/storage';
+import { storage } from '../Firebase/firebase.config';
+import Swal from "sweetalert2";
+import axiosPrivateUser from "../hook/axiosPrivateUser";
+import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
+import axiosPrivateAdmin from "../hook/axiosPrivateAdmin";
 
 const Drawer: React.FC = () => {
+
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
@@ -13,6 +20,123 @@ const Drawer: React.FC = () => {
 
   const { userInfo, handleLogout } = authContext;
 
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      const pathImage = `imagesAvatar/${userInfo?._id}`;
+      try {
+        await apiUpdateImage(pathImage);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "There was an error updating.",
+          text: `${error}`,
+        });
+        return;
+      }
+  
+      const storageRef = ref(storage, pathImage);
+      if (userInfo?.image === pathImage) {
+        try {
+          await deleteObject(storageRef);
+          console.log('ลบรูปภาพเก่าสำเร็จ');
+          await handleUpload(selectedFile, pathImage);
+        } catch (error) {
+          console.error('เกิดข้อผิดพลาดในการลบรูปภาพเก่า:', error);
+        }
+      } else {
+        await handleUpload(selectedFile, pathImage);
+      }
+    }
+  };
+  
+
+  const handleUpload = (file: File , pathImage:string) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function (event) {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = function () {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+  
+          const MAX_WIDTH = 500;
+          const MAX_HEIGHT = 500;
+          let width = img.width;
+          let height = img.height;
+  
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+  
+          canvas.width = width;
+          canvas.height = height;
+  
+          ctx?.drawImage(img, 0, 0, width, height);
+  
+          canvas.toBlob((blob) => {
+            if(blob){
+              const storageRef = ref(storage, pathImage);
+              const uploadTask = uploadBytesResumable(storageRef, blob);
+    
+              uploadTask.on('state_changed', () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                  console.log('File available at', downloadURL);
+                });
+              });
+            }
+          }, file.type);
+        };
+      };
+    }else{
+      return
+    }
+  };
+  
+  const apiUpdateImage = async(pathImage: string) => {
+    if(userInfo){
+      const updateImage = {
+        image : pathImage,
+        role : userInfo.role
+      }
+
+      const whatAxios = (() => {
+        switch (userInfo.role) {
+          case 'user':
+            return axiosPrivateUser;
+          case 'business':
+            return axiosPrivateBusiness;
+          case 'admin':
+            return axiosPrivateAdmin;
+          default:
+            throw new Error('Invalid user role');
+        }
+      })();
+
+      const response = await whatAxios.put(`/user/updateUser/${userInfo._id}` , updateImage)
+
+      if (!response) {
+        throw new Error(`Error: ${response}`);
+      } else if (response) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Avatar image change successful!",
+        });
+      }
+    }
+  } 
+  
   return (
     <div>
       <div className="md:w-1/4">
@@ -67,13 +191,11 @@ const Drawer: React.FC = () => {
                   >
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="flex flex-col items-center justify-center">
-                        <p>
-                          <BsCamera />
-                        </p>
+                        <p><BsCamera /></p>
                         <p>เปลี่ยนรูป</p>
                       </div>
                     </div>
-                    <input type="file" accept="image/*" className="hidden" />
+                    <input type="file" className="hidden" onChange={handleChange} />
                   </label>
                 </div>
               </div>

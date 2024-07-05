@@ -14,7 +14,7 @@ const EmailIsVerify = () => {
       throw new Error("AuthContext must be used within an AuthProvider");
     }
   
-    const { userInfo } = authContext;
+    const { userInfo , thisPage } = authContext;
 
     const[navigateOpen , setNavigateOpen] = useState<boolean>(false)
 
@@ -27,7 +27,8 @@ const EmailIsVerify = () => {
         }).then((result) => {
         if (result.isConfirmed) {
             setNavigateOpen(true);
-            {userInfo 
+            {
+                userInfo 
                 ? null
                 :(document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
             }
@@ -36,7 +37,7 @@ const EmailIsVerify = () => {
     }, []);
 
     if (!navigateOpen) {
-        if(!userInfo){
+        if(thisPage === "/"){
             return <Home />
         }else{
             return <Animetionload />

@@ -7,10 +7,12 @@ import axiosPublic from "../hook/axiosPublic";
 import bcrypt from 'bcryptjs';
 import {
   auth,
-  GoogleAuthProvider , 
+  GoogleAuthProvider, 
   signInWithPopup,
-  UserCredential
+  UserCredential,
+  storage
 } from "../Firebase/firebase.config";
+import { ref , getDownloadURL } from 'firebase/storage';
 
 type SignUpForm1Data = {
   type: "form1";
@@ -94,13 +96,30 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [showModalVerify, setShowModalVerify] = useState<boolean>(false);
   const [showModalOTP, setShowModalOTP] = useState<boolean>(false);
   const [userInfo, setUserInfo] = useState<User | null>(() => {
-  const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
   useEffect(() => {
     if (userInfo) {
       localStorage.setItem("user", JSON.stringify(userInfo));
+      const fetchImageUrl = async () => {
+        try {
+          const filePath = userInfo?.image
+          const storageRef = ref(storage, filePath);
+          const url = await getDownloadURL(storageRef);
+          setUserInfo((prevUserInfo) => {
+            if (prevUserInfo) {
+              return { ...prevUserInfo, image: url };
+            } else {
+              return null;
+            }
+          });
+        } catch (error) {
+          console.error('Error fetching image URL:', error);
+        }
+      };  
+      fetchImageUrl();
     }
   }, [userInfo]);
 
@@ -317,7 +336,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         }
         if(isPasswordValid){
           try {
-            const response = await axiosPublic.post("/user/login", userData, { withCredentials: true });
+            const response = await axiosPublic.post("/user/login", userData);
             const data = response.data;   
               if(data.isVerified){
                 setUserInfo(data);
