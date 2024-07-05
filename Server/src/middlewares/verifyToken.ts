@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 const verifyToken = async (req: Request, res: Response) => {
   const { token } = req.query;
   const secret = process.env.SECRET as string;
+  const client = process.env.CLIENT_URL as string;
   try {
     const decode: any = jwt.verify(token as string, secret);
     const role = decode.role;
@@ -26,10 +27,10 @@ const verifyToken = async (req: Request, res: Response) => {
     }
 
     verify.isVerified = true;
-    const saveverify = await verify.save();
-    res.redirect("http://localhost:5173/verifySuccess");
-  } catch(error) {
-    res.status(500).send(error);
+    await verify.save();
+    res.redirect(`${client}/verifySuccess/${token}`);
+  } catch {
+    res.errored;
   }
 };
 
