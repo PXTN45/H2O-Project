@@ -1,37 +1,25 @@
-import BusinessModel from "../model/business.model";
-import UserModel from "../model/user.model";
-import AdminModel from "../model/admin.model ";
-import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
+import jwt, { VerifyErrors } from "jsonwebtoken";
 
-const verifyToken = async (req: Request, res: Response) => {
-  const { token } = req.query;
+const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
+  const token = req.cookies.token;
+  console.log(token);
   const secret = process.env.SECRET as string;
-  const client = process.env.CLIENT_URL as string;
-  try {
-    const decode: any = jwt.verify(token as string, secret);
-    const role = decode.role;
-    let verify;
-    if (decode.role === "user") {
-      const user = await UserModel.findById(decode.userId);
-      verify = user;
-    } else if (decode.role === "business") {
-      const business = await BusinessModel.findById(decode.userId);
-      verify = business;
-    } else if (decode.role === "admin") {
-      const admin = await AdminModel.findById(decode.userId);
-      verify = admin;
-    }
-    if (!verify) {
-      res.status(400).json(decode);
-    }
 
-    verify.isVerified = true;
-    await verify.save();
-    res.redirect(`${client}/verifySuccess/${token}`);
-  } catch {
-    res.errored;
+  if (!token) {
+    res.status(401).json("No token provided");
+    return;
   }
+
+  jwt.verify(token, secret, (err: VerifyErrors | null, decoded: any) => {
+    if (err) {
+      console.error("Error verifying token:", err);
+      res.status(401).json("Unauthorized");
+    } else {
+      res.status(200).json("Verify success");
+      next();
+    }
+  });
 };
 
 export default verifyToken;
