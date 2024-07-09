@@ -9,19 +9,19 @@ import {
   getAllBusiness,
   getAllAdmin,
   updateUser,
-  checkEmailExists
+  checkEmailExists,
 } from "../controller/user.controller";
 import verifyEmailToken from "../middlewares/verifyEmailToken";
-import verifyToken from "../middlewares/verifyToken";
+import { verifyToken } from "../middlewares/verifyToken";
+import verifyUser from "../middlewares/verifyUser";
 
 const router = Router();
 
-router.get("/userData", getAllUser);
+router.get("/userData", verifyToken, verifyUser, getAllUser);
 
 router.get("/businessData", getAllBusiness);
 
 router.get("/adminData", getAllAdmin);
-
 
 router.post("/userRegister", userRegister);
 
@@ -31,10 +31,7 @@ router.post("/adminRegister", adminRegister);
 
 router.post("/checkEmailExists", checkEmailExists);
 
-
-router.put("/updateUser/:id",verifyToken, updateUser);
-
-
+router.put("/updateUser/:id", verifyToken, updateUser);
 
 router.post("/login", Login);
 

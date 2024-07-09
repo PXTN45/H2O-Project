@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { VerifyErrors } from "jsonwebtoken";
 
-const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
+interface CustomRequest extends Request {
+  decoded?: any; // or type according to your decoded object structure
+}
+
+const verifyToken = (req: CustomRequest, res: Response, next: NextFunction): void => {
   const token = req.cookies.token;
-  console.log(token);
   const secret = process.env.SECRET as string;
 
   if (!token) {
@@ -16,10 +19,11 @@ const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
       console.error("Error verifying token:", err);
       res.status(401).json("Unauthorized");
     } else {
-      res.status(200).json("Verify success");
+      req.decoded = decoded;
+      // console.log(req.decoded);
       next();
     }
   });
 };
 
-export default verifyToken;
+export { verifyToken, CustomRequest };

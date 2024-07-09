@@ -99,16 +99,6 @@ app.get("/", (req: Request, res: Response) => {
   res.send("<h1> Welcome to H2O Project</h1>");
 });
 
-app.get("/jwt", async (req: Request, res: Response) => {
-  const user = req.body;
-  console.log(user);
-  
-  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET as string, {
-    expiresIn: "1h",
-  });
-  res.send({ token });
-});
-
 // Server setup
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
