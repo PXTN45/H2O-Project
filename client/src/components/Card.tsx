@@ -1,12 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 interface Image {
   image_upload: string;
 }
 
 interface Item {
-  id: string;
+  _id: string;
   image: Image[];
   name_package?: string;
   name_homestay?: string;
@@ -20,6 +19,10 @@ interface CardProps {
   item: Item;
 }
 
+const seeDetail = (id : string) => {
+  console.log(id);
+}
+
 const Card: React.FC<CardProps> = ({ item }) => {
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
@@ -27,25 +30,18 @@ const Card: React.FC<CardProps> = ({ item }) => {
   };
 
   return (
-    <div className="max-w-sm rounded overflow-hidden shadow-lg relative w-[16.5rem] mx-6 my-6 h-[25rem]">
+    <div className="max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300" onClick={() => seeDetail(item._id)}>
       <img
         src={item.image[0].image_upload}
         alt="images to cards"
-        className="hover:scale-105 transform transition duration-300 w-full h-[15rem] object-cover"
+        className="w-full h-[15rem] object-cover"
       />
       <div className="px-6 py-4">
         <div className="font-bold text-xl mb-2">{truncateText(item.name_package || item.name_homestay || "", 20)}</div>
-        <p className="text-gray-700 text-base">{truncateText(item.detail_package || item.detail_homestay || "", 20)}</p>
+        <p className="text-base">{truncateText(item.detail_package || item.detail_homestay || "", 20)}</p>
       </div>
-      <div className="px-6 py- flex justify-between items-center absolute bottom-0 w-full">
-        <div className="text-sm font-semibold text-gray-700">
-          {item.price_package || item.price_homestay} <span className="text-red-500">฿</span>
-        </div>
-        <Link to={`/details/${item.id}`}>
-          <button className="rounded-[0.5rem] my-4 w-full h-10 relative overflow-hidden py-2 px-4 focus:outline-none bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg">
-            ดูรายละเอียด
-          </button>
-        </Link>
+      <div className="text-lg font-semibold absolute bottom-5 right-0 mx-5">
+        <span className="mx-2">฿</span>{item.price_package || item.price_homestay} 
       </div>
     </div>
   );

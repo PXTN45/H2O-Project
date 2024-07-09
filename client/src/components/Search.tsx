@@ -88,7 +88,7 @@ const Search: React.FC = () => {
   return (
     <div className="mx-auto">
       {isPackage === false && (
-        <div className="relative bg-white bg-opacity-50 p-6 rounded-[20px] w-[full] h-full flex flex-col items-center justify-center shadow-lg">
+        <div className="relative bg-white bg-opacity-50 p-6 rounded-[20px] w-full h-full flex flex-col items-center justify-center shadow-lg">
         <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
           <button
             className="bg-gradient-to-r from-primaryUser to-primaryBusiness text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
@@ -115,7 +115,7 @@ const Search: React.FC = () => {
           </button>
         </div>
         <div className="flex flex-col items-center justify-center mt-4 sm:flex-row sm:justify-between w-full">
-          <div className="relative w-full sm:w-[20rem] mb-5">
+          <div className="relative w-full mb-5">
             <button
               className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 sm:mr-2 w-full h-[5rem]"
               onClick={togglePeopleMenu}
@@ -246,7 +246,7 @@ const Search: React.FC = () => {
             </button>
           </div>
           <div className="flex flex-col items-center justify-center mt-4 sm:flex-row sm:justify-between w-full">
-            <div className="relative w-full sm:w-[20rem] mb-5">
+            <div className="relative w-full mb-5">
               <button
                 className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 sm:mr-2 w-full h-[5rem]"
                 onClick={togglePeopleMenu}

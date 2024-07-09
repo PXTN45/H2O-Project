@@ -44,7 +44,7 @@ const Filterpackage: React.FC = () => {
 
   return (
     <div className="container mx-auto mt-12">
-      <h1 className="text-2xl font-bold mb-4">Homestays Recommend</h1>
+      <h1 className="text-2xl font-bold mb-4 my-[2rem] mx-[1.75rem]">Homestays Recommend</h1>
       <div className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
         <button
           onClick={() => filterByType("")}
@@ -87,13 +87,11 @@ const Filterpackage: React.FC = () => {
           วิลล่า
         </button>
       </div>
-      <div
-        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 ${
-          filteredData.length > 5 ? "md:flex md:flex-wrap" : ""
-        }`}
-      >
-        {filteredData.slice(0, 5).map((item, index) => (
-          <Card key={index} item={item} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filteredData.slice(0, 4).map((item, index) => (
+          <div key={index} className="w-full">
+            <Card item={item} />
+          </div>
         ))}
       </div>
     </div>

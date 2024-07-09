@@ -4,6 +4,7 @@ import Search from "./Search";
 import { AuthContext } from "../AuthContext/auth.provider";
 import Modal from "./Get-Stared";
 import ModalSelectRoles from "./Modal-SelectRoles";
+import { BsPersonWalking } from "react-icons/bs";
 
 const Navbar: React.FC = () => {
   const authContext = useContext(AuthContext);
@@ -60,12 +61,8 @@ const Navbar: React.FC = () => {
               to="/"
               className="flex items-center space-x-3 rtl:space-x-reverse text-xl"
             >
-              <img
-                src="https://i.imgur.com/yF7nGI7.png"
-                className="h-10"
-                alt="H2O"
-              />
-              <span className="self-center font-bold whitespace-nowrap dark:text-black">
+              <BsPersonWalking className="h-8 w-10" />
+              <span className="self-center font-bold whitespace-nowrap">
                 H2O
               </span>
             </Link>
