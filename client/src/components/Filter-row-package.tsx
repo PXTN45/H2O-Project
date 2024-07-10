@@ -6,7 +6,7 @@ interface Image {
 }
 
 interface Item {
-  id: string;
+  _id: string;
   image: Image[];
   name_package?: string;
   detail_package?: string;
@@ -40,15 +40,15 @@ const Filterpackage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto mt-20">
+    <div className="container mx-auto my-20">
       <h1 className="text-2xl font-bold mb-4 my-[2rem] mx-[1.75rem]">Packages Recommend</h1>
       <div className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
         <button
           onClick={() => filterByType("")}
           className={
             isType === ""
-              ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg"
+              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+              : "btn border bg-white border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
           }
         >
           ทั้งหมด
@@ -57,8 +57,8 @@ const Filterpackage: React.FC = () => {
           onClick={() => filterByType("การท่องเที่ยวธรรมชาติ")}
           className={
             isType === "การท่องเที่ยวธรรมชาติ"
-              ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg"
+              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+              : "btn border bg-white border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
           }
         >
           ธรรมชาติ
@@ -67,8 +67,8 @@ const Filterpackage: React.FC = () => {
           onClick={() => filterByType("การท่องเที่ยวทางน้ำ")}
           className={
             isType === "การท่องเที่ยวทางน้ำ"
-              ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg"
+              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+              : "btn border bg-white border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
           }
         >
           ทางน้ำ
@@ -77,8 +77,8 @@ const Filterpackage: React.FC = () => {
           onClick={() => filterByType("การท่องเที่ยวเชิงวัฒนธรรม")}
           className={
             isType === "การท่องเที่ยวเชิงวัฒนธรรม"
-              ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg"
+              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+              : "btn border bg-white border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
           }
         >
           เชิงวัฒนธรรม

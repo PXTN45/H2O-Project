@@ -60,8 +60,14 @@ interface UserRegister {
 interface AuthContextType {
   thisPage: string;
   setThisPage: React.Dispatch<React.SetStateAction<string>>;
+  thisSunOrMoon: string;
+  setThisSunOrMoon: React.Dispatch<React.SetStateAction<string>>;
+  isDarkMode: boolean;
+  setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
   reload: boolean;
   setReload: React.Dispatch<React.SetStateAction<boolean>>;
+  loadPage: boolean;
+  setLoadPage: React.Dispatch<React.SetStateAction<boolean>>;
   isOTPVarify: boolean;
   setIsOTPVarify: React.Dispatch<React.SetStateAction<boolean>>;
   userInfo: User | null;
@@ -85,6 +91,12 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [thisPage, setThisPage] = useState<string>("");
+  const [thisSunOrMoon, setThisSunOrMoon] = useState<string>("Sun");
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const storedDarkMode = localStorage.getItem("isDarkMode");
+    return storedDarkMode ? JSON.parse(storedDarkMode) : false;
+  });
+  const [loadPage, setLoadPage] = useState<boolean>(false);
   const [whatUser, setWhatUser] = useState<User[]>([]);
   const [messageOTP, setMessageOTP] = useState<ConfirmationResult | undefined>(undefined);
   const [dataRegister, setDataRegister] = useState<UserRegister | null>(null);
@@ -103,6 +115,17 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(userInfo));
     }
   }, [userInfo]);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add("dark");
+      setThisSunOrMoon("Moon");
+    } else {
+      document.body.classList.remove("dark");
+      setThisSunOrMoon("Sun");
+    }
+    localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode));
+  }, [isDarkMode, setThisSunOrMoon]);
 
   const handleSignUp = async (formData: SignUpFormData) => {
     try {
@@ -552,6 +575,12 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     isOTPVarify,
     setIsOTPVarify,
     signUpWithGoogle,
+    loadPage,
+    setLoadPage,
+    thisSunOrMoon,
+    setThisSunOrMoon,
+    isDarkMode,
+    setIsDarkMode,
   };
 
   return (

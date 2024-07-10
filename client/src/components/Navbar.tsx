@@ -6,7 +6,11 @@ import Modal from "./Get-Stared";
 import ModalSelectRoles from "./Modal-SelectRoles";
 import { BsPersonWalking } from "react-icons/bs";
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  image: string;
+}
+
+const Navbar: React.FC<NavbarProps> = ({image}) => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error('AuthContext must be used within an AuthProvider');
@@ -28,14 +32,14 @@ const Navbar: React.FC = () => {
       <nav
         className={
           thisPage === "/"
-            ? "bg-white border-gray-200 dark:bg-gray-900 relative"
+            ? "bg-white w-full relative"
             : userInfo && userInfo.role === "user"
-            ? "bg-gradient-to-r from-primaryUser to-secondUser border-gray-200 dark:bg-gray-900 relative"
+            ? "bg-gradient-to-r from-primaryUser to-secondUser w-full relative"
             : userInfo && userInfo.role === "business"
-            ? "bg-gradient-to-r from-primaryBusiness to-secondBusiness border-gray-200 dark:bg-gray-900 relative"
+            ? "bg-gradient-to-r from-primaryBusiness to-secondBusiness w-full relative"
             : userInfo && userInfo.role === "admin"
-            ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin border-gray-200 dark:bg-gray-900 relative"
-            : "bg-gradient-to-r from-dark to-smoke border-gray-200 dark:bg-gray-900 relative"
+            ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin w-full relative"
+            : "bg-gradient-to-r from-dark to-smoke w-full relative"
         }
       >
         <div
@@ -47,9 +51,10 @@ const Navbar: React.FC = () => {
           style={
             !userInfo || (userInfo && thisPage === "/")
               ? {
-                  backgroundImage: 'url("https://i.imgur.com/cMKQjfM.jpg")',
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
+                backgroundImage: `url(${image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
                 }
               : {}
           }
@@ -116,9 +121,9 @@ const Navbar: React.FC = () => {
                     {isOpen && (
                       <div
                         id="userDropdown"
-                        className="z-10 absolute right-7 mt-2 bg-white divide-y divide-gray-100 rounded-[1.25rem] rounded-tr-[0rem] shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
+                        className="z-10 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44"
                       >
-                        <div className="px-4 py-3 text-sm text-gray-900">
+                        <div className="px-4 py-3 text-sm">
                           <div>
                             {userInfo.role === "user" || userInfo.role === "admin"
                               ? `${userInfo.name} ${userInfo.lastName}`

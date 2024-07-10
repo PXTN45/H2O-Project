@@ -6,7 +6,7 @@ interface Image {
 }
 
 interface Item {
-  id: string;
+  _id: string;
   image: Image[];
   name_package?: string;
   name_homestay?: string;
@@ -50,8 +50,8 @@ const Filterpackage: React.FC = () => {
           onClick={() => filterByType("")}
           className={
             isType === ""
-              ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg"
+              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+              : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
           }
         >
           ทั้งหมด
@@ -60,8 +60,8 @@ const Filterpackage: React.FC = () => {
           onClick={() => filterByType("บ้านเดี่ยว")}
           className={
             isType === "บ้านเดี่ยว"
-              ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg"
+              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+              : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
           }
         >
           ธรรมชาติ
@@ -70,8 +70,8 @@ const Filterpackage: React.FC = () => {
           onClick={() => filterByType("โฮมสเตย์")}
           className={
             isType === "โฮมสเตย์"
-              ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg"
+              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+              : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
           }
         >
           ทางน้ำ
@@ -80,8 +80,8 @@ const Filterpackage: React.FC = () => {
           onClick={() => filterByType("วิลล่า")}
           className={
             isType === "วิลล่า"
-              ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg"
+              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+              : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
           }
         >
           วิลล่า

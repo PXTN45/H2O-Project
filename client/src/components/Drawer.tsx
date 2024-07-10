@@ -201,12 +201,12 @@ const Drawer: React.FC = () => {
                 <button
                   className={
                     userInfo?.role === "user"
-                      ? "btn btn-sm rounded-full bg-white text-dark hover:bg-gradient-to-r from-primaryUser to-secondUser"
+                      ? "btn btn-sm rounded-full btn-text hover:bg-gradient-to-r from-primaryUser to-secondUser hover:text-white"
                       : userInfo?.role === "business"
-                      ? "btn btn-sm rounded-full bg-white text-dark hover:bg-gradient-to-r from-primaryBusiness to-secondBusiness"
+                      ? "btn btn-sm rounded-full btn-text hover:bg-gradient-to-r from-primaryBusiness to-secondBusiness hover:text-white"
                       : userInfo?.role === "admin"
-                      ? "btn btn-sm rounded-full bg-white text-dark hover:bg-gradient-to-r from-primaryAdmin to-secondAdmin"
-                      : "btn btn-sm rounded-full bg-white text-dark hover:bg-gradient-to-r from-dark to-smoke"
+                      ? "btn btn-sm rounded-full btn-text hover:bg-gradient-to-r from-primaryAdmin to-secondAdmin hover:text-white"
+                      : "btn btn-sm rounded-full btn-text hover:bg-gradient-to-r from-dark to-smoke hover:text-white"
                   }
                 >
                   {userInfo?.role === "user" || userInfo?.role === "admin"
@@ -217,6 +217,7 @@ const Drawer: React.FC = () => {
                 </button>
               </div>
               {/* Sidebar content here */}
+              <div className="text-darkmode">
               {userInfo?.role === "user" ? (
                 <div>
                   <Link to={"/dashboard-user/ProfileUser"}>
@@ -272,7 +273,7 @@ const Drawer: React.FC = () => {
                   </Link>
                 </div>
               ): null}
-              <hr className="h-px my-4 bg-white border-0 dark:bg-gray-300"></hr>
+              <hr className="h-px my-4 line-darkmode border-0"></hr>
               {userInfo?.role === "user" ? (
                 <div>
                   <Link to={"#"}>
@@ -293,6 +294,7 @@ const Drawer: React.FC = () => {
               <li onClick={handleLogout}>
                 <a>Log out</a>
               </li>
+              </div>
             </ul>
           </div>
         </div>

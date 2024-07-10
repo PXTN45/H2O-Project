@@ -177,7 +177,7 @@ const ModalSelectRoles = ({ name } : {name : string}) => {
         {customerUser ? (
           <>
             <button
-              className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none bg-white border border-primaryUser text-primaryUser hover:bg-gradient-to-r from-primaryUser to-secondUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 text-[30px]"
+              className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none border border-primaryUser text-primaryUser hover:bg-gradient-to-r from-primaryUser to-secondUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 text-[30px]"
               onClick={clickUser}
             >
               <span className="relative z-10 flex items-center justify-start w-full h-full">
@@ -192,7 +192,7 @@ const ModalSelectRoles = ({ name } : {name : string}) => {
         {businessUser ? (
           <>
             <button
-            className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none bg-white border border-primaryBusiness text-primaryBusiness hover:bg-gradient-to-r from-primaryBusiness to-secondBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-[1rem] text-[36px]"
+            className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryBusiness hover:bg-gradient-to-r from-primaryBusiness to-secondBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-[1rem] text-[36px]"
             onClick={clickBusiness}
             >
               <span className="relative z-10 flex items-center justify-center w-full h-full">
@@ -207,7 +207,7 @@ const ModalSelectRoles = ({ name } : {name : string}) => {
         {adminUser ?(
           <>
             <button
-            className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none bg-white border border-primaryAdmin text-primaryAdmin hover:bg-gradient-to-r from-primaryAdmin to-secondAdmin hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-[1rem] text-[36px]"
+            className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none border border-primaryAdmin text-primaryAdmin hover:bg-gradient-to-r from-primaryAdmin to-secondAdmin hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-[1rem] text-[36px]"
             onClick={clickAdmin}
             >
               <span className="relative z-10 flex items-center justify-center w-full h-full">

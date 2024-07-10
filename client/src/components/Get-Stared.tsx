@@ -872,14 +872,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                 <button
                   className={
                     activePage === "login"
-                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none bg-white border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                       : activePage === "signup-user" && userInfo?.role !== "admin"
-                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none bg-white border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                       : activePage === "signup-business"
-                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none bg-white border border-primaryBusiness text-primaryBusiness hover:bg-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryBusiness hover:bg-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                       : activePage === "signup-user" && userInfo?.role === "admin"
-                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none bg-white border border-primaryAdmin text-primaryAdmin hover:bg-primaryAdmin hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
-                      : "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none bg-white border border-dark text-dark hover:bg-dark hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryAdmin text-primaryAdmin hover:bg-primaryAdmin hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                      : "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-dark text-dark hover:bg-dark hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                   }  
                   onClick={GoogleSignUpOrSignIn}
                 >
@@ -895,8 +895,8 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
             <button
               className={
                 activePage === "signup-user"
-                  ? "rounded-[0.5rem] w-full h-12 relative overflow-hidden focus:outline-none bg-white border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-4"
-                  : "rounded-[0.5rem] w-full h-12 relative overflow-hidden focus:outline-none bg-white border border-primaryBusiness text-primaryBusiness hover:bg-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-4"
+                  ? "rounded-[0.5rem] w-full h-12 relative overflow-hidden focus:outline-none border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-4"
+                  : "rounded-[0.5rem] w-full h-12 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryBusiness hover:bg-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-4"
               }
               onClick={() =>
                 toggleForm(

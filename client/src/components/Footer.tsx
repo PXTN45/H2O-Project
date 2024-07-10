@@ -8,10 +8,9 @@ const Footer = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { userInfo, thisPage } = authContext;
+  const { userInfo, thisPage , isDarkMode , setIsDarkMode } = authContext;
 
   const [isFooterVisible, setIsFooterVisible] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,20 +30,12 @@ const Footer = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.body.classList.add("dark");
-    } else {
-      document.body.classList.remove("dark");
-    }
-  }, [isDarkMode]);
-
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
 
   return (
-    <div className={`mt-[10rem] relative w-full h-full ${isDarkMode ? "dark" : ""}`}>
+    <div className={`relative w-full h-full ${isDarkMode ? "dark" : ""}`}>
       <div
         className={`fixed 
           ${isDarkMode ? "text-white" : "text-black"
