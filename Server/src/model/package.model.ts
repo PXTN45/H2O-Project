@@ -52,7 +52,7 @@ const PackageSchema: Schema = new Schema({
       },
     ],
   },
-  image_upload: {
+  image: {
     type: [
       {
         image_upload: {
