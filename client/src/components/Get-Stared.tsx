@@ -4,11 +4,16 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { AuthContext , User } from "../AuthContext/auth.provider";
 import { FaPhone } from "react-icons/fa";
 import { BsExclamationTriangle } from "react-icons/bs";
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import axiosPublic from "../hook/axiosPublic";
 import Swal from "sweetalert2";
 
 interface ModalProps {
   name: string;
+}
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  WebkitTextSecurity?: string;
 }
 
 interface FormValues {
@@ -47,7 +52,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
   const { handleLogin, handleSignUp, handleForgot , userInfo , signUpWithGoogle , setUserInfo } = authContext;
 
   const [activePage, setActivePage] = useState<"login" | "signup-user" | "signup-business">("login");
-
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   useEffect(() => {
     if ((activePage === "login" || activePage === "signup-user" || activePage === "signup-business") && userInfo?.role === "admin") {
@@ -105,8 +110,6 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
     }
   };
 
-
-  
   const GoogleSignUp = async (role: string) => {
     try {
       const result = await signUpWithGoogle();
@@ -313,6 +316,10 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
     }   
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const toggleForm = (page: "login" | "signup-user" | "signup-business") => {
     reset();
     setActivePage(page);
@@ -426,7 +433,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                       </div>
                   )}
                 </label>
-                <input
+                {/* <input
                   type="password"
                   placeholder="password"
                   className="input input-bordered"
@@ -442,7 +449,38 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                         "The password format is incorrect.",
                     },
                   })}
-                />
+                /> */}
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder="password"
+                    className="input input-bordered w-full pr-10"
+                    style={{
+                      WebkitTextSecurity: showPassword ? 'none' : 'disc',
+                    }as InputProps}
+                    {...register('password', {
+                      required: 'Please enter a password',
+                      minLength: {
+                        value: 8,
+                        message: 'Password must be at least 8 characters',
+                      },
+                      pattern: {
+                        value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
+                        message: 'The password format is incorrect.',
+                      },
+                    })}
+                  />
+                  <div
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? (
+                      <AiFillEyeInvisible className="text-black" />
+                    ) : (
+                      <AiFillEye className="text-black" />
+                    )}
+                  </div>
+                </div>
               </div>
             </>
           ) : activePage === "signup-user" ? (
