@@ -69,7 +69,6 @@ const BusinessSchema = new Schema<Business>({
   password: {
     type: String,
     minlength: 8,
-    required: true,
   },
   businessName: {
     type: String,
@@ -89,9 +88,6 @@ const BusinessSchema = new Schema<Business>({
   },
   phone: {
     type: String,
-    minlength: 12,
-    maxlength: 12,
-    required: true,
     trim: true,
   },
   image: {

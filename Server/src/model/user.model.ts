@@ -63,7 +63,6 @@ const UserSchema = new Schema<User>({
   password: {
     type: String,
     minlength: 8,
-    required: true
   },
   name: {
     type: String,
@@ -79,9 +78,6 @@ const UserSchema = new Schema<User>({
   },
   phone: {
     type: String,
-    minlength: 12,
-    maxlength: 12,
-    required: true,
     trim: true
   },
   image: {

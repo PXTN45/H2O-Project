@@ -17,7 +17,7 @@ import verifyUser from "../middlewares/verifyUser";
 
 const router = Router();
 
-router.get("/userData", verifyToken, verifyUser, getAllUser);
+router.get("/userData", getAllUser);
 
 router.get("/businessData", getAllBusiness);
 
@@ -31,7 +31,7 @@ router.post("/adminRegister", adminRegister);
 
 router.post("/checkEmailExists", checkEmailExists);
 
-router.put("/updateUser/:id", verifyToken, updateUser);
+router.put("/updateUser/:id", updateUser);
 
 router.post("/login", Login);
 
