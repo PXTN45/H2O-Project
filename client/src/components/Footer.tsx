@@ -45,7 +45,9 @@ const Footer = () => {
           right-5 z-10 transition-all`
         } 
       >
-        <label className="swap swap-rotate bg-primaryUser rounded-full w-14 h-14">
+        <label className={isDarkMode ? "swap swap-rotate bg-gradient-to-r from-primaryBusiness to-secondBusiness rounded-full w-14 h-14" 
+          :"swap swap-rotate bg-gradient-to-r from-primaryUser to-secondUser rounded-full w-14 h-14" 
+        }>
           <input type="checkbox" className="theme-controller" checked={isDarkMode} onChange={toggleTheme} />
           {/* sun icon */}
           <svg

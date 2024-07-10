@@ -43,6 +43,11 @@ body {
   color: white;
 }
 
+.text-darkmode-oneColor {
+  color: black;
+}
+
+
 .line-darkmode {
   background-color: white;
 }
@@ -89,6 +94,10 @@ body.dark {
 }
 
 body.dark .text-darkmode {
+  color: black;
+}
+
+body.dark .text-darkmode-oneColor {
   color: black;
 }
 
