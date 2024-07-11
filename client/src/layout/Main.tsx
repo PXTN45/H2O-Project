@@ -1,25 +1,25 @@
-import React, { useContext, useEffect , useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { AuthContext } from "../AuthContext/auth.provider";
 import Animetionload from "../assets/loadingAPI/loaddingTravel";
-import { ref , getDownloadURL } from 'firebase/storage';
-import { storage } from '../Firebase/firebase.config';
+import { ref, getDownloadURL } from "firebase/storage";
+import { storage } from "../Firebase/firebase.config";
 import Footer from "../components/Footer";
-
 
 const Main: React.FC = () => {
   const location = useLocation();
 
   const authContext = useContext(AuthContext);
+
   if (!authContext) {
-    throw new Error('AuthContext must be used within an AuthProvider');
+    throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { thisPage , setThisPage , loadPage , setLoadPage , thisSunOrMoon} = authContext;
+  const { thisPage, setThisPage, loadPage, setLoadPage, thisSunOrMoon } =
+    authContext;
 
   const [isImage, setIsImage] = useState<string>("");
-
 
   useEffect(() => {
     setThisPage(location.pathname);
@@ -28,27 +28,27 @@ const Main: React.FC = () => {
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const pathImage = `Homepage/${thisSunOrMoon}.jpg`; 
+        const pathImage = `Homepage/${thisSunOrMoon}.jpg`;
         const filePath = pathImage;
         const storageRef = ref(storage, filePath);
         const url = await getDownloadURL(storageRef);
-        if(url){
+        if (url) {
           setIsImage(url);
-          setLoadPage(true)
+          setLoadPage(true);
         }
       } catch (error) {
         console.error("Error fetching image:", error);
       }
     };
 
-    if(thisPage === "/"){
-      setLoadPage(false)
+    if (thisPage === "/") {
+      setLoadPage(false);
       fetchImage();
-    }else{
-      setLoadPage(true)
-      return
+    } else {
+      setLoadPage(true);
+      return;
     }
-  }, [thisSunOrMoon , setLoadPage , thisPage]);
+  }, [thisSunOrMoon, setLoadPage, thisPage]);
 
   return (
     <div>
@@ -62,9 +62,7 @@ const Main: React.FC = () => {
         <>
           <Animetionload />
         </>
-      )
-      }
-
+      )}
     </div>
   );
 };

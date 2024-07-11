@@ -1,6 +1,6 @@
 // Snackbar.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 type SnackbarProps = {
   message: string;
@@ -33,7 +33,7 @@ const Snackbar: React.FC<SnackbarProps> = ({ message, show, onClose }) => {
   return (
     <div
       className={`flex items-center justify-center bg-primaryAdmin text-dark px-4 py-2 rounded-md transition-opacity ${
-        isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >
       <p>{message}</p>

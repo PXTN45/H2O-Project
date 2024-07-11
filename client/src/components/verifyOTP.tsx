@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { verifyOTP } from "../Firebase/OTP";
-import { UserRegister , User } from "../AuthContext/auth.provider"
+import { AuthContext } from "../AuthContext/auth.provider";
+import { UserRegister, User } from "../AuthContext/auth.provider";
 import { ConfirmationResult } from "../Firebase/OTP";
 import { MdSecurity } from "react-icons/md";
 import Swal from "sweetalert2";
@@ -15,9 +16,16 @@ interface ModalProps {
   changPassword: User | null;
 }
 
-
 let currentOTPIndex: number = 0;
-const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalidOTP,dataRegister,setMessageOTPUndify,changPassword}) => {
+const VerifyModal: React.FC<ModalProps> = ({
+  showModal,
+  onClose,
+  messageOTP,
+  invalidOTP,
+  dataRegister,
+  setMessageOTPUndify,
+  changPassword,
+}) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,6 +33,14 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
   const [activeOTPIndex, setActiveOTPIndex] = useState<number>(0);
   const [invalidCounter, setInvalidCounter] = useState<number>(0);
   const [counter, setCounter] = useState<number>(60);
+
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+
+  const { setLoadPage } = authContext;
 
   const handleOnChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = target;
@@ -58,18 +74,20 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
   };
 
   const invalidCounterUser = () => {
-    if(invalidCounter <= 1){
+    if (invalidCounter <= 1) {
       invalidOTP();
-      setInvalidCounter((prevCounter) => prevCounter + 1)
-    }else{
-      setInvalidCounter(0)
+      setInvalidCounter((prevCounter) => prevCounter + 1);
+    } else {
+      setInvalidCounter(0);
       handleModalClose();
       Swal.fire({
         icon: "error",
         title: "Error",
         text: "You entered the wrong OTP and exceeded the limit.",
       }).then(() => {
-        (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+        (
+          document.getElementById("Get-Started") as HTMLDialogElement
+        )?.showModal();
       });
     }
   };
@@ -89,7 +107,17 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
     const verifyAndProcessOTP = async () => {
       if (fullOTP.length === 6 && messageOTP) {
         try {
-          await verifyOTP(messageOTP, fullOTP , invalidCounterUser , formatOTP , dataRegister , handleModalClose , changPassword);
+          setLoadPage(false);
+          await verifyOTP(
+            messageOTP,
+            fullOTP,
+            invalidCounterUser,
+            formatOTP,
+            dataRegister,
+            handleModalClose,
+            changPassword
+          );
+          setLoadPage(true);
         } catch (error) {
           console.error("Error verifying OTP:", error);
         }
@@ -97,7 +125,7 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
     };
 
     verifyAndProcessOTP();
-  }, [activeOTPIndex, showModal , messageOTP , invalidCounter]);
+  }, [activeOTPIndex, showModal, messageOTP, invalidCounter]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -108,12 +136,12 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
     } else if (counter === 0) {
       handleModalClose();
       Swal.fire({
-        icon: 'warning',
-        title: 'Time expired for OTP input',
-        text: 'Please try again',
+        icon: "warning",
+        title: "Time expired for OTP input",
+        text: "Please try again",
         timer: 3000,
-        timerProgressBar: true, 
-        showConfirmButton: false
+        timerProgressBar: true,
+        showConfirmButton: false,
       });
     }
     return () => {
@@ -121,7 +149,7 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
         clearInterval(interval);
       }
     };
-  }, [showModal , counter]);
+  }, [showModal, counter]);
   return (
     <>
       <div
@@ -130,29 +158,29 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
         style={{ display: "none" }}
       >
         <div className="relative w-auto max-w-3xl mx-auto my-6">
-          <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-            <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
+          <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full outline-none focus:outline-none otp">
+            <div className="flex items-start justify-between p-5 border-b border-solid rounded-t">
               <div className="flex flex-row justify-center items-center">
                 <h4 className="text-2xl font-semibold">Please verify OTP...</h4>
                 <MdSecurity size={23} />
               </div>
               <button
-                  className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                  onClick={handleModalClose}
+                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                onClick={handleModalClose}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-6 h-6"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
+                  <path
+                    fillRule="evenodd"
+                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
             </div>
             <div className="relative p-6 flex-auto">
               <div className={"flex justify-center items-center space-x-2"}>
@@ -163,7 +191,7 @@ const VerifyModal: React.FC<ModalProps> = ({showModal,onClose,messageOTP,invalid
                         ref={activeOTPIndex === index ? inputRef : null}
                         type="text"
                         className={
-                          "w-8 h-8 border-2 rounded bg-white outline-none text-center font-semibold text-xl spin-button-none border-primaryUser focus:border-primaryBusiness focus:text-primaryUser text-dark transition shadow-md shadow-dark"
+                          "w-8 h-8 border-2 rounded input-otp outline-none text-center font-semibold text-xl spin-button-none border-primaryUser focus:border-primaryBusiness focus:text-primaryUser text-dark transition shadow-md shadow-dark"
                         }
                         onChange={handleOnChange}
                         onKeyDown={(e) => handleOnKeyDown(e, index)}

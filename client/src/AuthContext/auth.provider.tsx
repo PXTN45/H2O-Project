@@ -1,13 +1,19 @@
-import React, {useState,useEffect,ReactNode,createContext,FC,} from "react";
+import React, {
+  useState,
+  useEffect,
+  ReactNode,
+  createContext,
+  FC,
+} from "react";
 import VerifyModal from "../components/verifyModal";
 import OTPModal from "../components/verifyOTP";
 import { sendOTP, ConfirmationResult } from "../Firebase/OTP";
 import Swal from "sweetalert2";
 import axiosPublic from "../hook/axiosPublic";
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 import {
   auth,
-  GoogleAuthProvider, 
+  GoogleAuthProvider,
   signInWithPopup,
   UserCredential,
 } from "../Firebase/firebase.config";
@@ -64,8 +70,6 @@ interface AuthContextType {
   setThisSunOrMoon: React.Dispatch<React.SetStateAction<string>>;
   isDarkMode: boolean;
   setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
-  reload: boolean;
-  setReload: React.Dispatch<React.SetStateAction<boolean>>;
   loadPage: boolean;
   setLoadPage: React.Dispatch<React.SetStateAction<boolean>>;
   isOTPVarify: boolean;
@@ -98,10 +102,11 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   });
   const [loadPage, setLoadPage] = useState<boolean>(false);
   const [whatUser, setWhatUser] = useState<User[]>([]);
-  const [messageOTP, setMessageOTP] = useState<ConfirmationResult | undefined>(undefined);
+  const [messageOTP, setMessageOTP] = useState<ConfirmationResult | undefined>(
+    undefined
+  );
   const [dataRegister, setDataRegister] = useState<UserRegister | null>(null);
   const [changPassword, setChangPassword] = useState<User | null>(null);
-  const [reload, setReload] = useState<boolean>(false);
   const [isOTPVarify, setIsOTPVarify] = useState<boolean>(false);
   const [showModalVerify, setShowModalVerify] = useState<boolean>(false);
   const [showModalOTP, setShowModalOTP] = useState<boolean>(false);
@@ -134,18 +139,18 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
       if (type === "form1") {
         const { name, lastName } = formData;
-        let yourRole:string = ""
-        let roles:string = "";
+        let yourRole: string = "";
+        let roles: string = "";
 
-        if(userInfo){
+        if (userInfo) {
           yourRole = userInfo?.role;
         }
 
         const createdAdmin = yourRole;
 
-        if(createdAdmin === "admin"){
+        if (createdAdmin === "admin") {
           roles = "admin";
-        }else{
+        } else {
           roles = "user";
         }
 
@@ -172,11 +177,14 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
       (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
 
-      let haveEmail:boolean = true;
-      const cheackMail = await axiosPublic.post(`/user/checkEmailExists` , {email:newUser.email , role:newUser.role})
-      haveEmail = cheackMail.data
-      
-      if(haveEmail){
+      let haveEmail: boolean = true;
+      const cheackMail = await axiosPublic.post(`/user/checkEmailExists`, {
+        email: newUser.email,
+        role: newUser.role,
+      });
+      haveEmail = cheackMail.data;
+
+      if (haveEmail) {
         (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
         Swal.fire({
           icon: "error",
@@ -185,19 +193,23 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           confirmButtonText: "OK",
         }).then((result) => {
           if (result.isConfirmed) {
-            (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.showModal();
           }
         });
-      }else if(!haveEmail){
+      } else if (!haveEmail) {
         if (!phone) {
           throw new Error("Phone number is required");
         }
-  
+
         if (phone.length <= 10 && phone.length >= 9) {
           let newPhone: string = "";
           if (phone.startsWith("0")) {
-            if(phone.length <= 9){
-              (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
+            if (phone.length <= 9) {
+              (
+                document.getElementById("Get-Started") as HTMLDialogElement
+              )?.close();
               Swal.fire({
                 icon: "error",
                 title: "Please check the phone numbe",
@@ -205,17 +217,21 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
                 confirmButtonText: "OK",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+                  (
+                    document.getElementById("Get-Started") as HTMLDialogElement
+                  )?.showModal();
                 }
               });
-            }else{
+            } else {
               newPhone = "+66" + phone.substr(1);
               newUser.phone = newPhone;
               setShowModalVerify(true);
             }
           } else if (!phone.startsWith("0")) {
-            if(phone.length >= 10){
-              (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
+            if (phone.length >= 10) {
+              (
+                document.getElementById("Get-Started") as HTMLDialogElement
+              )?.close();
               Swal.fire({
                 icon: "error",
                 title: "Please check the phone numbe",
@@ -223,27 +239,29 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
                 confirmButtonText: "OK",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+                  (
+                    document.getElementById("Get-Started") as HTMLDialogElement
+                  )?.showModal();
                 }
               });
-            }else{
+            } else {
               newPhone = "+66" + phone;
               newUser.phone = newPhone;
               setShowModalVerify(true);
             }
           }
-  
+
           const openInputOTP = () => {
             setShowModalVerify(false);
             setShowModalOTP(true);
           };
-  
+
           const invalidMessageOTP = () => {
             setShowModalVerify(false);
           };
-  
+
           try {
-            if(userInfo?.role !== "admin" && newUser.role === "admin"){
+            if (userInfo?.role !== "admin" && newUser.role === "admin") {
               Swal.fire({
                 icon: "error",
                 title: "Can't register because role isn't admin",
@@ -251,10 +269,12 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
                 confirmButtonText: "OK",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+                  (
+                    document.getElementById("Get-Started") as HTMLDialogElement
+                  )?.showModal();
                 }
               });
-            }else{
+            } else {
               const confirmationResult = await sendOTP(
                 newPhone,
                 openInputOTP,
@@ -288,7 +308,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         title: "Error invalid phone",
         text: "Failed to sign up. Please try enter phone number again.",
         confirmButtonText: "OK",
-        }).then((result) => {
+      }).then((result) => {
         if (result.isConfirmed) {
           (
             document.getElementById("Get-Started") as HTMLDialogElement
@@ -308,7 +328,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const responseUser = await axiosPublic.get("/user/userData");
       const responseBusiness = await axiosPublic.get("/user/businessData");
       const responseAdmin = await axiosPublic.get("/user/adminData");
-          
+
       if (!responseUser && !responseBusiness && !responseAdmin) {
         throw new Error("Failed to fetch user data");
       }
@@ -318,55 +338,82 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const userDataAdmin: User[] = await responseAdmin.data;
 
       const allUsers = [...userDataUser, ...userDataBusiness, ...userDataAdmin];
-      
+
       const user = allUsers.filter(
-        (user) =>
-          user.email.toLowerCase() === email.toLowerCase() 
+        (user) => user.email.toLowerCase() === email.toLowerCase()
       );
 
-      
       if (user.length >= 2) {
         (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
-        (document.getElementById("Modal-SelectRoles") as HTMLDialogElement)?.showModal();
-        const userSendData = [...user, { password : password }] as User[];
+        (
+          document.getElementById("Modal-SelectRoles") as HTMLDialogElement
+        )?.showModal();
+        const userSendData = [...user, { password: password }] as User[];
         setWhatUser(userSendData);
-      } else if (user.length === 1) { 
-        const isPasswordValid = await bcrypt.compare(password, user[0].password);
-        const loggedInUser = user[0];
-        const userData = {
-          "email": email,
-          "password": password,
-          "role": loggedInUser.role
-        }
-        if(isPasswordValid){
-          try {
-            const response = await axiosPublic.post("/user/login", userData);
-            const data = response.data;   
-              if(data.isVerified){
+      } else if (user.length === 1) {
+        if (user[0].password) {
+          const isPasswordValid = await bcrypt.compare(
+            password,
+            user[0].password
+          );
+          const loggedInUser = user[0];
+          const userData = {
+            email: email,
+            password: password,
+            role: loggedInUser.role,
+          };
+          if (isPasswordValid) {
+            try {
+              const response = await axiosPublic.post("/user/login", userData);
+              const data = response.data;
+              if (data.isVerified) {
                 setUserInfo(data);
-              }else{
+              } else {
                 Swal.fire({
-                  icon: 'warning',
-                  title: 'Email Confirmation',
-                  text: 'Your email has not been confirmed yet.',
-                  confirmButtonText: 'OK',
+                  icon: "warning",
+                  title: "Email Confirmation",
+                  text: "Your email has not been confirmed yet.",
+                  confirmButtonText: "OK",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+                    (
+                      document.getElementById(
+                        "Get-Started"
+                      ) as HTMLDialogElement
+                    )?.showModal();
                   }
                 });
               }
-            (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
-          } catch (error) {
-            console.error("Error registering user:", error);
+              (
+                document.getElementById("Get-Started") as HTMLDialogElement
+              )?.close();
+            } catch (error) {
+              console.error("Error registering user:", error);
+            }
+          } else {
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.close();
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Invalid Password!",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                (
+                  document.getElementById("Get-Started") as HTMLDialogElement
+                )?.showModal();
+              }
+            });
           }
-        }else{
-          (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
+        } else {
+          (
+            document.getElementById("Get-Started") as HTMLDialogElement
+          )?.close();
           Swal.fire({
             icon: "error",
             title: "Oops...",
-            text: "Invalid Password!",
-            footer: '<a href="#">Why do I have this issue?</a>',
+            text: "Invalid Password! or SingIn with Google?",
           }).then((result) => {
             if (result.isConfirmed) {
               (
@@ -374,14 +421,13 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
               )?.showModal();
             }
           });
-        }   
+        }
       } else {
         (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
         Swal.fire({
           icon: "error",
           title: "Oops...",
           text: "Invalid email or password!",
-          footer: '<a href="#">Why do I have this issue?</a>',
         }).then((result) => {
           if (result.isConfirmed) {
             (
@@ -400,7 +446,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const responseUser = await axiosPublic.get("/user/userData");
       const responseBusiness = await axiosPublic.get("/user/businessData");
       const responseAdmin = await axiosPublic.get("/user/adminData");
-          
+
       if (!responseUser && !responseBusiness && !responseAdmin) {
         throw new Error("Failed to fetch user data");
       }
@@ -410,17 +456,17 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const userDataAdmin: User[] = await responseAdmin.data;
 
       const allUsers = [...userDataUser, ...userDataBusiness, ...userDataAdmin];
-      
+
       const user = allUsers.filter(
         (user) =>
-          user.email.toLowerCase() === email.toLowerCase()  && user.password
+          user.email.toLowerCase() === email.toLowerCase() && user.password
       );
 
-      if(user.length > 0){
-        const validatePhoneFormat = (phone : string) => {
+      if (user.length > 0) {
+        const validatePhoneFormat = (phone: string) => {
           const phoneRegex = /^\d{10}$/;
           return phoneRegex.test(phone);
-        };    
+        };
 
         const { value: phone } = await Swal.fire({
           title: "Enter your phone number",
@@ -430,8 +476,8 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           inputValidator: (value) => {
             if (!value) {
               return "You need to enter an phone";
-            }else if (!validatePhoneFormat(value)) {
-              return 'Invalid phone number format';
+            } else if (!validatePhoneFormat(value)) {
+              return "Invalid phone number format";
             }
           },
         });
@@ -455,52 +501,53 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           });
         }
 
-        const whatUsers = user.filter(u => u.phone === newPhone);
-  
-        if(whatUsers.length > 0){
-          let readyChangePassword : User[] = []
+        const whatUsers = user.filter((u) => u.phone === newPhone);
+
+        if (whatUsers.length > 0) {
+          let readyChangePassword: User[] = [];
 
           const inputOptions: { [key: string]: string } = {};
           whatUsers.forEach((user) => {
-            inputOptions[user.role] = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            inputOptions[user.role] =
+              user.role.charAt(0).toUpperCase() + user.role.slice(1);
           });
 
-          if(whatUsers.length >= 2){
+          if (whatUsers.length >= 2) {
             const { value: role } = await Swal.fire({
-              title: 'Select your role',
-              input: 'select',
+              title: "Select your role",
+              input: "select",
               inputOptions: inputOptions,
-              inputPlaceholder: 'Select a role',
+              inputPlaceholder: "Select a role",
               showCancelButton: true,
               inputValidator: (value) => {
                 if (!value) {
-                  return 'You need to select a role';
+                  return "You need to select a role";
                 }
-              }
+              },
             });
             const oneUser = whatUsers.find((user) => user.role === role);
             if (oneUser) {
-              readyChangePassword.push(oneUser)
+              readyChangePassword.push(oneUser);
             }
-          }else if (whatUsers.length === 1){
-            readyChangePassword = [whatUsers[0]]
+          } else if (whatUsers.length === 1) {
+            readyChangePassword = [whatUsers[0]];
           }
-          
-          const phonInData = readyChangePassword[0].phone
 
-          if(phonInData){
-            setChangPassword(readyChangePassword[0])
+          const phonInData = readyChangePassword[0].phone;
+
+          if (phonInData) {
+            setChangPassword(readyChangePassword[0]);
             setShowModalVerify(true);
-            
+
             const openInputOTP = () => {
               setShowModalVerify(false);
               setShowModalOTP(true);
             };
-    
+
             const invalidMessageOTP = () => {
               setShowModalVerify(false);
             };
-    
+
             try {
               const confirmationResult = await sendOTP(
                 phonInData,
@@ -512,26 +559,26 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
             } catch (error) {
               console.error("Error:", (error as Error).message);
             }
-          }else{
+          } else {
             Swal.fire({
-              icon: 'error',
+              icon: "error",
               title: "Error something",
-              text: 'Please contact the admin.',
-            });  
-          }        
-        }else{
+              text: "Please contact the admin.",
+            });
+          }
+        } else {
           Swal.fire({
-            icon: 'error',
-            title: 'Email and Phone not math',
-            text: 'The email and phone you entered does not math in our system.',
-          });  
+            icon: "error",
+            title: "Email and Phone not math",
+            text: "The email and phone you entered does not math in our system.",
+          });
         }
-      }else{
+      } else {
         Swal.fire({
-          icon: 'error',
-          title: 'Email not found',
-          text: 'The email you entered does not exist in our system.',
-        });   
+          icon: "error",
+          title: "Email not found",
+          text: "The email you entered does not exist in our system.",
+        });
       }
     } catch (error) {
       console.error("Error:", (error as Error).message);
@@ -552,18 +599,18 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     });
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
+    setLoadPage(false);
     await axiosPublic.post("/user/logout");
     setUserInfo(null);
     localStorage.removeItem("user");
+    setLoadPage(true);
     window.location.href = "/";
   };
 
   const authInfo: AuthContextType = {
     thisPage,
     setThisPage,
-    reload,
-    setReload,
     userInfo,
     setUserInfo,
     handleLogin,
@@ -585,9 +632,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider value={authInfo}>
-      <VerifyModal
-        showModal={showModalVerify}
-      />
+      <VerifyModal showModal={showModalVerify} />
       {children}
       <OTPModal
         showModal={showModalOTP}
@@ -603,4 +648,4 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 };
 
 export default AuthProvider;
-export type { UserRegister , User };
+export type { UserRegister, User };

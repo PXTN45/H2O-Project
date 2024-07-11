@@ -10,10 +10,10 @@ interface NavbarProps {
   image: string;
 }
 
-const Navbar: React.FC<NavbarProps> = ({image}) => {
+const Navbar: React.FC<NavbarProps> = ({ image }) => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
-    throw new Error('AuthContext must be used within an AuthProvider');
+    throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { thisPage, userInfo, handleLogout } = authContext;
 
@@ -25,7 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({image}) => {
 
   const handleCreateAdmin = () => {
     (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
-  }
+  };
 
   return (
     <div>
@@ -51,10 +51,10 @@ const Navbar: React.FC<NavbarProps> = ({image}) => {
           style={
             !userInfo || (userInfo && thisPage === "/")
               ? {
-                backgroundImage: `url(${image})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
+                  backgroundImage: `url(${image})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
                 }
               : {}
           }
@@ -101,7 +101,13 @@ const Navbar: React.FC<NavbarProps> = ({image}) => {
               className="bg-blue-500 hover:bg-blue-600 text-lg font-bold py-2 px-4 rounded"
               onClick={
                 !userInfo
-                  ? () => {(document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();}
+                  ? () => {
+                      (
+                        document.getElementById(
+                          "Get-Started"
+                        ) as HTMLDialogElement
+                      )?.showModal();
+                    }
                   : toggleDropdown
               }
             >
@@ -125,12 +131,12 @@ const Navbar: React.FC<NavbarProps> = ({image}) => {
                       >
                         <div className="px-4 py-3 text-sm">
                           <div>
-                            {userInfo.role === "user" || userInfo.role === "admin"
+                            {userInfo.role === "user" ||
+                            userInfo.role === "admin"
                               ? `${userInfo.name} ${userInfo.lastName}`
                               : userInfo.role === "business"
                               ? `${userInfo.businessName}`
-                              :null
-                            }
+                              : null}
                           </div>
                           <div className="font-medium truncate">
                             {userInfo.email}
@@ -150,23 +156,26 @@ const Navbar: React.FC<NavbarProps> = ({image}) => {
                           </li>
                           {userInfo && userInfo.role === "business" && (
                             <li>
-                              <a href="/create-business" className="block px-4 py-2">
-                                Create a sale 
+                              <a
+                                href="/create-business"
+                                className="block px-4 py-2"
+                              >
+                                Create a sale
                               </a>
                             </li>
                           )}
                           {userInfo && userInfo.role === "admin" && (
                             <li>
-                              <a className="block px-4 py-2" onClick={handleCreateAdmin}>
+                              <a
+                                className="block px-4 py-2"
+                                onClick={handleCreateAdmin}
+                              >
                                 Create a User
                               </a>
                             </li>
                           )}
                           <li>
-                            <a
-                              href="#"
-                              className="block px-4 py-2"
-                            >
+                            <a href="#" className="block px-4 py-2">
                               Settings
                             </a>
                           </li>

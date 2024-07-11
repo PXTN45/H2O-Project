@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import axiosPublic from "../hook/axiosPublic";
+import { AuthContext } from "../AuthContext/auth.provider";
 import Card from "./Card";
 
 interface Image {
   image_upload: string;
 }
 
+interface Room {
+  price_homeStay: number;
+}
+
 interface Item {
   _id: string;
   image: Image[];
+  room_type: Room[];
   name_package?: string;
   detail_package?: string;
   price_package?: number;
@@ -19,29 +26,47 @@ const Filterpackage: React.FC = () => {
   const [filteredData, setFilteredData] = useState<Item[]>([]);
   const [isType, setIsType] = useState<string>("");
 
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+
+  const { setLoadPage } = authContext;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/packageData.json");
-        const data: Item[] = await response.json();
-        setDataPackage(data);
-        setFilteredData(data);
+        const response = await axiosPublic.get("/package");
+        const data = await response.data;
+        if (data) {
+          setDataPackage(data);
+          setFilteredData(data);
+          setLoadPage(true);
+        } else {
+          setLoadPage(false);
+        }
       } catch (error) {
         console.log("Error fetching data:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [setLoadPage]);
 
   const filterByType = (type: string) => {
-    const filtered = type === "" ? dataPackage : dataPackage.filter((item) => item.type_package === type);
+    const filtered =
+      type === ""
+        ? dataPackage
+        : dataPackage.filter((item) => item.type_package === type);
     setFilteredData(filtered);
     setIsType(type);
   };
 
   return (
     <div className="container mx-auto my-20">
-      <h1 className="text-2xl font-bold mb-4 my-[2rem] mx-[1.75rem]">Packages Recommend</h1>
+      <h1 className="text-2xl font-bold mb-4 my-[2rem] mx-[1.75rem]">
+        Packages Recommend
+      </h1>
       <div className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
         <button
           onClick={() => filterByType("")}

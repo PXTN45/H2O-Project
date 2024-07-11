@@ -1,10 +1,10 @@
-import React, { useState, useContext ,useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { SiGmail } from "react-icons/si";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { AuthContext , User } from "../AuthContext/auth.provider";
+import { AuthContext, User } from "../AuthContext/auth.provider";
 import { FaPhone } from "react-icons/fa";
 import { BsExclamationTriangle } from "react-icons/bs";
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import axiosPublic from "../hook/axiosPublic";
 import Swal from "sweetalert2";
 
@@ -40,7 +40,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
     handleSubmit,
     register,
     formState: { errors },
-    reset 
+    reset,
   } = useForm<FormValues>();
 
   const authContext = useContext(AuthContext);
@@ -49,19 +49,36 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { handleLogin, handleSignUp, handleForgot , userInfo , signUpWithGoogle , setUserInfo } = authContext;
+  const {
+    handleLogin,
+    handleSignUp,
+    handleForgot,
+    userInfo,
+    signUpWithGoogle,
+    setUserInfo,
+    setLoadPage,
+  } = authContext;
 
-  const [activePage, setActivePage] = useState<"login" | "signup-user" | "signup-business">("login");
+  const [activePage, setActivePage] = useState<
+    "login" | "signup-user" | "signup-business"
+  >("login");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
 
   useEffect(() => {
-    if ((activePage === "login" || activePage === "signup-user" || activePage === "signup-business") && userInfo?.role === "admin") {
+    if (
+      (activePage === "login" ||
+        activePage === "signup-user" ||
+        activePage === "signup-business") &&
+      userInfo?.role === "admin"
+    ) {
       setActivePage("signup-user");
-    }else{
-      return
+    } else {
+      return;
     }
-  }, [userInfo , activePage]);
-  
+  }, [userInfo, activePage]);
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const email = data.email;
     const password = data.password;
@@ -70,7 +87,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
     const lastName = data.lastName;
     const businessName = data.businessName;
     const phone = data.phone;
-    
+
     if (activePage === "login") {
       handleLogin(email, password);
     } else if (activePage === "signup-user") {
@@ -113,12 +130,12 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
   const GoogleSignUp = async (role: string) => {
     try {
       const result = await signUpWithGoogle();
-  
+
       const user = result.user;
       const responseUser = await axiosPublic.get("/user/userData");
       const responseBusiness = await axiosPublic.get("/user/businessData");
       const responseAdmin = await axiosPublic.get("/user/adminData");
-          
+
       if (!responseUser && !responseBusiness && !responseAdmin) {
         throw new Error("Failed to fetch user data");
       }
@@ -129,74 +146,85 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
 
       const allUsers = [...userDataUser, ...userDataBusiness, ...userDataAdmin];
       const userGoogle = user?.email;
-      if(!userGoogle){
+      if (!userGoogle) {
         throw new Error("No data user...");
       }
       const userFilter = allUsers.filter(
         (user) =>
-          user.email.toLowerCase() === userGoogle.toLowerCase() &&  user.role === role
+          user.email.toLowerCase() === userGoogle.toLowerCase() &&
+          user.role === role
       );
-      const userRespone = userFilter[0]
+      const userRespone = userFilter[0];
       console.log(userRespone);
-      
-      if(userRespone){
-        if(!userRespone.password){
+
+      if (userRespone) {
+        if (!userRespone.password) {
           const userData = {
-            email : userRespone.email,
-            role : userRespone.role,
-          }
-          
+            email: userRespone.email,
+            role: userRespone.role,
+          };
+
           try {
+            setLoadPage(false);
             const response = await axiosPublic.post("/user/login", userData);
             const data = response.data;
-  
+
             if (data.isVerified) {
               setUserInfo(data);
-              return
+              setLoadPage(true);
+              return;
             } else {
               Swal.fire({
-                icon: 'warning',
-                title: 'Email Confirmation',
-                text: 'Your email has not been confirmed yet.',
-                confirmButtonText: 'OK',
+                icon: "warning",
+                title: "Email Confirmation",
+                text: "Your email has not been confirmed yet.",
+                confirmButtonText: "OK",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+                  (
+                    document.getElementById("Get-Started") as HTMLDialogElement
+                  )?.showModal();
                 }
               });
             }
-            (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.close();
           } catch (error) {
             console.error("Error logging in user:", error);
           }
-        }else if(userRespone.password){
-          (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
+        } else if (userRespone.password) {
+          (
+            document.getElementById("Get-Started") as HTMLDialogElement
+          )?.close();
           Swal.fire({
-            icon: 'error',
-            title: 'Email is already in use',
+            icon: "error",
+            title: "Email is already in use",
             text: "You didn't sign up through Google.",
-            confirmButtonText: 'OK',
+            confirmButtonText: "OK",
           }).then((result) => {
             if (result.isConfirmed) {
-              (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+              (
+                document.getElementById("Get-Started") as HTMLDialogElement
+              )?.showModal();
             }
           });
-          return
+          return;
         }
       }
 
       const displayName = user?.displayName;
       let firstName = "";
       let lastName = "";
-  
+
       if (displayName) {
         const parts = displayName.split(" ");
         firstName = parts[0];
         lastName = parts[1];
       }
-  
+
       let userInfo: UserInfo[] = [];
-  
+
       if (role === "user" || role === "admin") {
         const reqBody = {
           name: firstName,
@@ -211,7 +239,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
         const str = user?.uid;
         const firstFourChars = str.slice(0, 4);
         const nameDefaultBusiness = `Business@${firstFourChars}`;
-        
+
         const reqBody = {
           businessName: nameDefaultBusiness,
           name: firstName,
@@ -222,47 +250,54 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           role: role,
         };
         userInfo.push(reqBody);
-      } else [
-        userInfo = []
-      ]
-  
+      } else [(userInfo = [])];
+
       if (userInfo.length > 0) {
-        const response = await axiosPublic.post(`/user/${role}Register`, ...userInfo);
-  
+        setLoadPage(false);
+        const response = await axiosPublic.post(
+          `/user/${role}Register`,
+          ...userInfo
+        );
+
         (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
         const dataRegister = response.data;
-  
+
         if (dataRegister) {
+          setLoadPage(true);
           Swal.fire({
             title: "Login google account successfully",
             icon: "success",
             timer: 1500,
           });
-  
+
           const userData = {
             email: dataRegister.email,
             role: dataRegister.role,
           };
-  
+
           try {
             const response = await axiosPublic.post("/user/login", userData);
             const data = response.data;
-  
+
             if (data.isVerified) {
               setUserInfo(data);
             } else {
               Swal.fire({
-                icon: 'warning',
-                title: 'Email Confirmation',
-                text: 'Your email has not been confirmed yet.',
-                confirmButtonText: 'OK',
+                icon: "warning",
+                title: "Email Confirmation",
+                text: "Your email has not been confirmed yet.",
+                confirmButtonText: "OK",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+                  (
+                    document.getElementById("Get-Started") as HTMLDialogElement
+                  )?.showModal();
                 }
               });
             }
-            (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.close();
           } catch (error) {
             console.error("Error logging in user:", error);
           }
@@ -283,41 +318,46 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
       });
     }
   };
-  
+
   const GoogleSignUpOrSignIn = () => {
-    if(activePage === "signup-user"){
-      const role = "user"
-      GoogleSignUp(role)
-    }else if(activePage === "signup-business"){
-      const role = "business"
-      GoogleSignUp(role)
-    }else if(activePage === "login"){
+    if (activePage === "signup-user") {
+      const role = "user";
+      GoogleSignUp(role);
+    } else if (activePage === "signup-business") {
+      const role = "business";
+      GoogleSignUp(role);
+    } else if (activePage === "login") {
       (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
       Swal.fire({
-        title: 'Select status to log in',
-        text: 'Log in with your Google account.',
+        title: "Select status to log in",
+        text: "Log in with your Google account.",
         showCancelButton: true,
-        confirmButtonText: 'USER',
-        cancelButtonText: 'BUSINESS',
+        confirmButtonText: "USER",
+        cancelButtonText: "BUSINESS",
         reverseButtons: false,
         customClass: {
-          confirmButton: 'swal-button-confirm',
-          cancelButton: 'swal-button-cancel'
-        }
+          confirmButton: "swal-button-confirm",
+          cancelButton: "swal-button-cancel",
+        },
       }).then((result) => {
         if (result.isConfirmed) {
-            const role = (result.dismiss === Swal.DismissReason.cancel) ? "business" : "user";
-            GoogleSignUp(role)
+          const role =
+            result.dismiss === Swal.DismissReason.cancel ? "business" : "user";
+          GoogleSignUp(role);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            const role = "business";
-            GoogleSignUp(role)
+          const role = "business";
+          GoogleSignUp(role);
         }
       });
-    }   
+    }
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const toggleForm = (page: "login" | "signup-user" | "signup-business") => {
@@ -387,25 +427,26 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               ? "Login Now"
               : activePage === "signup-user" && userInfo?.role !== "admin"
               ? "Sign Up - Customer"
-              :activePage === "signup-business"
+              : activePage === "signup-business"
               ? "Sign Up - Business"
               : activePage === "signup-user" && userInfo?.role === "admin"
               ? "Sign Up - Admin"
-              : null
-            }
+              : null}
           </h3>
           {activePage === "login" ? (
             <>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Email</span>              
+                  <span className="label-text">Email</span>
                   {errors.email && (
-                      <div className="tooltip">
-                        <span className="text-alert text-sm">
-                          <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.email.message}</span>
+                    <div className="tooltip">
+                      <span className="text-alert text-sm">
+                        <BsExclamationTriangle className="inline-block mr-1" />
+                        <span className="tooltip-text">
+                          {errors.email.message}
                         </span>
-                      </div>
+                      </span>
+                    </div>
                   )}
                 </label>
                 <input
@@ -416,8 +457,8 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                     required: "Please enter email",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email format"
-                    }
+                      message: "Invalid email format",
+                    },
                   })}
                 />
               </div>
@@ -425,48 +466,36 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                 <label className="label">
                   <span className="label-text">Password</span>
                   {errors.password && (
-                      <div className="tooltip">
-                        <span className="text-alert text-sm">
-                          <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.password.message}</span>
+                    <div className="tooltip">
+                      <span className="text-alert text-sm">
+                        <BsExclamationTriangle className="inline-block mr-1" />
+                        <span className="tooltip-text">
+                          {errors.password.message}
                         </span>
-                      </div>
+                      </span>
+                    </div>
                   )}
                 </label>
-                {/* <input
-                  type="password"
-                  placeholder="password"
-                  className="input input-bordered"
-                  {...register("password", {
-                    required: "Please enter a password",
-                    minLength: {
-                      value: 8,
-                      message: "Password must be at least 8 characters",
-                    },
-                    pattern: {
-                      value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
-                      message:
-                        "The password format is incorrect.",
-                    },
-                  })}
-                /> */}
                 <div className="relative w-full">
                   <input
                     type="text"
                     placeholder="password"
                     className="input input-bordered w-full pr-10"
-                    style={{
-                      WebkitTextSecurity: showPassword ? 'none' : 'disc',
-                    }as InputProps}
-                    {...register('password', {
-                      required: 'Please enter a password',
+                    style={
+                      {
+                        WebkitTextSecurity: showPassword ? "none" : "disc",
+                      } as InputProps
+                    }
+                    {...register("password", {
+                      required: "Please enter a password",
                       minLength: {
                         value: 8,
-                        message: 'Password must be at least 8 characters',
+                        message: "Password must be at least 8 characters",
                       },
                       pattern: {
-                        value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
-                        message: 'The password format is incorrect.',
+                        value:
+                          /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
+                        message: "The password format is incorrect.",
                       },
                     })}
                   />
@@ -474,11 +503,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                     onClick={togglePasswordVisibility}
                   >
-                    {showPassword ? (
-                      <AiFillEyeInvisible className="text-black" />
-                    ) : (
-                      <AiFillEye className="text-black" />
-                    )}
+                    {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
                   </div>
                 </div>
               </div>
@@ -493,7 +518,9 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                       <div className="tooltip">
                         <span className="text-alert text-sm">
                           <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.name.message}</span>
+                          <span className="tooltip-text">
+                            {errors.name.message}
+                          </span>
                         </span>
                       </div>
                     )}
@@ -506,8 +533,8 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                       required: "Please enter",
                       pattern: {
                         value: /^[A-Za-zก-ฮ]+$/,
-                        message: "Invalid format"
-                      }
+                        message: "Invalid format",
+                      },
                     })}
                   />
                 </div>
@@ -518,7 +545,9 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                       <div className="tooltip">
                         <span className="text-alert text-sm">
                           <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.lastName.message}</span>
+                          <span className="tooltip-text">
+                            {errors.lastName.message}
+                          </span>
                         </span>
                       </div>
                     )}
@@ -531,8 +560,8 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                       required: "Please enter",
                       pattern: {
                         value: /^[A-Za-zก-ฮ]+$/,
-                        message: "Invalid format"
-                      }
+                        message: "Invalid format",
+                      },
                     })}
                   />
                 </div>
@@ -541,12 +570,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                 <label className="label">
                   <span className="label-text">Email</span>
                   {errors.email && (
-                      <div className="tooltip">
-                        <span className="text-alert text-sm">
-                          <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.email.message}</span>
+                    <div className="tooltip">
+                      <span className="text-alert text-sm">
+                        <BsExclamationTriangle className="inline-block mr-1" />
+                        <span className="tooltip-text">
+                          {errors.email.message}
                         </span>
-                      </div>
+                      </span>
+                    </div>
                   )}
                 </label>
                 <input
@@ -557,8 +588,8 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                     required: "Please enter email",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email format"
-                    }
+                      message: "Invalid email format",
+                    },
                   })}
                 />
               </div>
@@ -570,56 +601,96 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                       <div className="tooltip">
                         <span className="text-alert text-sm">
                           <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.password.message}</span>
+                          <span className="tooltip-text">
+                            {errors.password.message}
+                          </span>
                         </span>
                       </div>
                     )}
                   </label>
-                  <input
-                    type="password"
-                    placeholder="password"
-                    className="input input-bordered w-full"
-                    {...register("password", {
-                      required: "Please enter a password",
-                      minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                      pattern: {
-                        value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
-                        message: "Password must contain at least 1 digit, 1 lowercase letter, 1 uppercase letter, 1 special character, and be at least 8 characters long.",
-                      },
-                    })}
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="password"
+                      className="input input-bordered w-full pr-10"
+                      style={
+                        {
+                          WebkitTextSecurity: showPassword ? "none" : "disc",
+                        } as InputProps
+                      }
+                      {...register("password", {
+                        required: "Please enter a password",
+                        minLength: {
+                          value: 8,
+                          message: "Password must be at least 8 characters",
+                        },
+                        pattern: {
+                          value:
+                            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
+                          message: "The password format is incorrect.",
+                        },
+                      })}
+                    />
+                    <div
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={togglePasswordVisibility}
+                    >
+                      {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
+                    </div>
+                  </div>
                 </div>
                 <div className="ml-2">
                   <label className="label">
-                    <span className="label-text whitespace-nowrap">Confirm Password</span>
-                      {errors.ConfirmPassword && (
-                        <div className="tooltip">
-                          <span className="text-alert text-sm">
-                            <BsExclamationTriangle className="inline-block mr-1" />
-                            <span className="tooltip-text">{errors.ConfirmPassword.message}</span>
+                    <span className="label-text whitespace-nowrap">
+                      Confirm Password
+                    </span>
+                    {errors.ConfirmPassword && (
+                      <div className="tooltip">
+                        <span className="text-alert text-sm">
+                          <BsExclamationTriangle className="inline-block mr-1" />
+                          <span className="tooltip-text">
+                            {errors.ConfirmPassword.message}
                           </span>
-                        </div>
-                      )}
+                        </span>
+                      </div>
+                    )}
                   </label>
-                  <input
-                    type="password"
-                    placeholder="confirm password"
-                    className="input input-bordered w-full"
-                    {...register("ConfirmPassword", {
-                      required: "Please enter a password",
-                      minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                      pattern: {
-                        value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
-                        message: "Password must contain at least 1 digit, 1 lowercase letter, 1 uppercase letter, 1 special character, and be at least 8 characters long.",
-                      },
-                    })}
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="Confirm Password"
+                      className="input input-bordered w-full pr-10"
+                      style={
+                        {
+                          WebkitTextSecurity: showConfirmPassword
+                            ? "none"
+                            : "disc",
+                        } as InputProps
+                      }
+                      {...register("ConfirmPassword", {
+                        required: "Please enter a password",
+                        minLength: {
+                          value: 8,
+                          message: "Password must be at least 8 characters",
+                        },
+                        pattern: {
+                          value:
+                            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
+                          message: "The password format is incorrect.",
+                        },
+                      })}
+                    />
+                    <div
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={toggleConfirmPasswordVisibility}
+                    >
+                      {showConfirmPassword ? (
+                        <AiFillEye />
+                      ) : (
+                        <AiFillEyeInvisible />
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
               <label className="label flex items-center">
@@ -627,12 +698,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                   Phone Number <FaPhone className="ml-1" />
                 </span>
                 {errors.phone && (
-                      <div className="tooltip">
-                        <span className="text-alert text-sm">
-                          <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.phone.message}</span>
-                        </span>
-                      </div>
+                  <div className="tooltip">
+                    <span className="text-alert text-sm">
+                      <BsExclamationTriangle className="inline-block mr-1" />
+                      <span className="tooltip-text">
+                        {errors.phone.message}
+                      </span>
+                    </span>
+                  </div>
                 )}
               </label>
               <div className="flex flex-row justify-between">
@@ -672,12 +745,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                 <label className="label">
                   <span className="label-text">Business name</span>
                   {errors.businessName && (
-                      <div className="tooltip">
-                        <span className="text-alert text-sm">
-                          <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.businessName.message}</span>
+                    <div className="tooltip">
+                      <span className="text-alert text-sm">
+                        <BsExclamationTriangle className="inline-block mr-1" />
+                        <span className="tooltip-text">
+                          {errors.businessName.message}
                         </span>
-                      </div>
+                      </span>
+                    </div>
                   )}
                 </label>
                 <input
@@ -693,12 +768,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                 <label className="label">
                   <span className="label-text">Email</span>
                   {errors.email && (
-                      <div className="tooltip">
-                        <span className="text-alert text-sm">
-                          <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.email.message}</span>
+                    <div className="tooltip">
+                      <span className="text-alert text-sm">
+                        <BsExclamationTriangle className="inline-block mr-1" />
+                        <span className="tooltip-text">
+                          {errors.email.message}
                         </span>
-                      </div>
+                      </span>
+                    </div>
                   )}
                 </label>
                 <input
@@ -709,8 +786,8 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                     required: "Please enter email",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email format"
-                    }
+                      message: "Invalid email format",
+                    },
                   })}
                 />
               </div>
@@ -722,27 +799,43 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                       <div className="tooltip">
                         <span className="text-alert text-sm">
                           <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.password.message}</span>
+                          <span className="tooltip-text">
+                            {errors.password.message}
+                          </span>
                         </span>
                       </div>
                     )}
                   </label>
-                  <input
-                    type="password"
-                    placeholder="password"
-                    className="input input-bordered w-full"
-                    {...register("password", {
-                      required: "Please enter a password",
-                      minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                      pattern: {
-                        value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
-                        message: "Password must contain at least 1 digit, 1 lowercase letter, 1 uppercase letter, 1 special character, and be at least 8 characters long.",
-                      },
-                    })}
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="password"
+                      className="input input-bordered w-full pr-10"
+                      style={
+                        {
+                          WebkitTextSecurity: showPassword ? "none" : "disc",
+                        } as InputProps
+                      }
+                      {...register("password", {
+                        required: "Please enter a password",
+                        minLength: {
+                          value: 8,
+                          message: "Password must be at least 8 characters",
+                        },
+                        pattern: {
+                          value:
+                            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
+                          message: "The password format is incorrect.",
+                        },
+                      })}
+                    />
+                    <div
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={togglePasswordVisibility}
+                    >
+                      {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
+                    </div>
+                  </div>
                 </div>
                 <div className="ml-2">
                   <label className="label">
@@ -750,30 +843,52 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                       Confirm Password
                     </span>
                     {errors.ConfirmPassword && (
-                        <div className="tooltip">
-                          <span className="text-alert text-sm">
-                            <BsExclamationTriangle className="inline-block mr-1" />
-                            <span className="tooltip-text">{errors.ConfirmPassword.message}</span>
+                      <div className="tooltip">
+                        <span className="text-alert text-sm">
+                          <BsExclamationTriangle className="inline-block mr-1" />
+                          <span className="tooltip-text">
+                            {errors.ConfirmPassword.message}
                           </span>
-                        </div>
+                        </span>
+                      </div>
                     )}
                   </label>
-                  <input
-                    type="password"
-                    placeholder="confirm password"
-                    className="input input-bordered w-full"
-                    {...register("ConfirmPassword", {
-                      required: "Please enter a password",
-                      minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                      pattern: {
-                        value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
-                        message: "Password must contain at least 1 digit, 1 lowercase letter, 1 uppercase letter, 1 special character, and be at least 8 characters long.",
-                      },
-                    })}
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="Confirm Password"
+                      className="input input-bordered w-full pr-10"
+                      style={
+                        {
+                          WebkitTextSecurity: showConfirmPassword
+                            ? "none"
+                            : "disc",
+                        } as InputProps
+                      }
+                      {...register("ConfirmPassword", {
+                        required: "Please enter a password",
+                        minLength: {
+                          value: 8,
+                          message: "Password must be at least 8 characters",
+                        },
+                        pattern: {
+                          value:
+                            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
+                          message: "The password format is incorrect.",
+                        },
+                      })}
+                    />
+                    <div
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={toggleConfirmPasswordVisibility}
+                    >
+                      {showConfirmPassword ? (
+                        <AiFillEye />
+                      ) : (
+                        <AiFillEyeInvisible />
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
               <label className="label flex items-center">
@@ -781,12 +896,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                   Phone Number <FaPhone className="ml-1" />
                 </span>
                 {errors.phone && (
-                      <div className="tooltip">
-                        <span className="text-alert text-sm">
-                          <BsExclamationTriangle className="inline-block mr-1" />
-                          <span className="tooltip-text">{errors.phone.message}</span>
-                        </span>
-                      </div>
+                  <div className="tooltip">
+                    <span className="text-alert text-sm">
+                      <BsExclamationTriangle className="inline-block mr-1" />
+                      <span className="tooltip-text">
+                        {errors.phone.message}
+                      </span>
+                    </span>
+                  </div>
                 )}
               </label>
               <div className="flex flex-row justify-between">
@@ -854,7 +971,9 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           <p className="text-center my-2 font-bold text-[0.9rem] ">
             {activePage === "login"
               ? "Don't have an account?"
-              : (activePage === "signup-user" || activePage === "signup-business") && userInfo?.role !== "admin"
+              : (activePage === "signup-user" ||
+                  activePage === "signup-business") &&
+                userInfo?.role !== "admin"
               ? "Already have an account?"
               : "For administrators only"}{" "}
             <button
@@ -864,72 +983,68 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                 toggleForm(activePage === "login" ? "signup-user" : "login")
               }
             >
-              {activePage === "login" 
-                ? "Sign Up Now" 
-                : (activePage === "signup-user" || activePage === "signup-business") && userInfo?.role !== "admin"
+              {activePage === "login"
+                ? "Sign Up Now"
+                : (activePage === "signup-user" ||
+                    activePage === "signup-business") &&
+                  userInfo?.role !== "admin"
                 ? "Login"
-                : null
-              }
+                : null}
             </button>
           </p>
         </form>
-        {
-          activePage === "signup-user" && userInfo?.role === "admin"
-          ? null
-          :(
-            <div className="max-w-screen-xl flex items-center justify-between">
-              <hr
-                className={
-                  activePage === "login" || activePage === "signup-user" && userInfo?.role !== "admin"
-                    ? "w-[50vw] border-t-2 border-primaryUser shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
-                    : userInfo?.role === "admin"
-                    ? "w-[50vw] border-t-2 border-primaryAdmin shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
-                    : "w-[50vw] border-t-2 border-primaryBusiness shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
-                }
-              />
-              <div className="items-center justify-center ml-6 mr-6 font-bold">
-                <h3>or</h3>
-              </div>
-              <hr
-                className={
-                  activePage === "login" || activePage === "signup-business" && userInfo?.role !== "admin"
-                    ? "w-[50vw] border-t-2 border-primaryBusiness shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
-                    : userInfo?.role === "admin"
-                    ? "w-[50vw] border-t-2 border-primaryAdmin shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
-                    : "w-[50vw] border-t-2 border-primaryUser shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
-                }
-              />
+        {activePage === "signup-user" && userInfo?.role === "admin" ? null : (
+          <div className="max-w-screen-xl flex items-center justify-between">
+            <hr
+              className={
+                activePage === "login" ||
+                (activePage === "signup-user" && userInfo?.role !== "admin")
+                  ? "w-[50vw] border-t-2 border-primaryUser shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+                  : userInfo?.role === "admin"
+                  ? "w-[50vw] border-t-2 border-primaryAdmin shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+                  : "w-[50vw] border-t-2 border-primaryBusiness shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+              }
+            />
+            <div className="items-center justify-center ml-6 mr-6 font-bold">
+              <h3>or</h3>
             </div>
-          )
-        }
+            <hr
+              className={
+                activePage === "login" ||
+                (activePage === "signup-business" && userInfo?.role !== "admin")
+                  ? "w-[50vw] border-t-2 border-primaryBusiness shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+                  : userInfo?.role === "admin"
+                  ? "w-[50vw] border-t-2 border-primaryAdmin shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+                  : "w-[50vw] border-t-2 border-primaryUser shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+              }
+            />
+          </div>
+        )}
         <div className="text-center justify-center items-center p-7">
-        {
-          activePage === "signup-user" && userInfo?.role === "admin"  
-            ? null
-            : (
-                <button
-                  className={
-                    activePage === "login"
-                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
-                      : activePage === "signup-user" && userInfo?.role !== "admin"
-                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
-                      : activePage === "signup-business"
-                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryBusiness hover:bg-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
-                      : activePage === "signup-user" && userInfo?.role === "admin"
-                      ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryAdmin text-primaryAdmin hover:bg-primaryAdmin hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
-                      : "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-dark text-dark hover:bg-dark hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
-                  }  
-                  onClick={GoogleSignUpOrSignIn}
-                >
-                  <span className="relative z-10 flex items-center justify-center w-full h-full">
-                    <SiGmail className="w-6 h-6" />
-                    <h3 className="ml-3">Gmail</h3>
-                  </span>
-                </button>
-              )
-        }
-          
-          {(activePage === "signup-user" || activePage === "signup-business") && userInfo?.role !== "admin"  ? (
+          {activePage === "signup-user" && userInfo?.role === "admin" ? null : (
+            <button
+              className={
+                activePage === "login"
+                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                  : activePage === "signup-user" && userInfo?.role !== "admin"
+                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                  : activePage === "signup-business"
+                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryBusiness hover:bg-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                  : activePage === "signup-user" && userInfo?.role === "admin"
+                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryAdmin text-primaryAdmin hover:bg-primaryAdmin hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                  : "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-dark text-dark hover:bg-dark hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+              }
+              onClick={GoogleSignUpOrSignIn}
+            >
+              <span className="relative z-10 flex items-center justify-center w-full h-full">
+                <SiGmail className="w-6 h-6" />
+                <h3 className="ml-3">Gmail</h3>
+              </span>
+            </button>
+          )}
+
+          {(activePage === "signup-user" || activePage === "signup-business") &&
+          userInfo?.role !== "admin" ? (
             <button
               className={
                 activePage === "signup-user"
@@ -962,7 +1077,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               ? "bg-primaryUser absolute left-0 right-0 h-6"
               : activePage === "signup-business"
               ? "bg-primaryBusiness absolute left-0 right-0 h-6"
-              : activePage === "signup-user"&& userInfo?.role === "admin"
+              : activePage === "signup-user" && userInfo?.role === "admin"
               ? "bg-primaryAdmin absolute left-0 right-0 h-6"
               : "bg-dark absolute left-0 right-0 h-6"
           }

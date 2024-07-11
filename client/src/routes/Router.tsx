@@ -10,7 +10,6 @@ import ProfileUser from "../pages/user/profile";
 import ProfileBusiness from "../pages/business/profile";
 import SelectionCreate from "../pages/business/selectionCreate";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
-import Test from "./test";
 
 const router = createBrowserRouter([
   {
@@ -22,18 +21,6 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/Test",
-        element: <Test />,
-      },
-      {
-        path: "/verifySuccess/:token",
-        element: (
-          <PrivateVerifyEmail>
-            <VerifyEmailSuccess />
-          </PrivateVerifyEmail>
-        ),
-      },
-      {
         path: "/create-business",
         element: (
           <PrivateRouterBusiness>
@@ -42,8 +29,8 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path:"/dashboard-user",
-        element:(
+        path: "/dashboard-user",
+        element: (
           <PrivateRouterUser>
             <DrawerDashBoard />
           </PrivateRouterUser>
@@ -51,13 +38,13 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard-user/ProfileUser",
-            element: <ProfileUser />
+            element: <ProfileUser />,
           },
-        ]
+        ],
       },
       {
-        path:"/dashboard-business",
-        element:(
+        path: "/dashboard-business",
+        element: (
           <PrivateRouterBusiness>
             <DrawerDashBoard />
           </PrivateRouterBusiness>
@@ -65,13 +52,13 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard-business/ProfileBusiness",
-            element: <ProfileBusiness />
+            element: <ProfileBusiness />,
           },
-        ]
+        ],
       },
       {
-        path:"/dashboard-admin",
-        element:(
+        path: "/dashboard-admin",
+        element: (
           <PrivateRouterAdmin>
             <DrawerDashBoard />
           </PrivateRouterAdmin>
@@ -79,11 +66,19 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard-admin/ProfileAdmin",
-            element: <ProfileBusiness />
+            element: <ProfileBusiness />,
           },
-        ]
-      }
+        ],
+      },
     ],
+  },
+  {
+    path: "/verifySuccess/:token",
+    element: (
+      <PrivateVerifyEmail>
+        <VerifyEmailSuccess />
+      </PrivateVerifyEmail>
+    ),
   },
 ]);
 

@@ -28,9 +28,9 @@ const VerifyModal: React.FC<ModalProps> = ({ showModal }) => {
         className="fixed inset-0 z-50 hidden items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none"
         style={{ display: "none" }}
       >
-        <div className="relative w-auto max-w-3xl mx-auto my-6">
-          <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-            <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
+        <div className="relative w-auto max-w-3xl mx-auto my-6 otp">
+          <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full outline-none focus:outline-nonea">
+            <div className="flex items-start justify-between p-5 border-b border-solid rounded-t">
               <div className="flex flex-row justify-center items-center">
                 <h4 className="text-2xl font-semibold">Please verify...</h4>
                 <BsShieldLockFill size={23} />
@@ -42,8 +42,10 @@ const VerifyModal: React.FC<ModalProps> = ({ showModal }) => {
                 className="flex items-center justify-center"
               />
             </div>
-            <div className="flex items-center justify-center p-6 border-t border-solid border-gray-300 rounded-b">
-              <span className="text-md">Please confirm that you are not a robot.</span>
+            <div className="flex items-center justify-center p-6 border-t border-solid rounded-b">
+              <span className="text-md">
+                Please confirm that you are not a robot.
+              </span>
             </div>
           </div>
         </div>

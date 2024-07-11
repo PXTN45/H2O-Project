@@ -1,151 +1,206 @@
 import { useContext } from "react";
 import { FaHouseUser } from "react-icons/fa";
 import { FaBuildingUser } from "react-icons/fa6";
-import { MdAdminPanelSettings } from 'react-icons/md';
+import { MdAdminPanelSettings } from "react-icons/md";
 import { AuthContext } from "../AuthContext/auth.provider";
 import Swal from "sweetalert2";
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 import axiosPublic from "../hook/axiosPublic";
 
 interface loginData {
-  email: string; 
-  password: string; 
+  email: string;
+  password: string;
   role: string;
 }
 
-const ModalSelectRoles = ({ name } : {name : string}) => {
+const ModalSelectRoles = ({ name }: { name: string }) => {
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
-    throw new Error('AuthContext must be used within an AuthProvider');
+    throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { whatUser, setUserInfo , userInfo } = authContext;
+  const { whatUser, setUserInfo, userInfo } = authContext;
   const customerUser = whatUser.find((user) => user.role === "user");
   const businessUser = whatUser.find((user) => user.role === "business");
   const adminUser = whatUser.find((user) => user.role === "admin");
 
-  let password:string = "";
-  if(whatUser.length === 4){
+  let password: string = "";
+  if (whatUser.length === 4) {
     password = whatUser[3].password;
-  }else if(whatUser.length === 3){
+  } else if (whatUser.length === 3) {
     password = whatUser[2].password;
   }
 
-  const apiLogin = async(userData: loginData) => {
+  const apiLogin = async (userData: loginData) => {
     try {
       const response = await axiosPublic.post("/user/login", userData);
-      const data = response.data;   
-        if(data.isVerified){
-          setUserInfo(data);
-        }else{
-          Swal.fire({
-            icon: 'warning',
-            title: 'Email Confirmation',
-            text: 'Your email has not been confirmed yet.',
-            confirmButtonText: 'OK',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
-            }
-          });
-        }
+      const data = response.data;
+      if (data.isVerified) {
+        setUserInfo(data);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Email Confirmation",
+          text: "Your email has not been confirmed yet.",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.showModal();
+          }
+        });
+      }
       (document.getElementById("Get-Started") as HTMLDialogElement)?.close();
       (document.getElementById(name) as HTMLDialogElement)?.close();
     } catch (error) {
       console.error("Error registering user:", error);
     }
-  }
-
-  const clickUser = async() => {
-    if(!customerUser){
-      throw new Error('No customerUser!');
-    }
-    const isPasswordValid = await bcrypt.compare(password, customerUser.password);
-    const userData = {
-      "email": customerUser.email,
-      "password": password,
-      "role": customerUser.role
-    }
-    if(isPasswordValid){
-      apiLogin(userData)
-    }else{
-      (document.getElementById(name) as HTMLDialogElement)?.close();
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Invalid Password!",
-        footer: '<a href="#">Why do I have this issue?</a>',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          (
-            document.getElementById("Get-Started") as HTMLDialogElement
-          )?.showModal();
-        }
-      });
-    }   
-  };
-  const clickBusiness = async() => {
-    if(!businessUser){
-      throw new Error('No customerUser!');
-    }
-    const isPasswordValid = await bcrypt.compare(password, businessUser.password);
-    const userData = {
-      "email": businessUser.email,
-      "password": password,
-      "role": businessUser.role
-    }
-    if(isPasswordValid){
-      apiLogin(userData)
-    }else{
-      (document.getElementById(name) as HTMLDialogElement)?.close();
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Invalid Password!",
-        footer: '<a href="#">Why do I have this issue?</a>',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          (
-            document.getElementById("Get-Started") as HTMLDialogElement
-          )?.showModal();
-        }
-      });
-    }   
-  };
-  const clickAdmin = async() => {
-    if(!adminUser){
-      throw new Error('No adminUser!');
-    }
-    const isPasswordValid = await bcrypt.compare(password, adminUser.password);
-    const userData = {
-      "email": adminUser.email,
-      "password": password,
-      "role": adminUser.role
-    }
-    if(isPasswordValid){
-      apiLogin(userData)
-    }else{
-      (document.getElementById(name) as HTMLDialogElement)?.close();
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Invalid Password!",
-        footer: '<a href="#">Why do I have this issue?</a>',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          (
-            document.getElementById("Get-Started") as HTMLDialogElement
-          )?.showModal();
-        }
-      });
-    }   
   };
 
-  if(userInfo){
-    return
+  const clickUser = async () => {
+    if (!customerUser) {
+      throw new Error("No customerUser!");
+    }
+    if (customerUser.password) {
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        customerUser.password
+      );
+      const userData = {
+        email: customerUser.email,
+        password: password,
+        role: customerUser.role,
+      };
+      if (isPasswordValid) {
+        apiLogin(userData);
+      } else {
+        (document.getElementById(name) as HTMLDialogElement)?.close();
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Invalid Password!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.showModal();
+          }
+        });
+      }
+    } else {
+      (document.getElementById(name) as HTMLDialogElement)?.close();
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Invalid Password! or SingIn with Google?",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          (
+            document.getElementById("Get-Started") as HTMLDialogElement
+          )?.showModal();
+        }
+      });
+    }
+  };
+
+  const clickBusiness = async () => {
+    if (!businessUser) {
+      throw new Error("No customerUser!");
+    }
+    if (businessUser.password) {
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        businessUser.password
+      );
+      const userData = {
+        email: businessUser.email,
+        password: password,
+        role: businessUser.role,
+      };
+      if (isPasswordValid) {
+        apiLogin(userData);
+      } else {
+        (document.getElementById(name) as HTMLDialogElement)?.close();
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Invalid Password!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.showModal();
+          }
+        });
+      }
+    } else {
+      (document.getElementById(name) as HTMLDialogElement)?.close();
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Invalid Password! or SingIn with Google?",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          (
+            document.getElementById("Get-Started") as HTMLDialogElement
+          )?.showModal();
+        }
+      });
+    }
+  };
+
+  const clickAdmin = async () => {
+    if (!adminUser) {
+      throw new Error("No adminUser!");
+    }
+    if (adminUser.password) {
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        adminUser.password
+      );
+      const userData = {
+        email: adminUser.email,
+        password: password,
+        role: adminUser.role,
+      };
+      if (isPasswordValid) {
+        apiLogin(userData);
+      } else {
+        (document.getElementById(name) as HTMLDialogElement)?.close();
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Invalid Password!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.showModal();
+          }
+        });
+      }
+    } else {
+      (document.getElementById(name) as HTMLDialogElement)?.close();
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Invalid Password! or SingIn with Google?",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          (
+            document.getElementById("Get-Started") as HTMLDialogElement
+          )?.showModal();
+        }
+      });
+    }
+  };
+
+  if (userInfo) {
+    return;
   }
-  
+
   return (
     <dialog id={name} className="modal">
       <div className="modal-box ">
@@ -153,7 +208,9 @@ const ModalSelectRoles = ({ name } : {name : string}) => {
           className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
           onClick={() => {
             (document.getElementById(name) as HTMLDialogElement)?.close();
-            (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
+            (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.showModal();
           }}
         >
           <svg
@@ -188,12 +245,12 @@ const ModalSelectRoles = ({ name } : {name : string}) => {
               </span>
             </button>
           </>
-        ) : null }
+        ) : null}
         {businessUser ? (
           <>
             <button
-            className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryBusiness hover:bg-gradient-to-r from-primaryBusiness to-secondBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-[1rem] text-[36px]"
-            onClick={clickBusiness}
+              className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryBusiness hover:bg-gradient-to-r from-primaryBusiness to-secondBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-[1rem] text-[36px]"
+              onClick={clickBusiness}
             >
               <span className="relative z-10 flex items-center justify-center w-full h-full">
                 <div className="flex flex-row items-center justify-start w-full h-full">
@@ -203,12 +260,12 @@ const ModalSelectRoles = ({ name } : {name : string}) => {
               </span>
             </button>
           </>
-        ) : null }
-        {adminUser ?(
+        ) : null}
+        {adminUser ? (
           <>
             <button
-            className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none border border-primaryAdmin text-primaryAdmin hover:bg-gradient-to-r from-primaryAdmin to-secondAdmin hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-[1rem] text-[36px]"
-            onClick={clickAdmin}
+              className="rounded-[0.5rem] w-full h-[100px] relative overflow-hidden focus:outline-none border border-primaryAdmin text-primaryAdmin hover:bg-gradient-to-r from-primaryAdmin to-secondAdmin hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2 mt-[1rem] text-[36px]"
+              onClick={clickAdmin}
             >
               <span className="relative z-10 flex items-center justify-center w-full h-full">
                 <div className="flex flex-row items-center justify-start w-full h-full">

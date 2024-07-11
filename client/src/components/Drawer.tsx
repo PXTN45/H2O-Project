@@ -1,131 +1,141 @@
+import React, { useContext } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../AuthContext/auth.provider";
-import { useContext } from "react";
 import { BsCamera } from "react-icons/bs";
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from '../Firebase/firebase.config';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import Swal from "sweetalert2";
+import { AuthContext } from "../AuthContext/auth.provider";
+import { storage } from "../Firebase/firebase.config";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
 import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
 import axiosPrivateAdmin from "../hook/axiosPrivateAdmin";
 
 const Drawer: React.FC = () => {
-
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { userInfo, handleLogout , setUserInfo } = authContext;
+  const { userInfo, handleLogout, setUserInfo, setLoadPage } = authContext;
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      const resizedFile = await resizeImage(selectedFile, 500, 500);
       const pathImage = `imagesAvatar/${userInfo?._id}`;
-      handleUpload(selectedFile, pathImage);
-      let imageURL: string = ""
-      try {
-        const filePath = pathImage
-        const storageRef = ref(storage, filePath);
-        const url = await getDownloadURL(storageRef);
-        imageURL = url
-      } catch (error) {
-        console.error('Error fetching image URL:', error);
-      }
-      try {
-        await apiUpdateImage(imageURL);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "There was an error updating.",
-          text: `${error}`,
-        });
-        return;
-      }
-    }
-  };
-  
 
-  const handleUpload = (file: File , pathImage:string) => {
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = function (event) {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = function () {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-  
-          const MAX_WIDTH = 500;
-          const MAX_HEIGHT = 500;
-          let width = img.width;
-          let height = img.height;
-  
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
+      Swal.fire({
+        title: "Are you sure you want to change the image?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, change it!",
+        cancelButtonText: "Cancel",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            setLoadPage(false);
+            await handleUpload(resizedFile, pathImage);
+            const storageRef = ref(storage, pathImage);
+            const imageURL = await getDownloadURL(storageRef);
+            await apiUpdateImage(imageURL);
+            setLoadPage(true);
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "There was an error updating.",
+              text: `${error}`,
+            });
           }
-  
-          canvas.width = width;
-          canvas.height = height;
-  
-          ctx?.drawImage(img, 0, 0, width, height);
-  
-          canvas.toBlob((blob) => {
-            if(blob){
-              const storageRef = ref(storage, pathImage);
-              const uploadTask = uploadBytesResumable(storageRef, blob);
-    
-              uploadTask.on('state_changed', () => {
-                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                  console.log('File available at', downloadURL);
-                });
-              });
-            }
-          }, file.type);
-        };
-      };
-    }else{
-      return
+        } else if (result.isDismissed) {
+          console.log("User canceled the image change");
+        }
+      });
     }
   };
-  
-  const apiUpdateImage = async(imageURL: string) => {
-    if(userInfo){
+
+  const resizeImage = (
+    file: File,
+    maxWidth: number,
+    maxHeight: number
+  ): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        Math.min(maxWidth / img.width, maxHeight / img.height);
+
+        canvas.width = maxWidth;
+        canvas.height = maxHeight;
+        ctx?.drawImage(img, 0, 0, maxWidth, maxHeight);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const resizedFile = new File([blob], file.name, {
+              type: file.type,
+            });
+            resolve(resizedFile);
+          } else {
+            reject(new Error("Canvas is empty"));
+          }
+        }, file.type);
+      };
+      img.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleUpload = async (file: File, pathImage: string) => {
+    const storageRef = ref(storage, pathImage);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise<void>((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        () => {},
+        (error) => {
+          reject(error);
+        },
+        () => {
+          resolve();
+        }
+      );
+    });
+  };
+
+  const apiUpdateImage = async (imageURL: string) => {
+    if (userInfo) {
       const updateImage = {
-        image : imageURL,
-        role : userInfo.role
-      }
+        image: imageURL,
+        role: userInfo.role,
+      };
 
       const whatAxios = (() => {
         switch (userInfo.role) {
-          case 'user':
+          case "user":
             return axiosPrivateUser;
-          case 'business':
+          case "business":
             return axiosPrivateBusiness;
-          case 'admin':
+          case "admin":
             return axiosPrivateAdmin;
           default:
-            throw new Error('Invalid user role');
+            throw new Error("Invalid user role");
         }
       })();
 
-      const response = await whatAxios.put(`/user/updateUser/${userInfo._id}` , updateImage)
+      const response = await whatAxios.put(
+        `/user/updateUser/${userInfo._id}`,
+        updateImage
+      );
 
       if (!response) {
         throw new Error(`Error: ${response}`);
-      } else if (response) {
-        setUserInfo(response.data)
+      } else {
+        setUserInfo(response.data);
         Swal.fire({
           icon: "success",
           title: "Success",
@@ -133,8 +143,8 @@ const Drawer: React.FC = () => {
         });
       }
     }
-  } 
-  
+  };
+
   return (
     <div>
       <div className="md:w-1/4">
@@ -189,11 +199,17 @@ const Drawer: React.FC = () => {
                   >
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="flex flex-col items-center justify-center">
-                        <p><BsCamera /></p>
+                        <p>
+                          <BsCamera />
+                        </p>
                         <p>เปลี่ยนรูป</p>
                       </div>
                     </div>
-                    <input type="file" className="hidden" onChange={handleChange} />
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={handleChange}
+                    />
                   </label>
                 </div>
               </div>
@@ -218,82 +234,82 @@ const Drawer: React.FC = () => {
               </div>
               {/* Sidebar content here */}
               <div className="text-darkmode">
-              {userInfo?.role === "user" ? (
-                <div>
-                  <Link to={"/dashboard-user/ProfileUser"}>
-                    <li>
-                      <a>Profile</a>
-                    </li>
-                  </Link>
-                  <Link to={"#"}>
-                    <li>
-                      <a>My Bookings</a>
-                    </li>
-                  </Link>
-                  <Link to={"#"}>
-                    <li>
-                      <a>My review</a>
-                    </li>
-                  </Link>
-                  <Link to={"#"}>
-                    <li>
-                      <a>Property messages</a>
-                    </li>
-                  </Link>
-                </div>
-              ) : userInfo?.role === "business" ? (
-                <div>
-                  <Link to={"/dashboard-business/ProfileBusiness"}>
-                    <li>
-                      <a>Profile</a>
-                    </li>
-                  </Link>
-                  <Link to={"#"}>
-                    <li>
-                      <a>My Business</a>
-                    </li>
-                  </Link>
-                  <Link to={"#"}>
-                    <li>
-                      <a>Review</a>
-                    </li>
-                  </Link>
-                  <Link to={"#"}>
-                    <li>
-                      <a>Property messages</a>
-                    </li>
-                  </Link>
-                </div>
-              ) : userInfo?.role === "admin" ? (
-                <div>
-                  <Link to={"/dashboard-business/ProfileAdmin"}>
-                    <li>
-                      <a>Profile</a>
-                    </li>
-                  </Link>
-                </div>
-              ): null}
-              <hr className="h-px my-4 line-darkmode border-0"></hr>
-              {userInfo?.role === "user" ? (
-                <div>
-                  <Link to={"#"}>
-                    <li>
-                      <a>History Booking</a>
-                    </li>
-                  </Link>
-                </div>
-              ) : userInfo?.role === "business" ? (
-                <div>
-                  <Link to={"#"}>
-                    <li>
-                      <a>How to get money</a>
-                    </li>
-                  </Link>
-                </div>
-              ) : null}
-              <li onClick={handleLogout}>
-                <a>Log out</a>
-              </li>
+                {userInfo?.role === "user" ? (
+                  <div>
+                    <Link to={"/dashboard-user/ProfileUser"}>
+                      <li>
+                        <a>Profile</a>
+                      </li>
+                    </Link>
+                    <Link to={"#"}>
+                      <li>
+                        <a>My Bookings</a>
+                      </li>
+                    </Link>
+                    <Link to={"#"}>
+                      <li>
+                        <a>My review</a>
+                      </li>
+                    </Link>
+                    <Link to={"#"}>
+                      <li>
+                        <a>Property messages</a>
+                      </li>
+                    </Link>
+                  </div>
+                ) : userInfo?.role === "business" ? (
+                  <div>
+                    <Link to={"/dashboard-business/ProfileBusiness"}>
+                      <li>
+                        <a>Profile</a>
+                      </li>
+                    </Link>
+                    <Link to={"#"}>
+                      <li>
+                        <a>My Business</a>
+                      </li>
+                    </Link>
+                    <Link to={"#"}>
+                      <li>
+                        <a>Review</a>
+                      </li>
+                    </Link>
+                    <Link to={"#"}>
+                      <li>
+                        <a>Property messages</a>
+                      </li>
+                    </Link>
+                  </div>
+                ) : userInfo?.role === "admin" ? (
+                  <div>
+                    <Link to={"/dashboard-business/ProfileAdmin"}>
+                      <li>
+                        <a>Profile</a>
+                      </li>
+                    </Link>
+                  </div>
+                ) : null}
+                <hr className="h-px my-4 line-darkmode border-0"></hr>
+                {userInfo?.role === "user" ? (
+                  <div>
+                    <Link to={"#"}>
+                      <li>
+                        <a>History Booking</a>
+                      </li>
+                    </Link>
+                  </div>
+                ) : userInfo?.role === "business" ? (
+                  <div>
+                    <Link to={"#"}>
+                      <li>
+                        <a>How to get money</a>
+                      </li>
+                    </Link>
+                  </div>
+                ) : null}
+                <li onClick={handleLogout}>
+                  <a>Log out</a>
+                </li>
               </div>
             </ul>
           </div>
