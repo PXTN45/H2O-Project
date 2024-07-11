@@ -43,12 +43,27 @@ const swaggerDefinition = {
       description: "Development server",
     },
   ],
+  security: [
+    {
+      BearerAuth: [],
+    },
+  ],
+  components: {
+    securitySchemes: {
+      BearerAuth: {
+        type: "apiKey",
+        name: "Authorization",
+        in: "header",
+        description: 'Example enter token "Bearer eyJhbGciO...."',
+      },
+    },
+  },
 };
 
 // Swagger options
 const options = {
   swaggerDefinition,
-  apis: ["src/routes/package.router.ts", "src/routes/homestay.router.ts"], // Adjust this if the paths to the routes change
+  apis: ["src/routes/package.router.ts", "src/routes/homestay.router.ts",  "src/routes/user.router.ts"], // Adjust this if the paths to the routes change
   connectTimeoutMS: 10000, // Set timeout for the connection
   useNewUrlParser: true,
   useUnifiedTopology: true,
