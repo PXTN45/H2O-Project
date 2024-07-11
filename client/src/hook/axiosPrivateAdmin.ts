@@ -3,6 +3,7 @@ import { getCookie } from "typescript-cookie";
 
 const axiosPrivateAdmin = axios.create({
     baseURL: import.meta.env.VITE_H2O_URL,
+    withCredentials: true,
 });
 
 axiosPrivateAdmin.interceptors.request.use(
