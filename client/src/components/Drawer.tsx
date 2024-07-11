@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext , useRef  } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import { BsCamera } from "react-icons/bs";
@@ -11,6 +11,7 @@ import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
 import axiosPrivateAdmin from "../hook/axiosPrivateAdmin";
 
 const Drawer: React.FC = () => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
@@ -51,6 +52,9 @@ const Drawer: React.FC = () => {
             });
           }
         } else if (result.isDismissed) {
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
           console.log("User canceled the image change");
         }
       });
@@ -208,6 +212,7 @@ const Drawer: React.FC = () => {
                     <input
                       type="file"
                       className="hidden"
+                      ref={fileInputRef}
                       onChange={handleChange}
                     />
                   </label>
