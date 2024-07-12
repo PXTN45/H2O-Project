@@ -35,7 +35,7 @@ const Footer = () => {
   };
 
   return (
-    <div className={`relative w-full h-full ${isDarkMode ? "dark" : ""}`}>
+    <div id="footer" className={`relative w-full h-full ${isDarkMode ? "dark" : ""}`}>
       <div
         className={`fixed 
           ${isDarkMode ? "text-white" : "text-black"}

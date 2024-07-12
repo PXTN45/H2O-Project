@@ -67,7 +67,7 @@ const Filterpackage: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4 my-[2rem] mx-[1.75rem]">
         Packages Recommend
       </h1>
-      <div className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
+      <div id="butttonSelect-Package" className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
         <button
           onClick={() => filterByType("")}
           className={

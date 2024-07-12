@@ -188,6 +188,7 @@ const VerifyModal: React.FC<ModalProps> = ({
                   return (
                     <React.Fragment key={index}>
                       <input
+                        id="otp"
                         ref={activeOTPIndex === index ? inputRef : null}
                         type="text"
                         className={

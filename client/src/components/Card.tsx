@@ -40,11 +40,12 @@ const Card: React.FC<CardProps> = ({ item }) => {
       onClick={() => seeDetail(item._id)}
     >
       <img
+        id="imageCard-Home"
         src={item.image[0].image_upload}
         alt="images to cards"
         className="w-full h-[15rem] object-cover"
       />
-      <div className="px-6 py-4">
+      <div id="detailCard-Home" className="px-6 py-4">
         <div className="font-bold text-xl mb-2">
           {truncateText(item.name_package || item.name_homeStay || "", 20)}
         </div>
@@ -52,7 +53,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
           {truncateText(item.detail_package || item.detail_homeStay || "", 20)}
         </p>
       </div>
-      <div className="text-lg font-semibold absolute bottom-5 right-0 mx-5">
+      <div id="priceCard-Home" className="text-lg font-semibold absolute bottom-5 right-0 mx-5">
         <span className="mx-2">฿</span>
         {item.price_package || item.room_type[0].price_homeStay}
       </div>

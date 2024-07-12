@@ -112,7 +112,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               }
             >
               {!userInfo ? (
-                <>Get Started</>
+                <div id="GetStarted">Get Started</div>
               ) : (
                 <>
                   <div className="relative">

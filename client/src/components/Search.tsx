@@ -90,12 +90,14 @@ const Search: React.FC = () => {
         <div className="relative bg-white bg-opacity-50 p-6 rounded-[20px] w-full h-full flex flex-col items-center justify-center shadow-lg">
           <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
             <button
+              id="button-homestaySearch-Select"
               className="bg-gradient-to-r from-primaryUser to-primaryBusiness text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
               onClick={clickToHome}
             >
               ที่พัก
             </button>
             <button
+              id="button-homestaySearch-noSelect"
               className="bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
               onClick={clickToPackage}
             >
@@ -109,13 +111,14 @@ const Search: React.FC = () => {
               placeholder="ค้นหาที่พักที่สนใจ"
               className="bg-white text-dark p-2 mb-2 rounded-tl-[10px] rounded-bl-[10px] block h-[3.5rem] w-full"
             />
-            <button className="bg-gradient-to-r from-primaryUser to-primaryBusiness p-2 mb-2 block text-white rounded-tr-[10px] rounded-br-[10px] w-40 h-[3.5rem]">
+            <button id="search-Homestay" className="bg-gradient-to-r from-primaryUser to-primaryBusiness p-2 mb-2 block text-white rounded-tr-[10px] rounded-br-[10px] w-40 h-[3.5rem]">
               ค้นหา
             </button>
           </div>
           <div className="flex flex-col items-center justify-center mt-4 sm:flex-row sm:justify-between w-full">
             <div className="relative w-full mb-5">
               <button
+                id="peple-buttonHomstay"
                 className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[16rem]"
                 onClick={togglePeopleMenu}
               >
@@ -180,6 +183,7 @@ const Search: React.FC = () => {
             <div className="w-5" />
             <div className="relative w-full mb-5 flex flex-col items-center justify-center">
               <button
+                id="date-buttonHomstay"
                 className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[23rem]"
                 onClick={toggleCalendar}
               >
@@ -221,12 +225,14 @@ const Search: React.FC = () => {
         <div className="relative bg-white bg-opacity-50 p-6 rounded-[20px] w-full h-full flex flex-col items-center justify-center shadow-lg">
           <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
             <button
+              id="button-packageSearch-noSelect"
               className="bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
               onClick={clickToHome}
             >
               ที่พัก
             </button>
             <button
+              id="button-packageSearch-Select"
               className="bg-gradient-to-r from-primaryUser to-primaryBusiness text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
               onClick={clickToPackage}
             >
@@ -240,13 +246,14 @@ const Search: React.FC = () => {
               placeholder="ค้นหาแพ็คเกจที่สนใจ"
               className="bg-white text-dark p-2 mb-2 rounded-tl-[10px] rounded-bl-[10px] block h-[3.5rem] w-full"
             />
-            <button className="bg-gradient-to-r from-primaryUser to-primaryBusiness p-2 mb-2 block text-white rounded-tr-[10px] rounded-br-[10px] w-40 h-[3.5rem]">
+            <button id="search-Package" className="bg-gradient-to-r from-primaryUser to-primaryBusiness p-2 mb-2 block text-white rounded-tr-[10px] rounded-br-[10px] w-40 h-[3.5rem]">
               ค้นหา
             </button>
           </div>
           <div className="flex flex-col items-center justify-center mt-4 sm:flex-row sm:justify-between w-full">
             <div className="relative w-full mb-5">
               <button
+                id="peple-buttonPackage"
                 className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[16rem]"
                 onClick={togglePeopleMenu}
               >
@@ -311,6 +318,7 @@ const Search: React.FC = () => {
             <div className="w-5" />
             <div className="relative w-full mb-5 flex flex-col items-center justify-center">
               <button
+                id="date-buttonPackage"
                 className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[23rem]"
                 onClick={toggleCalendar}
               >
