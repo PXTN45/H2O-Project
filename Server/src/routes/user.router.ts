@@ -235,7 +235,7 @@ const router = Router();
  *       403:
  *         description: Forbidden, user does not have admin privileges
  */
-router.get("/userData");
+router.get("/userData", getAllUser);
 
 /**
  * @swagger
@@ -257,7 +257,7 @@ router.get("/userData");
  *       500:
  *         description: Internal server error
  */
-router.get("/businessData");
+router.get("/businessData", getAllBusiness);
 
 /**
  * @swagger
@@ -279,7 +279,7 @@ router.get("/businessData");
  *       500:
  *         description: Internal server error
  */
-router.get("/adminData");
+router.get("/adminData", getAllAdmin);
 
 
 /**
