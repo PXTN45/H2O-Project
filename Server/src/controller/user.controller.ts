@@ -195,30 +195,43 @@ const updateUser = async (req: Request, res: Response) => {
 const Login = async (req: Request, res: Response): Promise<void> => {
   const secret = process.env.SECRET as string;
   const { email, password, role } = req.body;
+
+  const user = await UserModel.findOne({ email }).collation({ locale: 'en', strength: 2 }); //strength โดยพื้นฐานมี 4 ละดับการใช้ต่างกันศึกษาเพิ่มโดยหาเอกสาร
+  const business = await BusinessModel.findOne({ email }).collation({ locale: 'en', strength: 2 });
+  const admin = await AdminModel.findOne({ email }).collation({ locale: 'en', strength: 2 });
+  
+  let cheackPasswordUser: boolean = false
+  let cheackPasswordBusiness: boolean = false
+  let cheackPasswordAdmin: boolean = false
+  if(password){
+    const isMatchedPasswordUser = bcrypt.compareSync(password, user.password);
+    const isMatchedPasswordBusiness = bcrypt.compareSync(password, business.password);
+    const isMatchedPasswordAdmin = bcrypt.compareSync(password, admin.password);
+    cheackPasswordUser = isMatchedPasswordUser
+    cheackPasswordBusiness = isMatchedPasswordBusiness
+    cheackPasswordAdmin = isMatchedPasswordAdmin
+  }
+
   let userData;
-  if (role === "user") {
-    const user = await UserModel.findOne({ email });
-    userData = user;
-  } else if (role === "business") {
-    const user = await BusinessModel.findOne({ email });
-    userData = user;
-  } else if (role === "admin") {
-    const user = await AdminModel.findOne({ email });
-    userData = user;
+  if(cheackPasswordUser || cheackPasswordBusiness || cheackPasswordAdmin){
+    if (role === "user") {
+      userData = user;
+    } else if (role === "business") {
+      userData = business;
+    } else if (role === "admin") {
+      userData = admin;
+    }
+  }else{
+    res.status(400).json("pass isn't compareSync");
+    return
   }
 
   if (!userData) {
-    res.status(400).json("Wrong credentials");
+    res.status(400).json("No user-data");
     return;
   }
-
-  let cheackPassword: boolean = false
-  if(password){
-    const isMatchedPassword = bcrypt.compareSync(password, userData.password);
-    cheackPassword = isMatchedPassword
-  }
   
-  if (cheackPassword) {
+  if (userData) {
     jwt.sign({ email, id: userData._id, role }, secret, {}, (err, token) => {
       if (err) throw err;
       res.cookie("token", token);
