@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { FaHouseUser } from "react-icons/fa";
 import { FaBuildingUser } from "react-icons/fa6";
 import { MdAdminPanelSettings } from "react-icons/md";
-import { AuthContext } from "../AuthContext/auth.provider";
+import { AuthContext , User } from "../AuthContext/auth.provider";
 import Swal from "sweetalert2";
 import bcrypt from "bcryptjs";
 import axiosPublic from "../hook/axiosPublic";
@@ -32,6 +32,24 @@ const ModalSelectRoles = ({ name }: { name: string }) => {
     password = whatUser[2].password;
   }
 
+  let isPasswordValid: boolean = false;
+  const bcryptCompare = async ( customerUser: User | undefined,businessUser: User | undefined,adminUser: User | undefined ) => {
+    const comparePassword = async (user: User | undefined) => {
+      if (!user) return false;
+      return await bcrypt.compare(password, user.password);
+    };
+  
+    const isPasswordValidCustomerUser = await comparePassword(customerUser);
+    const isPasswordValidBusinessUser = await comparePassword(businessUser);
+    const isPasswordValidAdminUser = await comparePassword(adminUser);
+  
+    if (isPasswordValidCustomerUser || isPasswordValidBusinessUser || isPasswordValidAdminUser) {
+      isPasswordValid = true;
+    } else {
+      isPasswordValid = false;
+    }
+  };
+  
   const apiLogin = async (userData: loginData) => {
     try {
       const response = await axiosPublic.post("/user/login", userData);
@@ -64,10 +82,7 @@ const ModalSelectRoles = ({ name }: { name: string }) => {
       throw new Error("No customerUser!");
     }
     if (customerUser.password) {
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        customerUser.password
-      );
+      await bcryptCompare(customerUser , businessUser , adminUser);
       const userData = {
         email: customerUser.email,
         password: password,
@@ -110,10 +125,7 @@ const ModalSelectRoles = ({ name }: { name: string }) => {
       throw new Error("No customerUser!");
     }
     if (businessUser.password) {
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        businessUser.password
-      );
+      await bcryptCompare(customerUser , businessUser , adminUser);
       const userData = {
         email: businessUser.email,
         password: password,
@@ -156,10 +168,7 @@ const ModalSelectRoles = ({ name }: { name: string }) => {
       throw new Error("No adminUser!");
     }
     if (adminUser.password) {
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        adminUser.password
-      );
+      await bcryptCompare(customerUser , businessUser , adminUser);
       const userData = {
         email: adminUser.email,
         password: password,
