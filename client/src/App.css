@@ -1,0 +1,409 @@
+@import url("https://fonts.googleapis.com/css2?family=K2D:wght@100&family=Kanit:ital@1&family=Noto+Sans+Cypro+Minoan&family=Open+Sans:ital,wght@0,300;0,400;1,400;1,500&display=swap");
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+    color: white;
+  }
+
+  .modal-box {
+    background-color: black;
+    color: white;
+  }
+
+  .side-box {
+    background-color: black;
+    color: white;
+  }
+
+  .input {
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+  }
+
+  .label-text {
+    font-size: 0.95rem;
+    font-weight: bold;
+    line-height: 1.25rem;
+    --tw-text-opacity: 1;
+    color: white;
+  }
+
+  .label-text-alt {
+    font-size: 0.9rem;
+    font-weight: bold;
+    line-height: 1rem;
+    --tw-text-opacity: 1;
+    color: white;
+  }
+}
+
+body {
+  font-family: "K2D", sans-serif;
+  background-color: white;
+  color: black;
+}
+
+.text-darkmode {
+  color: white;
+}
+
+.text-darkmode-oneColor {
+  color: black;
+}
+
+
+.line-darkmode {
+  background-color: white;
+}
+
+.modal-box {
+  background-color: white;
+  color: black;
+}
+
+.input {
+  background-color: white;
+  border: 1px solid black;
+  color: black;
+}
+
+.label-text,
+.label-text-alt {
+  color: black;
+}
+
+.shadow {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.btn {
+  background-color: white;
+}
+
+.otp {
+  background-color: white;
+  border: 1px solid black;
+  color: black;
+}
+
+.input-otp {
+  background-color: white;
+  color: black;
+}
+
+.btn-text {
+  color: black;
+}
+
+.border:hover {
+  border: 1px solid white;
+}
+
+.divide {
+  background-color: white;
+}
+
+body.dark {
+  font-family: "K2D", sans-serif;
+  background-color: black;
+  color: white;
+}
+
+body.dark .text-darkmode {
+  color: black;
+}
+
+body.dark .text-darkmode-oneColor {
+  color: black;
+}
+
+body.dark .line-darkmode {
+  background-color: black;
+}
+
+body.dark .border:hover {
+  border: 1px solid black;
+}
+
+body.dark .shadow {
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.5);
+}
+
+body.dark .btn {
+  background-color: black;
+}
+
+body.dark .btn-text {
+  color: white;
+}
+
+body.dark .modal-box,
+body.dark .side-box,
+body.dark .input {
+  background-color: black;
+  color: white;
+  border: 1px solid white;
+}
+
+body.dark .otp {
+  background-color: black;
+  color: white;
+  border: 1px solid white;
+}
+
+body.dark .input-otp {
+  background-color: black;
+  color: white;
+}
+
+body.dark .label-text,
+body.dark .label-text-alt {
+  color: white;
+}
+
+body.dark .divide {
+  background-color: black;
+}
+
+.shadow-text {
+  text-shadow: 12px 12px 14px rgba(0, 0, 0, 0.3);
+}
+
+.bg-gif {
+  background-image: url('https://img.freepik.com/free-photo/3d-background-with-white-cubes_23-2150472987.jpg?w=1060&t=st=1718023373~exp=1718023973~hmac=630ada289e901f0d0a37628436ca63482923254a75c74e179a9450bc4bd93fb3');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 0;
+}
+
+.bg-custom-bg2 {
+  background-image: url('https://www.matichon.co.th/wp-content/uploads/2020/09/%E0%B8%A0%E0%B8%9B-%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%88%E0%B8%B1%E0%B8%94%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%97%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B9%80%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%A7%E0%B9%80%E0%B8%8A%E0%B8%B4%E0%B8%87%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%A7%E0%B8%B1%E0%B8%95%E0%B8%B4%E0%B8%A8%E0%B8%B2%E0%B8%AA%E0%B8%95%E0%B8%A3%E0%B9%8C.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 0;
+}
+
+.bg-custom-bg1 {
+  background-image: url('https://static.vinwonders.com/production/homestay-la-gi-banner.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 0;
+}
+
+.group:hover .bg-custom-bg2 {
+  opacity: 1;
+}
+
+.group:hover .bg-custom-bg1 {
+  opacity: 1;
+}
+
+.text-overlay {
+  position: relative;
+  z-index: 9;
+  opacity: 1;
+  transition: color 0.3s ease-in-out;
+}
+
+.group:hover .text-overlay {
+  color: white;
+}
+
+.group:hover .overlay {
+  opacity: 1;
+}
+
+@media only screen and (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* loading */
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(80px) rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg) translateX(80px) rotate(-360deg);
+  }
+}
+
+@keyframes slide {
+  0% {
+    width: 0%;
+  }
+
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes jump {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-30px);
+    color: #DC9832
+  }
+
+  60% {
+    transform: translateY(-15px);
+    color: #4B99FA
+  }
+}
+
+@keyframes jump-and-change-color {
+  0% {
+    transform: translateY(0);
+    color: red;
+  }
+
+  25% {
+    transform: translateY(-30px);
+    color: orange;
+  }
+
+  50% {
+    transform: translateY(0);
+    color: yellow;
+  }
+
+  75% {
+    transform: translateY(-15px);
+    color: green;
+  }
+
+  100% {
+    transform: translateY(0);
+    color: blue;
+  }
+}
+
+.animate-jump {
+  animation: jump 2s infinite;
+}
+
+.animate-jump-and-change-color {
+  animation: jump-and-change-color 2s infinite;
+}
+
+.animate-slide {
+  animation: slide 1.5s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: slide 1.5s ease-in-out infinite;
+}
+
+.animate-orbit {
+  animation: orbit 5s linear infinite;
+}
+
+.earth {
+  background: radial-gradient(circle, #3b82f6 0%, #1e40af 100%);
+}
+
+.shadow-text {
+  text-shadow: 12px 12px 14px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .shadow-text {
+  text-shadow: 12px 12px 14px rgba(255, 255, 255, 0.3);
+}
+
+/* Box Alert */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip .tooltip-text {
+  white-space: normal;
+  max-width: 100px;
+  visibility: hidden;
+  width: max-content;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+body.dark .tooltip-text {
+  white-space: normal;
+  max-width: 100px;
+  visibility: hidden;
+  width: max-content;
+  background-color: rgba(255, 255, 255, 0.75);
+  color: #000;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Swal butoon */
+
+.swal-button-confirm {
+  background-color: #DC9832 !important;
+}
+
+.swal-button-cancel {
+  background-color: #4B99FA !important;
+}
+
+/* calendar */
+@media (max-width: 640px) {
+  .calendar-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}

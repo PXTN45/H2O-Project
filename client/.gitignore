@@ -23,4 +23,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD:Server/.gitignore
 *.env
+=======
+*.env
+>>>>>>> Client-version1.4.0(ReadyForSearch):client/.gitignore
