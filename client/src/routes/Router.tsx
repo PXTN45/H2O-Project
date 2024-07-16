@@ -37,7 +37,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "/dashboard-user/ProfileUser",
+            path: "/dashboard-user/Profile-user",
             element: <ProfileUser />,
           },
         ],
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "/dashboard-business/ProfileBusiness",
+            path: "/dashboard-business/Profile-business",
             element: <ProfileBusiness />,
           },
         ],
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "/dashboard-admin/ProfileAdmin",
+            path: "/dashboard-admin/Profile-admin",
             element: <ProfileBusiness />,
           },
         ],

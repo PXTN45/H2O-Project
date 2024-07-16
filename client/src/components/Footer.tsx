@@ -38,7 +38,7 @@ const Footer = () => {
     <div id="footer" className={`relative w-full h-full ${isDarkMode ? "dark" : ""}`}>
       <div
         className={`fixed 
-          ${isDarkMode ? "text-white" : "text-black"}
+          ${isDarkMode ? "text-white" : "text-dark"}
           ${isFooterVisible ? "bottom-[calc(64px)]" : "bottom-5"} 
           right-5 z-10 transition-all`}
       >

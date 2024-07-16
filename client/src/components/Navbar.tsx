@@ -98,7 +98,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
             </div>
 
             <button
-              className="bg-blue-500 hover:bg-blue-600 text-lg font-bold py-2 px-4 rounded"
+              className="text-lg font-bold py-2 px-4 rounded"
               onClick={
                 !userInfo
                   ? () => {
@@ -143,12 +143,12 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
                           </div>
                         </div>
                         <ul
-                          className="py-2 text-sm text-gray-700 dark:text-gray-200"
+                          className="py-2 text-sm"
                           aria-labelledby="avatarButton"
                         >
                           <li>
                             <a
-                              href={`/dashboard-${userInfo.role}`}
+                              href={`/dashboard-${userInfo.role}//Profile-${userInfo.role}`}
                               className="block px-4 py-2"
                             >
                               Dashboard

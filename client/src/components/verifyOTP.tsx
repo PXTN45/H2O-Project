@@ -199,7 +199,7 @@ const VerifyModal: React.FC<ModalProps> = ({
                         value={otp[index]}
                       />
                       {index === otp.length - 1 ? null : (
-                        <span className={"w-2 py-0.5 bg-gray-400"} />
+                        <span className={"w-2 py-0.5"} />
                       )}
                     </React.Fragment>
                   );

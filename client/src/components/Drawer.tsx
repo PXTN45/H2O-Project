@@ -198,7 +198,7 @@ const Drawer: React.FC = () => {
                     />
                   </div>
                   <label
-                    className="absolute inset-0 bg-gray-700 bg-opacity-50 text-white text-lg cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    className="absolute inset-0 bg-opacity-50 text-white text-lg cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     style={{ textAlign: "center" }}
                   >
                     <div className="absolute inset-0 flex items-center justify-center">

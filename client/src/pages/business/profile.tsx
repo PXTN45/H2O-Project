@@ -21,7 +21,7 @@ const Profile: React.FC = () => {
             <h1 className="text-lg">
               ชื่อธุรกิจ : {userInfo.businessName}
             </h1>
-            <button className="text-blue-500 hover:text-blue-700">
+            <button>
               <FaEdit size={24} />
             </button>
           </div>
@@ -33,7 +33,7 @@ const Profile: React.FC = () => {
               ที่อยู่ :{" "}
               {userInfo.address !== "" ? userInfo.address : "ยังไม่มีข้อมูล"}
             </h1>
-            <button className="text-blue-500 hover:text-blue-700">
+            <button>
               <FaEdit size={24} />
             </button>
           </div>
@@ -47,7 +47,7 @@ const Profile: React.FC = () => {
                 ? userInfo.birthday.toString()
                 : "ยังไม่มีข้อมูล"}
             </h1>
-            <button className="text-blue-500 hover:text-blue-700">
+            <button>
               <FaEdit size={24} />
             </button>
           </div>
@@ -59,7 +59,7 @@ const Profile: React.FC = () => {
               เบอร์โทรศัพท์ :{" "}
               {userInfo.phone !== "" ? userInfo.phone : "ยังไม่มีข้อมูล"}
             </h1>
-            <button className="text-blue-500 hover:text-blue-700">
+            <button>
               <FaEdit size={24} />
             </button>
           </div>
