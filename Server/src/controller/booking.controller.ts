@@ -3,7 +3,7 @@ import Booking from "../model/booking.model";
 import BookingModel from "../model/booking.model";
 const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { booker, homeStayDetail, paymentDetail } = req.body;
+    const { booker, homeStayDetail, paymentDetail,room_type } = req.body;
 
   
     // if (!booker || !homeStayDetail || paymentDetail) {
@@ -14,7 +14,8 @@ const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
     const newBookHomeStay = new Booking({
       booker,
       homeStayDetail,
-      paymentDetail
+      paymentDetail,
+      room_type
     });
 
     await newBookHomeStay.save();
