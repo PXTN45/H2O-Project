@@ -8,9 +8,10 @@ import packgeRouter from "./routes/package.router";
 import homeStayRouter from "./routes/homestay.router"
 import bookingRouter from "./routes/booking.router"
 import userRouter from "./routes/user.router";
+import generateQR from "./routes/generateQR.router";
 import jwt  from "jsonwebtoken";
 // const cookieParser = require("cookie-parser");
-import cookieParser = require("cookie-parser");
+import cookieParser from "cookie-parser";
 
 
 // Load environment variables from .env file
