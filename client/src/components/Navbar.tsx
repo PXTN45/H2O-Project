@@ -148,7 +148,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
                         >
                           <li>
                             <a
-                              href={`/dashboard-${userInfo.role}//Profile-${userInfo.role}`}
+                              href={`/dashboard-${userInfo.role}/Profile-${userInfo.role}`}
                               className="block px-4 py-2"
                             >
                               Dashboard
