@@ -8,29 +8,30 @@ const verifyEmailToken = async (req: Request, res: Response) => {
   const { token } = req.query;
   const secret = process.env.SECRET as string;
   const client = process.env.CLIENT_URL as string;
+
   try {
     const decode: any = jwt.verify(token as string, secret);
     const role = decode.role;
-    let verify;
-    if (decode.role === "user") {
-      const user = await UserModel.findById(decode.userId);
-      verify = user;
-    } else if (decode.role === "business") {
-      const business = await BusinessModel.findById(decode.userId);
-      verify = business;
-    } else if (decode.role === "admin") {
-      const admin = await AdminModel.findById(decode.userId);
-      verify = admin;
+    let verify: any;
+
+    if (role === "user") {
+      verify = await UserModel.findById(decode.userId);
+    } else if (role === "business") {
+      verify = await BusinessModel.findById(decode.userId);
+    } else if (role === "admin") {
+      verify = await AdminModel.findById(decode.userId);
     }
+
     if (!verify) {
-      res.status(400).json(decode);
+      res.status(400).json({ error: "Verification failed" });
+      return;
     }
 
     verify.isVerified = true;
     await verify.save();
     res.redirect(`${client}/verifySuccess/${token}`);
-  } catch {
-    res.errored;
+  } catch (error) {
+    res.status(400).json({ error: "Token verification failed" });
   }
 };
 

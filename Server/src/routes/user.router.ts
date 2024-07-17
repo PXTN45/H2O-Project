@@ -209,7 +209,7 @@ import verifyEmailToken from "../middlewares/verifyEmailToken";
 import { verifyToken } from "../middlewares/verifyToken";
 import verifyUser from "../middlewares/verifyUser";
 import verifyAdmin from "../middlewares/verifyAdmin";
-import verifyBusiness from "src/middlewares/verifyBusiness";
+import verifyBusiness from "../middlewares/verifyBusiness";
 
 const router = Router();
 

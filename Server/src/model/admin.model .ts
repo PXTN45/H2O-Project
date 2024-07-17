@@ -6,10 +6,10 @@ export interface Admin extends Document {
   password: string;
   name: string;
   lastName: string;
-  birthday:Date;
+  birthday: Date;
   phone: string;
   image: string;
-  isVerified:boolean;
+  isVerified: boolean;
   role: string;
 }
 
@@ -34,7 +34,7 @@ const AdminSchema = new Schema<Admin>({
   },
   birthday: {
     type: Date,
-    default: null
+    default: null,
   },
   phone: {
     type: String,
@@ -44,7 +44,8 @@ const AdminSchema = new Schema<Admin>({
   },
   image: {
     type: String,
-    default: "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg",
+    default:
+      "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg",
     required: true,
   },
   isVerified: { type: Boolean, default: false },

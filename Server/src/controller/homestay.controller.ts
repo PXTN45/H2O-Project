@@ -34,7 +34,7 @@ const getByIdHomeStay = async (req: Request, res: Response): Promise<void> => {
     } else {
       res.json(data);
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -46,7 +46,7 @@ const createHomeStay = async (req: Request, res: Response): Promise<void> => {
   try {
     const savedHomeStay = await newHomeStay.save();
     res.status(201).json(savedHomeStay);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -60,7 +60,7 @@ const getByPriceHomeStay = async (req: Request, res: Response): Promise<void> =>
     } else {
       res.json(homeStayPrice);
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -75,7 +75,7 @@ const updateHomeStay = async (req: Request, res: Response): Promise<void> => {
     } else {
       res.status(200).json({ message: "HomeStay Updated!", updatedHomeStay });
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -89,7 +89,7 @@ const deleteHomeStay = async (req: Request, res: Response): Promise<void> => {
     } else {
       res.status(200).json(data);
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };

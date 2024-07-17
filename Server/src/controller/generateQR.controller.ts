@@ -18,7 +18,7 @@ const generateQR = (req: Request<{}, {}, QRRequestBody>, res: Response) => {
         }
     };
 
-    QRCode.toDataURL(payload, (err, url) => {
+    QRCode.toDataURL(payload, (err: any, url) => {
         if (err) {
             console.error('การสร้าง QR Code ล้มเหลว:', err);
             return res.status(400).json({
