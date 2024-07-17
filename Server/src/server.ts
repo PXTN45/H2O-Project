@@ -110,6 +110,7 @@ app.use("/", packgeRouter);
 app.use("/", homeStayRouter)
 app.use("/", bookingRouter)
 app.use("/user", userRouter);
+app.use("/payment", generateQR);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<h1> Welcome to H2O Project</h1>");
