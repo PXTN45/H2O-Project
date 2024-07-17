@@ -9,7 +9,7 @@ interface QRRequestBody {
 
 const generateQR = (req: Request<{}, {}, QRRequestBody>, res: Response) => {
     const amount: number = parseFloat(String(_.get(req, ["body", "amount"])));
-    const mobileNumber: string = '0123456789';
+    const mobileNumber: string = '0928983405';
     const payload: string = generatePayload(mobileNumber, { amount });
     const option = {
         color: {
