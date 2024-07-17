@@ -7,34 +7,32 @@ interface QRRequestBody {
     amount: number;
 }
 
-// app.post('/generateQR', (req: Request<{}, {}, QRRequestBody>, res: Response) => {
-    const generateQR = (req: Request<{}, {}, QRRequestBody>, res: Response) => {
-        const amount: number = parseFloat(String(_.get(req, ["body", "amount"])));
-        const mobileNumber: string = '0123456789';
-        const payload: string = generatePayload(mobileNumber, { amount });
-        const option = {
-            color: {
-                dark: '#000',
-                light: '#fff'
-            }
-        };
-    
-        QRCode.toDataURL(payload, option, (err: Error | null, url: string | undefined) => {
-            if (err) {
-                console.log('generate fail');
-                return res.status(400).json({
-                    RespCode: 400,
-                    RespMessage: 'bad: ' + err.message
-                });
-            } else {
-                return res.status(200).json({
-                    RespCode: 200,
-                    RespMessage: 'good',
-                    Result: url
-                });
-            }
-        });
+const generateQR = (req: Request<{}, {}, QRRequestBody>, res: Response) => {
+    const amount: number = parseFloat(String(_.get(req, ["body", "amount"])));
+    const mobileNumber: string = '0123456789';
+    const payload: string = generatePayload(mobileNumber, { amount });
+    const option = {
+        color: {
+            dark: '#000',
+            light: '#fff'
+        }
     };
-    
+
+    QRCode.toDataURL(payload, (err, url) => {
+        if (err) {
+            console.error('การสร้าง QR Code ล้มเหลว:', err);
+            return res.status(400).json({
+                RespCode: 400,
+                RespMessage: 'การสร้าง QR code ล้มเหลว: ' + err.message
+            });
+        } else {
+            return res.status(200).json({
+                RespCode: 200,
+                RespMessage: 'สร้าง QR code สำเร็จ',
+                Result: url
+            });
+        }
+    });
+};
 
 export default generateQR;
