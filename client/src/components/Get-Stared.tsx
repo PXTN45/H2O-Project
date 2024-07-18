@@ -953,6 +953,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           </div>
           <div className="form-control mt-2">
             <input
+              id={activePage === "login" ? "Login" : "SignUp"}
               type="submit"
               value={activePage === "login" ? "Login" : "Sign Up"}
               className={
@@ -1023,6 +1024,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
         <div className="text-center justify-center items-center p-7">
           {activePage === "signup-user" && userInfo?.role === "admin" ? null : (
             <button
+              id="Google"
               className={
                 activePage === "login"
                   ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
