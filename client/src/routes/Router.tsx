@@ -9,6 +9,7 @@ import VerifyEmailSuccess from "../pages/orther/emailIsVerify";
 import ProfileUser from "../pages/user/profile";
 import ProfileBusiness from "../pages/business/profile";
 import SelectionCreate from "../pages/business/selectionCreate";
+import Payment from "../pages/orther/MakePayment";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
 
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/Payment",
+        element: <Payment />,
       },
       {
         path: "/search",
