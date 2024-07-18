@@ -39,17 +39,17 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
             ? "bg-gradient-to-r from-primaryBusiness to-secondBusiness w-full relative"
             : userInfo && userInfo.role === "admin"
             ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin w-full relative"
-            : "bg-gradient-to-r from-dark to-smoke w-full relative"
+            : "bg-gradient-to-r from-primaryUser to-primaryBusiness w-full relative"
         }
       >
         <div
           className={
-            !userInfo || (userInfo && thisPage === "/")
+            !userInfo && thisPage === "/" || (userInfo && thisPage === "/")
               ? "relative p-8 h-[700px]"
               : "relative"
           }
           style={
-            !userInfo || (userInfo && thisPage === "/")
+            !userInfo && thisPage === "/" || (userInfo && thisPage === "/")
               ? {
                   backgroundImage: `url(${image})`,
                   backgroundSize: "cover",
@@ -195,7 +195,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               )}
             </button>
           </div>
-          {!userInfo || (userInfo && thisPage === "/") ? (
+          {!userInfo && thisPage === "/" || (userInfo && thisPage === "/") ? (
             <div className="flex items-center mt-[100px]">
               <Search />
             </div>
