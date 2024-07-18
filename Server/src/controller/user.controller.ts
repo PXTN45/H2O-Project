@@ -216,6 +216,7 @@ const Login = async (req: Request, res: Response): Promise<void> => {
   let checkPasswordUser: boolean = false;
   let checkPasswordBusiness: boolean = false;
   let checkPasswordAdmin: boolean = false;
+  let isPasswordValid: boolean = false;
 
   if (password) {
     const isMatchedPasswordUser = user ? bcrypt.compareSync(password, user.password) : false;
@@ -227,16 +228,24 @@ const Login = async (req: Request, res: Response): Promise<void> => {
     checkPasswordAdmin = isMatchedPasswordAdmin;
   }
 
+  if (checkPasswordUser || checkPasswordBusiness || checkPasswordAdmin) {
+    isPasswordValid = true;
+  } else {
+    isPasswordValid = false;
+    res.status(400).json("pass isn't compareSync");
+    return
+  }
+
   let userData: typeof user | typeof business | typeof admin | null = null;
 
-  if (checkPasswordUser) {
+  if (role === "user") {
     userData = user;
-  } else if (checkPasswordBusiness) {
+  } else if (role === "business") {
     userData = business;
-  } else if (checkPasswordAdmin) {
+  } else if (role === "admin") {
     userData = admin;
   } else {
-    res.status(400).json("pass isn't compareSync");
+    res.status(400).json("role isn't compare");
     return;
   }
 
