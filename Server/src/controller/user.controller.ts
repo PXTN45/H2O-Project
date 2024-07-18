@@ -238,15 +238,20 @@ const Login = async (req: Request, res: Response): Promise<void> => {
 
   let userData: typeof user | typeof business | typeof admin | null = null;
 
-  if (role === "user") {
-    userData = user;
-  } else if (role === "business") {
-    userData = business;
-  } else if (role === "admin") {
-    userData = admin;
-  } else {
-    res.status(400).json("role isn't compare");
-    return;
+  if(isPasswordValid){
+    if (role === "user") {
+      userData = user;
+    } else if (role === "business") {
+      userData = business;
+    } else if (role === "admin") {
+      userData = admin;
+    } else {
+      res.status(400).json("role isn't compare");
+      return;
+    }
+  }else{
+    res.status(400).json("Isn't verify");
+    return
   }
 
   if (!userData) {
