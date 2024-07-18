@@ -1,5 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=K2D:wght@100&family=Kanit:ital@1&family=Noto+Sans+Cypro+Minoan&family=Open+Sans:ital,wght@0,300;0,400;1,400;1,500&display=swap");
+<<<<<<< HEAD
 /* darkrig */
+=======
+/* testMerch */
+>>>>>>> origin/Client-version1.4.1(Fix-Bug)
 @media (prefers-color-scheme: dark) {
   body {
     background-color: black;
