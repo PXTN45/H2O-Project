@@ -8,9 +8,10 @@ import packgeRouter from "./routes/package.router";
 import homeStayRouter from "./routes/homestay.router"
 import bookingRouter from "./routes/booking.router"
 import userRouter from "./routes/user.router";
+import generateQR from "./routes/generateQR.router";
 import jwt  from "jsonwebtoken";
 // const cookieParser = require("cookie-parser");
-import cookieParser = require("cookie-parser");
+import cookieParser from "cookie-parser";
 
 
 // Load environment variables from .env file
@@ -109,6 +110,7 @@ app.use("/", packgeRouter);
 app.use("/", homeStayRouter)
 app.use("/", bookingRouter)
 app.use("/user", userRouter);
+app.use("/payment", generateQR);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<h1> Welcome to H2O Project</h1>");

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import PackageModel from "../model/package.model"
+import PackageModel from "../model/package.model";
 
 const getAllPackage = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -37,7 +37,7 @@ const getByIdPackage = async (req: Request, res: Response): Promise<void> => {
     } else {
       res.json(data);
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -49,7 +49,7 @@ const createPackage = async (req: Request, res: Response): Promise<void> => {
   try {
     const savedPackage = await newPackage.save();
     res.status(201).json(savedPackage);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -66,7 +66,7 @@ const getByPricePackage = async (
     } else {
       res.json(packagePrice);
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -83,7 +83,7 @@ const updatePackage = async (req: Request, res: Response): Promise<void> => {
     } else {
       res.status(200).json({ message: "Package Updated!", updatedPackage });
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -97,7 +97,7 @@ const deletePackage = async (req: Request, res: Response): Promise<void> => {
     } else {
       res.status(200).json(data);
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -109,9 +109,9 @@ const searchPackage = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await PackageModel.find({
       $or: [
-        { name_package: { $regex: name, $options: 'i' } },
-        { type_package: { $regex: type, $options: 'i' } },
-        { detail_package: { $regex: detail, $options: 'i' } },
+        { name_package: { $regex: name, $options: "i" } },
+        { type_package: { $regex: type, $options: "i" } },
+        { detail_package: { $regex: detail, $options: "i" } },
       ],
     });
     res.status(200).json(data);

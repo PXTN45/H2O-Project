@@ -13,7 +13,7 @@ const getAllUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData = await UserModel.find();
     res.status(200).json(userData);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -22,7 +22,7 @@ const getAllBusiness = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData = await BusinessModel.find();
     res.status(200).json(userData);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -31,7 +31,7 @@ const getAllAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData = await AdminModel.find();
     res.status(200).json(userData);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -44,18 +44,20 @@ const userRegister = async (req: Request, res: Response): Promise<void> => {
 
   if (existingUser) {
     res.status(302).json({ message: "Email is already in use" });
-  }else{
-    if(userReq.password){
-      if(userReq.password.length < 8){
-        res.status(400).json({ message: "Password must be at least 8 characters long" });
-      }else{
+  } else {
+    if (userReq.password) {
+      if (userReq.password.length < 8) {
+        res
+          .status(400)
+          .json({ message: "Password must be at least 8 characters long" });
+      } else {
         try {
           const user = await UserModel.create({
-            name : userReq.name,
-            lastName : userReq.lastName,
-            email : userReq.email,
+            name: userReq.name,
+            lastName: userReq.lastName,
+            email: userReq.email,
             password: bcrypt.hashSync(userReq.password, salt),
-            phone : userReq.phone,
+            phone: userReq.phone,
           });
           const token = jwt.sign(
             { userId: user.id, email: user.email, role: user.role },
@@ -71,7 +73,7 @@ const userRegister = async (req: Request, res: Response): Promise<void> => {
           res.status(400).json(error);
         }
       }
-    }else if(!userReq.password){
+    } else if (!userReq.password) {
       const newUser = new UserModel(req.body);
       const savedUser = await newUser.save();
       res.status(201).json(savedUser);
@@ -87,17 +89,19 @@ const businessRegister = async (req: Request, res: Response): Promise<void> => {
 
   if (existingUser) {
     res.status(302).json({ message: "Email is already in use" });
-  }else{
-    if(userReq.password){
-      if(userReq.password.length < 8){
-        res.status(400).json({ message: "Password must be at least 8 characters long" });
-      }else{
+  } else {
+    if (userReq.password) {
+      if (userReq.password.length < 8) {
+        res
+          .status(400)
+          .json({ message: "Password must be at least 8 characters long" });
+      } else {
         try {
           const user = await BusinessModel.create({
             businessName: userReq.businessName,
-            email : userReq.email,
+            email: userReq.email,
             password: bcrypt.hashSync(userReq.password, salt),
-            phone : userReq.phone,
+            phone: userReq.phone,
           });
           const token = jwt.sign(
             { userId: user.id, email: user.email, role: user.role },
@@ -113,7 +117,7 @@ const businessRegister = async (req: Request, res: Response): Promise<void> => {
           res.status(400).json(error);
         }
       }
-    }else if(!userReq.password){
+    } else if (!userReq.password) {
       const newUser = new BusinessModel(req.body);
       const savedUser = await newUser.save();
       res.status(201).json(savedUser);
@@ -153,8 +157,8 @@ const updateUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
   const updateData = req.body;
   const salt = bcrypt.genSaltSync(10);
-  
-  if(updateData.password){
+
+  if (updateData.password) {
     updateData.password = bcrypt.hashSync(updateData.password, salt);
   }
 
@@ -196,41 +200,60 @@ const Login = async (req: Request, res: Response): Promise<void> => {
   const secret = process.env.SECRET as string;
   const { email, password, role } = req.body;
 
-  const user = await UserModel.findOne({ email }).collation({ locale: 'en', strength: 2 }); //strength โดยพื้นฐานมี 4 ละดับการใช้ต่างกันศึกษาเพิ่มโดยหาเอกสาร
-  const business = await BusinessModel.findOne({ email }).collation({ locale: 'en', strength: 2 });
-  const admin = await AdminModel.findOne({ email }).collation({ locale: 'en', strength: 2 });
-  
-  let cheackPasswordUser: boolean = false
-  let cheackPasswordBusiness: boolean = false
-  let cheackPasswordAdmin: boolean = false
-  if(password){
-    const isMatchedPasswordUser = bcrypt.compareSync(password, user.password);
-    const isMatchedPasswordBusiness = bcrypt.compareSync(password, business.password);
-    const isMatchedPasswordAdmin = bcrypt.compareSync(password, admin.password);
-    cheackPasswordUser = isMatchedPasswordUser
-    cheackPasswordBusiness = isMatchedPasswordBusiness
-    cheackPasswordAdmin = isMatchedPasswordAdmin
+  const user = await UserModel.findOne({ email }).collation({
+    locale: "en",
+    strength: 2,
+  }); //strength โดยพื้นฐานมี 4 ละดับการใช้ต่างกันศึกษาเพิ่มโดยหาเอกสาร
+  const business = await BusinessModel.findOne({ email }).collation({
+    locale: "en",
+    strength: 2,
+  });
+  const admin = await AdminModel.findOne({ email }).collation({
+    locale: "en",
+    strength: 2,
+  });
+
+  let checkPasswordUser: boolean = false;
+  let checkPasswordBusiness: boolean = false;
+  let checkPasswordAdmin: boolean = false;
+  let isPasswordValid: boolean = false;
+
+  if (password) {
+    const isMatchedPasswordUser = user ? bcrypt.compareSync(password, user.password) : false;
+    const isMatchedPasswordBusiness = business ? bcrypt.compareSync(password, business.password) : false;
+    const isMatchedPasswordAdmin = admin ? bcrypt.compareSync(password, admin.password) : false;
+
+    checkPasswordUser = isMatchedPasswordUser;
+    checkPasswordBusiness = isMatchedPasswordBusiness;
+    checkPasswordAdmin = isMatchedPasswordAdmin;
   }
 
-  let userData;
-  if(cheackPasswordUser || cheackPasswordBusiness || cheackPasswordAdmin){
-    if (role === "user") {
-      userData = user;
-    } else if (role === "business") {
-      userData = business;
-    } else if (role === "admin") {
-      userData = admin;
-    }
-  }else{
+  if (checkPasswordUser || checkPasswordBusiness || checkPasswordAdmin) {
+    isPasswordValid = true;
+  } else {
+    isPasswordValid = false;
     res.status(400).json("pass isn't compareSync");
     return
+  }
+
+  let userData: typeof user | typeof business | typeof admin | null = null;
+
+  if (role === "user") {
+    userData = user;
+  } else if (role === "business") {
+    userData = business;
+  } else if (role === "admin") {
+    userData = admin;
+  } else {
+    res.status(400).json("role isn't compare");
+    return;
   }
 
   if (!userData) {
     res.status(400).json("No user-data");
     return;
   }
-  
+
   if (userData) {
     jwt.sign({ email, id: userData._id, role }, secret, {}, (err, token) => {
       if (err) throw err;
@@ -238,19 +261,14 @@ const Login = async (req: Request, res: Response): Promise<void> => {
       const { password, ...userWithOutPassword } = userData.toObject();
       res.status(200).json({ ...userWithOutPassword });
     });
-  } else if(!password){
-    jwt.sign({ email, id: userData._id, role }, secret, {}, (err, token) => {
-      if (err) throw err;
-      res.cookie("token", token);
-      res.status(200).json(userData);
-    });
-  }else {
+  } else {
     res.status(400).json("Wrong credentials");
   }
 };
 
-const checkEmailExists = async(req: Request, res: Response): Promise<void> => {
-  const { email , role } = req.body;
+
+const checkEmailExists = async (req: Request, res: Response): Promise<void> => {
+  const { email, role } = req.body;
   try {
     let userData;
     if (role === "user") {
@@ -263,17 +281,17 @@ const checkEmailExists = async(req: Request, res: Response): Promise<void> => {
       const user = await AdminModel.findOne({ email });
       userData = user;
     }
-    
+
     res.status(200).json(!!userData);
   } catch (error) {
-    console.error('Error checking email existence:', error);
-    throw new Error('Failed to check email existence');
+    console.error("Error checking email existence:", error);
+    throw new Error("Failed to check email existence");
   }
 };
 
 const Logout = (req: Request, res: Response): void => {
-  res.clearCookie('token', { path: '/' });
-  res.status(200).json({ message: 'Successfully logged out' });
+  res.clearCookie("token", { path: "/" });
+  res.status(200).json({ message: "Successfully logged out" });
 };
 
 export {
@@ -286,5 +304,5 @@ export {
   getAllBusiness,
   getAllAdmin,
   updateUser,
-  checkEmailExists
+  checkEmailExists,
 };

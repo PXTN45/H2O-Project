@@ -3,28 +3,28 @@ import { Schema, model, Document } from "mongoose";
 export interface Business extends Document {
   email: string;
   password: string;
-  businessName:string;
+  businessName: string;
   name: string;
   lastName: string;
-  birthday:Date;
+  birthday: Date;
   phone: string;
   image: string;
   addresses: Address[];
-  idcard:string;
-  BankingName:string;
-  BankingUsername:string;
-  BankingUserlastname:string;
-  BankingCode:string;
-  isVerified:boolean;
+  idcard: string;
+  BankingName: string;
+  BankingUsername: string;
+  BankingUserlastname: string;
+  BankingCode: string;
+  isVerified: boolean;
   role: string;
 }
 
 export interface Address {
-  houseNumber:  string;
+  houseNumber: string;
   village: string;
   district: string;
   street: string;
-  city : string;
+  city: string;
   country: string;
   postalCode: string;
 }
@@ -32,31 +32,31 @@ export interface Address {
 const AddressSchema = new Schema<Address>({
   houseNumber: {
     type: String,
-    default: ""
+    default: "",
   },
   village: {
     type: String,
-    default: ""
+    default: "",
   },
   district: {
     type: String,
-    default: ""
+    default: "",
   },
   street: {
     type: String,
-    default: ""
+    default: "",
   },
   city: {
     type: String,
-    default: ""
+    default: "",
   },
   country: {
     type: String,
-    default: ""
+    default: "",
   },
   postalCode: {
     type: String,
-    default: ""
+    default: "",
   },
 });
 
@@ -76,15 +76,15 @@ const BusinessSchema = new Schema<Business>({
   },
   name: {
     type: String,
-    default: ""
+    default: "",
   },
   lastName: {
     type: String,
-    default: ""
+    default: "",
   },
   birthday: {
     type: Date,
-    default: null
+    default: null,
   },
   phone: {
     type: String,
@@ -93,40 +93,43 @@ const BusinessSchema = new Schema<Business>({
   image: {
     type: String,
     required: true,
-    default: "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg",
+    default:
+      "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg",
   },
   addresses: {
     type: [AddressSchema],
-    default: [{
-      houseNumber: "",
-      village: "",
-      district: "",
-      street: "",
-      city: "",
-      country: "",
-      postalCode: "",
-    }]
+    default: [
+      {
+        houseNumber: "",
+        village: "",
+        district: "",
+        street: "",
+        city: "",
+        country: "",
+        postalCode: "",
+      },
+    ],
   },
   idcard: {
     type: String,
     maxlength: 13,
-    default: ""
+    default: "",
   },
   BankingName: {
-    type: String, 
-    default: ""
+    type: String,
+    default: "",
   },
   BankingUsername: {
-    type: String, 
-    default: ""
+    type: String,
+    default: "",
   },
   BankingUserlastname: {
     type: String,
-    default: ""
+    default: "",
   },
   BankingCode: {
     type: String,
-    default: ""
+    default: "",
   },
   isVerified: { type: Boolean, default: false },
   role: { type: String, enum: ["business"], default: "business" },

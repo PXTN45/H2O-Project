@@ -9,16 +9,16 @@ export interface User extends Document {
   phone: string;
   image?: string;
   addresses: Address[];
-  isVerified:boolean;
+  isVerified: boolean;
   role: string;
 }
 
 export interface Address {
-  houseNumber:  string;
+  houseNumber: string;
   village: string;
   district: string;
   street: string;
-  city : string;
+  city: string;
   country: string;
   postalCode: string;
 }
@@ -26,31 +26,31 @@ export interface Address {
 const AddressSchema = new Schema<Address>({
   houseNumber: {
     type: String,
-    default: ""
+    default: "",
   },
   village: {
     type: String,
-    default: ""
+    default: "",
   },
   district: {
     type: String,
-    default: ""
+    default: "",
   },
   street: {
     type: String,
-    default: ""
+    default: "",
   },
   city: {
     type: String,
-    default: ""
+    default: "",
   },
   country: {
     type: String,
-    default: ""
+    default: "",
   },
   postalCode: {
     type: String,
-    default: ""
+    default: "",
   },
 });
 
@@ -58,7 +58,7 @@ const UserSchema = new Schema<User>({
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
@@ -66,42 +66,45 @@ const UserSchema = new Schema<User>({
   },
   name: {
     type: String,
-    required: true
+    required: true,
   },
   lastName: {
     type: String,
-    required: true
+    required: true,
   },
   birthday: {
     type: Date,
-    default: null
+    default: null,
   },
   phone: {
     type: String,
-    trim: true
+    trim: true,
   },
   image: {
     type: String,
-    default: "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg"
+    default:
+      "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg",
   },
   addresses: {
     type: [AddressSchema],
-    default: [{
-      houseNumber: "",
-      village: "",
-      district: "",
-      street: "",
-      city: "",
-      country: "",
-      postalCode: "",
-    }]
+    default: [
+      {
+        houseNumber: "",
+        village: "",
+        district: "",
+        street: "",
+        city: "",
+        country: "",
+        postalCode: "",
+      },
+    ],
   },
   isVerified: { type: Boolean, default: false },
   role: {
     type: String,
     enum: ["user"],
-    default: "user"
-  }
+    default: "user",
+  },
 });
 
 const UserModel = model<User>("User", UserSchema);
