@@ -12,6 +12,7 @@ import SelectionCreate from "../pages/business/selectionCreate";
 import Payment from "../pages/orther/MakePayment";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
+import TEST from "./test";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/test",
+        element: <TEST />,
       },
       {
         path: "/Payment",

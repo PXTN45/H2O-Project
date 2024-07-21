@@ -167,6 +167,23 @@ body.dark .divide {
   background-color: black;
 }
 
+body.dark .swal2-popup {
+  background-color: black;
+  color: white;
+}
+
+body.dark .swal2-title {
+  color: white;
+}
+
+body.dark .swal2-content {
+  color: white;
+}
+
+body.dark .swal2-actions button {
+  color: white;
+}
+
 .shadow-text {
   text-shadow: 12px 12px 14px rgba(0, 0, 0, 0.3);
 }
