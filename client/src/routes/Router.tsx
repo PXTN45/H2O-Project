@@ -13,6 +13,7 @@ import Payment from "../pages/orther/MakePayment";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
 import TEST from "./test";
+import TEST2 from "./test2";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/test",
         element: <TEST />,
+      },
+      {
+        path: "/test2",
+        element: <TEST2 />,
       },
       {
         path: "/Payment",

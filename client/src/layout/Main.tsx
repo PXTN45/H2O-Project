@@ -55,7 +55,7 @@ const Main: React.FC = () => {
       {loadPage ? (
         <>
           <Navbar image={isImage} />
-          <Outlet />
+            <Outlet />
           <Footer />
         </>
       ) : (

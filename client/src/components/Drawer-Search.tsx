@@ -33,7 +33,7 @@ const Drawer: React.FC = () => {
               <RxHamburgerMenu />
             </label>
           </div>
-          <div className="drawer-side shadow">
+          <div className="drawer-side z-20">
             <label
               htmlFor="my-drawer-2"
               aria-label="close sidebar"
@@ -44,7 +44,7 @@ const Drawer: React.FC = () => {
                 <input
                   type="text"
                   placeholder="ค้นหาสิ่งที่สนใจ"
-                  className="bg-white text-dark text-sm p-2 mb-2 rounded-full block w-full shadow"
+                  className="input text-sm p-2 mb-2 rounded-full block w-full shadow"
                 />
               </div>
               <div className="max-w-full rounded overflow-hidden shadow relative mx-5 my-5 h-full">
