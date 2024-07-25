@@ -12,6 +12,8 @@ import SelectionCreate from "../pages/business/selectionCreate";
 import Payment from "../pages/orther/MakePayment";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
+import BookingDetail from "../pages/orther/bookingDetail";
+import DetailPayment from "../pages/orther/detailPayment";
 import TEST from "./test";
 
 const router = createBrowserRouter([
@@ -30,6 +32,14 @@ const router = createBrowserRouter([
       {
         path: "/Payment",
         element: <Payment />,
+      },
+      {
+        path: "/detailPayment",
+        element: <DetailPayment />,
+      },
+      {
+        path: "/bookingDetail",
+        element: <BookingDetail />,
       },
       {
         path: "/search",
