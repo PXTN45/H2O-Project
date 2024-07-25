@@ -115,9 +115,22 @@ const verifyOTP = async (
         try {
           const { value: formValues } = await Swal.fire({
             title: "Enter your new password",
-            html:
-              '<input id="swal-input1" type="password" class="swal2-input" placeholder="New password">' +
-              '<input id="swal-input2" type="password" class="swal2-input" placeholder="Confirm password">',
+            html: `
+            <div class="max-w-full rounded overflow-hidden shadow relative transform transition duration-300">
+            <div class="relative mx-5 flex items-center justify-center">
+                <input id="swal-input1" type="text" class="swal2-input w-full" placeholder="New password" style="-webkit-text-security:disc" >
+                <span style="position: absolute; right: 50px; top: 63%; transform: translateY(-50%); cursor: pointer;" id="togglePassword1">
+                  <i class="fas fa-eye-slash"></i>
+                </span>
+              </div>
+              <div class="relative mx-5 flex items-center justify-center">
+                <input id="swal-input2" type="text" class="swal2-input w-full" placeholder="Confirm password" style="-webkit-text-security:disc" >
+                <span style="position: absolute; right: 50px; top: 63%; transform: translateY(-50%); cursor: pointer;" id="togglePassword2">
+                  <i class="fas fa-eye-slash"></i>
+                </span>
+              </div>
+            </div>
+            `,
             focusConfirm: false,
             showCancelButton: true,
             preConfirm: () => {
@@ -145,6 +158,35 @@ const verifyOTP = async (
                 );
               }
               return { newPassword };
+            },
+            didOpen: () => {
+              let hide = true
+              const togglePasswordVisibility = (id: string, iconId: string) => {
+                const input = document.getElementById(id) as HTMLInputElement;
+                const icon = document.getElementById(iconId) as HTMLElement;
+        
+                if (input && icon) {
+                  hide = !hide;
+        
+                  if (hide) {
+                    icon.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    input.style.setProperty("-webkit-text-security", "disc");
+                  } else {
+                    icon.innerHTML = '<i class="fas fa-eye"></i>';
+                    input.style.setProperty("-webkit-text-security", "none");
+                  }
+                }
+              };
+              document
+                .getElementById("togglePassword1")
+                ?.addEventListener("click", () =>
+                  togglePasswordVisibility("swal-input1", "togglePassword1")
+                );
+              document
+                .getElementById("togglePassword2")
+                ?.addEventListener("click", () =>
+                  togglePasswordVisibility("swal-input2", "togglePassword2")
+                );
             },
           });
 

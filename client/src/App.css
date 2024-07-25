@@ -110,6 +110,10 @@ body {
   background-color: white;
 }
 
+.swal2-select {
+  background-color: white;
+}
+
 body.dark {
   font-family: "K2D", sans-serif;
   background-color: black;
@@ -194,6 +198,9 @@ body.dark .swal2-actions button {
   color: white;
 }
 
+body.dark .swal2-select {
+  background-color: black;
+}
 .shadow-text {
   text-shadow: 12px 12px 14px rgba(0, 0, 0, 0.3);
 }

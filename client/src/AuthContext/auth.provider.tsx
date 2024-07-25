@@ -519,6 +519,9 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
               inputOptions: inputOptions,
               inputPlaceholder: "Select a role",
               showCancelButton: true,
+              customClass: {
+                input: 'swal2-select'
+              },
               inputValidator: (value) => {
                 if (!value) {
                   return "You need to select a role";
