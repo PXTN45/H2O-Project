@@ -16,10 +16,6 @@ const bookingDetail: React.FC = () => {
         <div className="flex flex-col mb-5 w-2/3 ">
           <div className="shadow-lg border rounded-lg mb-5 mr-5 p-5 ">
             <h1>รายละเอียดการติดต่อ</h1>
-            <h1>
-              กรุณากรอกข้อมูลให้ถูกต้องครบทุกช่อง
-              เพื่อให้แน่ใจว่าคุณจะได้รับบัตรยืนยันการจองในอีเมลของคุณ
-            </h1>
             <div className="flex flex-row">
               <div className="flex flex-col mr-5">
                 <h1>ชื่อ :</h1>
@@ -38,7 +34,7 @@ const bookingDetail: React.FC = () => {
               <p>รายละเอียดราคา</p>
               <div className="flex justify-between border-b border-indigo-100 ">
                 <p>ราคาห้องพัก</p>
-                <p>943.08 บาท</p>
+                <p>{price} บาท</p>
               </div>
               <div>
                 <button className="btn btn-warning" onClick={data}>

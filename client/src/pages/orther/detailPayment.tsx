@@ -12,7 +12,7 @@ const DetailPayment: React.FC = () => {
     const generateQR = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/payment/generateQR",
+          "https://h2o-project.onrender.com/payment/generateQR",
           { amount }
         );
         setQrCodeUrl(response.data.Result);
@@ -24,7 +24,7 @@ const DetailPayment: React.FC = () => {
   }, [amount]);
 
   return (
-    <div className="container-sm  mx-auto px-20">
+    <div className="container-sm  mx-auto px-60">
       <div className="flex flex-col items-center">
         <div className="flex justify-center mt-10 mb-10">
           <ul className="steps steps-vertical lg:steps-horizontal">
@@ -49,13 +49,13 @@ const DetailPayment: React.FC = () => {
                 <h6>เทวัญ จอมเทียน พัทยา (Tevan Jomtien Hotel Pattaya)</h6>
               </div>
               <div className="flex mt-3">
-                <div className="flex flex-col gap-5 w-1/2">
+                <div className="flex flex-col gap-5 mr-5">
                   <h1>ชื่อผู้เข้าพัก : </h1>
                   <h1>ห้อง : </h1>
                   <h1>เช็คอิน : </h1>
                   <h1>เช็คเอ้า : </h1>
                 </div>
-                <div className="flex flex-col gap-5 w-1/2">
+                <div className="flex flex-col gap-5 ">
                   <h1>Nattaphong Sriphaophan</h1>
                   <h1>ซูพีเรีย เตียงใหญ่ (Superior Double Room)</h1>
                   <h1>วันพุธที่ 24 กรกฎาคม 2567</h1>
