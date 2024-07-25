@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node-dev ./src/server.ts",
     "start:prod": "npm run build && node ./dist/src/server.js",
-    "build": "npx tsc"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
