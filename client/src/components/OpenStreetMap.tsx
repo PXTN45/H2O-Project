@@ -6,6 +6,8 @@ import axiosPublic from "../hook/axiosPublic";
 import { MdClose } from "react-icons/md";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
+Modal.setAppElement('#root');
+
 type Location = {
   latitude_location: number;
   longitude_location: number;
