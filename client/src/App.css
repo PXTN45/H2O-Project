@@ -69,6 +69,11 @@ body {
   color: black;
 }
 
+.modal-map {
+  background-color: #f1f1f1;
+  color: black;
+}
+
 .label-text,
 .label-text-alt {
   color: black;
@@ -147,6 +152,11 @@ body.dark .input {
   border: 1px solid white;
 }
 
+body.dark .modal-map {
+  background-color: black;
+  color: white;
+}
+
 body.dark .otp {
   background-color: black;
   color: white;
@@ -194,6 +204,13 @@ body.dark .swal2-actions button {
   background-repeat: no-repeat;
   background-position: center;
   z-index: 0;
+}
+
+.bg-map {
+  background-image: url('https://cdn6.agoda.net/images/MAPS-1213/default/bkg-map-entry.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .bg-custom-bg2 {

@@ -22,9 +22,7 @@ type Coordinate = HomeStayAndPackage & {
   lng: number;
 };
 
-Modal.setAppElement("#root");
-
-const MapComponent: React.FC = () => {
+const OpenStreetMap: React.FC = () => {
   const [map, setMap] = useState<L.Map | null>(null);
   const [marker, setMarker] = useState<L.Marker | null>(null);
   const [circle, setCircle] = useState<L.Circle | null>(null);
@@ -119,7 +117,7 @@ const MapComponent: React.FC = () => {
           );
 
           setCoordinates(filteredCoordinates);
-          console.log(coordinates);
+          console.log(filteredCoordinates);
         } catch (error) {
           console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
         }
@@ -144,12 +142,12 @@ const MapComponent: React.FC = () => {
   };
 
   return (
-    <div id="map_Search">
+    <div id="map_Search" className="w-full h-full">
       <button
-        className="bg-map w-full text-dark font-bold hover:text-primaryBusiness"
+        className="bg-map w-full h-full text-dark font-bold rounded-md hover:text-primaryBusiness"
         onClick={openModal}
       >
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center w-full h-full">
           <FaMapMarkerAlt className="text-alert text-[64px]" />
           <div className="mt-3">SEARCH ON MAP</div>
         </div>
@@ -159,6 +157,7 @@ const MapComponent: React.FC = () => {
         onRequestClose={closeModal}
         contentLabel="Map Modal"
         className="modal-map relative w-4/5 h-4/5 overflow-hidden flex flex-col translate-x-[-50%] translate-y-[-50%] top-[50%] left-[50%] rounded-xl"
+        overlayClassName="fixed inset-0 bg-white bg-opacity-80 z-40"
       >
         <div className="flex items-center justify-between p-2 rounded-tl-[10px]">
           <h1 className="font-bold ml-2">OpenStreetMap</h1>
@@ -178,4 +177,4 @@ const MapComponent: React.FC = () => {
   );
 };
 
-export default MapComponent;
+export default OpenStreetMap;

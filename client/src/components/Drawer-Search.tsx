@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
+import OpenStreetMap from "./OpenStreetMap";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { AuthContext } from "../AuthContext/auth.provider";
+
 
 const Drawer: React.FC = () => {
   const authContext = useContext(AuthContext);
@@ -33,19 +35,22 @@ const Drawer: React.FC = () => {
               <RxHamburgerMenu />
             </label>
           </div>
-          <div className="drawer-side z-20">
+          <div className="drawer-side z-10">
             <label
               htmlFor="my-drawer-2"
               aria-label="close sidebar"
               className="drawer-overlay"
             />
-            <ul className="menu p-4 w-80 min-h-full text-xl">
+            <ul className="menu p-4 w-80 min-h-full text-xl line-darkmode">
               <div className=" my-5 mx-5">
                 <input
                   type="text"
                   placeholder="ค้นหาสิ่งที่สนใจ"
                   className="input text-sm p-2 mb-2 rounded-full block w-full shadow"
                 />
+              </div>
+              <div className="mx-5 my-5 h-60 z-20">
+                <OpenStreetMap />
               </div>
               <div className="max-w-full rounded overflow-hidden shadow relative mx-5 my-5 h-full">
                 <div className="flex flex-col w-full h-full text-sm">

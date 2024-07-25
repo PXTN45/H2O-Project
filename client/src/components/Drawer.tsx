@@ -171,7 +171,7 @@ const Drawer: React.FC = () => {
               <RxHamburgerMenu />
             </label>
           </div>
-          <div className="drawer-side z-20">
+          <div className="drawer-side z-10">
             <label
               htmlFor="my-drawer-2"
               aria-label="close sidebar"

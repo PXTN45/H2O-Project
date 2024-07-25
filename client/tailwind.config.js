@@ -16,6 +16,7 @@ export default {
       'alert':"#dc143c ",
       'smoke': '#848884  ',
       'white':"#FFFFFF",
+      'whiteSmoke':"#f1f1f1",
       'dark':"#000",
     }
   },
