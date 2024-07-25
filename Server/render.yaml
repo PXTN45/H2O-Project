@@ -1,7 +1,12 @@
 services:
   - type: web
-    name: your-app-name
+    name: h2o-project  # ชื่อของบริการที่ต้องการตั้งค่า
     env: node
-    plan: free
-    buildCommand: npm run build
-    startCommand: npm run start:prod
+    plan: free  # แผนการใช้งานของ Render (free, starter, standard, ฯลฯ)
+    buildCommand: npm install && npm run build  # คำสั่งในการ build โปรเจกต์
+    startCommand: npm run start:prod  # คำสั่งในการรันแอปพลิเคชันใน production
+    envVars:  # การตั้งค่า environment variables (ถ้ามี)
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: your-database-url
