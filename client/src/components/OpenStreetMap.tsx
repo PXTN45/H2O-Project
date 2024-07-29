@@ -1,12 +1,13 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Modal from "react-modal";
 import axiosPublic from "../hook/axiosPublic";
+import { AuthContext } from "../AuthContext/auth.provider";
 import { MdClose } from "react-icons/md";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
-Modal.setAppElement('#root');
+Modal.setAppElement("#root");
 
 type Location = {
   latitude_location: number;
@@ -24,13 +25,41 @@ type Coordinate = HomeStayAndPackage & {
   lng: number;
 };
 
+interface OverpassTags {
+  name?: string;
+  amenity?: string;
+  shop?: string;
+}
+
+interface OverpassElement {
+  type: string;
+  id: number;
+  tags: OverpassTags;
+}
+
+interface OverpassResponse {
+  elements: OverpassElement[];
+}
+
+interface NamedArrays {
+  coordinates: Coordinate[];
+  places: string[];
+}
+
 const OpenStreetMap: React.FC = () => {
   const [map, setMap] = useState<L.Map | null>(null);
   const [marker, setMarker] = useState<L.Marker | null>(null);
   const [circle, setCircle] = useState<L.Circle | null>(null);
-  const [coordinates, setCoordinates] = useState<HomeStayAndPackage[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const mapRef = useRef<HTMLDivElement | null>(null);
+
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+
+  const { setMapData } = authContext;
 
   useEffect(() => {
     if (modalIsOpen) {
@@ -90,7 +119,6 @@ const OpenStreetMap: React.FC = () => {
           const responseHomeStay = await axiosPublic.get<HomeStayAndPackage[]>(
             "/homestay"
           );
-
           const responsePackage = await axiosPublic.get<HomeStayAndPackage[]>(
             "/package"
           );
@@ -98,28 +126,56 @@ const OpenStreetMap: React.FC = () => {
           const HomeStayData: HomeStayAndPackage[] = responseHomeStay.data;
           const PackageData: HomeStayAndPackage[] = responsePackage.data;
 
-          const allData = [...PackageData, ...HomeStayData];
+          const allData: HomeStayAndPackage[] = [
+            ...PackageData,
+            ...HomeStayData,
+          ];
 
-          const allCoordinates: Coordinate[] = allData.map(
-            (element: HomeStayAndPackage) => ({
-              ...element, // Keep the full data from the response
-              lat: element.location[0].latitude_location,
-              lng: element.location[0].longitude_location,
-            })
-          );
+          const allCoordinates: Coordinate[] = allData.map((element) => ({
+            ...element,
+            lat: element.location[0].latitude_location,
+            lng: element.location[0].longitude_location,
+          }));
 
           // Filter coordinates within the circle
-          const filteredCoordinates = allCoordinates.filter(
-            (coord: Coordinate) => {
-              return (
-                newCircle?.getLatLng().distanceTo([coord.lat, coord.lng]) <=
-                newCircle?.getRadius()
-              );
-            }
+          const filteredCoordinates: Coordinate[] = allCoordinates.filter(
+            (coord) =>
+              newCircle.getLatLng().distanceTo([coord.lat, coord.lng]) <=
+              newCircle.getRadius()
           );
 
-          setCoordinates(filteredCoordinates);
-          console.log(filteredCoordinates);
+          // Fetch places from Overpass API
+          const response = await fetch(
+            `https://overpass-api.de/api/interpreter?data=[out:json];node(around:1000,${e.latlng.lat},${e.latlng.lng})["tourism"];out;`
+          );
+          const data: OverpassResponse = await response.json();
+
+          const newPlaces = data.elements
+            .filter((element) => element.tags.name)
+            .map((element) => element.tags.name!);
+
+          const places =
+            newPlaces.length > 0
+              ? newPlaces
+              : ["ไม่มีสถานที่ท่องเที่ยวในรัศมีนี้"];
+          const coordinates =
+            filteredCoordinates.length > 0
+              ? filteredCoordinates
+              : [
+                  {
+                    _id: "",
+                    name_package: "ไม่มีรายการในรัศมีนี้",
+                    location: [],
+                    lat: 0,
+                    lng: 0,
+                  },
+                ];
+
+          const namedArrays: NamedArrays = {
+            coordinates: [...coordinates],
+            places: [...places],
+          };
+          setMapData(namedArrays);
         } catch (error) {
           console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
         }
@@ -133,7 +189,7 @@ const OpenStreetMap: React.FC = () => {
         map.off("click", handleMapClick);
       };
     }
-  }, [map, marker, circle]);
+  }, [map, marker, circle, setMapData]);
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -171,7 +227,7 @@ const OpenStreetMap: React.FC = () => {
           </button>
         </div>
         <div id="map" ref={mapRef} className="w-full h-[90%]" />
-        <footer className="text-center p-2 ">
+        <footer className="text-center p-2">
           <p>แผนที่แสดงข้อมูลในรัศมี 1 กิโลเมตร</p>
         </footer>
       </Modal>

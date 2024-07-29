@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext , useEffect } from "react";
 import OpenStreetMap from "./OpenStreetMap";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { AuthContext } from "../AuthContext/auth.provider";
@@ -11,7 +11,11 @@ const Drawer: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { userInfo } = authContext;
+  const { userInfo , mapData } = authContext;
+
+  useEffect(() => {
+    console.log(mapData);
+  },[mapData])
 
   return (
     <div>
@@ -41,7 +45,7 @@ const Drawer: React.FC = () => {
               aria-label="close sidebar"
               className="drawer-overlay"
             />
-            <ul className="menu p-4 w-80 min-h-full text-xl line-darkmode">
+            <ul className="menu p-4 min-h-full text-xl line-darkmode">
               <div className=" my-5 mx-5">
                 <input
                   type="text"
@@ -52,10 +56,25 @@ const Drawer: React.FC = () => {
               <div className="mx-5 my-5 h-60 z-20">
                 <OpenStreetMap />
               </div>
-              <div className="max-w-full rounded overflow-hidden shadow relative mx-5 my-5 h-full">
+              <div className="max-w-full rounded-md overflow-hidden shadow relative mx-5 my-5 h-full">
                 <div className="flex flex-col w-full h-full text-sm">
-                  <span className="my-5 ml-5">ช่วงราคา (ห้อง / คืน)</span>
-                  <span className="my-5 ml-5">ช่วงราคา (ห้อง / คืน)</span>
+                  <span className="font-bold text-lg my-5 mx-5">ช่วงราคา (ห้อง / คืน)</span>
+                  <div className="flex items-center justify-center mx-5 my-2">
+                    <div className="flex flex-col mx-3">
+                      <label className="font-semibold">ราคาเริ่มต้น</label>
+                      <input type="number" className="input w-32 h-8 my-3" />
+                    </div>
+                    <div className="flex flex-col mx-3">
+                      <label className="font-semibold">ราคาสูงสุด</label>
+                      <input type="number" className="input w-32 h-8 my-3" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="max-w-full rounded-md overflow-hidden shadow relative mx-5 my-5 h-full">
+                <div className="flex flex-col w-full h-full text-sm">
+                  <span className="font-bold text-lg my-5 mx-5">สถานที่เที่ยวใกล้ที่พัก</span>
+
                 </div>
               </div>
             </ul>
