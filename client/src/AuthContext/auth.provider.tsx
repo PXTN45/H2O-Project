@@ -63,7 +63,7 @@ interface UserRegister {
   role: string;
 }
 
-interface activity_package {
+/* interface activity_package {
   _id: string
   activity_name:string
 }
@@ -144,13 +144,14 @@ interface HomeStay {
     updatedAt: string
     lat: string
     lng: string
+} */
+
+interface Coordinate {
+  _id: string
 }
 
-type CoordinateType = HomeStay[] | Package[]
-
-
 interface mapDataCoordinates {
-  coordinates: any
+  coordinates: Coordinate[]
   places: string[]
 }
 
@@ -748,4 +749,4 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 };
 
 export default AuthProvider;
-export type { UserRegister, User , mapDataCoordinates };
+export type { UserRegister, User };

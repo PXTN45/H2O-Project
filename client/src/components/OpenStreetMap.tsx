@@ -16,7 +16,6 @@ type Location = {
 
 type HomeStayAndPackage = {
   _id: string;
-  name_package: string;
   location: Location[];
 };
 
