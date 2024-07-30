@@ -2,7 +2,11 @@ import React from 'react'
 
 const searchResult = () => {
   return (
-    <div>searchResult</div>
+    <div className='flex items-center justify-center w-full h-full'>
+        <div>
+            <span>a</span>
+        </div>
+    </div>
   )
 }
 

@@ -5,7 +5,7 @@ const DashBoard = () => {
   return (
       <div className="flex">
         <Drawer />
-        <div className="md:w-1.5/4 ">
+        <div className="md:w-1.5/4 w-full">
           <Outlet />
         </div>
       </div>
