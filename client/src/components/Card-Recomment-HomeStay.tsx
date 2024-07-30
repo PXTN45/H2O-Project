@@ -64,10 +64,10 @@ const Card: React.FC<CardProps> = ({ item }) => {
         className="w-full h-[15rem] object-cover"
       />
       <div id="detailCard-Home" className="px-6 py-4">
-        <div className="font-bold text-xl mb-2">
+        <div id="Name-Home" className="font-bold text-xl mb-2">
           {truncateText(item.name_homeStay || "", 15)}
         </div>
-        <p className="text-base">
+        <p id="Type-Home" className="text-base">
           {truncateText(item.location[0].province_location || "", 30)}
         </p>
       </div>
