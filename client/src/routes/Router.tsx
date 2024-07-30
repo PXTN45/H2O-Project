@@ -13,6 +13,7 @@ import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
 import BookingDetail from "../pages/orther/bookingDetail";
 import DetailPayment from "../pages/orther/detailPayment";
+import SearchResult from "../pages/orther/searchResult";
 
 const router = createBrowserRouter([
   {
@@ -36,8 +37,8 @@ const router = createBrowserRouter([
         element: (<DrawerSearch />),
         children:[
           {
-            path: "/search/1",
-            element: <ProfileUser />,
+            path: "/search/search-result",
+            element: <SearchResult />,
           },
         ],
       },
