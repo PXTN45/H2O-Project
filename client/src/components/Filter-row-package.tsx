@@ -1,20 +1,15 @@
 import React, { useEffect, useState, useContext } from "react";
 import axiosPublic from "../hook/axiosPublic";
 import { AuthContext } from "../AuthContext/auth.provider";
-import Card from "./Card";
+import Card from "./Card-Recomment-Package";
 
 interface Image {
   image_upload: string;
 }
 
-interface Room {
-  price_homeStay: number;
-}
-
 interface Item {
   _id: string;
   image: Image[];
-  room_type: Room[];
   name_package?: string;
   detail_package?: string;
   price_package?: number;
@@ -40,6 +35,7 @@ const Filterpackage: React.FC = () => {
         const response = await axiosPublic.get("/package");
         const data = await response.data;
         if (data) {
+          console.log(data);    
           setDataPackage(data);
           setFilteredData(data);
           setLoadPage(true);

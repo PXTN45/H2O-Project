@@ -1,4 +1,5 @@
 import React from "react";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 interface Image {
   image_upload: string;
@@ -8,16 +9,19 @@ interface Room {
   price_homeStay: number;
 }
 
+interface Location {
+  province_location: string;
+}
+
 interface Item {
   _id: string;
   image: Image[];
   room_type: Room[];
-  name_package?: string;
+  location: Location[];
   name_homeStay?: string;
-  detail_package?: string;
   detail_homeStay?: string;
-  price_package?: number;
   price_homestay?: number;
+  review_rating_homeStay?: number;
 }
 
 interface CardProps {
@@ -34,6 +38,20 @@ const Card: React.FC<CardProps> = ({ item }) => {
     return text.substr(0, maxLength) + "...";
   };
 
+  const renderStars = (rating: number) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (rating >= i) {
+        stars.push(<FaStar key={i} />);
+      } else if (rating >= i - 0.5) {
+        stars.push(<FaStarHalfAlt key={i} />);
+      } else {
+        stars.push(<FaRegStar key={i} />);
+      }
+    }
+    return stars;
+  };
+  
   return (
     <div
       className="max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
@@ -47,15 +65,22 @@ const Card: React.FC<CardProps> = ({ item }) => {
       />
       <div id="detailCard-Home" className="px-6 py-4">
         <div className="font-bold text-xl mb-2">
-          {truncateText(item.name_package || item.name_homeStay || "", 20)}
+          {truncateText(item.name_homeStay || "", 15)}
         </div>
         <p className="text-base">
-          {truncateText(item.detail_package || item.detail_homeStay || "", 20)}
+          {truncateText(item.location[0].province_location || "", 30)}
         </p>
       </div>
-      <div id="priceCard-Home" className="text-lg font-semibold absolute bottom-5 right-0 mx-5">
-        <span className="mx-2">฿</span>
-        {item.price_package || item.room_type[0].price_homeStay}
+      <div className="flex items-center justify-center mt-5">
+        <div id="Stars-Package" className="absolute left-0 font-bold px-6 py-4 text-primaryUser">
+          <div className="flex">
+            {renderStars(item.review_rating_homeStay || 0)}
+          </div>
+        </div>
+        <div id="Price-Package" className="absolute right-0 font-bold px-6 py-4">
+          <span className="mx-1">฿</span>
+          {item.room_type[0].price_homeStay}
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import axiosPublic from "../hook/axiosPublic";
-import Card from "./Card";
+import Card from "./Card-Recomment-HomeStay";
 import { AuthContext } from "../AuthContext/auth.provider";
 
 interface Image {
@@ -11,10 +11,15 @@ interface Room {
   price_homeStay: number;
 }
 
+interface Location {
+  province_location: string;
+}
+
 interface Item {
   _id: string;
   image: Image[];
   room_type: Room[];
+  location: Location[];
   name_package?: string;
   name_homestay?: string;
   detail_package?: string;
