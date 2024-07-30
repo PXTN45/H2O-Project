@@ -8,6 +8,13 @@ const getRandomPlaces = (places: string[], count: number) => {
   return shuffled.slice(0, count);
 };
 
+const truncateText = (text: string, maxLength: number) => {
+  if (text.length > maxLength) {
+    return text.slice(0, maxLength) + "...";
+  }
+  return text;
+};
+
 const Drawer: React.FC = () => {
   const authContext = useContext(AuthContext);
 
@@ -122,7 +129,7 @@ const Drawer: React.FC = () => {
                                 onChange={() => handleCheckboxChange(item)}
                                 className="mr-2"
                               />
-                              <label htmlFor={item}>{item}</label>
+                              <label htmlFor={item}>{truncateText(item, 30)}</label>
                             </div>
                           </li>
                         ))}
