@@ -66,16 +66,22 @@ const editHomeStayBooking = async (
 };
 
 const cancelBooking = async (req: Request, res: Response): Promise<void> => {
-  const id = req.params.id;
+  const bookingId = req.params.id;
   try {
-    const data = await Booking.findByIdAndDelete(id);
-    if (!data) {
-      res.status(404).json({ message: "HomeStay Not Found" });
-    } else {
-      res.status(200).json(data);
+    const booking = await BookingModel.findByIdAndUpdate(
+      bookingId,
+      { bookingStatus: "Cancelled" },
+      { new: true }
+    );
+
+    if (!booking) {
+      res.status(404).send({ message: "Booking not found" });
+      return;
     }
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+
+    res.status(200).send(booking);
+  } catch (error) {
+    res.status(500).send(error);
   }
 };
 

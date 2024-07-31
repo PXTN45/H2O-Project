@@ -15,6 +15,6 @@ router.post("/bookingPackage", bookPackage);
 router.put("/editPackageBooking",editPackageBooking)
 router.put("/editHomeStayBooking",editHomeStayBooking)
 router.put("/confirmBooking/:id", confirmBooking);
-router.delete("/cancelBooking",cancelBooking)
+router.put("/cancelBooking",cancelBooking)
 
 export default router;
