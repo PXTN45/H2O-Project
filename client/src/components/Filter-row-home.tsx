@@ -30,9 +30,10 @@ interface Item {
 }
 
 const Filterpackage: React.FC = () => {
-  const [dataPackage, setDataPackage] = useState<Item[]>([]);
+  const [dataHomeStays, setDataHomeStays] = useState<Item[]>([]);
   const [filteredData, setFilteredData] = useState<Item[]>([]);
   const [isType, setIsType] = useState<string>("");
+  const [randomProvinces, setRandomProvinces] = useState<string[]>([]);
 
   const authContext = useContext(AuthContext);
 
@@ -48,9 +49,10 @@ const Filterpackage: React.FC = () => {
         const response = await axiosPublic.get("/homestay");
         const data = await response.data;
         if (data) {
-          setDataPackage(data);
+          setDataHomeStays(data);
           setFilteredData(data);
-          setLoadPage(true);
+          setRandomProvinces(getRandomProvinces(data, 3));
+          setLoadPage(true);    
         } else {
           setLoadPage(false);
         }
@@ -61,13 +63,23 @@ const Filterpackage: React.FC = () => {
     fetchData();
   }, [setLoadPage]);
 
-  const filterByType = (type: string) => {
+  const getRandomProvinces = (data: Item[], count: number): string[] => {
+    const provinces = Array.from( // จะเปลี่ยน Set กลับมาเป็น Array ที่มีชื่อจังหวัดที่ไม่ซ้ำกัน
+      new Set(data.map((item) => item.location[0].province_location)) // จะทำการลบข้อมูลที่ซ้ำกันออกจากรายการ
+    );
+    const shuffledProvinces = provinces.sort(() => 0.5 - Math.random());
+    return shuffledProvinces.slice(0, count);
+  };
+
+  const filterByProvince = (province: string) => {
     const filtered =
-      type === ""
-        ? dataPackage
-        : dataPackage.filter((item) => item.type_homestay === type);
+      province === ""
+        ? dataHomeStays
+        : dataHomeStays.filter(
+            (item) => item.location[0].province_location === province
+          );
     setFilteredData(filtered);
-    setIsType(type);
+    setIsType(province);
   };
 
   return (
@@ -75,9 +87,13 @@ const Filterpackage: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4 my-[2rem] mx-[1.75rem]">
         Homestays Recommend
       </h1>
-      <div id="butttonSelect-HomeStay" className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
+      <div
+        id="butttonSelect-HomeStay"
+        className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]"
+      >
         <button
-          onClick={() => filterByType("")}
+          id="ทั้งหมด"
+          onClick={() => filterByProvince("")}
           className={
             isType === ""
               ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
@@ -86,36 +102,20 @@ const Filterpackage: React.FC = () => {
         >
           ทั้งหมด
         </button>
-        <button
-          onClick={() => filterByType("บ้านเดี่ยว")}
-          className={
-            isType === "บ้านเดี่ยว"
-              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-          }
-        >
-          ธรรมชาติ
-        </button>
-        <button
-          onClick={() => filterByType("โฮมสเตย์")}
-          className={
-            isType === "โฮมสเตย์"
-              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-          }
-        >
-          ทางน้ำ
-        </button>
-        <button
-          onClick={() => filterByType("วิลล่า")}
-          className={
-            isType === "วิลล่า"
-              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-          }
-        >
-          วิลล่า
-        </button>
+        {randomProvinces.map((province) => (
+          <button
+            id={province}
+            key={province}
+            onClick={() => filterByProvince(province)}
+            className={
+              isType === province
+                ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
+                : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
+            }
+          >
+            {province}
+          </button>
+        ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredData.slice(0, 4).map((item, index) => (

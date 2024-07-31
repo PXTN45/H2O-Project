@@ -35,7 +35,6 @@ const Filterpackage: React.FC = () => {
         const response = await axiosPublic.get("/package");
         const data = await response.data;
         if (data) {
-          console.log(data);    
           setDataPackage(data);
           setFilteredData(data);
           setLoadPage(true);
@@ -65,6 +64,7 @@ const Filterpackage: React.FC = () => {
       </h1>
       <div id="butttonSelect-Package" className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
         <button
+          id="ทั้งหมด"
           onClick={() => filterByType("")}
           className={
             isType === ""
@@ -75,6 +75,7 @@ const Filterpackage: React.FC = () => {
           ทั้งหมด
         </button>
         <button
+          id="การท่องเที่ยวธรรมชาติ"
           onClick={() => filterByType("การท่องเที่ยวธรรมชาติ")}
           className={
             isType === "การท่องเที่ยวธรรมชาติ"
@@ -85,6 +86,7 @@ const Filterpackage: React.FC = () => {
           ธรรมชาติ
         </button>
         <button
+          id="การท่องเที่ยวทางน้ำ"
           onClick={() => filterByType("การท่องเที่ยวทางน้ำ")}
           className={
             isType === "การท่องเที่ยวทางน้ำ"
@@ -95,6 +97,7 @@ const Filterpackage: React.FC = () => {
           ทางน้ำ
         </button>
         <button
+          id="การท่องเที่ยวเชิงวัฒนธรรม"
           onClick={() => filterByType("การท่องเที่ยวเชิงวัฒนธรรม")}
           className={
             isType === "การท่องเที่ยวเชิงวัฒนธรรม"
