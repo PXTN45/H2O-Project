@@ -284,7 +284,7 @@ const Search: React.FC = () => {
             {showCalendar && (
               <div className="flex items-start justify-center">
                 <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
-                  <div className="flex items-center justify-center">
+                  <div id="Calendar" className="flex items-center justify-center">
                     <Calendar
                       onChange={(dates) => {
                         if (dates) {
