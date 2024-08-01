@@ -79,6 +79,7 @@ const updatePackage = async (req: Request, res: Response): Promise<void> => {
       new: true,
     });
     if (!updatedPackage) {
+      
       res.status(404).json({ message: "Package Not Found" });
     } else {
       res.status(200).json({ message: "Package Updated!", updatedPackage });
