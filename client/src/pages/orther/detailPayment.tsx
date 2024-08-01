@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import axiosPublic from "../../hook/axiosPublic";
 
 const DetailPayment: React.FC = () => {
   const location = useLocation();
@@ -11,10 +12,9 @@ const DetailPayment: React.FC = () => {
   useEffect(() => {
     const generateQR = async () => {
       try {
-        const response = await axios.post(
-          "https://h2o-project.onrender.com/payment/generateQR",
-          { amount }
-        );
+        const response = await axiosPublic.post("/payment/generateQR", {
+          amount,
+        });
         setQrCodeUrl(response.data.Result);
       } catch (err) {
         console.error("Error generating QR code:", err);
@@ -33,7 +33,6 @@ const DetailPayment: React.FC = () => {
             </li>
             <li className="step step">ข้อมูลการชำระเงิน</li>
             <li className="step">รอการยืนยัน</li>
-
           </ul>
         </div>
 

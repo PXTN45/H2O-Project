@@ -19,6 +19,8 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.2",
+    "flowbite": "^2.4.1",
+    "flowbite-react": "^0.10.1",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "prop-types": "^15.8.1",

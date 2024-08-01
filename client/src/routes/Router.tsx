@@ -14,6 +14,8 @@ import DrawerSearch from "../layout/DrawerSearch";
 import BookingDetail from "../pages/orther/bookingDetail";
 import DetailPayment from "../pages/orther/detailPayment";
 import SearchResult from "../pages/orther/searchResult";
+import HomeStayDetail from "../pages/detail/homeStayDetail";
+import PackageDetail from "../pages/detail/packageDetail";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +33,14 @@ const router = createBrowserRouter([
       {
         path: "/bookingDetail",
         element: <BookingDetail />,
+      },
+      {
+        path: "/homeStayDetail",
+        element: <HomeStayDetail />,
+      },
+      {
+        path: "/packageDetail",
+        element: <PackageDetail />,
       },
       {
         path: "/search",

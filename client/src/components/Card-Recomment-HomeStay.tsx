@@ -1,5 +1,8 @@
 import React from "react";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../AuthContext/auth.provider";
+import { useContext } from "react";
 
 interface Image {
   image_upload: string;
@@ -33,6 +36,15 @@ const seeDetail = (id: string) => {
 };
 
 const Card: React.FC<CardProps> = ({ item }) => {
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+
+  const { setLoadPage } = authContext;
+
+
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength) + "...";
@@ -51,35 +63,49 @@ const Card: React.FC<CardProps> = ({ item }) => {
     }
     return stars;
   };
-  
+
+  const navigate = useNavigate();
+  const handleCardClick = () => {
+    navigate("/homeStayDetail", { state: { item } });
+  }
+
   return (
     <div
       className="max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
       onClick={() => seeDetail(item._id)}
     >
-      <img
-        id="imageCard-Home"
-        src={item.image[0].image_upload}
-        alt="images to cards"
-        className="w-full h-[15rem] object-cover"
-      />
-      <div id="detailCard-Home" className="px-6 py-4">
-        <div className="font-bold text-xl mb-2">
-          {truncateText(item.name_homeStay || "", 15)}
-        </div>
-        <p className="text-base">
-          {truncateText(item.location[0].province_location || "", 30)}
-        </p>
-      </div>
-      <div className="flex items-center justify-center mt-5">
-        <div id="Stars-Package" className="absolute left-0 font-bold px-6 py-4 text-primaryUser">
-          <div className="flex">
-            {renderStars(item.review_rating_homeStay || 0)}
+      <div onClick={handleCardClick}>
+        <img
+          id="imageCard-Home"
+          src={item.image[0].image_upload}
+          alt="images to cards"
+          className="w-full h-[15rem] object-cover"
+        />
+
+        <div id="detailCard-Home" className="px-6 py-4">
+          <div className="font-bold text-xl mb-2">
+            {truncateText(item.name_homeStay || "", 15)}
           </div>
+          <p className="text-base">
+            {truncateText(item.location[0].province_location || "", 30)}
+          </p>
         </div>
-        <div id="Price-Package" className="absolute right-0 font-bold px-6 py-4">
-          <span className="mx-1">฿</span>
-          {item.room_type[0].price_homeStay}
+        <div className="flex items-center justify-center mt-5">
+          <div
+            id="Stars-HomeStay"
+            className="absolute left-0 font-bold px-6 py-4 text-primaryUser"
+          >
+            <div className="flex">
+              {renderStars(item.review_rating_homeStay || 0)}
+            </div>
+          </div>
+          <div
+            id="Price-HomeStay"
+            className="absolute right-0 font-bold px-6 py-4"
+          >
+            <span className="mx-1">฿</span>
+            {item.room_type[0].price_homeStay}
+          </div>
         </div>
       </div>
     </div>
