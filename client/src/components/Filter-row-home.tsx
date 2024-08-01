@@ -22,8 +22,6 @@ interface Item {
   location: Location[];
   name_package?: string;
   name_homestay?: string;
-  detail_package?: string;
-  detail_homestay?: string;
   price_package?: number;
   price_homestay?: number;
   type_homestay?: string;

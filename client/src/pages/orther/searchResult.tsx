@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { RxExit } from "react-icons/rx";
@@ -7,18 +7,73 @@ import { IoPeopleSharp } from "react-icons/io5";
 import { LiaChildSolid } from "react-icons/lia";
 import { MdFamilyRestroom } from "react-icons/md";
 import { MdFilterList } from "react-icons/md";
+import { useLocation } from "react-router-dom";
+import axiosPublic from "../../hook/axiosPublic";
+
+interface Image {
+  image_upload: string;
+}
+
+interface Item {
+  _id: string;
+  image: Image[];
+  name_package?: string;
+  name_homestay?: string;
+  price_package?: number;
+  price_homestay?: number;
+  type_homestay?: string;
+}
 
 const SearchResult: React.FC = () => {
+  const location = useLocation();
+  const dataSearch = location.state?.dataSearch;
+
   const [isPackage, setIsPackage] = useState<boolean>(false);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
-  const [dateRange, setDateRange] = useState<Date[]>([new Date(), new Date()]);
+  const [dateRange, setDateRange] = useState<Date[]>([
+    new Date(dataSearch?.dateRange.startDate_Time ?? null),
+    new Date(dataSearch?.dateRange.endDate_Time ?? null),
+  ]);
   const [selectedDays, setSelectedDays] = useState<number>(0);
   const [showPeopleMenu, setShowPeopleMenu] = useState<boolean>(false);
-  const [numPeople, setNumPeople] = useState<number>(0);
-  const [numChildren, setNumChildren] = useState<number>(0);
+  const [numPeople, setNumPeople] = useState<number>(
+    dataSearch?.numPeople ?? 0
+  );
+  const [numChildren, setNumChildren] = useState<number>(
+    dataSearch?.numChildren ?? 0
+  );
   const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
+  const [dataHomeStays, setDataHomeStays] = useState<Item[]>([]);
+  const [dataPackage, setDataPackage] = useState<Item[]>([]);
 
-  console.log(selectedDays);
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  useEffect(() => {
+    const dayAfterTomorrow = new Date(today);
+    dayAfterTomorrow.setDate(today.getDate() + 2);
+
+    setDateRange([tomorrow, dayAfterTomorrow]);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const responseHomestay = await axiosPublic.get("/homestay");
+        const responsePackage = await axiosPublic.get("/package");
+
+        const dataHomestay = await responseHomestay.data;
+        const dataPackage = await responsePackage.data;
+
+        setDataHomeStays(dataHomestay);
+        setDataPackage(dataPackage);
+      } catch (error) {
+        console.log("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, [dataHomeStays, dataPackage]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {
@@ -178,7 +233,7 @@ const SearchResult: React.FC = () => {
           <div className="mx-14" />
           <div className="relative w-full mb-5 flex flex-col items-center justify-center">
             <button
-              id="date-buttonPackage"
+              id="date-buttonHomstay"
               className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[23rem] shadow-md"
               onClick={toggleCalendar}
             >
@@ -191,12 +246,15 @@ const SearchResult: React.FC = () => {
                   <RxExit className="w-5 h-5 ml-3 transform -scale-x-100" />
                 </span>
               ) : (
-                "เลือกวันที่"
+                <span className="font-bold flex items-center justify-center">
+                  <RxExit className="w-5 h-5 mr-3" />
+                  วันที่เช็คอิน - เช็คเอาท์
+                </span>
               )}
             </button>
             {showCalendar && (
               <div className="flex items-start justify-center">
-                <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
+                <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem]">
                   <div className="flex items-center justify-center">
                     <Calendar
                       onChange={(dates) => {
@@ -206,7 +264,7 @@ const SearchResult: React.FC = () => {
                       }}
                       value={[dateRange[0], dateRange[1]]}
                       selectRange={true}
-                      minDate={new Date()}
+                      minDate={tomorrow}
                     />
                   </div>
                 </div>
@@ -227,7 +285,7 @@ const SearchResult: React.FC = () => {
             </button>
             {showFilterMenu && (
               <div className="flex items-start justify-center">
-                <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tl-[0rem]">
+                <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
                   <div className="flex flex-col items-start">
                     <button
                       className="w-full text-left p-2 hover:bg-gray-100 rounded"
@@ -264,8 +322,9 @@ const SearchResult: React.FC = () => {
         <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
           <button
             id="button-homestaySearch-Select"
-            className={!isPackage ?
-                "bg-gradient-to-r from-primaryUser to-primaryBusiness text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
+            className={
+              !isPackage
+                ? "bg-gradient-to-r from-primaryUser to-primaryBusiness text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
                 : "bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
             }
             onClick={clickToHome}
@@ -274,14 +333,52 @@ const SearchResult: React.FC = () => {
           </button>
           <button
             id="button-homestaySearch-noSelect"
-            className={!isPackage ?
-                "bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+            className={
+              !isPackage
+                ? "bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
                 : "bg-gradient-to-r from-primaryUser to-primaryBusiness text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
             }
             onClick={clickToPackage}
           >
             แพ็คเกจ
           </button>
+        </div>
+        <div className="flex flex-col items-center justify-center mt-8 w-full h-full">
+          {isPackage ? (
+            <div>
+              <div className="flex flex-col gap-6">
+                <div className="bg-white shadow-md p-4 rounded-lg">
+                  Package 1
+                </div>
+                <div className="bg-white shadow-md p-4 rounded-lg">
+                  Package 2
+                </div>
+                <div className="bg-white shadow-md p-4 rounded-lg">
+                  Package 3
+                </div>
+                <div className="bg-white shadow-md p-4 rounded-lg">
+                  Package 4
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="flex flex-col gap-6">
+                <div className="bg-white shadow-md p-4 rounded-lg">
+                  Homestay 1
+                </div>
+                <div className="bg-white shadow-md p-4 rounded-lg">
+                  Homestay 2
+                </div>
+                <div className="bg-white shadow-md p-4 rounded-lg">
+                  Homestay 3
+                </div>
+                <div className="bg-white shadow-md p-4 rounded-lg">
+                  Homestay 4
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

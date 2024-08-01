@@ -7,6 +7,7 @@ import { IoPeopleSharp } from "react-icons/io5";
 import { LiaChildSolid } from "react-icons/lia";
 import { MdFamilyRestroom } from "react-icons/md";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Search: React.FC = () => {
   const [isPackage, setIsPackage] = useState<boolean>(false);
@@ -17,6 +18,8 @@ const Search: React.FC = () => {
   const [numPeople, setNumPeople] = useState<number>(0);
   const [numChildren, setNumChildren] = useState<number>(0);
   const [searchText, setSearchText] = useState<string>("");
+
+  const navigate = useNavigate();
 
   const today = new Date();
   const tomorrow = new Date(today);
@@ -119,17 +122,21 @@ const Search: React.FC = () => {
     const searchType = isPackage ? "Package" : "Homestay";
     const startDate = dateRange[0] ? formatDate(dateRange[0]) : "Not selected";
     const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
-    const dataSearch = {   
+    const startDate_Time = dateRange[0]
+    const endDate_Time = dateRange[1]
+    const dataSearch = {
       searchText,
       numPeople,
       numChildren,
       dateRange: {
         startDate,
         endDate,
+        startDate_Time,
+        endDate_Time,
       },
       searchType,
-    }
-    console.log(dataSearch);
+    };
+    navigate("/search/search-result", { state: { dataSearch } });
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -281,7 +288,7 @@ const Search: React.FC = () => {
                       }}
                       value={[dateRange[0], dateRange[1]]}
                       selectRange={true}
-                      minDate={new Date()}
+                      minDate={tomorrow}
                     />
                   </div>
                 </div>
