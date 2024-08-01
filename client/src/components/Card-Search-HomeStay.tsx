@@ -1,0 +1,89 @@
+import React from "react";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+
+interface Image {
+  image_upload: string;
+}
+
+interface Room {
+  price_homeStay: number;
+}
+
+interface Location {
+  province_location: string;
+}
+
+interface Item {
+  _id: string;
+  image: Image[];
+  room_type: Room[];
+  location: Location[];
+  name_homeStay?: string;
+  detail_homeStay?: string;
+  price_homestay?: number;
+  review_rating_homeStay?: number;
+}
+
+interface CardProps {
+  item: Item;
+}
+
+const seeDetail = (id: string) => {
+  console.log(id);
+};
+
+const Card: React.FC<CardProps> = ({ item }) => {
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.substr(0, maxLength) + "...";
+  };
+
+  const renderStars = (rating: number) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (rating >= i) {
+        stars.push(<FaStar key={i} />);
+      } else if (rating >= i - 0.5) {
+        stars.push(<FaStarHalfAlt key={i} />);
+      } else {
+        stars.push(<FaRegStar key={i} />);
+      }
+    }
+    return stars;
+  };
+  
+  return (
+    <div
+      className="max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
+      onClick={() => seeDetail(item._id)}
+    >
+      <img
+        id="imageCard-Home"
+        src={item.image[0].image_upload}
+        alt="images to cards"
+        className="w-full h-[15rem] object-cover"
+      />
+      <div id="detailCard-Home" className="px-6 py-4">
+        <div id="Name-Home" className="font-bold text-xl mb-2">
+          {truncateText(item.name_homeStay || "", 15)}
+        </div>
+        <p id="Type-Home" className="text-base">
+          {truncateText(item.location[0].province_location || "", 30)}
+        </p>
+      </div>
+      <div className="flex items-center justify-center mt-5">
+        <div id="Stars-Package" className="absolute left-0 font-bold px-6 py-4 text-primaryUser">
+          <div className="flex">
+            {renderStars(item.review_rating_homeStay || 0)}
+          </div>
+        </div>
+        <div id="Price-Package" className="absolute right-0 font-bold px-6 py-4">
+          <span className="mx-1">฿</span>
+          {item.room_type[0].price_homeStay}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Card;
