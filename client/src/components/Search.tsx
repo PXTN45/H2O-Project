@@ -193,7 +193,7 @@ const Search: React.FC = () => {
         <div className="flex flex-col items-center justify-center mt-4 sm:flex-row sm:justify-between w-full">
           <div className="relative w-full mb-5">
             <button
-              id="peple-buttonHomstay"
+              id="people-buttonHomstay"
               className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[16rem]"
               onClick={togglePeopleMenu}
             >
