@@ -175,6 +175,7 @@ const Search: React.FC = () => {
         <div className="w-full h-1 my-5 bg-gradient-to-r from-primaryUser to-primaryBusiness shadow-lg rounded-full" />
         <div className="flex items-center justify-center w-full relative">
           <input
+            id="search-text"
             type="text"
             placeholder="ค้นหาที่พักที่สนใจ"
             className="bg-white text-dark p-2 mb-2 rounded-tl-[10px] rounded-bl-[10px] block h-[3.5rem] w-full"
@@ -215,6 +216,7 @@ const Search: React.FC = () => {
                     </div>
                     <div>
                       <button
+                        id="Decrease[1]"
                         className="text-primaryBusiness rounded-full p-2 mr-2"
                         onClick={handleDecreasePeople}
                       >
@@ -222,6 +224,7 @@ const Search: React.FC = () => {
                       </button>
                       <span className="text-lg">{numPeople}</span>
                       <button
+                        id="Increase[1]"
                         className="text-primaryUser rounded-full p-2 ml-2"
                         onClick={handleIncreasePeople}
                       >
@@ -236,6 +239,7 @@ const Search: React.FC = () => {
                     </div>
                     <div>
                       <button
+                        id="Decrease[2]"
                         className="text-primaryBusiness rounded-full p-2 mr-2"
                         onClick={handleDecreaseChildren}
                       >
@@ -243,6 +247,7 @@ const Search: React.FC = () => {
                       </button>
                       <span className="text-lg">{numChildren}</span>
                       <button
+                        id="Increase[2]"
                         className="text-primaryUser rounded-full p-2 ml-2"
                         onClick={handleIncreaseChildren}
                       >
