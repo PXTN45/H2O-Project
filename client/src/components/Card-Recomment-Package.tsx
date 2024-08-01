@@ -1,5 +1,6 @@
 import React from "react";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 interface Image {
   image_upload: string;
@@ -43,11 +44,18 @@ const Card: React.FC<CardProps> = ({ item }) => {
     return stars;
   };
 
+  const navigate = useNavigate();
+  const test = () => {
+    navigate("/packageDetail");
+  }
   return (
     <div
       className="max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
       onClick={() => seeDetail(item._id)}
     >
+      <div onClick={test}>
+
+      
       <img
         id="imageCard-Package"
         src={item.image[0].image_upload}
@@ -72,6 +80,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
           <span className="mx-1">฿</span>
           {item.price_package}
         </div>
+      </div>
       </div>
     </div>
   );
