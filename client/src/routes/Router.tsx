@@ -17,6 +17,7 @@ import SearchResult from "../pages/orther/searchResult";
 import HomeStayDetail from "../pages/detail/homeStayDetail";
 import PackageDetail from "../pages/detail/packageDetail";
 
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -35,7 +36,7 @@ const router = createBrowserRouter([
         element: <BookingDetail />,
       },
       {
-        path: "/homeStayDetail",
+        path: "/homeStayDetail/:id",
         element: <HomeStayDetail />,
       },
       {

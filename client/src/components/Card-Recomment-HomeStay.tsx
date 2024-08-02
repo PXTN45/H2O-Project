@@ -66,7 +66,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
 
   const navigate = useNavigate();
   const handleCardClick = () => {
-    navigate("/homeStayDetail", { state: { item } });
+    navigate(`/homeStayDetail/${item._id}`, { state: { item } });
   }
 
   return (
