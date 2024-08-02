@@ -40,7 +40,9 @@ const SearchResult: React.FC = () => {
   const location = useLocation();
   const dataSearch = location.state?.dataSearch;
 
-  const [isPackage, setIsPackage] = useState<boolean>(false);
+  const [isPackage, setIsPackage] = useState<boolean>(
+    dataSearch.searchType === "Homestay" ? false : dataSearch.searchType === "Package" ? true : false
+  );
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [dateRange, setDateRange] = useState<Date[]>([
     new Date(dataSearch?.dateRange.startDate_Time ?? null),
