@@ -3,6 +3,7 @@ import { Schema, model, Document } from "mongoose";
 interface HomeStay extends Document {
   name_homeStay: string;
   room_type: {
+    name_type_room:string
     bathroom_homeStay: number;
     bedroom_homeStay: number;
     sizeBedroom_homeStay: string;
@@ -40,6 +41,7 @@ const HomeStaySchema = new Schema<HomeStay>({
   room_type: {
     type: [
       {
+        name_type_room:{type:String,required:true},
         bathroom_homeStay: { type: Number, required: true },
         bedroom_homeStay: {type: Number,required: true},
         sizeBedroom_homeStay: {type: String,required: true},
