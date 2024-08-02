@@ -3,8 +3,8 @@ import { Schema, model, Document } from "mongoose";
 
 export interface Booking extends Document {
     booker : Schema.Types.ObjectId[];
-    homeStayDetail: Schema.Types.ObjectId[];
-    packageDetail :Schema.Types.ObjectId[];
+    homeStayDetail: Schema.Types.ObjectId;
+    packageDetail :Schema.Types.ObjectId;
     bookingDate : Date;
     bookingStatus : string;
     paymentDetail: string; // เช่น "Credit Card", "PayPal", "Bank Transfer"
@@ -17,14 +17,14 @@ const BookingSchema = new Schema<Booking>({
     type:Schema.Types.ObjectId , ref:"User",
     required:true
   }],
-  homeStayDetail:[{
+  homeStayDetail:{
     type:Schema.Types.ObjectId, ref:"HomeStay",
-    required: true,
-  }],
-  packageDetail:[{
+    required:false,
+  },
+  packageDetail:{
     type: Schema.Types.ObjectId , ref:"Package",
-    required:true
-  }],
+    required:false
+  },
   bookingDate:{
     type: Date,
     default: Date.now
