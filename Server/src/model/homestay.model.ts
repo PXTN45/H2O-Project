@@ -10,8 +10,8 @@ interface HomeStay extends Document {
   }[];
   max_people: number;
   detail_homeStay: string;
-  time_checkIn_homeStay: Date;
-  time_checkOut_homeStay: Date;
+  time_checkIn_homeStay: string;
+  time_checkOut_homeStay: string;
   policy_cancel_homeStay: string;
   location: {
     name_location: string;
@@ -58,11 +58,11 @@ const HomeStaySchema = new Schema<HomeStay>({
     required: true,
   },
   time_checkIn_homeStay: {
-    type: Date,
+    type: String,
     required: true,
   },
   time_checkOut_homeStay: {
-    type: Date,
+    type: String,
     required: true,
   },
   policy_cancel_homeStay: {
