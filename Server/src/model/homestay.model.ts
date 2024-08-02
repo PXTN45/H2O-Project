@@ -16,6 +16,11 @@ interface HomeStay extends Document {
   location: {
     name_location: string;
     province_location: string;
+    house_no: string;
+    village: string;
+    village_no: string;
+    alley: string;
+    street: string;
     district_location: string;
     subdistrict_location: string;
     zipcode_location: number;
@@ -74,6 +79,11 @@ const HomeStaySchema = new Schema<HomeStay>({
       {
         name_location: { type: String, required: true },
         province_location: { type: String, required: true },
+        house_no: {type:String,required: true },
+        village: {type:String,required: false },
+        village_no: {type:String,required: true },
+        alley: {type:String,required: false  },
+        street: {type:String,required: false },
         district_location: { type: String, required: true },
         subdistrict_location: { type: String, required: true },
         zipcode_location: { type: Number, required: true },
