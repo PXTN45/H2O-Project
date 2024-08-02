@@ -978,6 +978,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               ? "Already have an account?"
               : "For administrators only"}{" "}
             <button
+              id="NoAccount-HaveAccount"
               type="button"
               className="underline text-red-700 ml-1"
               onClick={() =>
