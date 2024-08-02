@@ -42,9 +42,6 @@ const Card: React.FC<CardProps> = ({ item }) => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { setLoadPage } = authContext;
-
-
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength) + "...";
