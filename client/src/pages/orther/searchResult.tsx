@@ -100,16 +100,9 @@ const SearchResult: React.FC = () => {
         if (mapData) {
           const dataforFilter = mapData.coordinates;
           
-          const filteredResultsHomestay = dataforFilter.map(
-            (item: any) =>
-              item.HomeStay.toLowerCase()
-          );
-          HomeStayData = filteredResultsHomestay;
-          const filteredResultsPackage = dataPackage.filter(
-            (item: any) =>
-              item.dataPackage.toLowerCase()
-          );
-          PackageData = filteredResultsPackage;
+          console.log(dataforFilter[0].HomeStay);
+          console.log(dataforFilter[0].Packages);
+          
         } else {
           const filteredResultsHomestay = dataHomestay.filter(
             (item: Item) =>

@@ -64,7 +64,7 @@ const Filterpackage: React.FC = () => {
       </h1>
       <div id="butttonSelect-Package" className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
         <button
-          id="ทั้งหมด[1]"
+          id="ทั้งหมด[2]"
           onClick={() => filterByType("")}
           className={
             isType === ""
