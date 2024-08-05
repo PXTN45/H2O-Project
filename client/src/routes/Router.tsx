@@ -40,7 +40,7 @@ const router = createBrowserRouter([
         element: <HomeStayDetail />,
       },
       {
-        path: "/packageDetail",
+        path: "/packageDetail/:id",
         element: <PackageDetail />,
       },
       {

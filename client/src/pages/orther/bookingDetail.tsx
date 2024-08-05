@@ -4,15 +4,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 const bookingDetail: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { item } = location.state || {};
-  console.log(item.room_type[0].price_homeStay);
-  if (!item) {
-    // ถ้าไม่มีข้อมูล ให้ redirect ไปหน้าอื่นหรือแสดงข้อความเตือน
-    navigate("/");
-    return null;
-  }
-  const data = () => {
-    navigate("/detailPayment", { state: { amount: item.room_type[0].price_homeStay } });
+  const { data } = location.state || {};
+  // console.log(item.room_type[0].price_homeStay);
+  // if (!item) {
+  //   // ถ้าไม่มีข้อมูล ให้ redirect ไปหน้าอื่นหรือแสดงข้อความเตือน
+  //   navigate("/");
+  //   return null;
+  // }
+  console.log(data);
+  
+  const booking = () => {
+    navigate("/detailPayment", { state: { amount: data.room_type[0].price_homeStay } });
   };
   return (
     <div className="container-sm mx-auto px-60 m-10">
@@ -41,7 +43,7 @@ const bookingDetail: React.FC = () => {
               <p>รายละเอียดราคา</p>
               <div className="flex justify-between ">
                 <p>ราคาห้องพัก</p>
-                <p>{item.room_type[0].price_homeStay} บาท</p>
+                {/* <p>{data.room_type[0].price_homeStay} บาท</p> */}
               </div>
               <div>
                 <button className="btn btn-warning" onClick={data}>
