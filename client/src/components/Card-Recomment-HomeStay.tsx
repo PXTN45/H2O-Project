@@ -45,8 +45,6 @@ const Card: React.FC<CardProps> = ({ item }) => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { setLoadPage } = authContext;
-
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength) + "...";
@@ -89,7 +87,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
           <div className="font-bold text-xl mb-2">
             {truncateText(item.name_homeStay || "", 15)}
           </div>
-          <p className="text-base">
+          <p id="Province-HomeStay" className="text-base">
             {truncateText(item.location[0].province_location || "", 30)}
           </p>
         </div>

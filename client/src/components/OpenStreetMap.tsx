@@ -125,23 +125,30 @@ const OpenStreetMap: React.FC = () => {
           const HomeStayData: HomeStayAndPackage[] = responseHomeStay.data;
           const PackageData: HomeStayAndPackage[] = responsePackage.data;
 
-          const allData: HomeStayAndPackage[] = [
-            ...PackageData,
-            ...HomeStayData,
-          ];
+          const CoordinatesHomestay: Coordinate[] = HomeStayData.map((element) => ({
+            ...element,
+            lat: element.location[0].latitude_location,
+            lng: element.location[0].longitude_location,
+          }));
 
-          const allCoordinates: Coordinate[] = allData.map((element) => ({
+          const CoordinatesPackages: Coordinate[] = PackageData.map((element) => ({
             ...element,
             lat: element.location[0].latitude_location,
             lng: element.location[0].longitude_location,
           }));
 
           // Filter coordinates within the circle
-          const filteredCoordinates: Coordinate[] = allCoordinates.filter(
+          const filteredCoordinatesHomestay: Coordinate[] = CoordinatesHomestay.filter(
             (coord) =>
               newCircle.getLatLng().distanceTo([coord.lat, coord.lng]) <=
               newCircle.getRadius()
           );
+
+          const filteredCoordinatesPackages: Coordinate[] = CoordinatesPackages.filter(
+            (coord) =>
+              newCircle.getLatLng().distanceTo([coord.lat, coord.lng]) <=
+              newCircle.getRadius()
+          ); 
 
           // Fetch places from Overpass API
           const response = await fetch(
@@ -158,19 +165,34 @@ const OpenStreetMap: React.FC = () => {
               ? newPlaces
               : ["ไม่มีสถานที่ท่องเที่ยวในรัศมีนี้"];
           const coordinates =
-            filteredCoordinates.length > 0
-              ? filteredCoordinates
+            filteredCoordinatesHomestay.length > 0 || filteredCoordinatesPackages.length > 0
+              ? [
+                  {
+                    HomeStay: filteredCoordinatesHomestay ,
+                    Packages: filteredCoordinatesPackages
+                  }
+                ]
               : [
                   {
-                    _id: "",
-                    name_package: "ไม่มีรายการในรัศมีนี้",
-                    location: [],
-                    lat: 0,
-                    lng: 0,
+                    HomeStay:{
+                      _id: "",
+                      name_homeStay: "ไม่มีรายการในรัศมีนี้",
+                      location: [],
+                      lat: 0,
+                      lng: 0,
+                    },
+                    Packages:{
+                      _id: "",
+                      name_package: "ไม่มีรายการในรัศมีนี้",
+                      location: [],
+                      lat: 0,
+                      lng: 0,
+                    }
+   
                   },
                 ];
 
-          const namedArrays: NamedArrays = {
+          const namedArrays: any = {
             coordinates: [...coordinates],
             places: [...places],
           };
