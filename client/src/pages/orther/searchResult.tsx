@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { RxExit } from "react-icons/rx";
@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import axiosPublic from "../../hook/axiosPublic";
 import CardHomeStay from "../../components/Card-Search-HomeStay";
 import CardPackage from "../../components/Card-Search-Package";
+import { AuthContext } from "../../AuthContext/auth.provider";
 
 interface Image {
   image_upload: string;
@@ -22,6 +23,7 @@ interface Room {
 
 interface Location {
   province_location: string;
+  latitude_location: string;
 }
 
 interface Item {
@@ -40,8 +42,20 @@ const SearchResult: React.FC = () => {
   const location = useLocation();
   const dataSearch = location.state?.dataSearch;
 
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+
+  const { mapData } = authContext;
+
   const [isPackage, setIsPackage] = useState<boolean>(
-    dataSearch.searchType === "Homestay" ? false : dataSearch.searchType === "Package" ? true : false
+    dataSearch.searchType === "Homestay"
+      ? false
+      : dataSearch.searchType === "Package"
+      ? true
+      : false
   );
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [dateRange, setDateRange] = useState<Date[]>([
@@ -81,29 +95,46 @@ const SearchResult: React.FC = () => {
         const dataPackage = await responsePackage.data;
         const searchMessage = await dataSearch;
 
-        const filteredResultsHomestay = dataHomestay.filter(
-          (item: Item) =>
-            item.name_homeStay
-              ?.toLowerCase()
-              .includes(searchMessage.searchText.toLowerCase()) ?? false
-        );
-
-        const filteredResultsPackage = dataPackage.filter(
-          (item: Item) =>
-            item.name_package
-              ?.toLowerCase()
-              .includes(searchMessage.searchText.toLowerCase()) ?? false
-        );
-
-        setDataHomeStays(filteredResultsHomestay);
-        setDataPackage(filteredResultsPackage);
+        let HomeStayData = [];
+        let PackageData = [];
+        if (mapData) {
+          const dataforFilter = mapData.coordinates;
+          
+          const filteredResultsHomestay = dataforFilter.map(
+            (item: any) =>
+              item.HomeStay.toLowerCase()
+          );
+          HomeStayData = filteredResultsHomestay;
+          const filteredResultsPackage = dataPackage.filter(
+            (item: any) =>
+              item.dataPackage.toLowerCase()
+          );
+          PackageData = filteredResultsPackage;
+        } else {
+          const filteredResultsHomestay = dataHomestay.filter(
+            (item: Item) =>
+              item.name_homeStay
+                ?.toLowerCase()
+                .includes(searchMessage.searchText.toLowerCase()) ?? false
+          );
+          HomeStayData = filteredResultsHomestay;
+          const filteredResultsPackage = dataPackage.filter(
+            (item: Item) =>
+              item.name_package
+                ?.toLowerCase()
+                .includes(searchMessage.searchText.toLowerCase()) ?? false
+          );
+          PackageData = filteredResultsPackage;
+        }
+        setDataHomeStays(HomeStayData);
+        setDataPackage(PackageData);
       } catch (error) {
         console.log("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [dataSearch, dataHomeStays, dataPackage]);
+  }, [dataSearch, dataHomeStays, dataPackage, mapData]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {

@@ -90,7 +90,7 @@ const Filterpackage: React.FC = () => {
         className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]"
       >
         <button
-          id="ทั้งหมด"
+          id="ทั้งหมด[1]"
           onClick={() => filterByProvince("")}
           className={
             isType === ""

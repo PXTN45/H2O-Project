@@ -24,8 +24,10 @@ const Drawer: React.FC = () => {
 
   const { userInfo, mapData } = authContext;
 
+  console.log(mapData);
+  
   const [data, setData] = useState<string[]>([]);
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  //const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (mapData?.places) {
@@ -33,7 +35,7 @@ const Drawer: React.FC = () => {
     }
   }, [mapData]);
 
-  const handleCheckboxChange = (item: string) => {
+/*   const handleCheckboxChange = (item: string) => {
     setCheckedItems((prevCheckedItems) => {
       const newCheckedItems = new Set(prevCheckedItems);
       if (newCheckedItems.has(item)) {
@@ -43,7 +45,7 @@ const Drawer: React.FC = () => {
       }
       return newCheckedItems;
     });
-  };
+  }; */
 
   return (
     <div>
@@ -121,14 +123,14 @@ const Drawer: React.FC = () => {
                         {data.map((item) => (
                           <li key={item} className="mb-2">
                             <div className="flex items-center justify-start">
-                              <input
+    {/*                           <input
                                 type="checkbox"
                                 id={item}
                                 value={item}
                                 checked={checkedItems.has(item)}
                                 onChange={() => handleCheckboxChange(item)}
                                 className="mr-2"
-                              />
+                              /> */}
                               <label htmlFor={item}>{truncateText(item, 30)}</label>
                             </div>
                           </li>
