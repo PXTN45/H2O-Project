@@ -98,7 +98,7 @@ const SearchResult: React.FC = () => {
         let HomeStayData = [];
         let PackageData = [];
         if (mapData) {
-          const dataforFilter = mapData.coordinates;
+          const dataforFilter:any = mapData.coordinates;
           HomeStayData = dataforFilter[0].HomeStay;
           PackageData = dataforFilter[0].Packages;         
         } else {
@@ -125,7 +125,7 @@ const SearchResult: React.FC = () => {
     };
 
     fetchData();
-  }, [dataSearch, dataHomeStays, dataPackage]);
+  }, [dataSearch, dataHomeStays, dataPackage, mapData]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {
