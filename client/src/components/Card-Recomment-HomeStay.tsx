@@ -83,7 +83,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
           <div className="font-bold text-xl mb-2">
             {truncateText(item.name_homeStay || "", 15)}
           </div>
-          <p className="text-base">
+          <p id="Province-HomeStay" className="text-base">
             {truncateText(item.location[0].province_location || "", 30)}
           </p>
         </div>
