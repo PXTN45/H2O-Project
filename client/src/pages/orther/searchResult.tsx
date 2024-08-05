@@ -99,10 +99,8 @@ const SearchResult: React.FC = () => {
         let PackageData = [];
         if (mapData) {
           const dataforFilter = mapData.coordinates;
-          
-          console.log(dataforFilter[0].HomeStay);
-          console.log(dataforFilter[0].Packages);
-          
+          HomeStayData = dataforFilter[0].HomeStay;
+          PackageData = dataforFilter[0].Packages;         
         } else {
           const filteredResultsHomestay = dataHomestay.filter(
             (item: Item) =>
@@ -127,7 +125,7 @@ const SearchResult: React.FC = () => {
     };
 
     fetchData();
-  }, [dataSearch, dataHomeStays, dataPackage, mapData]);
+  }, [dataSearch, dataHomeStays, dataPackage]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {
