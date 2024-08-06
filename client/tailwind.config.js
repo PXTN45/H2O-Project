@@ -4,6 +4,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/flowbite/**/*.js"
   ],
   theme: {
     colors: {
@@ -25,5 +26,5 @@ export default {
       },
     },
   },
-  plugins: [daisyui],
+  plugins: [daisyui, require('flowbite/plugin')],
 };

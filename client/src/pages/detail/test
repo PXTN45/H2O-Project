@@ -1,0 +1,176 @@
+<div className="rounded-lg shadow-boxShadow p-10">
+    <div className="font-bold text-2xl">
+      {item.room_type[0].name_type_room}
+    </div>
+    <div className="flex flex-wrap  gap-4 my-3">
+      <div className="w-full md:w-[500px]">
+        <p className="my-2">ห้องพัก</p>
+        {/* carousel */}
+        <div className="carousel w-full md:w-[500px]">
+          <div
+            id="slide1"
+            className="carousel-item relative w-full"
+          >
+            <img
+              src={item.image[0].image_upload}
+              className="w-full rounded-lg"
+            />
+            <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+              <a
+                href="#slide4"
+                className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
+              >
+                ❮
+              </a>
+              <a
+                href="#slide2"
+                className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
+              >
+                ❯
+              </a>
+            </div>
+          </div>
+          <div
+            id="slide2"
+            className="carousel-item relative w-full"
+          >
+            <img
+              src={item.image[1].image_upload}
+              className="w-full"
+            />
+            <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+              <a
+                href="#slide1"
+                className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
+              >
+                ❮
+              </a>
+              <a
+                href="#slide3"
+                className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
+              >
+                ❯
+              </a>
+            </div>
+          </div>
+          <div
+            id="slide3"
+            className="carousel-item relative w-full"
+          >
+            <img
+              src={item.image[2].image_upload}
+              className="w-full"
+            />
+            <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+              <a
+                href="#slide2"
+                className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
+              >
+                ❮
+              </a>
+              <a
+                href="#slide4"
+                className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
+              >
+                ❯
+              </a>
+            </div>
+          </div>
+          <div
+            id="slide4"
+            className="carousel-item relative w-full"
+          >
+            <img
+              src={item.image[3].image_upload}
+              className="w-full"
+            />
+            <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+              <a
+                href="#slide3"
+                className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
+              >
+                ❮
+              </a>
+              <a
+                href="#slide1"
+                className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
+              >
+                ❯
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4">
+          <ul className="flex flex-col gap-3">
+            <li className="flex items-center">
+              <RxRulerSquare className="mr-2 text-2xl" />{" "}
+              {item.room_type[0].sizeBedroom_homeStay}
+            </li>
+            <li className="flex items-center">
+              <MdOutlineBathroom className="mr-2 text-2xl" />{" "}
+              {item.room_type[0].bathroom_homeStay} ห้องน้ำ
+            </li>
+
+            {item.room_type[0].bedroom_homeStay > 1 ? (
+              <li className="flex items-center">
+                <MdOutlineBedroomParent className="mr-2 text-2xl" />{" "}
+                {item.room_type[0].bedroom_homeStay} เตียงคู่
+              </li>
+            ) : (
+              <li className="flex items-center">
+                <MdOutlineBedroomChild className="mr-2 text-2xl" />{" "}
+                {item.room_type[0].bedroom_homeStay} เตียงเดี่ยว
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+
+      <div className="w-full md:w-[840px]">
+        <div className="flex flex-row mb-5">
+          <h1 className="w-2/5">สิทธิประโยชน์</h1>
+          <h1 className="w-1/5">ผู้เข้าพัก</h1>
+          <p className="w-2/5">ราคา ต่อห้อง ต่อคืน</p>
+        </div>
+        <div className="shadow-boxShadow flex rounded-lg p-10 ">
+          <div className="w-2/6 border-r text-md">{facilities}</div>
+          <div className="w-1/6 flex justify-center border-r">
+            <FaMale className="text-xl" />{" "}
+            <FaMale className="text-xl" />{" "}
+          </div>
+          <div className="w-2/6 flex flex-col justify-end border-r p-2">
+            {item.discount <= 0 ? (
+              <p className="flex justify-end font-bold text-alert text-3xl">
+                {item.room_type[0].price_homeStay} บาท
+              </p>
+            ) : (
+              <div>
+                <div className=" text-white w-full md:w-[100px] rounded-xl flex justify-center item-center bg-alert text-sm">
+                  SALE! ลด {item.discount} %
+                </div>
+                <p className="flex justify-end text-sm ">
+                  <del>{item.room_type[0].price_homeStay}</del> บาท
+                </p>
+                <p className="flex justify-end font-bold text-alert text-3xl">
+                  {discount(item.discount) || 0} บาท
+                </p>
+              </div>
+            )}
+
+            <p className="flex justify-end text-xs">ราคาต่อคืน</p>
+            <p className="flex justify-end text-xs">
+              (ก่อนรวมภาษีและค่าธรรมเนียม)
+            </p>
+          </div>
+          <div className="w-1/6 flex pl-3">
+            <button
+              className="btn btn-warning w-full sm:btn-sm md:btn-md lg:btn-lg"
+              onClick={handleButtonClick}
+            >
+              จอง
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

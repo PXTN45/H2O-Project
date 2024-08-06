@@ -8,8 +8,11 @@ interface Image {
   image_upload: string;
 }
 
-interface Room {
+interface Offer {
   price_homeStay: number;
+}
+interface Room {
+  offer: Offer[];
 }
 
 interface Location {
@@ -60,11 +63,12 @@ const Card: React.FC<CardProps> = ({ item }) => {
     }
     return stars;
   };
+  console.log(item);
 
   const navigate = useNavigate();
   const handleCardClick = () => {
-    navigate(`/homeStayDetail/${item._id}`, { state: { item } });
-  }
+    navigate(`/homeStayDetail/${item._id}`);
+  };
 
   return (
     <div
@@ -101,7 +105,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
             className="absolute right-0 font-bold px-6 py-4"
           >
             <span className="mx-1">฿</span>
-            {item.room_type[0].price_homeStay}
+            {item.room_type[0].offer[0].price_homeStay}
           </div>
         </div>
       </div>

@@ -45,15 +45,15 @@ const Card: React.FC<CardProps> = ({ item }) => {
   };
 
   const navigate = useNavigate();
-  const test = () => {
-    navigate("/packageDetail");
+  const handleCardClick = () => {
+    navigate(`/packageDetail/${item._id}`);
   }
   return (
     <div
       className="max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
       onClick={() => seeDetail(item._id)}
     >
-      <div onClick={test}>
+      <div onClick={handleCardClick}>
 
       
       <img
