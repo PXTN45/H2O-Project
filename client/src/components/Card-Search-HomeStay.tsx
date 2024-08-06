@@ -22,6 +22,7 @@ interface Item {
   detail_homeStay?: string;
   price_homestay?: number;
   review_rating_homeStay?: number;
+  max_people?: number;
 }
 
 interface CardProps {
@@ -32,7 +33,7 @@ const seeDetail = (id: string) => {
   console.log(id);
 };
 
-const Card: React.FC<CardProps> = ({ item }) => {
+const Card: React.FC<CardProps> = ({ item , numFamily }) => {
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength) + "...";
@@ -89,6 +90,15 @@ const Card: React.FC<CardProps> = ({ item }) => {
       </div>
       <div id="right-card" className="w-[25%] bg-whiteSmoke">
         <div className="flex items-center justify-center mt-5">
+          <span className="mx-1">
+            {item.max_people !== undefined && numFamily > item.max_people ? (
+              <span>
+                ต้องใช้ {Math.ceil(numFamily / item.max_people)} ห้อง
+              </span>
+            ) : (
+              "จำนวนปกติ"
+            )}
+          </span>
           <div id="Price-Homestay" className="absolute right-0 font-bold px-6 py-4">
             <span className="mx-1">฿</span>
             {item.room_type[0].price_homeStay}

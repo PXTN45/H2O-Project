@@ -36,6 +36,7 @@ interface Item {
   price_package?: number;
   price_homestay?: number;
   type_homestay?: string;
+  max_people?: number;
 }
 
 const SearchResult: React.FC = () => {
@@ -70,6 +71,7 @@ const SearchResult: React.FC = () => {
   const [numChildren, setNumChildren] = useState<number>(
     dataSearch?.numChildren ?? 0
   );
+  const [numFamily, setNumFamily] = useState<number>(0);
   const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
   const [dataHomeStays, setDataHomeStays] = useState<Item[]>([]);
   const [dataPackage, setDataPackage] = useState<Item[]>([]);
@@ -129,6 +131,11 @@ const SearchResult: React.FC = () => {
 
     fetchData();
   }, [dataSearch, dataHomeStays, dataPackage, mapData]);
+
+  useEffect(() => {
+    const result = numPeople + numChildren;
+    setNumFamily(result);
+  }, [numPeople , numChildren]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {
@@ -433,7 +440,7 @@ const SearchResult: React.FC = () => {
                 <>
                   {dataHomeStays.map((item, index) => (
                     <div key={index} className="w-full">
-                      <CardHomeStay item={item} />
+                      <CardHomeStay item={item} numFamily={numFamily} />
                     </div>
                   ))}
                 </>
