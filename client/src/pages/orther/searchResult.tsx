@@ -71,7 +71,6 @@ const SearchResult: React.FC = () => {
   const [numChildren, setNumChildren] = useState<number>(
     dataSearch?.numChildren ?? 0
   );
-  const [numFamily, setNumFamily] = useState<number>(0);
   const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
   const [dataHomeStays, setDataHomeStays] = useState<Item[]>([]);
   const [dataPackage, setDataPackage] = useState<Item[]>([]);
@@ -81,7 +80,7 @@ const SearchResult: React.FC = () => {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-
+  
   useEffect(() => {
     const dayAfterTomorrow = new Date(today);
     dayAfterTomorrow.setDate(today.getDate() + 2);
@@ -102,21 +101,28 @@ const SearchResult: React.FC = () => {
         let HomeStayData = [];
         let PackageData = [];
         if (mapData) {
-          const dataforFilter:any = mapData.coordinates;
+          const dataforFilter: any = mapData.coordinates;
           HomeStayData = dataforFilter[0].HomeStay;
-          PackageData = dataforFilter[0].Packages;         
+          PackageData = dataforFilter[0].Packages;
         } else {
           const filteredResultsHomestay = dataHomestay.filter(
             (item: Item) =>
-              (item.name_homeStay?.toLowerCase().includes(searchMessage.searchText.toLowerCase()) ?? false) ||
-              (item.location[0]?.province_location?.toLowerCase() === searchMessage.searchText.toLowerCase())
+              (item.name_homeStay
+                ?.toLowerCase()
+                .includes(searchMessage.searchText.toLowerCase()) ??
+                false) ||
+              item.location[0]?.province_location?.toLowerCase() ===
+                searchMessage.searchText.toLowerCase()
           );
           HomeStayData = filteredResultsHomestay;
           const filteredResultsPackage = dataPackage.filter(
             (item: Item) =>
-              item.name_package
+              (item.name_package
                 ?.toLowerCase()
-                .includes(searchMessage.searchText.toLowerCase()) ?? false
+                .includes(searchMessage.searchText.toLowerCase()) ??
+                false) ||
+              item.location[0]?.province_location?.toLowerCase() ===
+                searchMessage.searchText.toLowerCase()
           );
           PackageData = filteredResultsPackage;
         }
@@ -130,12 +136,7 @@ const SearchResult: React.FC = () => {
     };
 
     fetchData();
-  }, [dataSearch, dataHomeStays, dataPackage, mapData]);
-
-  useEffect(() => {
-    const result = numPeople + numChildren;
-    setNumFamily(result);
-  }, [numPeople , numChildren]);
+  }, [dataSearch, mapData]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {
@@ -440,7 +441,12 @@ const SearchResult: React.FC = () => {
                 <>
                   {dataHomeStays.map((item, index) => (
                     <div key={index} className="w-full">
-                      <CardHomeStay item={item} numFamily={numFamily} />
+                      <CardHomeStay
+                        item={item}
+                        numPeople={numPeople}
+                        numChildren={numChildren}
+                        dateRange={dateRange}
+                      />
                     </div>
                   ))}
                 </>
