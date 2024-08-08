@@ -81,8 +81,8 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
 
   const calculateRequiredRooms = (offers: Offer[], numAdults: number, numChildren: number) => {
     let totalRooms = 0;
-    let remainingAdults = Math.min(numAdults);
-    let remainingChildren = Math.min(numChildren);
+    let remainingAdults = numAdults
+    let remainingChildren = numChildren
 
     // จัดเรียง offer ตามจำนวนห้องที่มากไปน้อย
     offers.sort((a, b) => b.roomcount - a.roomcount);
@@ -95,10 +95,15 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
       while ((remainingAdults > 0 || remainingChildren > 0) && availableRooms > 0) {
         const adultsInThisRoom = Math.min(remainingAdults, maxAdults);
         const childrenInThisRoom = Math.min(remainingChildren, maxChildren);
-        remainingAdults -= adultsInThisRoom;
-        remainingChildren -= childrenInThisRoom;
-        totalRooms++;
-        availableRooms--;
+        
+        if (adultsInThisRoom > 0 || childrenInThisRoom > 0) {
+          remainingAdults -= adultsInThisRoom;
+          remainingChildren -= childrenInThisRoom;
+          totalRooms++;
+          availableRooms--;
+        } else {
+          break;
+        }
       }
 
       if (remainingAdults <= 0 && remainingChildren <= 0) break;
@@ -116,13 +121,9 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
 
   // คำนวณจำนวนห้องที่ต้องการตาม offers สำหรับผู้ใหญ่และเด็ก
   const { totalRooms, remainingAdults, remainingChildren } = calculateRequiredRooms(allOffers, numPeople, numChildren);
-
-  console.log(remainingAdults);
-  console.log(remainingChildren);
   
-  // ถ้ามีผู้ใหญ่หรือเด็กที่ไม่สามารถจัดห้องให้ได้ ให้ซ่อนการ์ด
   if (remainingAdults > 0 || remainingChildren > 0) {
-    return null; // ไม่แสดงการ์ดถ้าห้องไม่เพียงพอ หรือจำนวนผู้ใหญ่/เด็กเกินข้อกำหนด
+    return null; // ไม่แสดงการ์ดถ้าห้องไม่เพียงพอ
   }
 
   return (
