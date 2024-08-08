@@ -16,7 +16,7 @@ import DetailPayment from "../pages/orther/detailPayment";
 import SearchResult from "../pages/orther/searchResult";
 import HomeStayDetail from "../pages/detail/homeStayDetail";
 import PackageDetail from "../pages/detail/packageDetail";
-
+import { PaymentProvider } from "../AuthContext/paymentContext";
 
 const router = createBrowserRouter([
   {
@@ -29,24 +29,37 @@ const router = createBrowserRouter([
       },
       {
         path: "/detailPayment",
-        element: <DetailPayment />,
-      },
-      {
-        path: "/bookingDetail",
-        element: <BookingDetail />,
+        element: (
+          <PaymentProvider>
+            <DetailPayment />
+          </PaymentProvider>
+        ),
       },
       {
         path: "/homeStayDetail/:id",
-        element: <HomeStayDetail />,
+        element: (
+          <PaymentProvider>
+            <HomeStayDetail />
+          </PaymentProvider>
+        ),
       },
+      {
+        path: "/bookingDetail",
+        element: (
+          <PaymentProvider>
+            <BookingDetail />
+          </PaymentProvider>
+        ),
+      },
+
       {
         path: "/packageDetail/:id",
         element: <PackageDetail />,
       },
       {
         path: "/search",
-        element: (<DrawerSearch />),
-        children:[
+        element: <DrawerSearch />,
+        children: [
           {
             path: "/search/search-result",
             element: <SearchResult />,

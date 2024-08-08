@@ -19,20 +19,26 @@ import {
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
-import { useRef } from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { CustomArrowProps } from "react-slick";
+import { FaChildReaching } from "react-icons/fa6";
+import { usePaymentContext } from "../../AuthContext/paymentContext";
+// import
 
 // types.ts
 export interface Image_room {
   image: string;
 }
+export interface Facilities_Room {
+  facilitiesName: string;
+}
+
 export interface Offer {
   price_homeStay: number;
-  quantity: number;
+  max_people: {
+    adult: number;
+    child: number;
+  };
   discount: number;
+  facilitiesRoom: Facilities_Room[];
 }
 export interface RoomType {
   name_type_room: string;
@@ -85,93 +91,43 @@ export interface HomeStay {
   createdAt: Date;
   updatedAt: Date;
 }
-
-// export interface Image {
-//   image: any;
-// }
-
-// const images = [
-//   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzwjRrPxNPtt9M_Lzn9REES05sB6iVSDLZEQ&s",
-//   "https://png.pngtree.com/thumb_back/fh260/background/20210911/pngtree-xiaguang-daytime-rape-flower-mountain-no-photography-picture-with-picture-image_851488.jpg",
-//   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT66gud8TleGwraiwt11soeAxXtebT-7dbn7g&s",
-//   "https://png.pngtree.com/thumb_back/fh260/background/20210903/pngtree-sunflower-summer-sunflower-flower-park-photography-picture-image_800070.jpg",
-//   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqr6aqnAvfBy_qBntb6cEC6QdH2_4Nd6tMFQ&s",
-// ];
+interface User {
+  _id?: string;
+  name?: string;
+  lastName?: string;
+  businessName?: string;
+  email: string;
+  password: string;
+  phone: string | undefined;
+  image: string;
+  address: string;
+  birthday: Date;
+  role: string;
+}
+interface PaymentData {
+  homeStayId: string;
+  homeStayName: string;
+  totalPrice: number;
+  roomType: RoomType;
+  offer: Offer;
+  bookingUser: User;
+}
 
 const homeStayDetail = () => {
-  const navigate = useNavigate();
-  const [item, setItem] = useState<HomeStay | undefined>();
-  const [isLoading, setLoadPage] = useState<boolean>(false);
-  // const sliderRef = useRef<Slider | null>(null);
   const { id } = useParams<{ id: string }>();
   const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [item, setItem] = useState<HomeStay | undefined>();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setLoadPage] = useState<boolean>(false);
+
+  const { setPaymentData } = usePaymentContext();
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
-  // const SampleNextArrow: React.FC<CustomArrowProps> = (props) => {
-  //   const { className, style, onClick } = props;
-  //   return (
-  //     <button
-  //       // className={`${className}  text-black rounded-full w-10 h-10`}
-  //       style={{
-  //         ...style,
-  //         display: "block",
-  //         background: "white",
-  //         borderRadius: "50%",
-  //         width: "40px",
-  //         height: "40px",
-  //         border: "none",
-  //         color: "black",
-  //       }}
-  //       onClick={onClick}
-  //     >
-  //       <span style={{ color: "black", fontSize: "35px", lineHeight: "40px" }}>
-  //         ›
-  //       </span>
-  //     </button>
-  //   );
-  // };
-
-  // const SamplePrevArrow: React.FC<CustomArrowProps> = (props) => {
-  //   const { className, style, onClick } = props;
-  //   return (
-  //     <div className="border">
-  //       <button
-  //         className="flex border"
-  //         style={{
-  //           ...style,
-  //           // display: "block",
-  //           background: "white",
-  //           borderRadius: "50%",
-  //           width: "40px",
-  //           height: "40px",
-  //           color: "black",
-  //         }}
-  //         onClick={onClick}
-  //       >
-  //         <span
-  //           style={{ color: "black", fontSize: "35px", lineHeight: "40px" }}
-  //         >
-  //           ‹
-  //         </span>
-  //       </button>
-  //     </div>
-  //   );
-  // };
-
-  // const settings = {
-  //   dots: false,
-  //   infinite: true,
-  //   speed: 500,
-  //   slidesToShow: 1,
-  //   slidesToScroll: 1,
-  //   nextArrow: <SampleNextArrow />,
-  //   prevArrow: <SamplePrevArrow />,
-  // };
-  // console.log(item);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { userInfo } = authContext;
+  console.log(userInfo);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -187,7 +143,7 @@ const homeStayDetail = () => {
     setLoadPage(false);
   }, [id]);
 
-  // console.log(item);
+  console.log(item);
   if (isLoading == true) {
     <p>no Item</p>;
   }
@@ -250,13 +206,9 @@ const homeStayDetail = () => {
       }
     };
 
-  const handleButtonClick = () => {
-    navigate("/bookingDetail", { state: { data } });
-  };
+
 
   const card = item?.room_type.map((data: RoomType, index: number) => {
-    console.log(data.image_room);
-
     const handlePrev = () => {
       if (data.image_room.length) {
         setCurrentIndex((prevIndex) =>
@@ -273,12 +225,6 @@ const homeStayDetail = () => {
       }
     };
 
-    const goToSlide = (index: number) => {
-      if (data.image_room.length) {
-        setCurrentIndex(index);
-      }
-    };
-
     const offer = data.offer.map((offer: Offer, i: number) => {
       const discount = (discount: number) => {
         const price = offer.price_homeStay;
@@ -289,13 +235,76 @@ const homeStayDetail = () => {
         }
       };
 
+      // console.log(data.offer[index].facilitiesRoom[i].facilitiesName);
+
+      const facilitiesRoom = offer?.facilitiesRoom.map(
+        (facility: Facilities_Room, index: number) => {
+          // console.log(facility.facilitiesName);
+          // console.log(facility.offer[index].facilitiesRoom[index].facilitiesName);
+
+          return (
+            <div key={index} className="flex items-center gap-4">
+              <FaCheck />
+              {facility.facilitiesName}
+            </div>
+          );
+        }
+      );
+
+      // console.log(i + "ผญ." + data.offer[i].max_people.adult + "ด" + data.offer[i].max_people.child);
+      // console.log(data.offer[i].max_people.child);
+
+      const handleSelectAndProceed = (offer: Offer) => {
+        if (item && userInfo && id) {
+          // Set payment data
+          const paymentData: PaymentData = {
+            homeStayId: id, 
+            homeStayName: item.name_homeStay,
+            totalPrice: offer.price_homeStay,
+            roomType: item.room_type[i], 
+            offer: offer,
+            bookingUser: userInfo,
+          };
+    
+          setPaymentData(paymentData);
+          navigate("/bookingDetail");
+        }
+      };
+
       return (
         <div key={i}>
           <div className="shadow-boxShadow flex rounded-lg p-10 my-5">
-            <div className="w-2/6 border-r text-md">{facilities}</div>
-            <div className="w-1/6 flex justify-center border-r">
-              <FaMale className="text-xl" /> <FaMale className="text-xl" />{" "}
-            </div>
+            <div className="w-2/6 border-r text-md">{facilitiesRoom}</div>
+            {data.offer[i].max_people.child > 0 &&
+            data.offer[i].max_people.adult > 0 &&
+            data.offer[i].max_people.adult < 2 ? (
+              <div className="w-1/6 border-r">
+                <div className="flex justify-center items-end">
+                  <FaMale className="text-xl" />
+                  <FaChildReaching className="text-md" />
+                </div>
+              </div>
+            ) : data.offer[i].max_people.child > 0 &&
+              data.offer[i].max_people.adult > 1 ? (
+              <div className="w-1/6 border-r">
+                <div className="flex justify-center items-end">
+                  <FaMale className="text-xl" /> <FaMale className="text-xl" />{" "}
+                  <FaChildReaching className="text-md" />
+                </div>
+              </div>
+            ) : data.offer[i].max_people.child <= 0 &&
+              data.offer[i].max_people.adult > 1 ? (
+              <div className="w-1/6 border-r">
+                <div className="flex justify-center items-end">
+                  <FaMale className="text-xl" /> <FaMale className="text-xl" />
+                </div>
+              </div>
+            ) : (
+              <div className="w-1/6 flex justify-center border-r">
+                <FaMale className="text-xl" />
+              </div>
+            )}
+
             <div className="w-2/6 flex flex-col justify-end border-r p-2">
               {offer.discount <= 0 ? (
                 <p className="flex justify-end font-bold text-alert text-3xl">
@@ -324,7 +333,7 @@ const homeStayDetail = () => {
               <button
                 className=" bg-primaryUser shadow-boxShadow px-8 h-10 rounded-3xl hover:scale-110 
                 transition-transform duration-300 text-white"
-                onClick={handleButtonClick}
+                onClick={() => handleSelectAndProceed(offer)}
               >
                 จอง
               </button>
@@ -351,7 +360,7 @@ const homeStayDetail = () => {
                     className="relative w-full"
                     data-carousel="slide"
                   >
-                    <div className="relative h-56 overflow-hidden rounded-lg md:h-96">
+                    <div className="relative h-80 overflow-hidden rounded-lg ">
                       {data?.image_room.map(
                         (src: Image_room, index: number) => (
                           <div
@@ -363,29 +372,13 @@ const homeStayDetail = () => {
                           >
                             <img
                               src={src.image}
-                              className="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 h-[300px] object-cover rounded-xl"
+                              className="absolute block w-full h-full object-cover rounded-xl"
                               alt={`Slide ${index + 1}`}
                             />
                           </div>
                         )
                       )}
                     </div>
-
-                    <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
-                      {data?.image_room.map((_, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          className={`w-3 h-3 rounded-full ${
-                            currentIndex === index ? "bg-white" : "bg-gray-500"
-                          }`}
-                          aria-current={currentIndex === index}
-                          aria-label={`Slide ${index + 1}`}
-                          onClick={() => goToSlide(index)}
-                        ></button>
-                      ))}
-                    </div>
-
                     <button
                       type="button"
                       className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
@@ -438,88 +431,6 @@ const homeStayDetail = () => {
                     </button>
                   </div>
                 </div>
-                {/* <div className="carousel w-full md:w-[500px] h-[300px] object-cover">
-                  <div id="slide1" className="carousel-item relative w-full">
-                    <img
-                      src={item.room_type[index].image_room[index].image}
-                      className="w-full rounded-lg object-cover"
-                    />
-                    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                      <a
-                        href="#slide4"
-                        className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
-                      >
-                        ❮
-                      </a>
-                      <a
-                        href="#slide2"
-                        className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
-                      >
-                        ❯
-                      </a>
-                    </div>
-                  </div>
-                  <div id="slide2" className="carousel-item relative w-full">
-                    <img
-                      src={item.room_type[index].image_room[index]?.image}
-                      className="w-full rounded-lg object-cover"
-                    />
-                    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                      <a
-                        href="#slide1"
-                        className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
-                      >
-                        ❮
-                      </a>
-                      <a
-                        href="#slide3"
-                        className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
-                      >
-                        ❯
-                      </a>
-                    </div>
-                  </div>
-                  <div id="slide3" className="carousel-item relative w-full">
-                    <img
-                      src={item.room_type[index].image_room[index].image}
-                      className="w-full rounded-lg object-cover"
-                    />
-                    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                      <a
-                        href="#slide2"
-                        className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
-                      >
-                        ❮
-                      </a>
-                      <a
-                        href="#slide4"
-                        className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
-                      >
-                        ❯
-                      </a>
-                    </div>
-                  </div>
-                  <div id="slide4" className="carousel-item relative w-full">
-                    <img
-                      src={item.room_type[index].image_room[index].image}
-                      className="w-full rounded-lg object-cover"
-                    />
-                    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                      <a
-                        href="#slide3"
-                        className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
-                      >
-                        ❮
-                      </a>
-                      <a
-                        href="#slide1"
-                        className="text-white hover:bg-white hover:text-dark rounded-2xl px-2 "
-                      >
-                        ❯
-                      </a>
-                    </div>
-                  </div>
-                </div> */}
 
                 <div className="mt-4">
                   <ul className="flex flex-col gap-3">
@@ -698,7 +609,7 @@ const homeStayDetail = () => {
                         <div>
                           <div>ต้องปรับปรุง</div>
                           <progress
-                            className="progress progress-info w-[300px] md:w-[600px] h-5"
+                            className="progress progress-info w-[200px] md:w-[600px] h-5"
                             value={10}
                             max="100"
                           ></progress>
@@ -706,7 +617,7 @@ const homeStayDetail = () => {
                         <div>
                           <div>ปานกลาง</div>
                           <progress
-                            className="progress progress-info w-[300px] md:w-[600px] h-5"
+                            className="progress progress-info w-[200px] md:w-[600px] h-5"
                             value="20"
                             max="100"
                           ></progress>
@@ -714,7 +625,7 @@ const homeStayDetail = () => {
                         <div>
                           <div>ดี</div>
                           <progress
-                            className="progress progress-info w-[300px] md:w-[600px] h-5"
+                            className="progress progress-info w-[200px] md:w-[600px] h-5"
                             value="40"
                             max="100"
                           ></progress>
@@ -722,7 +633,7 @@ const homeStayDetail = () => {
                         <div>
                           <div>ดีมาก</div>
                           <progress
-                            className="progress progress-info w-[300px] md:w-[600px] h-5"
+                            className="progress progress-info w-[200px] md:w-[600px] h-5"
                             value="60"
                             max="100"
                           ></progress>
@@ -730,7 +641,7 @@ const homeStayDetail = () => {
                         <div>
                           <div>ดีเยี่ยม</div>
                           <progress
-                            className="progress progress-info w-[300px] md:w-[600px] h-5"
+                            className="progress progress-info w-[200px] md:w-[600px] h-5"
                             value="80"
                             max="100"
                           ></progress>
