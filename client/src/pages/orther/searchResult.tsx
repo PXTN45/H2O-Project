@@ -36,6 +36,7 @@ interface Item {
   price_package?: number;
   price_homestay?: number;
   type_homestay?: string;
+  max_people?: number;
 }
 
 const SearchResult: React.FC = () => {
@@ -73,11 +74,13 @@ const SearchResult: React.FC = () => {
   const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
   const [dataHomeStays, setDataHomeStays] = useState<Item[]>([]);
   const [dataPackage, setDataPackage] = useState<Item[]>([]);
+  const [homeStayCount, setHomeStayCount] = useState<number>(0);
+  const [packageCount, setPackageCount] = useState<number>(0);
 
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-
+  
   useEffect(() => {
     const dayAfterTomorrow = new Date(today);
     dayAfterTomorrow.setDate(today.getDate() + 2);
@@ -98,34 +101,42 @@ const SearchResult: React.FC = () => {
         let HomeStayData = [];
         let PackageData = [];
         if (mapData) {
-          const dataforFilter:any = mapData.coordinates;
+          const dataforFilter: any = mapData.coordinates;
           HomeStayData = dataforFilter[0].HomeStay;
-          PackageData = dataforFilter[0].Packages;         
+          PackageData = dataforFilter[0].Packages;
         } else {
           const filteredResultsHomestay = dataHomestay.filter(
             (item: Item) =>
-              item.name_homeStay
+              (item.name_homeStay
                 ?.toLowerCase()
-                .includes(searchMessage.searchText.toLowerCase()) ?? false
+                .includes(searchMessage.searchText.toLowerCase()) ??
+                false) ||
+              item.location[0]?.province_location?.toLowerCase() ===
+                searchMessage.searchText.toLowerCase()
           );
           HomeStayData = filteredResultsHomestay;
           const filteredResultsPackage = dataPackage.filter(
             (item: Item) =>
-              item.name_package
+              (item.name_package
                 ?.toLowerCase()
-                .includes(searchMessage.searchText.toLowerCase()) ?? false
+                .includes(searchMessage.searchText.toLowerCase()) ??
+                false) ||
+              item.location[0]?.province_location?.toLowerCase() ===
+                searchMessage.searchText.toLowerCase()
           );
           PackageData = filteredResultsPackage;
         }
         setDataHomeStays(HomeStayData);
         setDataPackage(PackageData);
+        setHomeStayCount(HomeStayData.length);
+        setPackageCount(PackageData.length);
       } catch (error) {
         console.log("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [dataSearch, dataHomeStays, dataPackage, mapData]);
+  }, [dataSearch, mapData]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {
@@ -227,7 +238,7 @@ const SearchResult: React.FC = () => {
             }
             onClick={clickToHome}
           >
-            ที่พัก
+            ที่พัก ({homeStayCount})
           </button>
           <button
             id="button-homestaySearch-noSelect"
@@ -238,7 +249,7 @@ const SearchResult: React.FC = () => {
             }
             onClick={clickToPackage}
           >
-            แพ็คเกจ
+            แพ็คเกจ ({packageCount})
           </button>
         </div>
         <div id="header">
@@ -351,13 +362,13 @@ const SearchResult: React.FC = () => {
             <div className="mx-14" />
             <div className="relative w-full mb-5">
               <button
-                id="filter-buttonPackage"
+                id="sort-buttonPackage"
                 className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[16rem] shadow-md"
                 onClick={toggleFilterMenu}
               >
                 <span className="flex items-center justify-center font-bold">
                   <MdFilterList className="w-5 h-5 mr-3" />
-                  <span>Filter</span>
+                  <span>Sort</span>
                 </span>
               </button>
               {showFilterMenu && (
@@ -365,6 +376,7 @@ const SearchResult: React.FC = () => {
                   <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
                     <div className="flex flex-col items-start">
                       <button
+                        id="PriceHightToLow"
                         className="w-full text-left p-2 hover:bg-gray-100 rounded"
                         onClick={() =>
                           handleFilterClick("เรียงตามราคาสูงไปน้อย")
@@ -373,6 +385,7 @@ const SearchResult: React.FC = () => {
                         เรียงตามราคาสูงไปน้อย
                       </button>
                       <button
+                        id="PriceLowToHight"
                         className="w-full text-left p-2 hover:bg-gray-100 rounded"
                         onClick={() =>
                           handleFilterClick("เรียงตามราคาน้อยไปสูง")
@@ -381,6 +394,7 @@ const SearchResult: React.FC = () => {
                         เรียงตามราคาน้อยไปสูง
                       </button>
                       <button
+                        id="StarHightToLow"
                         className="w-full text-left p-2 hover:bg-gray-100 rounded"
                         onClick={() =>
                           handleFilterClick("เรียงตามดาวสูงไปน้อย")
@@ -389,6 +403,7 @@ const SearchResult: React.FC = () => {
                         เรียงตามดาวสูงไปน้อย
                       </button>
                       <button
+                        id="StarLowToHight"
                         className="w-full text-left p-2 hover:bg-gray-100 rounded"
                         onClick={() =>
                           handleFilterClick("เรียงตามดาวน้อยไปสูง")
@@ -426,7 +441,12 @@ const SearchResult: React.FC = () => {
                 <>
                   {dataHomeStays.map((item, index) => (
                     <div key={index} className="w-full">
-                      <CardHomeStay item={item} />
+                      <CardHomeStay
+                        item={item}
+                        numPeople={numPeople}
+                        numChildren={numChildren}
+                        dateRange={dateRange}
+                      />
                     </div>
                   ))}
                 </>

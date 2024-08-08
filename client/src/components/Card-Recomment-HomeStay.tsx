@@ -63,7 +63,6 @@ const Card: React.FC<CardProps> = ({ item }) => {
     }
     return stars;
   };
-  console.log(item);
 
   const navigate = useNavigate();
   const handleCardClick = () => {
