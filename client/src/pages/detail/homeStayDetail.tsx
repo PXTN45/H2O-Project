@@ -21,6 +21,7 @@ import { AuthContext } from "../../AuthContext/auth.provider";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { FaChildReaching } from "react-icons/fa6";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
+import axios from "axios";
 // import
 
 // types.ts
@@ -112,13 +113,26 @@ interface PaymentData {
   offer: Offer;
   bookingUser: User;
 }
+interface Review {
+  _id: string;
+  reviewer: string;
+  content: string;
+  rating: number;
+  package: string;
+  homestay: string;
+  createdAt: string;
+}
 
 const homeStayDetail = () => {
   const { id } = useParams<{ id: string }>();
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
   const [item, setItem] = useState<HomeStay | undefined>();
+  const [review, setReview] = useState<Review[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
+  const [progress, setProgress] = useState(0);
+  // const [reviewer, setReviewer] = useState<User>();
   const [isLoading, setLoadPage] = useState<boolean>(false);
 
   const { setPaymentData } = usePaymentContext();
@@ -127,25 +141,69 @@ const homeStayDetail = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { userInfo } = authContext;
-  console.log(userInfo);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoadPage(true);
       try {
         const res = await axiosPrivateUser.get(`/homestay/${id}`);
-        setItem(res.data);
+        if (res.data) {
+          setItem(res.data);
+        }
+
+        try {
+          const reviewsResponse = await axios.get<Review[]>("/review.json");
+          if (reviewsResponse.data) {
+            const filteredReviews = reviewsResponse.data.filter(
+              (review) => review.homestay === id
+            );
+
+            // ดึงข้อมูล reviewer ทั้งหมดในเวลาเดียวกัน
+            const reviewersPromises = filteredReviews.map(async (review) => {
+              try {
+                const userData = await axios.get(
+                  `http://localhost:3000/user/userData/${review.reviewer}`
+                );
+                return {
+                  ...review,
+                  reviewer: userData.data, // เพิ่มข้อมูลผู้รีวิวเข้าไปในรีวิวแต่ละรายการ
+                };
+              } catch (userError) {
+                console.error(
+                  `เกิดข้อผิดพลาดในการดึงรายละเอียด reviewer สำหรับ review ID: ${review._id}`,
+                  userError
+                );
+                return review;
+              }
+            });
+
+            // รอจนดึงข้อมูลผู้รีวิวเสร็จทั้งหมด
+            const reviewsWithReviewerData = await Promise.all(
+              reviewersPromises
+            );
+
+            setReview(reviewsWithReviewerData);
+          }
+        } catch (reviewError) {
+          console.error("เกิดข้อผิดพลาดในการดึงข้อมูลรีวิว:", reviewError);
+        }
       } catch (error) {
         console.error("เกิดข้อผิดพลาดในการดึงรายละเอียด homestay:", error);
+      } finally {
+        setLoadPage(false);
       }
     };
+
     fetchData();
-    setLoadPage(false);
   }, [id]);
 
-  console.log(item);
   if (isLoading == true) {
     <p>no Item</p>;
+  }
+  // console.log(review[0]?.reviewer);
+  if (review) {
+    console.log(review.length);
+    // console.log(review[1]?.reviewer);
   }
 
   const images = item?.image.slice(1, 7).map((img: any, index: number) => {
@@ -166,13 +224,6 @@ const homeStayDetail = () => {
       </div>
     );
   });
-
-  const radialProgress = (rating: number) => {
-    if (rating) {
-      const progress = (rating * 100) / 5;
-      return progress;
-    }
-  };
 
   // ตรวจสอบว่า item.facilities ถูกกำหนดก่อนการ map
   const facilities = item?.facilities.map((facility: any, index: number) => (
@@ -205,8 +256,6 @@ const homeStayDetail = () => {
         targetElement.scrollIntoView({ behavior: "smooth" });
       }
     };
-
-
 
   const card = item?.room_type.map((data: RoomType, index: number) => {
     const handlePrev = () => {
@@ -258,14 +307,16 @@ const homeStayDetail = () => {
         if (item && userInfo && id) {
           // Set payment data
           const paymentData: PaymentData = {
-            homeStayId: id, 
+            homeStayId: id,
             homeStayName: item.name_homeStay,
             totalPrice: offer.price_homeStay,
-            roomType: item.room_type[i], 
+            roomType: item.room_type[i],
             offer: offer,
             bookingUser: userInfo,
           };
-    
+
+          localStorage.setItem("paymentData", JSON.stringify(paymentData));
+
           setPaymentData(paymentData);
           navigate("/bookingDetail");
         }
@@ -274,7 +325,7 @@ const homeStayDetail = () => {
       return (
         <div key={i}>
           <div className="shadow-boxShadow flex rounded-lg p-10 my-5">
-            <div className="w-2/6 border-r text-md">{facilitiesRoom}</div>
+            <div className="w-2/6 border-r text-sm">{facilitiesRoom}</div>
             {data.offer[i].max_people.child > 0 &&
             data.offer[i].max_people.adult > 0 &&
             data.offer[i].max_people.adult < 2 ? (
@@ -475,7 +526,72 @@ const homeStayDetail = () => {
       </div>
     );
   });
+  // ฟังก์ชันคำนวณค่าเฉลี่ยของ rating
+  const calculateAverageRating = (reviews: Review[]): number => {
+    if (reviews.length === 0) return 0;
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return totalRating / reviews.length;
+  };
 
+  // ฟังก์ชันคำนวณความก้าวหน้า (progress)
+  const radialProgress = (rating: number): number => {
+    if (rating) {
+      return (rating * 100) / 5;
+    }
+    return 0;
+  };
+
+  useEffect(() => {
+    if (review.length > 0) {
+      const averageRating = calculateAverageRating(review);
+      const progress = radialProgress(averageRating);
+      setAverageRating(averageRating);
+      setProgress(progress);
+      // console.log("Average Rating:", averageRating);
+      // console.log("Progress:", progress);
+    }
+  }, [review]);
+
+  const reviews = review?.map((reviewHomeStay: Review, reviewIndex: number) => {
+    // console.log(reviewHomeStay);
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("th-TH", {
+        day: "numeric",
+        month: "numeric",
+        year: "numeric",
+      });
+    };
+
+    return (
+      <div
+        key={reviewIndex}
+        className="flex flex-wrap gap-4 my-5 shadow-boxShadow rounded-xl p-5"
+      >
+        <div className="w-full p-5 flex flex-wrap justify-between">
+          <div className="flex gap-2 items-center text-xl">
+            <div className="avatar">
+              <div className="w-12 rounded-full object-cover">
+                <img src={reviewHomeStay?.reviewer.image} />
+              </div>
+            </div>
+            <div>{reviewHomeStay?.reviewer.name}</div>
+            <div className="bg-primaryUser rounded-2xl px-3 py-1 text-white">
+              <div className="text-sm">{reviewHomeStay?.rating}/5</div>
+            </div>
+          </div>
+          <div>
+            <div>
+              <div>{formatDate(reviewHomeStay?.createdAt)}</div>
+            </div>
+          </div>
+        </div>
+        <div className="w-full  rounded-lg">
+          <div>{reviewHomeStay?.content}</div>
+        </div>
+      </div>
+    );
+  });
   return (
     <div>
       {item ? (
@@ -538,10 +654,13 @@ const homeStayDetail = () => {
                       </div>
                       {/* ดาว */}
                       <div className="flex items-center font-bold mb-2 text-primaryUser">
-                        {renderStars(item.review_rating_homeStay || 0)}
-                        <div className="flex gap-4">
-                          <h1>{item.review_rating_homeStay}</h1>
-                          <h1>1350 รีวิว</h1>
+                        {renderStars(averageRating)}
+                        <div className="flex gap-2 mx-2">
+                          <div>{averageRating}</div>
+                          <div className="flex gap-1">
+                            <div>{review.length} </div>
+                            <div>รีวิว</div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -594,15 +713,13 @@ const homeStayDetail = () => {
                     <div
                       className="radial-progress  text-primaryUser text-5xl font-bold "
                       style={{
-                        "--value": `${radialProgress(
-                          item.review_rating_homeStay
-                        )}`,
+                        "--value": `${progress}`,
                         "--size": "12rem",
                         "--thickness": "2rem",
                       }}
                       role="progressbar"
                     >
-                      {item.review_rating_homeStay}
+                      {averageRating}
                     </div>
                     <div className="flex flex-row items-center gap-10">
                       <div className="flex flex-col-reverse ">
@@ -688,125 +805,7 @@ const homeStayDetail = () => {
                   </div>
                 </div>
                 {/* Review */}
-                <div className="flex flex-wrap gap-4 my-5 shadow-boxShadow rounded-xl p-5">
-                  <div className="w-full md:w-1/4 p-5">
-                    <div className="flex gap-5  items-center text-xl">
-                      <div className="avatar">
-                        <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2">
-                          <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-                        </div>
-                      </div>
-                      <div>Nattaphong</div>
-                    </div>
-                  </div>
-                  <div className="w-full md:w-[970px] shadow-boxShadow p-5 rounded-lg">
-                    <div className="flex flex-wrap justify-between mb-5">
-                      <div className="bg-primaryUser rounded-xl px-2 text-l text-white">
-                        4.5/5
-                      </div>
-                      <div>02/สิงหาคม/2567</div>
-                    </div>
-                    <div>
-                      เป็นโรงแรมและที่พักที่สะอาดมากๆถูกใจมากในการดูแลเรื่องของความสะอาด
-                      แม่บ้านทำความสะอาดทุกอย่างในห้องได้ดีมากๆ
-                      ถ้าเปรียบกับที่อื่นในราคาเท่ากันที่อื่นทำความสะอาดทุกวันเหมือนกัน
-                      แต่ไม่เช็ดโต๊ะและถูกพื้นฯลฯ ฝักบัวอาบน้ำน้ำไหลมาก
-                      เทวัญสะดวกทุกอย่างไม่ว่าจะเป็นแหล่งเที่ยวแหล่งของกิน
-                      เราเลยพักต่ออีกสองคืน😊😊พนักงานทุกคนให้การบริการยิ้มแย้มแจ่มใสดีมากๆๆ
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 my-5 shadow-boxShadow rounded-xl p-5">
-                  <div className="w-1/4 p-5">
-                    <div className="flex gap-5 items-center text-xl">
-                      <div className="avatar">
-                        <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2">
-                          <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-                        </div>
-                      </div>
-                      <div>Suttiporn</div>
-                    </div>
-                  </div>
-                  <div className="w-3/4 shadow-boxShadow p-5 rounded-lg">
-                    <div className="flex justify-between mb-5">
-                      <div className="bg-primaryUser rounded-xl px-2 text-l text-white">
-                        4/5
-                      </div>
-                      <div>02/สิงหาคม/2567</div>
-                    </div>
-                    <div>
-                      บริการดีค่ะ ห้องพักสะอาด แต่เสียงดังค่ะ แม่บ้านทำความสะอาด
-                      วันที่เข้าพัก มีเด็กฝรั่งเสียงดังร้องไห้ นานมากค่ะ
-                      ตั้งแต่เช้าเลย หลายชั่วโมง
-                      และได้ยินเสียงทีวีห้องติดกันชัดมาก
-                      แต่ครั้งแรกค่ะที่เข้าพัก รอบหน้าก็ว่าจะไปอีกค่ะ
-                      ชอบการบริการ ราคาถูก ใกล้ของกิน แนะนำค่ะ
-                      ใครที่หาโรงแรมที่พัก😊👍
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-4 my-5 shadow-boxShadow rounded-xl p-5">
-                  <div className="w-1/4 p-5">
-                    <div className="flex gap-5 items-center text-xl">
-                      <div className="avatar">
-                        <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2">
-                          <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-                        </div>
-                      </div>
-                      <div>Athiphong</div>
-                    </div>
-                  </div>
-                  <div className="w-3/4 shadow-boxShadow p-5 rounded-lg">
-                    <div className="flex justify-between mb-5">
-                      <div className="bg-primaryUser rounded-xl px-2 text-l text-white">
-                        4.5/5
-                      </div>
-                      <div>02/สิงหาคม/2567</div>
-                    </div>
-                    <div>
-                      ส่วนตัวอ่านรีวิวมาบ้างแล้วก่อนพัก แย่บ้าง ดีบ้างปนๆกันไป
-                      แถวที่พักร้านอาหาร โลตัส เซเว่นฉ่ำมาก ไม่ต้องไปไหนไกล
-                      ห้องก็คุ้มราคามากกก ราคานี้ไม่มีอุปกรณ์ยาสระผม
-                      หมวกครอบผมไดร์เป่าผม ถือว่าคุ้มแล้วค่ะคืนละ 4-500
-                      แถมมีสระว่ายน้ำให้เล่นด้วย 08:00-20:00 แอร์เย็นดี
-                      ห้องกว้าง เตียงใหญ่ ห้องน้ำสวย มีตู้เย็น ตู้เสื้อผ้า ทีวี
-                      ผ้าเช็ดตัว ห้องพักดีแบบมากๆๆ
-                      ติดแค่เรื่องเสียงคอมแอร์ดัง+เสียงตู้เย็น
-                      แต่ถ้าใครไม่ติดแนะนำเลยค่ะต้องมาลองพักซักครั้ง
-                      ถ้ามีมีโอกาสก็จะไปพักอีกแน่นอนค่าา♥️♥️♥️
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-4 my-5 shadow-boxShadow rounded-xl p-5">
-                  <div className="w-1/4 p-5">
-                    <div className="flex gap-5 items-center text-xl">
-                      <div className="avatar">
-                        <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2">
-                          <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-                        </div>
-                      </div>
-                      <div>Supphalak</div>
-                    </div>
-                  </div>
-                  <div className="w-3/4 shadow-boxShadow p-5 rounded-lg">
-                    <div className="flex justify-between mb-5">
-                      <div className="bg-primaryUser rounded-xl px-2 text-l text-white">
-                        5/5
-                      </div>
-                      <div>02/สิงหาคม/2567</div>
-                    </div>
-                    <div>
-                      แนะนำที่นี้คะ มากี่รอบก็ประทับใจ แต่รอบนี้ได้ชั้น 4
-                      ติดหน้าลิฟต์ เราจองช่วงวันหยุดและด่วน
-                      เข้าใจพนักงานคะเหลือห้องสุดท้าย ห้องใหญ่ สะอาดมากๆ
-                      สามีชอบเพราะห้องไม่มีกลิ่นอับคะ แอร์เย็นไม่เสียงดัง
-                      ผ้าเช็ดตัวสะอาด แต่วันเข้าพักมี 1
-                      ผืนที่ขาดแต่แจ้งพนักงานเปลี่ยนมาเปลี่ยนให้
-                      แม่บ้านมาเปลี่ยนให้ ไวมากคะ จะครั้งไหนๆก็จะไปพักอีกคะ
-                    </div>
-                  </div>
-                </div>
+                {reviews}
               </div>
             </div>
           </div>
