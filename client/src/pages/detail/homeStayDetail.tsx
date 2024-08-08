@@ -26,6 +26,7 @@ import axios from "axios";
 
 // types.ts
 export interface Image_room {
+  _id: string;
   image: string;
 }
 export interface Facilities_Room {
@@ -112,6 +113,7 @@ interface PaymentData {
   roomType: RoomType;
   offer: Offer;
   bookingUser: User;
+  rating: number;
 }
 interface Review {
   _id: string;
@@ -126,6 +128,7 @@ interface Review {
 const homeStayDetail = () => {
   const { id } = useParams<{ id: string }>();
   const authContext = useContext(AuthContext);
+  const { setPaymentData } = usePaymentContext();
   const navigate = useNavigate();
   const [item, setItem] = useState<HomeStay | undefined>();
   const [review, setReview] = useState<Review[]>([]);
@@ -134,8 +137,6 @@ const homeStayDetail = () => {
   const [progress, setProgress] = useState(0);
   // const [reviewer, setReviewer] = useState<User>();
   const [isLoading, setLoadPage] = useState<boolean>(false);
-
-  const { setPaymentData } = usePaymentContext();
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
@@ -200,11 +201,6 @@ const homeStayDetail = () => {
   if (isLoading == true) {
     <p>no Item</p>;
   }
-  // console.log(review[0]?.reviewer);
-  if (review) {
-    console.log(review.length);
-    // console.log(review[1]?.reviewer);
-  }
 
   const images = item?.image.slice(1, 7).map((img: any, index: number) => {
     const specialClasses: { [key: number]: string } = {
@@ -227,8 +223,8 @@ const homeStayDetail = () => {
 
   // ตรวจสอบว่า item.facilities ถูกกำหนดก่อนการ map
   const facilities = item?.facilities.map((facility: any, index: number) => (
-    <div key={index} className="flex items-center gap-4">
-      <FaCheck />
+    <div key={index} className="flex items-center text-md gap-4">
+      <FaCheck className="text-xs" />
       {facility.facilities_name}
     </div>
   ));
@@ -313,6 +309,7 @@ const homeStayDetail = () => {
             roomType: item.room_type[i],
             offer: offer,
             bookingUser: userInfo,
+            rating: averageRating,
           };
 
           localStorage.setItem("paymentData", JSON.stringify(paymentData));
@@ -402,7 +399,7 @@ const homeStayDetail = () => {
               {item.room_type[index].name_type_room}
             </div>
             <div className="flex flex-wrap  gap-4 my-3">
-              <div className="w-full md:w-[500px]">
+              <div className="w-full md:w-[350px]">
                 <p className="my-2">ห้องพัก</p>
                 {/* carousel */}
                 <div>
@@ -411,7 +408,7 @@ const homeStayDetail = () => {
                     className="relative w-full"
                     data-carousel="slide"
                   >
-                    <div className="relative h-80 overflow-hidden rounded-lg ">
+                    <div className="relative h-60 overflow-hidden rounded-lg ">
                       {data?.image_room.map(
                         (src: Image_room, index: number) => (
                           <div
@@ -509,13 +506,12 @@ const homeStayDetail = () => {
                 </div>
               </div>
 
-              <div className="w-full md:w-[840px]">
+              <div className="w-full md:w-[750px]">
                 <div className="flex flex-row mb-5">
                   <h1 className="w-2/5">สิทธิประโยชน์</h1>
                   <h1 className="w-1/5">ผู้เข้าพัก</h1>
                   <p className="w-2/5">ราคา ต่อห้อง ต่อคืน</p>
                 </div>
-
                 {offer}
               </div>
             </div>
@@ -596,7 +592,7 @@ const homeStayDetail = () => {
     <div>
       {item ? (
         <div>
-          <div id="homeStayDetail" className="container-sm mx-10">
+          <div id="homeStayDetail" className="container-sm mx-10 md:mx-40">
             {/* รูปภาพ */}
             <div className="flex justify-center gap-4 mt-10 mb-5 ">
               <div>
@@ -643,9 +639,9 @@ const homeStayDetail = () => {
             </div>
 
             {/* homeStay Detail */}
-            <div className="flex flex-row flex-wrap mx-auto mb-10 gap-4">
+            <div className="flex flex-row flex-wrap  mb-10 gap-4">
               {/* Left Column */}
-              <div className="flex flex-col w-full md:w-3/4">
+              <div className="flex flex-col w-full md:w-4/5">
                 <div className="rounded-lg shadow-boxShadow p-10 mb-5">
                   <div className="flex items-center">
                     <div className="flex items-center flex-wrap gap-4">
@@ -680,7 +676,7 @@ const homeStayDetail = () => {
               </div>
 
               {/* Maps */}
-              <div className="flex w-full  md:w-[342px] h-[200px] shadow-boxShadow">
+              <div className="flex w-full md:w-[220px] h-60 shadow-boxShadow">
                 <OpenStreetMap />
               </div>
             </div>
