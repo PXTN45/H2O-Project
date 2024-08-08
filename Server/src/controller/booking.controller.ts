@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import Booking from "../model/booking.model";
-import BookingModel from "../model/booking.model";
+import User from "../model/user.model";
+import { getBookingNights, isDateValid } from "../utils";
+import BadRequestError from "../error/badrequest";
+import isBookingAvailable from "../utils/date/isBookingAvailable";
 
 const getBooking = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
@@ -11,12 +14,58 @@ const getBooking = async (req: Request, res: Response): Promise<void> => {
     res.status(404).json({ message: "Error cannot get this booking:", error });
   }
 };
-const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
+const getBookingHomeStayByUser = async (req: Request, res: Response): Promise<void> =>{
+  const userId = req.params.id
+  
   try {
-    const bookingHomeStay = req.body;
-    const newBookHomeStay = new Booking(bookingHomeStay);
-    await newBookHomeStay.save();
-    res.status(201).json(newBookHomeStay);
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({message: "User Not Found!"})
+      return
+    }
+    const bookings = await Booking.find({user:userId}).populate('homestay')
+    res.status(200).json(bookings)
+  } catch (error) {
+    
+  }
+}
+const getBookingPackageByUser = async (req: Request, res: Response): Promise<void> =>{
+  const userId = req.params.id
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({message: "User Not Found!"})
+      return
+    }
+    const bookings = await Booking.find({user:userId}).populate('package')
+    res.status(200).json(bookings)
+  } catch (error) {
+    
+  }
+}
+const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
+  const {homestay , bookingStart , bookingEnd} = req.body
+  const userId = req.params.id
+  try {
+    if(!isDateValid(bookingStart , bookingEnd)) {
+      throw new BadRequestError("Please provide valid dates starting from today!!!!!!!!")
+    }
+    const differenceInDays = getBookingNights(bookingStart, bookingEnd);
+    if (differenceInDays < 1 ){
+      throw new BadRequestError("Return date must after start date!!!!!!!")
+    }
+    if (!isBookingAvailable) {
+      throw new BadRequestError("The homeStay is already booked!!")
+    }
+      const booking = await Booking.create({
+        booker:[userId],
+        homestay,
+        bookingStart,
+        bookingEnd,
+        night:differenceInDays,
+
+      })
+    res.status(201).json({booking});
   } catch (error) {
     console.error("Error while booking home stay:", error);
     res.status(500).json({ message: "Server Error", error });
@@ -25,10 +74,10 @@ const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
 const bookPackage = async (req: Request, res: Response): Promise<void> => {
   try {
     const bookingPackage = req.body;
-    const newBookPackage = new Booking(bookingPackage);
+    const newBookingPackage = new Booking(bookingPackage);
 
-    await newBookPackage.save();
-    res.status(201).json(newBookPackage);
+    await newBookingPackage.save();
+    res.status(201).json(newBookingPackage);
   } catch (error) {
     console.error("Error while booking Package:", error);
     res.status(500).json({ message: "Server Error", error });
@@ -64,11 +113,24 @@ const editHomeStayBooking = async (
     res.status(500).json({ message: error.message });
   }
 };
+const deleteBooking = async (req: Request , res: Response) : Promise<void> => {
+  const bookingId = req.params.id
+  try {
+    const data = await Booking.findById(bookingId)
+    if (!data) {
+      res.status(404).json({ message: "Booking Not Found" });
+    }
+    await Booking.findByIdAndDelete(bookingId);
+    res.status(201).json({message: 'Booking deleted !'});
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 const cancelBooking = async (req: Request, res: Response): Promise<void> => {
   const bookingId = req.params.id;
   try {
-    const booking = await BookingModel.findByIdAndUpdate(
+    const booking = await Booking.findByIdAndUpdate(
       bookingId,
       { bookingStatus: "Cancelled" },
       { new: true }
@@ -89,7 +151,7 @@ const confirmBooking = async (req: Request, res: Response): Promise<void> => {
   const bookingId = req.params.id;
 
   try {
-    const booking = await BookingModel.findByIdAndUpdate(
+    const booking = await Booking.findByIdAndUpdate(
       bookingId,
       { bookingStatus: "Confirmed" },
       { new: true }
@@ -113,4 +175,7 @@ export {
   editPackageBooking,
   editHomeStayBooking,
   cancelBooking,
+  deleteBooking,
+  getBookingHomeStayByUser,
+  getBookingPackageByUser
 };

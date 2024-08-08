@@ -3,13 +3,13 @@ import { Schema, model, Document } from "mongoose";
 
 export interface Booking extends Document {
     booker : Schema.Types.ObjectId[];
-    homeStayDetail: Schema.Types.ObjectId;
-    packageDetail :Schema.Types.ObjectId;
-    bookingDate : Date;
+    homeStay: Schema.Types.ObjectId;
+    package :Schema.Types.ObjectId;
+    bookingStart : Date;
+    bookingEnd : Date;
+    night:number,
     bookingStatus : string;
-    paymentDetail: string; // เช่น "Credit Card", "PayPal", "Bank Transfer"
-    createdAt: Date;
-  updatedAt: Date;
+    paymentDetail: string; 
 }
 
 const BookingSchema = new Schema<Booking>({
@@ -17,17 +17,25 @@ const BookingSchema = new Schema<Booking>({
     type:Schema.Types.ObjectId , ref:"User",
     required:true
   }],
-  homeStayDetail:{
+  homeStay:{
     type:Schema.Types.ObjectId, ref:"HomeStay",
     required:false,
   },
-  packageDetail:{
+  package:{
     type: Schema.Types.ObjectId , ref:"Package",
     required:false
   },
-  bookingDate:{
+  bookingStart:{
     type: Date,
-    default: Date.now
+    required:true
+  },
+  bookingEnd:{
+    type: Date,
+    required:true
+  },
+  night:{
+    type: Number,
+    required:true
   },
   bookingStatus:{
     type: String,
@@ -39,14 +47,6 @@ const BookingSchema = new Schema<Booking>({
   paymentDetail: {
     type: String,
     required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 
 });
