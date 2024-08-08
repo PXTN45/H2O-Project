@@ -9,6 +9,15 @@ import AdminModel from "../model/admin.model ";
 
 dotenv.config();
 
+const getUserById = async (req: Request, res: Response): Promise<void> => {
+  const userId = req.params.id
+  try {
+    const userData = await UserModel.findById(userId);
+    res.status(200).json(userData);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
 const getAllUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData = await UserModel.find();
@@ -305,6 +314,7 @@ export {
   adminRegister,
   Login,
   Logout,
+  getUserById,
   getAllUser,
   getAllBusiness,
   getAllAdmin,

@@ -20,6 +20,7 @@ interface HomeStay extends Document {
       facilitiesRoom: {
         facilitiesName: string;
       }[];
+      roomCount: number;
     }[];
   }[];
   detail_homeStay: string;
@@ -90,6 +91,7 @@ const HomeStaySchema = new Schema<HomeStay>({
                   },
                 ],
               },
+              roomCount: { type: Number, require: true, default: 0 },
             },
           ],
         },
