@@ -7,8 +7,12 @@ interface Image {
   image_upload: string;
 }
 
-interface Room {
+interface Offer {
   price_homeStay: number;
+}
+
+interface Room {
+  offer: Offer[];
 }
 
 interface Location {

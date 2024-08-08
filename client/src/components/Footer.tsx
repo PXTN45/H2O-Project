@@ -51,7 +51,7 @@ const Footer = () => {
         >
           <input
             type="checkbox"
-            className="theme-controller"
+            className="theme-controller hidden"
             checked={isDarkMode}
             onChange={toggleTheme}
           />

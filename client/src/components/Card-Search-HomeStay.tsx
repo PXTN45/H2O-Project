@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 interface Image {
@@ -51,17 +52,17 @@ interface CardProps {
   numChildren: number;
 }
 
-const seeDetail = (id: string) => {
-  console.log(id);
+const findLowestPrice = (offers: Offer[]) => {
+  if (offers.length === 0) return 0;
+  const lowestPrice = Math.min(...offers.map(offer => offer.price_homeStay));
+  return lowestPrice;
 };
 
 const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
-  useEffect(() => {
-    const resultData = async () => {
-      console.log(item);
-    };
-    resultData();
-  }, [item]);
+  const navigate = useNavigate();
+  const handleCardClick = () => {
+    navigate(`/homeStayDetail/${item._id}`);
+  };
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
@@ -125,6 +126,8 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   // คำนวณจำนวนห้องที่ต้องการตาม offers สำหรับผู้ใหญ่และเด็ก
   const { totalRooms, remainingAdults, remainingChildren } = calculateRequiredRooms(allOffers, numPeople, numChildren);
   
+  const lowestPrice = findLowestPrice(allOffers);
+  
   if (remainingAdults > 0 || remainingChildren > 0) {
     return null; // ไม่แสดงการ์ดถ้าห้องไม่เพียงพอ
   }
@@ -132,7 +135,7 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   return (
     <div
       className="flex max-w-full rounded overflow-hidden shadow-boxShadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
-      onClick={() => seeDetail(item._id)}
+      onClick={handleCardClick}
     >
       <div id="image-Homestay" className="w-[25%]">
         <img
@@ -168,17 +171,22 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
         </div>
       </div>
       <div id="right-card" className="w-[25%] bg-whiteSmoke">
-        <div className="flex items-center justify-center mt-5">
-          <span className="mx-1">
-            <div className="w-full">
-              ใช้ห้องทั้งหมด: {totalRooms}
-            </div>
-          </span>
+        <div className="flex items-center justify-start">
+          <div className="bg-white w-[75%] rounded-br-[10px] border-white shadow-rb">
+            <span className="mx-1">
+              <div className="w-full mx-5">
+                ใช้ห้องทั้งหมด: {totalRooms}
+              </div>
+            </span>
+          </div>
           <div
             id="Price-Homestay"
-            className="absolute right-0 font-bold px-6 py-4"
+            className="absolute right-0 bottom-5 font-bold px-6 py-4"
           >
-            <span className="mx-1">฿</span>
+            <div className="flex flex-col items-end">
+              <span className="mx-1 font-bold text-[10px]">ราคาเริ่มต้น (คืนละ)</span>
+              <span className="mx-1 font-bold text-2xl">THB {lowestPrice}</span>
+            </div>
           </div>
         </div>
       </div>

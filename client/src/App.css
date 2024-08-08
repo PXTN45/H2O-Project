@@ -255,6 +255,10 @@ body.dark .swal2-select {
   transition: color 0.3s ease-in-out;
 }
 
+.shadow-rb {
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 .group:hover .text-overlay {
   color: white;
 }
