@@ -63,96 +63,29 @@ interface UserRegister {
   role: string;
 }
 
-/* interface activity_package {
-  _id: string
-  activity_name:string
+interface Location {
+  latitude_location: number;
+  longitude_location: number;
 }
 
-interface location {
-  _id: string
-  name_location: string
-  province_location: string
-  district_location: string
-  subdistrict_location: string
-  zipcode_location: number
-  latitude_location: string
-  longitude_location: string
-  radius_location: number
-  createdAt: string
-  updatedAt: string
+interface HomeStayAndPackage {
+  _id: string;
+  location: Location[];
 }
 
-interface image {
-  _id: string
-  image_upload:string
+interface Coordinate extends HomeStayAndPackage {
+  lat: number;
+  lng: number;
 }
 
-interface facilities {
-  _id: string
-  facilities_name:string
-}
-
-interface roomType {
-  _id: string
-  bathroom_homeStay: number
-  bedroom_homeStay: number
-  sizeBedroom_homeStay: string
-  price_homeStay: number
-}
-
-interface Package {
-    _id: string
-    name_package: string
-    type_package: string
-    max_people: number
-    detail_package: string
-    activity_package: activity_package[]
-    time_start_package: string
-    time_end_package: string
-    policy_cancel_package: string
-    location: location[]
-    image: image[]
-    price_package: string
-    homestay: string[]
-    business_user: string[]
-    review_rating_package: number
-    lat: string
-    lng: string
-}
-
-interface HomeStay {
-    _id: string
-    name_homeStay: string
-    type_homeStay: string
-    max_people: number
-    detail_homeStay: string
-    time_checkIn_homeStay: string
-    time_checkOut_homeStay: string
-    policy_cancel_homeStay: string
-    location: location[]
-    image: image[]
-    price_homeStay: string
-    business_user: string[]
-    review_rating_homeStay: number
-    facilities: facilities[]
-    bathroom_homeStay: number
-    bedroom_homeStay: number
-    sizeBedroom_homeStay: string
-    status_sell_homeStay: boolean
-    room_type: roomType[]
-    createdAt : string
-    updatedAt: string
-    lat: string
-    lng: string
-} */
-
-interface Coordinate {
-  _id: string
+interface Coordinates {
+  HomeStay: Coordinate[];
+  Packages: Coordinate[];
 }
 
 interface mapDataCoordinates {
-  coordinates: Coordinate[]
-  places: string[]
+  coordinates: Coordinates[];
+  places: string[];
 }
 
 interface AuthContextType {
@@ -209,7 +142,6 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
   const [mapData, setMapData] = useState<mapDataCoordinates | null>(null);
-
 
   useEffect(() => {
     if (userInfo) {
@@ -616,7 +548,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
               inputPlaceholder: "Select a role",
               showCancelButton: true,
               customClass: {
-                input: 'swal2-select'
+                input: "swal2-select",
               },
               inputValidator: (value) => {
                 if (!value) {

@@ -13,23 +13,46 @@ import CardHomeStay from "../../components/Card-Search-HomeStay";
 import CardPackage from "../../components/Card-Search-Package";
 import { AuthContext } from "../../AuthContext/auth.provider";
 
+interface Coordinate {
+  _id: string
+}
+
 interface Image {
   image_upload: string;
 }
-
-interface Room {
-  price_homeStay: number;
-}
-
 interface Location {
   province_location: string;
   latitude_location: string;
 }
 
+interface MaxPeople {
+  adult: number;
+  child: number;
+}
+
+interface Offer {
+  price_homeStay: number;
+  max_people: MaxPeople;
+  roomcount: number;
+}
+
+interface RoomType {
+  name_type_room: string;
+  bathroom_homeStay: number;
+  bedroom_homeStay: number;
+  sizeBedroom_homeStay: string;
+  max_people: {
+    adult: number;
+    child: number;
+  };
+  roomcount: number;
+  offer: Offer[];
+}
+
 interface Item {
   _id: string;
   image: Image[];
-  room_type: Room[];
+  room_type: RoomType[];
   location: Location[];
   name_package?: string;
   name_homeStay?: string;
@@ -37,6 +60,11 @@ interface Item {
   price_homestay?: number;
   type_homestay?: string;
   max_people?: number;
+}
+
+interface MapData {
+  HomeStay: Coordinate[];
+  Packages: Coordinate[];
 }
 
 const SearchResult: React.FC = () => {
@@ -63,7 +91,6 @@ const SearchResult: React.FC = () => {
     new Date(dataSearch?.dateRange.startDate_Time ?? null),
     new Date(dataSearch?.dateRange.endDate_Time ?? null),
   ]);
-  const [selectedDays, setSelectedDays] = useState<number>(0);
   const [showPeopleMenu, setShowPeopleMenu] = useState<boolean>(false);
   const [numPeople, setNumPeople] = useState<number>(
     dataSearch?.numPeople ?? 0
@@ -80,13 +107,6 @@ const SearchResult: React.FC = () => {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-  
-  useEffect(() => {
-    const dayAfterTomorrow = new Date(today);
-    dayAfterTomorrow.setDate(today.getDate() + 2);
-
-    setDateRange([tomorrow, dayAfterTomorrow]);
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +121,9 @@ const SearchResult: React.FC = () => {
         let HomeStayData = [];
         let PackageData = [];
         if (mapData) {
-          const dataforFilter: any = mapData.coordinates;
+          const dataforFilter: MapData[] = mapData.coordinates;
+          console.log(dataforFilter);
+          
           HomeStayData = dataforFilter[0].HomeStay;
           PackageData = dataforFilter[0].Packages;
         } else {
@@ -143,11 +165,6 @@ const SearchResult: React.FC = () => {
       const filteredDates = dates.filter((date): date is Date => date !== null);
       if (filteredDates.length === 2) {
         setDateRange(filteredDates);
-        const diffTime = Math.abs(
-          filteredDates[1].getTime() - filteredDates[0].getTime()
-        );
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        setSelectedDays(diffDays);
         setShowCalendar(false);
       }
     }
@@ -445,7 +462,6 @@ const SearchResult: React.FC = () => {
                         item={item}
                         numPeople={numPeople}
                         numChildren={numChildren}
-                        dateRange={dateRange}
                       />
                     </div>
                   ))}

@@ -25,9 +25,12 @@ interface RoomType {
   bathroom_homeStay: number;
   bedroom_homeStay: number;
   sizeBedroom_homeStay: string;
-  image_room: { image: string }[];
+  max_people: {
+    adult: number;
+    child: number;
+  };
+  roomcount: number;
   offer: Offer[];
-  _id: string;
 }
 
 interface Item {

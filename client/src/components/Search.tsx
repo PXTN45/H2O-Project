@@ -13,7 +13,6 @@ const Search: React.FC = () => {
   const [isPackage, setIsPackage] = useState<boolean>(false);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [dateRange, setDateRange] = useState<Date[]>([new Date(), new Date()]);
-  const [selectedDays, setSelectedDays] = useState<number>(0);
   const [showPeopleMenu, setShowPeopleMenu] = useState<boolean>(false);
   const [numPeople, setNumPeople] = useState<number>(0);
   const [numChildren, setNumChildren] = useState<number>(0);
@@ -37,11 +36,6 @@ const Search: React.FC = () => {
       const filteredDates = dates.filter((date): date is Date => date !== null);
       if (filteredDates.length === 2) {
         setDateRange(filteredDates);
-        const diffTime = Math.abs(
-          filteredDates[1].getTime() - filteredDates[0].getTime()
-        );
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        setSelectedDays(diffDays);
         setShowCalendar(false);
       }
     }

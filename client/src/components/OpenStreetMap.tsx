@@ -40,8 +40,13 @@ interface OverpassResponse {
   elements: OverpassElement[];
 }
 
-interface NamedArrays {
-  coordinates: Coordinate[];
+interface Coordinates {
+  HomeStay: Coordinate[];
+  Packages: Coordinate[];
+}
+
+interface CoordinatedArrays {
+  coordinates: Coordinates[];
   places: string[];
 }
 
@@ -148,7 +153,7 @@ const OpenStreetMap: React.FC = () => {
             (coord) =>
               newCircle.getLatLng().distanceTo([coord.lat, coord.lng]) <=
               newCircle.getRadius()
-          ); 
+          );
 
           // Fetch places from Overpass API
           const response = await fetch(
@@ -164,39 +169,18 @@ const OpenStreetMap: React.FC = () => {
             newPlaces.length > 0
               ? newPlaces
               : ["ไม่มีสถานที่ท่องเที่ยวในรัศมีนี้"];
-          const coordinates =
-            filteredCoordinatesHomestay.length > 0 || filteredCoordinatesPackages.length > 0
-              ? [
-                  {
-                    HomeStay: filteredCoordinatesHomestay ,
-                    Packages: filteredCoordinatesPackages
-                  }
-                ]
-              : [
-                  {
-                    HomeStay:{
-                      _id: "",
-                      name_homeStay: "ไม่มีรายการในรัศมีนี้",
-                      location: [],
-                      lat: 0,
-                      lng: 0,
-                    },
-                    Packages:{
-                      _id: "",
-                      name_package: "ไม่มีรายการในรัศมีนี้",
-                      location: [],
-                      lat: 0,
-                      lng: 0,
-                    }
-   
-                  },
-                ];
 
-          const namedArrays: any = {
-            coordinates: [...coordinates],
+          const coordinates: Coordinates = {
+            HomeStay: filteredCoordinatesHomestay,
+            Packages: filteredCoordinatesPackages,
+          };
+
+          const coordinatedArrays: CoordinatedArrays = {
+            coordinates: [coordinates],
             places: [...places],
           };
-          setMapData(namedArrays);
+
+          setMapData(coordinatedArrays);
         } catch (error) {
           console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
         }
