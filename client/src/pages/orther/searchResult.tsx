@@ -60,6 +60,7 @@ interface Item {
   price_homestay?: number;
   type_homestay?: string;
   max_people?: number;
+  review_rating_homeStay?: number;
 }
 
 interface MapData {
@@ -103,6 +104,7 @@ const SearchResult: React.FC = () => {
   const [dataPackage, setDataPackage] = useState<Item[]>([]);
   const [homeStayCount, setHomeStayCount] = useState<number>(0);
   const [packageCount, setPackageCount] = useState<number>(0);
+  const [sortOption, setSortOption] = useState<string | null>(null);
 
   const today = new Date();
   const tomorrow = new Date(today);
@@ -229,11 +231,6 @@ const SearchResult: React.FC = () => {
     }
   };
 
-  const handleFilterClick = (filter: string) => {
-    console.log(filter);
-    setShowFilterMenu(false);
-  };
-
   const clickToPackage = () => {
     setIsPackage(true);
   };
@@ -242,8 +239,56 @@ const SearchResult: React.FC = () => {
     setIsPackage(false);
   };
 
+  const sortData = (data: Item[]) => {
+    if (!sortOption) return data;
+
+    const sortedData = [...data];
+
+    switch (sortOption) {
+      case "เรียงตามราคาสูงไปน้อย":
+        return sortedData.sort((a, b) => {
+
+          const offersA = a.room_type[0].offer || [];
+          const offersB = b.room_type[0].offer || [];
+          
+          const maxPriceA = offersA.length ? Math.min(...offersA.map(o => o.price_homeStay)) : 0;
+          const maxPriceB = offersB.length ? Math.min(...offersB.map(o => o.price_homeStay)) : 0;     
+  
+          return maxPriceB - maxPriceA;
+        });
+        case "เรียงตามราคาต่ำไปสูง":
+          return sortedData.sort((a, b) => {
+            
+            const offersA = a.room_type[0].offer || [];
+            const offersB = b.room_type[0].offer || [];
+            
+            const minPriceA = offersA.length ? Math.min(...offersA.map(o => o.price_homeStay)) : 0;
+            const minPriceB = offersB.length ? Math.min(...offersB.map(o => o.price_homeStay)) : 0;
+    
+            return minPriceA - minPriceB;
+          });
+      case "เรียงตามดาวสูงไปน้อย":
+        return sortedData.sort(
+          (a, b) =>
+            (b.review_rating_homeStay ?? 0) - (a.review_rating_homeStay ?? 0)
+        );
+      case "เรียงตามดาวน้อยไปสูง":
+        return sortedData.sort(
+          (a, b) =>
+            (a.review_rating_homeStay ?? 0) - (b.review_rating_homeStay ?? 0)
+        );
+      default:
+        return data;
+    }
+  };
+
+  const handleFilterClick = (filter: string) => {
+    setSortOption(filter);
+    setShowFilterMenu(false);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
+    <div className="flex flex-col items-center justify-center w-full h-full mt-10">
       <div id="main-search" className="w-full my-5">
         <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
           <button
@@ -440,15 +485,15 @@ const SearchResult: React.FC = () => {
             <div className="w-full">
               {dataPackage.length > 0 ? (
                 <>
-                  {dataPackage.map((item, index) => (
+                  {sortData(dataPackage).map((item, index) => (
                     <div key={index} className="w-full">
                       <CardPackage item={item} />
                     </div>
                   ))}
                 </>
               ) : (
-                <div id="Package_notFound" className="flex justify-center">
-                  <span>ไม่มีข้อมูล</span>
+                <div id="Package_notFound" className="flex items-center justify-center h-[40rem]">
+                  <span>NOT FOUND PACKAGE</span>
                 </div>
               )}
             </div>
@@ -456,7 +501,7 @@ const SearchResult: React.FC = () => {
             <div className="w-full">
               {dataHomeStays.length > 0 ? (
                 <>
-                  {dataHomeStays.map((item, index) => (
+                  {sortData(dataHomeStays).map((item, index) => (
                     <div key={index} className="w-full">
                       <CardHomeStay
                         item={item}
@@ -467,8 +512,8 @@ const SearchResult: React.FC = () => {
                   ))}
                 </>
               ) : (
-                <div id="Homestay_notFound" className="flex justify-center">
-                  <span>ไม่มีข้อมูล</span>
+                <div id="Package_notFound" className="flex items-center justify-center h-[40rem]">
+                  <span>NOT FOUND HOMESTAY</span>
                 </div>
               )}
             </div>

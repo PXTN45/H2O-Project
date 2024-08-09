@@ -147,8 +147,10 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   }
 
   const allOffers = item.room_type.flatMap((room) => room.offer);
+  
   const { totalRooms, remainingAdults, remainingChildren } =
     calculateRequiredRooms(allOffers, numPeople, numChildren);
+    
   const lowestPrice = findLowestPrice(allOffers);
 
   if (remainingAdults > 0 || remainingChildren > 0) {
