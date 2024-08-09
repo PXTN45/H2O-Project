@@ -44,7 +44,7 @@ const getBookingPackageByUser = async (req: Request, res: Response): Promise<voi
   }
 }
 const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
-  const {homestay , bookingStart , bookingEnd} = req.body
+  const {homestay , bookingStart , bookingEnd , paymentDetail} = req.body
   const userId = req.params.id
   try {
     if(!isDateValid(bookingStart , bookingEnd)) {
@@ -63,6 +63,7 @@ const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
         bookingStart,
         bookingEnd,
         night:differenceInDays,
+        paymentDetail,
 
       })
     res.status(201).json({booking});

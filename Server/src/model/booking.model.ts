@@ -2,9 +2,9 @@ import { Schema, model, Document } from "mongoose";
 
 
 export interface Booking extends Document {
-    booker : Schema.Types.ObjectId[];
-    homeStay: Schema.Types.ObjectId;
-    package :Schema.Types.ObjectId;
+    booker : Schema.Types.ObjectId;
+    homestay?: Schema.Types.ObjectId;
+    package?:Schema.Types.ObjectId;
     bookingStart : Date;
     bookingEnd : Date;
     night:number,
@@ -13,11 +13,11 @@ export interface Booking extends Document {
 }
 
 const BookingSchema = new Schema<Booking>({
-  booker : [{
+  booker : {
     type:Schema.Types.ObjectId , ref:"User",
     required:true
-  }],
-  homeStay:{
+  },
+  homestay:{
     type:Schema.Types.ObjectId, ref:"HomeStay",
     required:false,
   },
@@ -35,7 +35,6 @@ const BookingSchema = new Schema<Booking>({
   },
   night:{
     type: Number,
-    required:true
   },
   bookingStatus:{
     type: String,
