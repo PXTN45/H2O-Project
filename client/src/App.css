@@ -267,6 +267,11 @@ body.dark .swal2-select {
   opacity: 1;
 }
 
+.carousel-container:hover .carousel-button {
+  display: block;
+}
+
+
 @media only screen and (max-width: 640px) {
   .container {
     padding-left: 1rem;

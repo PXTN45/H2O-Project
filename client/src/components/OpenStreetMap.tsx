@@ -220,7 +220,7 @@ const OpenStreetMap: React.FC = () => {
         onRequestClose={closeModal}
         contentLabel="Map Modal"
         className="modal-map relative w-4/5 h-4/5 overflow-hidden flex flex-col translate-x-[-50%] translate-y-[-50%] top-[50%] left-[50%] rounded-xl"
-        overlayClassName="fixed inset-0 bg-white bg-opacity-80 z-40"
+        overlayClassName="fixed inset-0 bg-white bg-opacity-80 z-[60]"
       >
         <div className="flex items-center justify-between p-2 rounded-tl-[10px]">
           <h1 className="font-bold ml-2">OpenStreetMap</h1>

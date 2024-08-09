@@ -14,7 +14,7 @@ import CardPackage from "../../components/Card-Search-Package";
 import { AuthContext } from "../../AuthContext/auth.provider";
 
 interface Coordinate {
-  _id: string
+  _id: string;
 }
 
 interface Image {
@@ -123,7 +123,7 @@ const SearchResult: React.FC = () => {
         if (mapData) {
           const dataforFilter: MapData[] = mapData.coordinates;
           console.log(dataforFilter);
-          
+
           HomeStayData = dataforFilter[0].HomeStay;
           PackageData = dataforFilter[0].Packages;
         } else {
@@ -270,25 +270,25 @@ const SearchResult: React.FC = () => {
           </button>
         </div>
         <div id="header">
-          <div className="flex flex-col items-center justify-center mt-4 sm:flex-row sm:justify-between w-full bg-primaryUser">
-            <div className="relative w-full mb-5">
+          <div className="flex flex-col items-center justify-between mt-4 xl:flex-row w-full">
+            <div className="relative w-full flex justify-start">
               <button
                 id="people-buttonPackage"
-                className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[16rem] shadow-md"
+                className="bg-white text-dark text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
                 onClick={togglePeopleMenu}
               >
                 <span className="flex items-center justify-center font-bold">
-                  <MdFamilyRestroom className="w-5 h-5 mr-3" />
+                  <MdFamilyRestroom className="w-4 h-4 mr-2 sm:mr-3" />
                   <span>ผู้ใหญ่</span>
-                  <span className="mx-2">{numPeople}</span>
-                  <span className="mr-3">/</span>
+                  <span className="mx-1 sm:mx-2">{numPeople}</span>
+                  <span className="mr-2 sm:mr-3">/</span>
                   <span>เด็ก</span>
-                  <span className="mx-2">{numChildren}</span>
+                  <span className="mx-1 sm:mx-2">{numChildren}</span>
                 </span>
               </button>
               {showPeopleMenu && (
                 <div className="flex items-start justify-center">
-                  <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tl-[0rem]">
+                  <div className="absolute left-0 z-10 mt-[4.5rem] bg-whiteSmoke text-darkmode-oneColor shadow-2xl p-4 w-full rounded-[1.25rem] rounded-tl-[0rem]">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center">
                         <IoPeopleSharp className="w-5 h-5 mr-5" />
@@ -335,31 +335,31 @@ const SearchResult: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="mx-16" />
-            <div className="relative w-full mb-5">
+
+            <div className="relative w-full flex justify-center mx-10">
               <button
                 id="date-buttonHomstay"
-                className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[23rem] shadow-md"
+                className="bg-white text-dark text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
                 onClick={toggleCalendar}
               >
                 {dateRange[0] && dateRange[1] ? (
                   <span className="flex items-center justify-center font-bold relative">
-                    <RxExit className="w-5 h-5 mr-3" />
+                    <RxExit className="w-4 h-4 mr-2 sm:mr-3" />
                     {formatDate(dateRange[0])}
-                    <IoRemoveOutline className="w-5 h-5 mx-3 rotate-90" />
+                    <IoRemoveOutline className="w-4 h-4 mx-1 sm:mx-3 rotate-90" />
                     {formatDate(dateRange[1])}
-                    <RxExit className="w-5 h-5 ml-3 transform -scale-x-100" />
+                    <RxExit className="w-4 h-4 ml-2 sm:ml-3 transform -scale-x-100" />
                   </span>
                 ) : (
                   <span className="font-bold flex items-center justify-center">
-                    <RxExit className="w-5 h-5 mr-3" />
+                    <RxExit className="w-4 h-4 mr-2 sm:mr-3" />
                     วันที่เช็คอิน - เช็คเอาท์
                   </span>
                 )}
               </button>
               {showCalendar && (
                 <div className="flex items-start justify-center">
-                  <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem]">
+                  <div className="absolute z-10 mt-[4.5rem] left-0 right-0 bg-whiteSmoke text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem]">
                     <div className="flex items-center justify-center">
                       <Calendar
                         onChange={(dates) => {
@@ -376,21 +376,21 @@ const SearchResult: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="mx-16" />
-            <div className="relative w-full mb-5">
+
+            <div className="relative w-full flex justify-end">
               <button
                 id="sort-buttonPackage"
-                className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[16rem] shadow-md"
+                className="bg-white text-dark text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
                 onClick={toggleFilterMenu}
               >
                 <span className="flex items-center justify-center font-bold">
-                  <MdFilterList className="w-5 h-5 mr-3" />
+                  <MdFilterList className="w-4 h-4 mr-2 sm:mr-3" />
                   <span>Sort</span>
                 </span>
               </button>
               {showFilterMenu && (
                 <div className="flex items-start justify-center">
-                  <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
+                  <div className="absolute z-10 mt-[4.5rem] right-0 bg-whiteSmoke text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
                     <div className="flex flex-col items-start">
                       <button
                         id="PriceHightToLow"
@@ -447,7 +447,7 @@ const SearchResult: React.FC = () => {
                   ))}
                 </>
               ) : (
-                <div className="flex justify-center">
+                <div id="Package_notFound" className="flex justify-center">
                   <span>ไม่มีข้อมูล</span>
                 </div>
               )}
@@ -467,7 +467,7 @@ const SearchResult: React.FC = () => {
                   ))}
                 </>
               ) : (
-                <div className="flex justify-center">
+                <div id="Homestay_notFound" className="flex justify-center">
                   <span>ไม่มีข้อมูล</span>
                 </div>
               )}
