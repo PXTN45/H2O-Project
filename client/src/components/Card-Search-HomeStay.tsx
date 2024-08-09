@@ -85,14 +85,13 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
 
   const calculateRequiredRooms = (offers: Offer[], numAdults: number, numChildren: number) => {
     let totalRooms = 0;
-    let remainingAdults = numAdults
-    let remainingChildren = numChildren
+    let remainingAdults = numAdults;
+    let remainingChildren = numChildren;
 
-    // จัดเรียง offer ตามจำนวนห้องที่มากไปน้อย
     offers.sort((a, b) => b.roomcount - a.roomcount);
 
     for (const offer of offers) {
-      let availableRooms = offer.roomcount; // จำนวนห้อง
+      let availableRooms = offer.roomcount;
       const maxAdults = offer.max_people.adult;
       const maxChildren = offer.max_people.child;
 
@@ -117,27 +116,23 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   };
 
   if (!Array.isArray(item.room_type) || item.room_type.length === 0) {
-    return null; // ไม่แสดงการ์ดถ้า item.room_type ไม่มีข้อมูล
+    return null;
   }
 
-  // ดึง offer ทั้งหมดจาก room_type
   const allOffers = item.room_type.flatMap(room => room.offer);
-
-  // คำนวณจำนวนห้องที่ต้องการตาม offers สำหรับผู้ใหญ่และเด็ก
   const { totalRooms, remainingAdults, remainingChildren } = calculateRequiredRooms(allOffers, numPeople, numChildren);
-  
   const lowestPrice = findLowestPrice(allOffers);
   
   if (remainingAdults > 0 || remainingChildren > 0) {
-    return null; // ไม่แสดงการ์ดถ้าห้องไม่เพียงพอ
+    return null;
   }
 
   return (
     <div
-      className="flex max-w-full rounded overflow-hidden shadow-boxShadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
+      className="flex flex-col md:flex-row max-w-full rounded overflow-hidden shadow-boxShadow relative my-6 h-full hover:scale-105 transform transition duration-300"
       onClick={handleCardClick}
     >
-      <div id="image-Homestay" className="w-[25%]">
+      <div id="image-Homestay" className="w-full md:w-[25%]">
         <img
           id="imageCard-Homestay"
           src={item.image[0].image_upload}
@@ -145,7 +140,7 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
           className="w-full h-[15rem] object-cover"
         />
       </div>
-      <div id="center-card-Homestay" className="w-[50%]">
+      <div id="center-card-Homestay" className="w-full md:w-[50%] bg-white">
         <div id="detailCard-Homestay" className="px-6 py-4">
           <div id="Name-Homestay" className="font-bold text-xl mb-2">
             {truncateText(item.name_homeStay || "", 30)}
@@ -170,8 +165,8 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
           </div>
         </div>
       </div>
-      <div id="right-card" className="w-[25%] bg-whiteSmoke">
-        <div className="flex items-center justify-start">
+      <div id="right-card" className="w-full md:w-[25%] bg-whiteSmoke">
+        <div className="flex flex-col ">
           <div className="bg-white w-[75%] rounded-br-[10px] border-white shadow-rb">
             <span className="mx-1">
               <div className="w-full mx-5">
@@ -181,7 +176,7 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
           </div>
           <div
             id="Price-Homestay"
-            className="absolute right-0 bottom-5 font-bold px-6 py-4"
+            className="mt-16 px-6 py-4"
           >
             <div className="flex flex-col items-end">
               <span className="mx-1 font-bold text-[10px]">ราคาเริ่มต้น (คืนละ)</span>

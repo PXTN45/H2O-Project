@@ -270,7 +270,7 @@ const SearchResult: React.FC = () => {
           </button>
         </div>
         <div id="header">
-          <div className="flex flex-col items-center justify-center mt-4 sm:flex-row sm:justify-between w-full">
+          <div className="flex flex-col items-center justify-center mt-4 sm:flex-row sm:justify-between w-full bg-primaryUser">
             <div className="relative w-full mb-5">
               <button
                 id="people-buttonPackage"
@@ -335,8 +335,8 @@ const SearchResult: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="mx-14" />
-            <div className="relative w-full mb-5 flex flex-col items-center justify-center">
+            <div className="mx-16" />
+            <div className="relative w-full mb-5">
               <button
                 id="date-buttonHomstay"
                 className="bg-white text-dark rounded-[10px] p-2 mb-2 sm:mb-0 w-full h-[5rem] sm:w-[23rem] shadow-md"
@@ -376,7 +376,7 @@ const SearchResult: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="mx-14" />
+            <div className="mx-16" />
             <div className="relative w-full mb-5">
               <button
                 id="sort-buttonPackage"
