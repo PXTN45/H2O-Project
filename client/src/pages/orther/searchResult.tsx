@@ -182,8 +182,10 @@ const SearchResult: React.FC = () => {
   };
 
   const handleDecreasePeople = () => {
-    if (numPeople > 0) {
+    if (numPeople > 1) {
       setNumPeople(numPeople - 1);
+    }else{
+      return
     }
   };
 

@@ -18,7 +18,7 @@ interface MaxPeople {
 interface Offer {
   price_homeStay: number;
   max_people: MaxPeople;
-  roomcount: number;
+  roomCount: number;
 }
 
 interface RoomType {
@@ -30,7 +30,7 @@ interface RoomType {
     adult: number;
     child: number;
   };
-  roomcount: number;
+  roomCount: number;
   offer: Offer[];
 }
 
@@ -112,10 +112,10 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
     let remainingAdults = numAdults;
     let remainingChildren = numChildren;
 
-    offers.sort((a, b) => b.roomcount - a.roomcount);
+    offers.sort((a, b) => b.roomCount - a.roomCount);
 
     for (const offer of offers) {
-      let availableRooms = offer.roomcount;
+      let availableRooms = offer.roomCount;
       const maxAdults = offer.max_people.adult;
       const maxChildren = offer.max_people.child;
 
