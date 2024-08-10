@@ -88,6 +88,17 @@ interface mapDataCoordinates {
   places: string[];
 }
 
+interface DrawerPrice {
+  startPrice: number;
+  endPrice: number;
+}
+
+interface DraweSearch {
+  drawerTextSearch: string;
+  drawerPrice: DrawerPrice;
+  drawerPlace: string;
+}
+
 interface AuthContextType {
   thisPage: string;
   setThisPage: React.Dispatch<React.SetStateAction<string>>;
@@ -110,6 +121,8 @@ interface AuthContextType {
   handleLogout: () => void;
   mapData: mapDataCoordinates | null;
   setMapData: React.Dispatch<React.SetStateAction<mapDataCoordinates | null>>;
+  drawerData: DraweSearch | null;
+  setDrawerData: React.Dispatch<React.SetStateAction<DraweSearch | null>>;
 }
 
 interface AuthProviderProps {
@@ -142,6 +155,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
   const [mapData, setMapData] = useState<mapDataCoordinates | null>(null);
+  const [drawerData, setDrawerData] = useState<DraweSearch | null>(null);
 
   useEffect(() => {
     if (userInfo) {
@@ -661,6 +675,8 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setIsDarkMode,
     mapData,
     setMapData,
+    drawerData, 
+    setDrawerData,
   };
 
   return (

@@ -26,12 +26,11 @@ const Drawer: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { userInfo, mapData } = authContext;
+  const { userInfo, mapData , setDrawerData } = authContext;
 
   const handleRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = Number(event.target.value);
     setRangeValue(newValue);
-    console.log(`Current value: ${newValue}`);
   };
   
   const [data, setData] = useState<string[]>([]);
@@ -42,6 +41,14 @@ const Drawer: React.FC = () => {
       setData(getRandomPlaces(mapData.places, 5));
     }
   }, [mapData]);
+
+  useEffect(() => {
+    if(rangeValue > 0){
+      handleSearch();
+    }else{
+      return
+    }
+  }, [rangeValue]);
 
   const handleCheckboxChange = (item: string) => {
     setCheckedItems((prevCheckedItems) => {
@@ -54,6 +61,27 @@ const Drawer: React.FC = () => {
       return newCheckedItems;
     });
   }; 
+
+  const handleSearch = () => {
+
+    const dataSearch = {
+      drawerTextSearch : searchText,
+      drawerPrice:
+      {
+        startPrice : 0,
+        endPrice : rangeValue,
+      },
+      drawerPlace: "Hi",
+    };
+
+    setDrawerData(dataSearch); 
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   return (
     <div>
@@ -91,6 +119,7 @@ const Drawer: React.FC = () => {
                     placeholder="ค้นหาสิ่งที่สนใจ"
                     className="input text-sm p-2 mb-2 rounded-full block w-full shadow"
                     onChange={(e) => setSearchText(e.target.value)}
+                    onKeyPress={handleKeyPress}
                   />
                 </div>
                 <div className="w-full flex items-center justify-center my-5 h-52">

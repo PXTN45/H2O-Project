@@ -33,7 +33,7 @@ interface MaxPeople {
 interface Offer {
   price_homeStay: number;
   max_people: MaxPeople;
-  roomcount: number;
+  roomCount: number;
 }
 
 interface RoomType {
@@ -45,7 +45,7 @@ interface RoomType {
     adult: number;
     child: number;
   };
-  roomcount: number;
+  roomCount: number;
   offer: Offer[];
 }
 
@@ -78,7 +78,10 @@ const SearchResult: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { mapData } = authContext;
+  const { mapData , drawerData , setDrawerData } = authContext;
+
+  console.log(drawerData);
+  
 
   const [isPackage, setIsPackage] = useState<boolean>(
     dataSearch.searchType === "Homestay"
@@ -111,6 +114,12 @@ const SearchResult: React.FC = () => {
   tomorrow.setDate(today.getDate() + 1);
 
   useEffect(() => {
+    return () => {
+      setDrawerData(null);
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const responseHomestay = await axiosPublic.get("/homestay");
@@ -119,6 +128,7 @@ const SearchResult: React.FC = () => {
         const dataHomestay = await responseHomestay.data;
         const dataPackage = await responsePackage.data;
         const searchMessage = await dataSearch;
+        const searchMessageDrawer = drawerData;
 
         let HomeStayData = [];
         let PackageData = [];
@@ -130,23 +140,30 @@ const SearchResult: React.FC = () => {
           PackageData = dataforFilter[0].Packages;
         } else {
           const filteredResultsHomestay = dataHomestay.filter(
-            (item: Item) =>
-              (item.name_homeStay
-                ?.toLowerCase()
-                .includes(searchMessage.searchText.toLowerCase()) ??
-                false) ||
-              item.location[0]?.province_location?.toLowerCase() ===
-                searchMessage.searchText.toLowerCase()
+            (item: Item) => {
+              const searchText = searchMessageDrawer && searchMessageDrawer.drawerTextSearch
+                ? searchMessageDrawer.drawerTextSearch.toLowerCase()
+                : searchMessage.searchText.toLowerCase();
+              
+              return (
+                (item.name_homeStay?.toLowerCase().includes(searchText) ?? false) ||
+                item.location[0]?.province_location?.toLowerCase() === searchText
+              );
+            }
           );
+          
           HomeStayData = filteredResultsHomestay;
           const filteredResultsPackage = dataPackage.filter(
-            (item: Item) =>
-              (item.name_package
-                ?.toLowerCase()
-                .includes(searchMessage.searchText.toLowerCase()) ??
-                false) ||
-              item.location[0]?.province_location?.toLowerCase() ===
-                searchMessage.searchText.toLowerCase()
+            (item: Item) =>{
+                const searchText = searchMessageDrawer && searchMessageDrawer.drawerTextSearch
+                ? searchMessageDrawer.drawerTextSearch.toLowerCase()
+                : searchMessage.searchText.toLowerCase();
+              
+              return (
+                (item.name_package?.toLowerCase().includes(searchText) ?? false) ||
+                item.location[0]?.province_location?.toLowerCase() === searchText
+              );
+            }
           );
           PackageData = filteredResultsPackage;
         }
@@ -160,7 +177,7 @@ const SearchResult: React.FC = () => {
     };
 
     fetchData();
-  }, [dataSearch, mapData]);
+  }, [dataSearch, mapData , drawerData]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {
