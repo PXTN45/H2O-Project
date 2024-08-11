@@ -90,7 +90,7 @@ const SearchResult: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { mapData, drawerData, setDrawerData, setMapData } = authContext;
+  const { mapData, drawerData, setDrawerData, setMapData , setLoadPage } = authContext;
 
   const [isPackage, setIsPackage] = useState<boolean>(
     dataSearch.searchType === "Homestay"
@@ -202,7 +202,6 @@ const SearchResult: React.FC = () => {
       try {
         const responseHomestay = await axiosPublic.get("/homestay");
         const responsePackage = await axiosPublic.get("/package");
-
         const dataHomestay = await responseHomestay.data;
         const dataPackage = await responsePackage.data;
         const searchMessage = await dataSearch;
@@ -291,7 +290,10 @@ const SearchResult: React.FC = () => {
       }
     };
 
+    setLoadPage(false)
     fetchData();
+    setLoadPage(true)
+
   }, [dataSearch, mapData, drawerData]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {

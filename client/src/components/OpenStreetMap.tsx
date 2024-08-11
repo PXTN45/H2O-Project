@@ -54,6 +54,8 @@ const OpenStreetMap: React.FC = () => {
   const [map, setMap] = useState<L.Map | null>(null);
   const [marker, setMarker] = useState<L.Marker | null>(null);
   const [circle, setCircle] = useState<L.Circle | null>(null);
+  const [tempMarker, setTempMarker] = useState<L.Marker | null>(null);
+  const [tempCircle, setTempCircle] = useState<L.Circle | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const mapRef = useRef<HTMLDivElement | null>(null);
 
@@ -63,7 +65,7 @@ const OpenStreetMap: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { setMapData , setDrawerData } = authContext;
+  const { setMapData , setDrawerData , setLoadPage } = authContext;
 
   useEffect(() => {
     if (modalIsOpen) {
@@ -119,6 +121,7 @@ const OpenStreetMap: React.FC = () => {
         }).addTo(map);
         setCircle(newCircle);
 
+        setLoadPage(false)
         try {
           const responseHomeStay = await axiosPublic.get<HomeStayAndPackage[]>(
             "/homestay"
@@ -185,17 +188,56 @@ const OpenStreetMap: React.FC = () => {
         } catch (error) {
           console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
         }
-
         setModalIsOpen(false);
+        setLoadPage(true)
+      };
+
+      const handleMouseMove = (e: L.LeafletMouseEvent) => {
+        if (!map) return;
+
+        // Remove previous temp marker and circle
+        if (tempMarker) {
+          tempMarker.remove();
+        }
+        if (tempCircle) {
+          tempCircle.remove();
+        }
+
+        // Create new temp marker and circle
+        const newTempMarker = L.marker(e.latlng, { opacity: 0.5 })
+          .addTo(map);
+
+        const newTempCircle = L.circle(e.latlng, {
+          color: "#4B99FA",
+          fillColor: "#72B1FF",
+          fillOpacity: 0.2,
+          radius: 1000, // 1,000 เมตร = 1 กิโลเมตร
+        }).addTo(map);
+
+        setTempMarker(newTempMarker);
+        setTempCircle(newTempCircle);
+      };
+
+      const handleMouseOut = () => {
+        if (tempMarker) {
+          tempMarker.remove();
+        }
+        if (tempCircle) {
+          tempCircle.remove();
+        }
       };
 
       map.on("click", handleMapClick);
+      map.on("mousemove", handleMouseMove);
+      map.on("mouseout", handleMouseOut);
 
       return () => {
         map.off("click", handleMapClick);
+        map.off("mousemove", handleMouseMove);
+        map.off("mouseout", handleMouseOut);
       };
     }
-  }, [map, marker, circle, setMapData]);
+  }, [map, marker, circle, tempMarker, tempCircle, setMapData]);
 
   const openModal = () => {
     setModalIsOpen(true);
