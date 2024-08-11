@@ -68,6 +68,18 @@ interface MapData {
   Packages: Coordinate[];
 }
 
+interface CoordinateHomeStay {
+  _id: string;
+  name_homeStay?: string
+  location?: Location[];
+}
+
+interface CoordinatePackages {
+  _id: string;
+  name_package?: string
+  location?: Location[];
+}
+
 const SearchResult: React.FC = () => {
   const location = useLocation();
   const dataSearch = location.state?.dataSearch;
@@ -78,10 +90,7 @@ const SearchResult: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { mapData , drawerData , setDrawerData } = authContext;
-
-  console.log(drawerData);
-  
+  const { mapData, drawerData, setDrawerData, setMapData } = authContext;
 
   const [isPackage, setIsPackage] = useState<boolean>(
     dataSearch.searchType === "Homestay"
@@ -104,6 +113,10 @@ const SearchResult: React.FC = () => {
   );
   const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
   const [dataHomeStays, setDataHomeStays] = useState<Item[]>([]);
+  const [
+    dataHomeStaysForPriceFilter,
+    setDataHomeStaysdataHomeStaysForPriceFilter,
+  ] = useState<Item[]>([]);
   const [dataPackage, setDataPackage] = useState<Item[]>([]);
   const [homeStayCount, setHomeStayCount] = useState<number>(0);
   const [packageCount, setPackageCount] = useState<number>(0);
@@ -113,12 +126,77 @@ const SearchResult: React.FC = () => {
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
+  //Filter Price
+  useEffect(() => {
+    if (drawerData?.drawerPrice.endPrice !== 0) {
+      const minPrices = dataHomeStays.map((location) => {
+        const offers = location.room_type.flatMap((roomType) => roomType.offer);
+        const minPrice = Math.min(
+          ...offers.map((offer) => offer.price_homeStay)
+        );
+        return offers.find((offer) => offer.price_homeStay === minPrice);
+      });
+
+      const filteredData = minPrices.filter((offer) => {
+        if (offer === undefined || offer.price_homeStay === undefined) {
+          return false;
+        }
+
+        const startPrice = drawerData?.drawerPrice?.startPrice ?? 0;
+        const endPrice = drawerData?.drawerPrice?.endPrice ?? Number.MAX_VALUE;
+
+        return (
+          offer.price_homeStay > startPrice && offer.price_homeStay <= endPrice
+        );
+      });
+
+      const validData = filteredData.filter((item) => item !== undefined);
+
+      const sortedData = validData.sort((a, b) => {
+        const priceA = a.price_homeStay ?? 0;
+        const priceB = b.price_homeStay ?? 0;
+
+        return priceA - priceB;
+      });
+
+      const formattedData = dataHomeStays
+        .map((location) => {
+          const offers = location.room_type.flatMap(
+            (roomType) => roomType.offer
+          );
+          const filteredOffers = offers.filter((offer) =>
+            sortedData.includes(offer)
+          );
+          if (filteredOffers.length > 0) {
+            return {
+              ...location,
+              room_type: location.room_type.map((roomType) => ({
+                ...roomType,
+                offer: roomType.offer.filter((offer) =>
+                  filteredOffers.includes(offer)
+                ),
+              })),
+            };
+          }
+          return null;
+        })
+        .filter((location) => location !== null);
+
+      setDataHomeStaysdataHomeStaysForPriceFilter(formattedData);
+    } else {
+      return;
+    }
+  }, [drawerData]);
+
+  //Set Start Loads null in page
   useEffect(() => {
     return () => {
       setDrawerData(null);
+      setMapData(null);
     };
   }, []);
 
+  //FillData
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -134,37 +212,74 @@ const SearchResult: React.FC = () => {
         let PackageData = [];
         if (mapData) {
           const dataforFilter: MapData[] = mapData.coordinates;
-          console.log(dataforFilter);
 
-          HomeStayData = dataforFilter[0].HomeStay;
-          PackageData = dataforFilter[0].Packages;
+          if (drawerData != null) {
+            const filteredResultsHomestay = dataforFilter[0].HomeStay.filter(
+              (item: CoordinateHomeStay) =>
+                (item.name_homeStay
+                  ?.toLowerCase()
+                  .includes(
+                    searchMessageDrawer?.drawerTextSearch?.toLowerCase() ?? ""
+                  ) ??
+                  false) ||
+                  (
+                    item.location && item.location.length > 0 &&
+                    item.location[0]?.province_location?.toLowerCase() ===
+                    searchMessageDrawer?.drawerTextSearch?.toLowerCase()
+                  )
+            );
+
+            HomeStayData = filteredResultsHomestay;
+
+            const filteredResultsPackage = dataforFilter[0].Packages.filter(
+              (item: CoordinatePackages) =>
+                (item.name_package
+                  ?.toLowerCase()
+                  .includes(
+                    searchMessageDrawer?.drawerTextSearch.toLowerCase() ?? ""
+                  ) ??
+                  false) ||
+                  (
+                    item.location && item.location.length > 0 &&
+                    item.location[0]?.province_location?.toLowerCase() ===
+                    searchMessageDrawer?.drawerTextSearch?.toLowerCase()
+                  )
+            );
+
+            PackageData = filteredResultsPackage;
+          } else {
+            HomeStayData = dataforFilter[0].HomeStay;
+            PackageData = dataforFilter[0].Packages;
+          }
         } else {
-          const filteredResultsHomestay = dataHomestay.filter(
-            (item: Item) => {
-              const searchText = searchMessageDrawer && searchMessageDrawer.drawerTextSearch
+          const filteredResultsHomestay = dataHomestay.filter((item: Item) => {
+            const searchText =
+              searchMessageDrawer && searchMessageDrawer.drawerTextSearch
                 ? searchMessageDrawer.drawerTextSearch.toLowerCase()
                 : searchMessage.searchText.toLowerCase();
-              
-              return (
-                (item.name_homeStay?.toLowerCase().includes(searchText) ?? false) ||
-                item.location[0]?.province_location?.toLowerCase() === searchText
-              );
-            }
-          );
-          
+
+            return (
+              (item.name_homeStay?.toLowerCase().includes(searchText) ??
+                false) ||
+              item.location[0]?.province_location?.toLowerCase() === searchText
+            );
+          });
+
           HomeStayData = filteredResultsHomestay;
-          const filteredResultsPackage = dataPackage.filter(
-            (item: Item) =>{
-                const searchText = searchMessageDrawer && searchMessageDrawer.drawerTextSearch
+
+          const filteredResultsPackage = dataPackage.filter((item: Item) => {
+            const searchText =
+              searchMessageDrawer && searchMessageDrawer.drawerTextSearch
                 ? searchMessageDrawer.drawerTextSearch.toLowerCase()
                 : searchMessage.searchText.toLowerCase();
-              
-              return (
-                (item.name_package?.toLowerCase().includes(searchText) ?? false) ||
-                item.location[0]?.province_location?.toLowerCase() === searchText
-              );
-            }
-          );
+
+            return (
+              (item.name_package?.toLowerCase().includes(searchText) ??
+                false) ||
+              item.location[0]?.province_location?.toLowerCase() === searchText
+            );
+          });
+
           PackageData = filteredResultsPackage;
         }
         setDataHomeStays(HomeStayData);
@@ -177,7 +292,7 @@ const SearchResult: React.FC = () => {
     };
 
     fetchData();
-  }, [dataSearch, mapData , drawerData]);
+  }, [dataSearch, mapData, drawerData]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
     if (dates !== null && dates !== undefined) {
@@ -201,8 +316,8 @@ const SearchResult: React.FC = () => {
   const handleDecreasePeople = () => {
     if (numPeople > 1) {
       setNumPeople(numPeople - 1);
-    }else{
-      return
+    } else {
+      return;
     }
   };
 
@@ -266,26 +381,32 @@ const SearchResult: React.FC = () => {
     switch (sortOption) {
       case "เรียงตามราคาสูงไปน้อย":
         return sortedData.sort((a, b) => {
-
           const offersA = a.room_type[0].offer || [];
           const offersB = b.room_type[0].offer || [];
-          
-          const maxPriceA = offersA.length ? Math.min(...offersA.map(o => o.price_homeStay)) : 0;
-          const maxPriceB = offersB.length ? Math.min(...offersB.map(o => o.price_homeStay)) : 0;     
-  
+
+          const maxPriceA = offersA.length
+            ? Math.min(...offersA.map((o) => o.price_homeStay))
+            : 0;
+          const maxPriceB = offersB.length
+            ? Math.min(...offersB.map((o) => o.price_homeStay))
+            : 0;
+
           return maxPriceB - maxPriceA;
         });
-        case "เรียงตามราคาต่ำไปสูง":
-          return sortedData.sort((a, b) => {
-            
-            const offersA = a.room_type[0].offer || [];
-            const offersB = b.room_type[0].offer || [];
-            
-            const minPriceA = offersA.length ? Math.min(...offersA.map(o => o.price_homeStay)) : 0;
-            const minPriceB = offersB.length ? Math.min(...offersB.map(o => o.price_homeStay)) : 0;
-    
-            return minPriceA - minPriceB;
-          });
+      case "เรียงตามราคาต่ำไปสูง":
+        return sortedData.sort((a, b) => {
+          const offersA = a.room_type[0].offer || [];
+          const offersB = b.room_type[0].offer || [];
+
+          const minPriceA = offersA.length
+            ? Math.min(...offersA.map((o) => o.price_homeStay))
+            : 0;
+          const minPriceB = offersB.length
+            ? Math.min(...offersB.map((o) => o.price_homeStay))
+            : 0;
+
+          return minPriceA - minPriceB;
+        });
       case "เรียงตามดาวสูงไปน้อย":
         return sortedData.sort(
           (a, b) =>
@@ -511,7 +632,10 @@ const SearchResult: React.FC = () => {
                   ))}
                 </>
               ) : (
-                <div id="Package_notFound" className="flex items-center justify-center h-[40rem]">
+                <div
+                  id="Package_notFound"
+                  className="flex items-center justify-center h-[40rem]"
+                >
                   <span>NOT FOUND PACKAGE</span>
                 </div>
               )}
@@ -520,18 +644,39 @@ const SearchResult: React.FC = () => {
             <div className="w-full">
               {dataHomeStays.length > 0 ? (
                 <>
-                  {sortData(dataHomeStays).map((item, index) => (
-                    <div key={index} className="w-full">
-                      <CardHomeStay
-                        item={item}
-                        numPeople={numPeople}
-                        numChildren={numChildren}
-                      />
-                    </div>
-                  ))}
+                  {(drawerData?.drawerPrice?.endPrice ?? 0) > 0 ? (
+                    <>
+                      {sortData(dataHomeStaysForPriceFilter).map(
+                        (item, index) => (
+                          <div key={index} className="w-full">
+                            <CardHomeStay
+                              item={item}
+                              numPeople={numPeople}
+                              numChildren={numChildren}
+                            />
+                          </div>
+                        )
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {sortData(dataHomeStays).map((item, index) => (
+                        <div key={index} className="w-full">
+                          <CardHomeStay
+                            item={item}
+                            numPeople={numPeople}
+                            numChildren={numChildren}
+                          />
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </>
               ) : (
-                <div id="Package_notFound" className="flex items-center justify-center h-[40rem]">
+                <div
+                  id="Package_notFound"
+                  className="flex items-center justify-center h-[40rem]"
+                >
                   <span>NOT FOUND HOMESTAY</span>
                 </div>
               )}

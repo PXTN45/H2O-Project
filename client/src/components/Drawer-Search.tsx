@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef, useCallback } from "react";
 import OpenStreetMap from "./OpenStreetMap";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { AuthContext } from "../AuthContext/auth.provider";
@@ -18,21 +18,21 @@ const truncateText = (text: string, maxLength: number) => {
 const Drawer: React.FC = () => {
   const [rangeValue, setRangeValue] = useState(0);
   const [searchText, setSearchText] = useState<string>("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { userInfo, mapData , setDrawerData } = authContext;
+  const { userInfo, mapData, setDrawerData } = authContext;
 
   const handleRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = Number(event.target.value);
     setRangeValue(newValue);
   };
-  
+
   const [data, setData] = useState<string[]>([]);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
@@ -41,14 +41,6 @@ const Drawer: React.FC = () => {
       setData(getRandomPlaces(mapData.places, 5));
     }
   }, [mapData]);
-
-  useEffect(() => {
-    if(rangeValue > 0){
-      handleSearch();
-    }else{
-      return
-    }
-  }, [rangeValue]);
 
   const handleCheckboxChange = (item: string) => {
     setCheckedItems((prevCheckedItems) => {
@@ -60,28 +52,40 @@ const Drawer: React.FC = () => {
       }
       return newCheckedItems;
     });
-  }; 
+  };
 
-  const handleSearch = () => {
-
+  const handleSearch = useCallback(() => {
     const dataSearch = {
-      drawerTextSearch : searchText,
-      drawerPrice:
-      {
-        startPrice : 0,
-        endPrice : rangeValue,
+      drawerTextSearch: searchText,
+      drawerPrice: {
+        startPrice: 0,
+        endPrice: rangeValue,
       },
       drawerPlace: "Hi",
     };
 
-    setDrawerData(dataSearch); 
-  };
+    setDrawerData(dataSearch);
+  }, [searchText, rangeValue, setDrawerData]);
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      handleSearch();
+      if (inputRef.current) {
+        const currentValue = inputRef.current.value.trim();
+
+        if (currentValue === "") {
+          setSearchText("");
+        } else {
+          setSearchText(currentValue);
+        }
+
+        inputRef.current.value = "";
+      }
     }
   };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchText, rangeValue, handleSearch]);
 
   return (
     <div>
@@ -89,7 +93,6 @@ const Drawer: React.FC = () => {
         <div className="drawer lg:drawer-open">
           <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col items-center justify-center">
-            {/* Page content here */}
             <label
               htmlFor="my-drawer-2"
               className={
@@ -116,9 +119,9 @@ const Drawer: React.FC = () => {
                 <div className="w-full flex items-center justify-center my-5">
                   <input
                     type="text"
+                    ref={inputRef}
                     placeholder="ค้นหาสิ่งที่สนใจ"
                     className="input text-sm p-2 mb-2 rounded-full block w-full shadow"
-                    onChange={(e) => setSearchText(e.target.value)}
                     onKeyPress={handleKeyPress}
                   />
                 </div>

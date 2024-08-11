@@ -63,7 +63,7 @@ const OpenStreetMap: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { setMapData } = authContext;
+  const { setMapData , setDrawerData } = authContext;
 
   useEffect(() => {
     if (modalIsOpen) {
@@ -181,6 +181,7 @@ const OpenStreetMap: React.FC = () => {
           };
 
           setMapData(coordinatedArrays);
+          setDrawerData(null)
         } catch (error) {
           console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
         }
