@@ -95,19 +95,19 @@ const Drawer: React.FC = () => {
   return (
     <div>
       <div className="md:w-1/4">
-        <div className="drawer lg:drawer-open">
+        <div className="drawer xl:drawer-open">
           <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col items-center justify-center">
             <label
               htmlFor="my-drawer-2"
               className={
                 userInfo?.role === "user"
-                  ? "btn btn-circle btn-primary drawer-button lg:hidden bg-gradient-to-b from-primaryUser to-secondUser"
+                  ? "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryUser to-secondUser"
                   : userInfo?.role === "business"
-                  ? "btn btn-circle btn-primary drawer-button lg:hidden bg-gradient-to-b from-primaryBusiness to-secondBusiness"
+                  ? "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryBusiness to-secondBusiness"
                   : userInfo?.role === "admin"
-                  ? "btn btn-circle btn-primary drawer-button lg:hidden bg-gradient-to-b from-primaryAdmin to-secondAdmin"
-                  : "btn btn-circle btn-primary drawer-button lg:hidden bg-gradient-to-b from-primaryUser to-primaryBusiness"
+                  ? "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryAdmin to-secondAdmin"
+                  : "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryUser to-primaryBusiness"
               }
             >
               <RxHamburgerMenu />

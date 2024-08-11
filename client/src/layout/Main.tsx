@@ -34,7 +34,6 @@ const Main: React.FC = () => {
         const url = await getDownloadURL(storageRef);
         if (url) {
           setIsImage(url);
-          setLoadPage(true);
         }
       } catch (error) {
         console.error("Error fetching image:", error);
@@ -43,12 +42,12 @@ const Main: React.FC = () => {
 
     if (thisPage === "/") {
       setLoadPage(false);
-      fetchImage();
+      fetchImage().finally(() => setLoadPage(true));
     } else {
-      setLoadPage(true);
+      setLoadPage(true)
       return;
     }
-  }, [thisSunOrMoon, setLoadPage, thisPage]);
+  }, [thisSunOrMoon, thisPage]);
 
   return (
     <div>
