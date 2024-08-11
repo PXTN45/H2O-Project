@@ -1,12 +1,7 @@
 import React, { useContext, useEffect, useState, useRef, useCallback } from "react";
 import OpenStreetMap from "./OpenStreetMap";
-import { RxHamburgerMenu } from "react-icons/rx";
+import { RxHamburgerMenu, RxArrowLeft, RxArrowRight } from "react-icons/rx";
 import { AuthContext } from "../AuthContext/auth.provider";
-
-const getRandomPlaces = (places: string[], count: number) => {
-  const shuffled = [...places].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-};
 
 const truncateText = (text: string, maxLength: number) => {
   if (text.length > maxLength) {
@@ -18,6 +13,8 @@ const truncateText = (text: string, maxLength: number) => {
 const Drawer: React.FC = () => {
   const [rangeValue, setRangeValue] = useState(0);
   const [searchText, setSearchText] = useState<string>("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const itemsPerPage = 3;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const authContext = useContext(AuthContext);
@@ -34,25 +31,12 @@ const Drawer: React.FC = () => {
   };
 
   const [data, setData] = useState<string[]>([]);
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (mapData?.places) {
-      setData(getRandomPlaces(mapData.places, 5));
+      setData(mapData.places);
     }
   }, [mapData]);
-
-  const handleCheckboxChange = (item: string) => {
-    setCheckedItems((prevCheckedItems) => {
-      const newCheckedItems = new Set(prevCheckedItems);
-      if (newCheckedItems.has(item)) {
-        newCheckedItems.delete(item);
-      } else {
-        newCheckedItems.add(item);
-      }
-      return newCheckedItems;
-    });
-  };
 
   const handleSearch = useCallback(() => {
     const dataSearch = {
@@ -86,6 +70,27 @@ const Drawer: React.FC = () => {
   useEffect(() => {
     handleSearch();
   }, [searchText, rangeValue, handleSearch]);
+
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const currentPage = Math.floor(currentIndex / itemsPerPage) + 1;
+
+  const handleNext = () => {
+    if (currentPage === totalPages) {
+      setCurrentIndex(0); // Go to the first page
+    } else {
+      setCurrentIndex(currentIndex + itemsPerPage);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentPage === 1) {
+      setCurrentIndex((totalPages - 1) * itemsPerPage); // Go to the last page
+    } else {
+      setCurrentIndex(currentIndex - itemsPerPage);
+    }
+  };
+
+  const displayedData = data.slice(currentIndex, currentIndex + itemsPerPage);
 
   return (
     <div>
@@ -146,46 +151,59 @@ const Drawer: React.FC = () => {
                       />
                       <div className="w-[80%] mt-2 flex items-center justify-between">
                         <span className="flex justify-start">เริ่มต้น: 0</span>
-                        <span className="flex justify-end">สูงสุด: {rangeValue}</span>
+                        <span className="flex justify-end">
+                          สูงสุด: {rangeValue}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="w-full rounded-md overflow-hidden shadow relative my-5 h-full">
                   <div className="flex flex-col w-full h-full text-sm">
-                    <span className="w- font-bold text-lg my-5 mx-5">
+                    <span className="font-bold text-lg my-5 mx-5">
                       สถานที่เที่ยวใกล้ที่พัก
                     </span>
-                    <ul className="list-disc w-full">
-                      {data.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center mb-20 mt-12">
-                          <label className=" flex justify-start font-semibold">
-                            ไม่พบข้อมูล
-                          </label>
-                          <p className="flex justify-end font-medium">
-                            ( โปรดใช้ Map ในการค้นหาสถานที่ )
+                    {data.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center mb-20 mt-12">
+                        <label className="flex justify-start font-semibold">
+                          ไม่พบข้อมูล
+                        </label>
+                        <p className="flex justify-end font-medium">
+                          ( โปรดใช้ Map ในการค้นหาสถานที่ )
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="mb-2">
+                        {displayedData.map((item) => (
+                          <p key={item} className="mx-10 mb-2">
+                            <div className="flex items-center justify-start">
+                              <label className="font-medium">
+                                {truncateText(item, 35)}
+                              </label>
+                            </div>
                           </p>
+                        ))}
+                        <div className="flex justify-between items-center mx-5 mt-10 mb-5">
+                          <button
+                            onClick={handlePrev}
+                            disabled={data.length === 0}
+                            className="w-8 h-8 bg-smoke text-white rounded-full flex justify-center items-center hover:bg-primaryBusiness hover:text-dark"
+                          >
+                            <RxArrowLeft size={20} />
+                          </button>
+                          <span className="text-sm font-semibold">
+                            หน้า {currentPage} / {totalPages}
+                          </span>
+                          <button
+                            onClick={handleNext}
+                            disabled={data.length === 0}
+                            className="w-8 h-8 bg-smoke text-white rounded-full flex justify-center items-center hover:bg-primaryBusiness hover:text-dark"
+                          >
+                            <RxArrowRight size={20} />
+                          </button>
                         </div>
-                      ) : (
-                        <div className="mx-5 mb-2">
-                          {data.map((item) => (
-                            <li key={item} className="mb-2">
-                              <div className="flex items-center justify-start">
-                                <input
-                                  type="checkbox"
-                                  id={item}
-                                  value={item}
-                                  checked={checkedItems.has(item)}
-                                  onChange={() => handleCheckboxChange(item)}
-                                  className="mr-2"
-                                />
-                                <label htmlFor={item}>{truncateText(item, 30)}</label>
-                              </div>
-                            </li>
-                          ))}
-                        </div>
-                      )}
-                    </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

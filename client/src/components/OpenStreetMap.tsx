@@ -160,8 +160,9 @@ const OpenStreetMap: React.FC = () => {
 
           // Fetch places from Overpass API
           const response = await fetch(
-            `https://overpass-api.de/api/interpreter?data=[out:json];node(around:1000,${e.latlng.lat},${e.latlng.lng})["tourism"];out;`
-          );
+            `https://overpass-api.de/api/interpreter?data=[out:json];node(around:1000,${e.latlng.lat},${e.latlng.lng})["tourism"~"attraction|museum|viewpoint|park|zoo|pub|tech"];out;`
+          );          
+          
           const data: OverpassResponse = await response.json();
 
           const newPlaces = data.elements
@@ -171,7 +172,7 @@ const OpenStreetMap: React.FC = () => {
           const places =
             newPlaces.length > 0
               ? newPlaces
-              : ["ไม่มีสถานที่ท่องเที่ยวในรัศมีนี้"];
+              : ["ไม่มีสถานที่ท่องเที่ยวในรัศนี้..."];
 
           const coordinates: Coordinates = {
             HomeStay: filteredCoordinatesHomestay,
