@@ -96,7 +96,7 @@ const Filterpackage: React.FC = () => {
           className={`btn px-4 py-2 rounded-md ${
             isType === ""
               ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white"
-              : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white"
+              : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white menu-SupportDarkMode"
           }`}
         >
           ทั้งหมด
@@ -109,7 +109,7 @@ const Filterpackage: React.FC = () => {
             className={`btn px-4 py-2 rounded-md ${
               isType === province
                 ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white"
-                : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white"
+                : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white menu-SupportDarkMode"
             }`}
           >
             {province}

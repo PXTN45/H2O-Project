@@ -30,17 +30,25 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
     (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
   };
 
+  console.log(thisPage);
+
   return (
     <div>
       <nav
         className={
           thisPage === "/"
             ? "bg-white w-full relative"
-            : userInfo && userInfo.role === "user"
+            : userInfo &&
+              userInfo.role === "user" &&
+              thisPage !== "/search/search-result"
             ? "bg-gradient-to-r from-primaryUser to-secondUser w-full relative"
-            : userInfo && userInfo.role === "business"
+            : userInfo &&
+              userInfo.role === "business" &&
+              thisPage !== "/search/search-result"
             ? "bg-gradient-to-r from-primaryBusiness to-secondBusiness w-full relative"
-            : userInfo && userInfo.role === "admin"
+            : userInfo &&
+              userInfo.role === "admin" &&
+              thisPage !== "/search/search-result"
             ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin w-full relative"
             : "bg-gradient-to-r from-primaryNoRole to-secondNoRole w-full relative"
         }
@@ -144,7 +152,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
                     {isOpen && (
                       <div
                         id="userDropdown"
-                        className="z-10 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44"
+                        className="z-10 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44 card-box"
                       >
                         <div className="px-4 py-3 text-sm">
                           <div>

@@ -517,7 +517,7 @@ const SearchResult: React.FC = () => {
                 </div>
               )}
             </div>
-              <div className="my-3"/>
+            <div className="my-3" />
             <div className="relative w-full flex justify-center mx-10">
               <button
                 id="date-buttonHomstay"
@@ -558,7 +558,7 @@ const SearchResult: React.FC = () => {
                 </div>
               )}
             </div>
-              <div className="my-3"/>
+            <div className="my-3" />
             <div className="relative w-full flex justify-end">
               <button
                 id="sort-buttonPackage"

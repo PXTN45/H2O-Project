@@ -204,7 +204,7 @@ const Search: React.FC = () => {
             </button>
             {showPeopleMenu && (
               <div className="flex items-start justify-center">
-                <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tl-[0rem]">
+                <div className="absolute z-10 mt-2 bg-white text-dark text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tl-[0rem]">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center">
                       <IoPeopleSharp className="w-5 h-5 mr-5" />
@@ -279,7 +279,7 @@ const Search: React.FC = () => {
             </button>
             {showCalendar && (
               <div className="flex items-start justify-center">
-                <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
+                <div className="absolute z-10 mt-2 bg-white text-dark text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
                   <div
                     id="Calendar"
                     className="flex items-center justify-center"

@@ -29,7 +29,7 @@ const Drawer: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { userInfo, mapData, setDrawerData } = authContext;
+  const { mapData, setDrawerData } = authContext;
 
   const handleRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = Number(event.target.value);
@@ -109,15 +109,7 @@ const Drawer: React.FC = () => {
             <label
               id="HamburgerMenu"
               htmlFor="my-drawer-2"
-              className={
-                userInfo?.role === "user"
-                  ? "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryUser to-secondUser"
-                  : userInfo?.role === "business"
-                  ? "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryBusiness to-secondBusiness"
-                  : userInfo?.role === "admin"
-                  ? "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryAdmin to-secondAdmin"
-                  : "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryNoRole to-secondNoRole"
-              }
+              className="btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryNoRole to-secondNoRole"
             >
               <RxHamburgerMenu />
             </label>
