@@ -2,6 +2,9 @@ import { Schema, model, Document } from "mongoose";
 
 interface HomeStay extends Document {
   name_homeStay: string;
+  nearbyPlaces: {
+    places: string;
+  }[];
   room_type: {
     image_room: {
       image: string;
@@ -21,6 +24,7 @@ interface HomeStay extends Document {
         facilitiesName: string;
       }[];
       roomCount: number;
+      quantityRoom: number;
     }[];
   }[];
   detail_homeStay: string;
@@ -46,7 +50,7 @@ interface HomeStay extends Document {
   business_user: Schema.Types.ObjectId[];
   review_rating_homeStay: number;
   facilities: { facilities_name: string }[];
-  status_sell_homeStay: boolean;
+  status_sell_homeStay: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,6 +59,15 @@ const HomeStaySchema = new Schema<HomeStay>({
   name_homeStay: {
     type: String,
     required: true,
+  },
+  nearbyPlaces: {
+    type: [
+      {
+        places: {
+          type: String,
+        },
+      },
+    ],
   },
   room_type: {
     type: [
@@ -91,7 +104,8 @@ const HomeStaySchema = new Schema<HomeStay>({
                   },
                 ],
               },
-              roomCount: { type: Number, require: true, default: 0 },
+              roomCount: { type: Number },
+              quantityRoom: { type: Number, default: 1 },
             },
           ],
         },
@@ -163,8 +177,10 @@ const HomeStaySchema = new Schema<HomeStay>({
     },
   ],
   status_sell_homeStay: {
-    type: Boolean,
+    type: String,
     required: true,
+    enum: ["Ready", "NotReady"],
+    default: "Ready",
   },
   createdAt: {
     type: Date,

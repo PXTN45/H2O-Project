@@ -5,6 +5,7 @@ import { getBookingNights, isDateValid } from "../utils";
 import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
 
+
 const getBooking = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
   try {
