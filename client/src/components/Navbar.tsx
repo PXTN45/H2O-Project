@@ -5,17 +5,20 @@ import { AuthContext } from "../AuthContext/auth.provider";
 import Modal from "./Get-Stared";
 import ModalSelectRoles from "./Modal-SelectRoles";
 import { BsPersonWalking } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   image: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ image }) => {
+  const navigate = useNavigate();
+
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
-  const { thisPage, userInfo, handleLogout } = authContext;
+  const { thisPage, userInfo, handleLogout, setLoadPage } = authContext;
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -100,13 +103,26 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
             <button
               className="text-lg font-bold py-2 px-4 rounded"
               onClick={
-                !userInfo
+                !userInfo && thisPage === "/"
                   ? () => {
                       (
                         document.getElementById(
                           "Get-Started"
                         ) as HTMLDialogElement
                       )?.showModal();
+                    }
+                  : !userInfo && thisPage !== "/"
+                  ? () => {
+                      navigate(`/`);
+                      setLoadPage(false);
+                      setTimeout(() => {
+                        (
+                          document.getElementById(
+                            "Get-Started"
+                          ) as HTMLDialogElement
+                        )?.showModal();
+                        setLoadPage(true);
+                      }, 1000);
                     }
                   : toggleDropdown
               }
