@@ -9,7 +9,7 @@ import isBookingAvailable from "../utils/date/isBookingAvailable";
 const getBooking = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
   try {
-    const data = await Booking.find();
+    const data = (await Booking.find().populate([{path:"booker", select:"email name lastName"}]));
     res.status(201).json(data);
   } catch (error: any) {
     res.status(404).json({ message: "Error cannot get this booking:", error });
