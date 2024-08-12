@@ -710,7 +710,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               </label>
               <div className="flex flex-row justify-between">
                 <div>
-                  <select className="input input-bordered w-[4.4rem]">
+                  <select className="input input-bordered w-[5.5rem]">
                     <option value="+66">
                       +66 {String.fromCharCode(160)} ( Thailand )
                     </option>
@@ -908,7 +908,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               </label>
               <div className="flex flex-row justify-between">
                 <div>
-                  <select className="input input-bordered w-[4.4rem]">
+                  <select className="input input-bordered w-[5.5rem]">
                     <option value="+66">
                       +66 {String.fromCharCode(160)} ( Thailand )
                     </option>
@@ -977,10 +977,11 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                 userInfo?.role !== "admin"
               ? "Already have an account?"
               : "For administrators only"}{" "}
-            <button
+            <a
               id="NoAccount-HaveAccount"
+              href="#"
               type="button"
-              className="underline text-red-700 ml-1"
+              className="underline text-dark ml-1 hover:text-smoke"
               onClick={() =>
                 toggleForm(activePage === "login" ? "signup-user" : "login")
               }
@@ -992,18 +993,19 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                   userInfo?.role !== "admin"
                 ? "Login"
                 : null}
-            </button>
+            </a>
           </p>
         </form>
         {activePage === "signup-user" && userInfo?.role === "admin" ? null : (
           <div className="max-w-screen-xl flex items-center justify-between">
             <hr
               className={
-                activePage === "login" ||
-                (activePage === "signup-user" && userInfo?.role !== "admin")
+                activePage === "signup-user" && userInfo?.role !== "admin"
                   ? "w-[50vw] border-t-2 border-primaryUser shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
                   : userInfo?.role === "admin"
                   ? "w-[50vw] border-t-2 border-primaryAdmin shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+                  : activePage === "login"
+                  ? "w-[50vw] border-t-2 border-primaryNoRole shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
                   : "w-[50vw] border-t-2 border-primaryBusiness shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
               }
             />
@@ -1012,11 +1014,12 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
             </div>
             <hr
               className={
-                activePage === "login" ||
-                (activePage === "signup-business" && userInfo?.role !== "admin")
+                activePage === "signup-business" && userInfo?.role !== "admin"
                   ? "w-[50vw] border-t-2 border-primaryBusiness shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
                   : userInfo?.role === "admin"
                   ? "w-[50vw] border-t-2 border-primaryAdmin shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+                  : activePage === "login"
+                  ? "w-[50vw] border-t-2 border-secondNoRole shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
                   : "w-[50vw] border-t-2 border-primaryUser shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
               }
             />
@@ -1028,7 +1031,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               id="Google"
               className={
                 activePage === "login"
-                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryNoRole text-primaryNoRole hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                   : activePage === "signup-user" && userInfo?.role !== "admin"
                   ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                   : activePage === "signup-business"
