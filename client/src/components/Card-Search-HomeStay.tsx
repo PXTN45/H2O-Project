@@ -158,7 +158,7 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   }
 
   return (
-    <div onClick={handleCardClick} className="flex flex-col xl:flex-row max-w-full rounded overflow-hidden shadow-boxShadow relative my-6 h-full hover:scale-105 transform transition duration-300">
+    <div onClick={handleCardClick} className="card-box flex flex-col xl:flex-row max-w-full rounded overflow-hidden shadow-boxShadow relative my-6 h-full hover:scale-105 transform transition duration-300">
       <div id="image-Homestay" className="w-full xl:w-[25%]">
         <div
           id="default-carousel"
@@ -190,7 +190,7 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
           >
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
               <svg
-                className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+                className="w-4 h-4 rtl:rotate-180"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -215,7 +215,7 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
           >
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
               <svg
-                className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+                className="w-4 h-4 rtl:rotate-180"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -234,7 +234,7 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
           </button>
         </div>
       </div>
-      <div id="center-card-Homestay" className="w-full xl:w-[50%] bg-white">
+      <div id="center-card-Homestay" className="w-full xl:w-[50%]">
         <div id="detailCard-Homestay" className="px-6 py-4">
           <div id="Name-Homestay" className="font-bold text-xl mb-2">
             {truncateText(item.name_homeStay || "", 30)}
@@ -259,9 +259,9 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
           </div>
         </div>
       </div>
-      <div id="right-card" className="w-full xl:w-[25%] bg-whiteSmoke">
+      <div id="right-card" className="w-full xl:w-[25%] semi-bg">
         <div className="flex flex-col ">
-          <div className="bg-white w-[75%] rounded-br-[10px] border-white shadow-rb">
+          <div className="card-semiBox w-[75%] rounded-br-[10px]">
             <span className="mx-1">
               <div className="w-full mx-5">ใช้ห้องทั้งหมด: {totalRooms}</div>
             </span>

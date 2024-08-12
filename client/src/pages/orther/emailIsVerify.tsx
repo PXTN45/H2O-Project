@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -15,25 +15,23 @@ const EmailIsVerify = () => {
 
   const [navigateOpen, setNavigateOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    Swal.fire({
-      title: "Email is Verify",
-      text: "Your Account is Ready for Use Now",
-      icon: "success",
-      confirmButtonText: "OK",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setNavigateOpen(true);
-        {
-          userInfo
-            ? null
-            : (
-                document.getElementById("Get-Started") as HTMLDialogElement
-              )?.showModal();
-        }
+  Swal.fire({
+    title: "Email is Verify",
+    text: "Your Account is Ready for Use Now",
+    icon: "success",
+    confirmButtonText: "OK",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      setNavigateOpen(true);
+      {
+        userInfo
+          ? null
+          : (
+              document.getElementById("Get-Started") as HTMLDialogElement
+            )?.showModal();
       }
-    });
-  }, []);
+    }
+  });
 
   if (!navigateOpen) {
     return <Animetionload />;

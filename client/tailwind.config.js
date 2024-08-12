@@ -22,11 +22,8 @@ export default {
       white: "#FFFFFF",
       whiteSmoke: "#f1f1f1",
       dark: "#000",
-    },
-    extend: {
-      boxShadow: {
-        boxShadow: "0 0px 8px -3px rgba(0, 0, 0, 0.3)",
-      },
+      cardBackgroudDaekMode: "#2C2C2C ",
+      borderedDarkMode: "#3D3D3D ",
     },
   },
   plugins: [daisyui, flowbite],

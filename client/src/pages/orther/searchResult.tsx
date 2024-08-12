@@ -433,7 +433,7 @@ const SearchResult: React.FC = () => {
             className={
               !isPackage
                 ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
-                : "bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+                : "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
             }
             onClick={clickToHome}
           >
@@ -443,7 +443,7 @@ const SearchResult: React.FC = () => {
             id="button-homestaySearch-noSelect"
             className={
               !isPackage
-                ? "bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+                ? "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
                 : "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
             }
             onClick={clickToPackage}
@@ -456,7 +456,7 @@ const SearchResult: React.FC = () => {
             <div className="relative w-full flex justify-start">
               <button
                 id="people-buttonPackage"
-                className="bg-white text-dark text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
+                className="card-box text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
                 onClick={togglePeopleMenu}
               >
                 <span className="flex items-center justify-center font-bold">
@@ -470,7 +470,7 @@ const SearchResult: React.FC = () => {
               </button>
               {showPeopleMenu && (
                 <div className="flex items-start justify-center">
-                  <div className="absolute left-0 z-10 mt-[4.5rem] bg-whiteSmoke text-darkmode-oneColor shadow-2xl p-4 w-full rounded-[1.25rem] rounded-tl-[0rem]">
+                  <div className="absolute left-0 z-10 mt-[4.5rem] semi-bg shadow-2xl p-4 w-full rounded-[1.25rem] rounded-tl-[0rem]">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center">
                         <IoPeopleSharp className="w-5 h-5 mr-5" />
@@ -517,11 +517,11 @@ const SearchResult: React.FC = () => {
                 </div>
               )}
             </div>
-
+              <div className="my-3"/>
             <div className="relative w-full flex justify-center mx-10">
               <button
                 id="date-buttonHomstay"
-                className="bg-white text-dark text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
+                className="card-box text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
                 onClick={toggleCalendar}
               >
                 {dateRange[0] && dateRange[1] ? (
@@ -541,7 +541,7 @@ const SearchResult: React.FC = () => {
               </button>
               {showCalendar && (
                 <div className="flex items-start justify-center">
-                  <div className="absolute z-10 mt-[4.5rem] left-0 right-0 bg-whiteSmoke text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem]">
+                  <div className="absolute z-10 mt-[4.5rem] left-0 right-0 semi-bg text-dark shadow-lg p-4 w-full rounded-[1.25rem]">
                     <div className="flex items-center justify-center">
                       <Calendar
                         onChange={(dates) => {
@@ -558,11 +558,11 @@ const SearchResult: React.FC = () => {
                 </div>
               )}
             </div>
-
+              <div className="my-3"/>
             <div className="relative w-full flex justify-end">
               <button
                 id="sort-buttonPackage"
-                className="bg-white text-dark text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
+                className="card-box text-xs sm:text-sm rounded-[10px] p-1 sm:p-2 mb-2 sm:mb-0 w-full h-[4rem] sm:h-[4rem] shadow-md"
                 onClick={toggleFilterMenu}
               >
                 <span className="flex items-center justify-center font-bold">
@@ -572,11 +572,11 @@ const SearchResult: React.FC = () => {
               </button>
               {showFilterMenu && (
                 <div className="flex items-start justify-center">
-                  <div className="absolute z-10 mt-[4.5rem] right-0 bg-whiteSmoke text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
+                  <div className="absolute z-10 mt-[4.5rem] right-0 semi-bg shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
                     <div className="flex flex-col items-start">
                       <button
                         id="PriceHightToLow"
-                        className="w-full text-left p-2 hover:bg-gray-100 rounded"
+                        className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
                         onClick={() =>
                           handleFilterClick("เรียงตามราคาสูงไปน้อย")
                         }
@@ -585,7 +585,7 @@ const SearchResult: React.FC = () => {
                       </button>
                       <button
                         id="PriceLowToHight"
-                        className="w-full text-left p-2 hover:bg-gray-100 rounded"
+                        className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
                         onClick={() =>
                           handleFilterClick("เรียงตามราคาน้อยไปสูง")
                         }
@@ -594,7 +594,7 @@ const SearchResult: React.FC = () => {
                       </button>
                       <button
                         id="StarHightToLow"
-                        className="w-full text-left p-2 hover:bg-gray-100 rounded"
+                        className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
                         onClick={() =>
                           handleFilterClick("เรียงตามดาวสูงไปน้อย")
                         }
@@ -603,7 +603,7 @@ const SearchResult: React.FC = () => {
                       </button>
                       <button
                         id="StarLowToHight"
-                        className="w-full text-left p-2 hover:bg-gray-100 rounded"
+                        className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
                         onClick={() =>
                           handleFilterClick("เรียงตามดาวน้อยไปสูง")
                         }

@@ -71,6 +71,9 @@ const sendOTP = async (
       icon: "error",
       title: "Error",
       text: "Failed to send OTP. Please try again.",
+      customClass: {
+        htmlContainer: 'swal-text'
+      },
     }).then(() => {
       (
         document.getElementById("Get-Started") as HTMLDialogElement

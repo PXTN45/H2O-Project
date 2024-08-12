@@ -128,22 +128,22 @@ const Drawer: React.FC = () => {
               aria-label="close sidebar"
               className="drawer-overlay"
             />
-            <ul className="menu p-4 w-[85%] min-h-full text-xl line-darkmode">
-              <div className="w-full xl:w-72">
+            <ul className="menu p-4 w-[85%] xl:w-96 min-h-full text-xl menu-SupportDarkMode">
+              <div className="w-full ">
                 <div className="w-full flex items-center justify-center my-5">
                   <input
                     id="SearchAll"
                     type="text"
                     ref={inputRef}
                     placeholder="ค้นหาสิ่งที่สนใจ"
-                    className="text-sm p-2 mb-2 rounded-md block w-full shadow-lg border border-whiteSmoke focus:ring-2 focus:ring-primary-500 focus:border-transparent transition duration-150 ease-in-out"
+                    className="input text-sm p-2 mb-2 rounded-md block w-full shadow-lg border border-whiteSmoke focus:ring-2 focus:ring-primary-500 focus:border-transparent transition duration-150 ease-in-out"
                     onKeyPress={handleKeyPress}
                   />
                 </div>
                 <div className="w-full flex items-center justify-center my-5 h-52 shadow-lg">
                   <OpenStreetMap />
                 </div>
-                <div className="w-full rounded-md shadow-lg relative">
+                <div className="w-full rounded-md shadow-lg relative card-box">
                   <div className="flex flex-col w-full h-full text-sm">
                     <span className="font-bold text-lg mt-5 mx-5">
                       ช่วงราคา (ห้อง / คืน)
@@ -169,7 +169,7 @@ const Drawer: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="w-full rounded-md overflow-hidden shadow-lg relative my-5 h-full">
+                <div className="w-full rounded-md overflow-hidden shadow-lg relative my-5 h-full card-box">
                   <div className="flex flex-col w-full h-full text-sm">
                     <span className="font-bold text-lg my-5 mx-5">
                       สถานที่เที่ยวใกล้ที่พัก

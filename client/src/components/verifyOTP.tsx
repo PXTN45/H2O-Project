@@ -32,7 +32,7 @@ const VerifyModal: React.FC<ModalProps> = ({
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [activeOTPIndex, setActiveOTPIndex] = useState<number>(0);
   const [invalidCounter, setInvalidCounter] = useState<number>(0);
-  const [counter, setCounter] = useState<number>(60);
+  const [counter, setCounter] = useState<number>(60000000000);
 
   const authContext = useContext(AuthContext);
 
@@ -188,11 +188,11 @@ const VerifyModal: React.FC<ModalProps> = ({
                   return (
                     <React.Fragment key={index}>
                       <input
-                        id="otp"
+                        id={`otp[${index}]`}
                         ref={activeOTPIndex === index ? inputRef : null}
                         type="text"
                         className={
-                          "w-8 h-8 border-2 rounded input-otp outline-none text-center font-semibold text-xl spin-button-none border-primaryUser focus:border-primaryBusiness focus:text-primaryUser text-dark transition shadow-md shadow-dark"
+                          "w-8 h-8 border-2 rounded outline-none text-center font-semibold text-[8px] spin-button-none border-primaryNoRole focus:border-secondNoRole focus:text-primaryNoRole text-dark transition shadow-md"
                         }
                         onChange={handleOnChange}
                         onKeyDown={(e) => handleOnKeyDown(e, index)}

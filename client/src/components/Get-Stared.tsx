@@ -943,10 +943,10 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               <label className="label ml-auto mt-5">
                 <a
                   href="#"
-                  className="label-text-alt link link-hover"
+                  className="link link-hover hover:text-smoke font-semibold"
                   onClick={handleForgotPasswordClick}
                 >
-                  Forgot password?
+                  Forgot password ?
                 </a>
               </label>
             )}
@@ -971,23 +971,23 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           </div>
           <p className="text-center my-2 font-bold text-[0.9rem] ">
             {activePage === "login"
-              ? "Don't have an account?"
+              ? "Don't have an account ?"
               : (activePage === "signup-user" ||
                   activePage === "signup-business") &&
                 userInfo?.role !== "admin"
-              ? "Already have an account?"
+              ? "Already have an account ?"
               : "For administrators only"}{" "}
             <a
               id="NoAccount-HaveAccount"
               href="#"
               type="button"
-              className="underline text-dark ml-1 hover:text-smoke"
+              className="underline ml-1 hover:text-smoke"
               onClick={() =>
                 toggleForm(activePage === "login" ? "signup-user" : "login")
               }
             >
               {activePage === "login"
-                ? "Sign Up Now"
+                ? "Sign Up"
                 : (activePage === "signup-user" ||
                     activePage === "signup-business") &&
                   userInfo?.role !== "admin"
