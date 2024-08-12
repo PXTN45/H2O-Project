@@ -243,7 +243,7 @@ const OpenStreetMap: React.FC = () => {
   return (
     <div id="map_Search" className="w-full h-full">
       <button
-        className="bg-map w-full h-full text-dark font-bold rounded-md hover:text-primaryBusiness"
+        className="bg-map w-full h-full text-dark font-bold rounded-md hover:text-primaryNoRole"
         onClick={openModal}
       >
         <div className="flex flex-col items-center justify-center w-full h-full">
@@ -255,7 +255,7 @@ const OpenStreetMap: React.FC = () => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Map Modal"
-        className="modal-map relative w-4/5 h-4/5 overflow-hidden flex flex-col translate-x-[-50%] translate-y-[-50%] top-[50%] left-[50%] rounded-xl"
+        className="card-box relative w-4/5 h-4/5 overflow-hidden flex flex-col translate-x-[-50%] translate-y-[-50%] top-[50%] left-[50%] rounded-xl"
         overlayClassName="fixed inset-0 bg-white bg-opacity-80 z-[60]"
         shouldCloseOnOverlayClick={false}
       >
