@@ -35,7 +35,7 @@ const Footer = () => {
   };
 
   return (
-    <div id="footer" className={`relative w-full h-full ${isDarkMode ? "dark" : ""} `}>
+    <div id="footer" className={`relative mt-32 w-full h-full ${isDarkMode ? "dark" : ""} `}>
       <div
         className={`fixed 
           ${isDarkMode ? "text-white" : "text-dark"}
@@ -81,7 +81,7 @@ const Footer = () => {
             ? "bg-gradient-to-l from-primaryBusiness to-secondBusiness mt-10 py-4"
             : userInfo?.role === "admin" && thisPage !== "/"
             ? "bg-gradient-to-l from-primaryAdmin to-secondAdmin mt-10 py-4"
-            : "bg-gradient-to-r from-primaryUser to-primaryBusiness mt-10 py-4"
+            : "bg-gradient-to-r from-primaryNoRole to-secondNoRole mt-10 py-4"
         }
       >
         <div className="container mx-auto flex justify-center items-center">

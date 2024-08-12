@@ -159,7 +159,7 @@ const OpenStreetMap: React.FC = () => {
   }, [map, marker, circle, setMapData]);
 
   const fetchData = async (latlng: L.LatLng, newCircle: L.Circle) => {
-    setLoadPage(false)
+    setLoadPage(false);
     try {
       const responseHomeStay = await axiosPublic.get<HomeStayAndPackage[]>(
         "/homestay"
@@ -226,7 +226,7 @@ const OpenStreetMap: React.FC = () => {
 
       setMapData(coordinatedArrays);
       setDrawerData(null);
-      setLoadPage(true)
+      setLoadPage(true);
     } catch (error) {
       console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
     }

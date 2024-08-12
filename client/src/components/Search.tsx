@@ -116,8 +116,8 @@ const Search: React.FC = () => {
     const searchType = isPackage ? "Package" : "Homestay";
     const startDate = dateRange[0] ? formatDate(dateRange[0]) : "Not selected";
     const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
-    const startDate_Time = dateRange[0]
-    const endDate_Time = dateRange[1]
+    const startDate_Time = dateRange[0];
+    const endDate_Time = dateRange[1];
     const dataSearch = {
       searchText,
       numPeople,
@@ -136,6 +136,8 @@ const Search: React.FC = () => {
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSearch();
+    } else {
+      return;
     }
   };
 
@@ -147,7 +149,7 @@ const Search: React.FC = () => {
             id="button-homestaySearch-Select"
             className={`p-2 rounded-tl-[10px] rounded-bl-[10px] w-full ${
               !isPackage
-                ? "bg-gradient-to-r from-primaryUser to-primaryBusiness text-white"
+                ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white"
                 : "bg-white text-dark border border-whiteSmoke"
             }`}
             onClick={clickToHome}
@@ -158,7 +160,7 @@ const Search: React.FC = () => {
             id="button-homestaySearch-noSelect"
             className={`p-2 rounded-tr-[10px] rounded-br-[10px] w-full ${
               isPackage
-                ? "bg-gradient-to-r from-primaryUser to-primaryBusiness text-white"
+                ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white"
                 : "bg-white text-dark border border-whiteSmoke"
             }`}
             onClick={clickToPackage}
@@ -166,7 +168,7 @@ const Search: React.FC = () => {
             แพ็คเกจ
           </button>
         </div>
-        <div className="w-full h-1 my-5 bg-gradient-to-r from-primaryUser to-primaryBusiness shadow-lg rounded-full" />
+        <div className="w-full h-1 my-5 bg-gradient-to-r from-primaryNoRole to-secondNoRole shadow-lg rounded-full" />
         <div className="flex items-center justify-center w-full relative">
           <input
             id="search-text"
@@ -178,7 +180,7 @@ const Search: React.FC = () => {
           />
           <button
             id="search-Homestay"
-            className="bg-gradient-to-r from-primaryUser to-primaryBusiness p-2 mb-2 block text-white rounded-tr-[10px] rounded-br-[10px] w-40 h-[3.5rem]"
+            className="bg-gradient-to-r from-primaryNoRole to-secondNoRole p-2 mb-2 block text-white rounded-tr-[10px] rounded-br-[10px] w-40 h-[3.5rem]"
             onClick={handleSearch}
           >
             ค้นหา
@@ -278,7 +280,10 @@ const Search: React.FC = () => {
             {showCalendar && (
               <div className="flex items-start justify-center">
                 <div className="absolute z-10 mt-2 bg-white text-darkmode-oneColor shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
-                  <div id="Calendar" className="flex items-center justify-center">
+                  <div
+                    id="Calendar"
+                    className="flex items-center justify-center"
+                  >
                     <Calendar
                       onChange={(dates) => {
                         if (dates) {

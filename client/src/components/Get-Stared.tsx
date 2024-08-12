@@ -958,7 +958,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               value={activePage === "login" ? "Login" : "Sign Up"}
               className={
                 activePage === "login"
-                  ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white border-white"
+                  ? "btn bg-gradient-to-r from-primaryNoRole to-secondNoRole transition-opacity group-hover:opacity-100 text-white border-white"
                   : activePage === "signup-user" && userInfo?.role !== "admin"
                   ? "btn bg-gradient-to-r from-primaryUser to-secondUser transition-opacity group-hover:opacity-100 text-white border-white"
                   : activePage === "signup-business"
@@ -1028,7 +1028,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               id="Google"
               className={
                 activePage === "login"
-                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                   : activePage === "signup-user" && userInfo?.role !== "admin"
                   ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                   : activePage === "signup-business"
@@ -1075,7 +1075,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
         <div
           className={
             activePage === "login"
-              ? "bg-gradient-to-r from-primaryUser to-primaryBusiness absolute left-0 right-0 h-6"
+              ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole absolute left-0 right-0 h-6"
               : activePage === "signup-user" && userInfo?.role !== "admin"
               ? "bg-primaryUser absolute left-0 right-0 h-6"
               : activePage === "signup-business"

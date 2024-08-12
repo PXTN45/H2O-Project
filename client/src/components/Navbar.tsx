@@ -39,17 +39,17 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
             ? "bg-gradient-to-r from-primaryBusiness to-secondBusiness w-full relative"
             : userInfo && userInfo.role === "admin"
             ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin w-full relative"
-            : "bg-gradient-to-r from-primaryUser to-primaryBusiness w-full relative"
+            : "bg-gradient-to-r from-primaryNoRole to-secondNoRole w-full relative"
         }
       >
         <div
           className={
-            !userInfo && thisPage === "/" || (userInfo && thisPage === "/")
+            (!userInfo && thisPage === "/") || (userInfo && thisPage === "/")
               ? "relative p-8 h-[700px]"
               : "relative"
           }
           style={
-            !userInfo && thisPage === "/" || (userInfo && thisPage === "/")
+            (!userInfo && thisPage === "/") || (userInfo && thisPage === "/")
               ? {
                   backgroundImage: `url(${image})`,
                   backgroundSize: "cover",
@@ -72,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               </span>
             </Link>
 
-            <div className="hidden md:flex flex-grow items-center justify-center text-lg">
+            <div className="hidden lg:flex flex-grow items-center justify-center text-lg">
               <ul className="font-medium flex space-x-8 rtl:space-x-reverse">
                 <li>
                   <Link to="/home" className="link-style ml-[50px]">
@@ -116,14 +116,15 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               ) : (
                 <>
                   <div className="relative">
-                    <img
-                      id="avatarButton"
-                      data-dropdown-toggle="userDropdown"
-                      data-dropdown-placement="bottom-start"
-                      className="w-10 h-10 rounded-full cursor-pointer"
-                      src={userInfo.image}
-                      alt="User dropdown"
-                    />
+                    <div className="flex items-center">
+                      <img
+                        id="avatarButton"
+                        className="w-8 h-8 rounded-full cursor-pointer"
+                        src={userInfo.image}
+                        alt="User avatar"
+                      />
+                    </div>
+
                     {isOpen && (
                       <div
                         id="userDropdown"
@@ -195,7 +196,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               )}
             </button>
           </div>
-          {!userInfo && thisPage === "/" || (userInfo && thisPage === "/") ? (
+          {(!userInfo && thisPage === "/") || (userInfo && thisPage === "/") ? (
             <div className="flex items-center mt-[100px]">
               <Search />
             </div>

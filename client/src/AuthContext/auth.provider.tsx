@@ -96,7 +96,6 @@ interface DrawerPrice {
 interface DraweSearch {
   drawerTextSearch: string;
   drawerPrice: DrawerPrice;
-  drawerPlace: string;
 }
 
 interface AuthContextType {
@@ -675,7 +674,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setIsDarkMode,
     mapData,
     setMapData,
-    drawerData, 
+    drawerData,
     setDrawerData,
   };
 

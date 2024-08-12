@@ -70,13 +70,13 @@ interface MapData {
 
 interface CoordinateHomeStay {
   _id: string;
-  name_homeStay?: string
+  name_homeStay?: string;
   location?: Location[];
 }
 
 interface CoordinatePackages {
   _id: string;
-  name_package?: string
+  name_package?: string;
   location?: Location[];
 }
 
@@ -90,7 +90,7 @@ const SearchResult: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { mapData, drawerData, setDrawerData, setMapData , setLoadPage } = authContext;
+  const { mapData, drawerData, setDrawerData, setMapData } = authContext;
 
   const [isPackage, setIsPackage] = useState<boolean>(
     dataSearch.searchType === "Homestay"
@@ -221,11 +221,10 @@ const SearchResult: React.FC = () => {
                     searchMessageDrawer?.drawerTextSearch?.toLowerCase() ?? ""
                   ) ??
                   false) ||
-                  (
-                    item.location && item.location.length > 0 &&
-                    item.location[0]?.province_location?.toLowerCase() ===
-                    searchMessageDrawer?.drawerTextSearch?.toLowerCase()
-                  )
+                (item.location &&
+                  item.location.length > 0 &&
+                  item.location[0]?.province_location?.toLowerCase() ===
+                    searchMessageDrawer?.drawerTextSearch?.toLowerCase())
             );
 
             HomeStayData = filteredResultsHomestay;
@@ -238,11 +237,10 @@ const SearchResult: React.FC = () => {
                     searchMessageDrawer?.drawerTextSearch.toLowerCase() ?? ""
                   ) ??
                   false) ||
-                  (
-                    item.location && item.location.length > 0 &&
-                    item.location[0]?.province_location?.toLowerCase() ===
-                    searchMessageDrawer?.drawerTextSearch?.toLowerCase()
-                  )
+                (item.location &&
+                  item.location.length > 0 &&
+                  item.location[0]?.province_location?.toLowerCase() ===
+                    searchMessageDrawer?.drawerTextSearch?.toLowerCase())
             );
 
             PackageData = filteredResultsPackage;
@@ -290,10 +288,7 @@ const SearchResult: React.FC = () => {
       }
     };
 
-    setLoadPage(false)
     fetchData();
-    setLoadPage(true)
-
   }, [dataSearch, mapData, drawerData]);
 
   const handleDateChange = (dates: Date[] | undefined | null) => {
@@ -437,7 +432,7 @@ const SearchResult: React.FC = () => {
             id="button-homestaySearch-Select"
             className={
               !isPackage
-                ? "bg-gradient-to-r from-primaryUser to-primaryBusiness text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
+                ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
                 : "bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
             }
             onClick={clickToHome}
@@ -449,7 +444,7 @@ const SearchResult: React.FC = () => {
             className={
               !isPackage
                 ? "bg-white text-dark p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-                : "bg-gradient-to-r from-primaryUser to-primaryBusiness text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+                : "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
             }
             onClick={clickToPackage}
           >
@@ -676,7 +671,7 @@ const SearchResult: React.FC = () => {
                 </>
               ) : (
                 <div
-                  id="Package_notFound"
+                  id="Homestay_notFound"
                   className="flex items-center justify-center h-[40rem]"
                 >
                   <span>NOT FOUND HOMESTAY</span>

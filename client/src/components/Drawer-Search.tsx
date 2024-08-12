@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState, useRef, useCallback } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import OpenStreetMap from "./OpenStreetMap";
 import { RxHamburgerMenu, RxArrowLeft, RxArrowRight } from "react-icons/rx";
 import { AuthContext } from "../AuthContext/auth.provider";
@@ -30,6 +36,9 @@ const Drawer: React.FC = () => {
     setRangeValue(newValue);
   };
 
+  const handleRangeMouseUp = () => {
+    handleSearch(); // ส่งข้อมูลเมื่อหยุดเลื่อน
+  };
   const [data, setData] = useState<string[]>([]);
 
   useEffect(() => {
@@ -45,11 +54,14 @@ const Drawer: React.FC = () => {
         startPrice: 0,
         endPrice: rangeValue,
       },
-      drawerPlace: "Hi",
     };
 
     setDrawerData(dataSearch);
   }, [searchText, rangeValue, setDrawerData]);
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchText]);
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -66,10 +78,6 @@ const Drawer: React.FC = () => {
       }
     }
   };
-
-  useEffect(() => {
-    handleSearch();
-  }, [searchText, rangeValue, handleSearch]);
 
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const currentPage = Math.floor(currentIndex / itemsPerPage) + 1;
@@ -99,6 +107,7 @@ const Drawer: React.FC = () => {
           <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col items-center justify-center">
             <label
+              id="HamburgerMenu"
               htmlFor="my-drawer-2"
               className={
                 userInfo?.role === "user"
@@ -123,17 +132,18 @@ const Drawer: React.FC = () => {
               <div className="w-full xl:w-72">
                 <div className="w-full flex items-center justify-center my-5">
                   <input
+                    id="SearchAll"
                     type="text"
                     ref={inputRef}
                     placeholder="ค้นหาสิ่งที่สนใจ"
-                    className="input text-sm p-2 mb-2 rounded-full block w-full shadow"
+                    className="text-sm p-2 mb-2 rounded-md block w-full shadow-lg border border-whiteSmoke focus:ring-2 focus:ring-primary-500 focus:border-transparent transition duration-150 ease-in-out"
                     onKeyPress={handleKeyPress}
                   />
                 </div>
-                <div className="w-full flex items-center justify-center my-5 h-52">
+                <div className="w-full flex items-center justify-center my-5 h-52 shadow-lg">
                   <OpenStreetMap />
                 </div>
-                <div className="w-full rounded-md shadow relative">
+                <div className="w-full rounded-md shadow-lg relative">
                   <div className="flex flex-col w-full h-full text-sm">
                     <span className="font-bold text-lg mt-5 mx-5">
                       ช่วงราคา (ห้อง / คืน)
@@ -147,6 +157,7 @@ const Drawer: React.FC = () => {
                         max="25000"
                         value={rangeValue}
                         onChange={handleRangeChange}
+                        onMouseUp={handleRangeMouseUp}
                         className="w-[80%] accent-primaryBusiness"
                       />
                       <div className="w-[80%] mt-2 flex items-center justify-between">
@@ -158,7 +169,7 @@ const Drawer: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="w-full rounded-md overflow-hidden shadow relative my-5 h-full">
+                <div className="w-full rounded-md overflow-hidden shadow-lg relative my-5 h-full">
                   <div className="flex flex-col w-full h-full text-sm">
                     <span className="font-bold text-lg my-5 mx-5">
                       สถานที่เที่ยวใกล้ที่พัก
@@ -175,7 +186,7 @@ const Drawer: React.FC = () => {
                     ) : (
                       <div className="mb-2">
                         {displayedData.map((item) => (
-                          <p key={item} className="mx-10 mb-2">
+                          <p key={item} id={item} className="mx-10 mb-2">
                             <div className="flex items-center justify-start">
                               <label className="font-medium">
                                 {truncateText(item, 35)}
@@ -185,6 +196,7 @@ const Drawer: React.FC = () => {
                         ))}
                         <div className="flex justify-between items-center mx-5 mt-10 mb-5">
                           <button
+                            id="BackDrawwer"
                             onClick={handlePrev}
                             disabled={data.length === 0}
                             className="w-8 h-8 bg-smoke text-white rounded-full flex justify-center items-center hover:bg-primaryBusiness hover:text-dark"
@@ -195,6 +207,7 @@ const Drawer: React.FC = () => {
                             หน้า {currentPage} / {totalPages}
                           </span>
                           <button
+                            id="NextDrawwer"
                             onClick={handleNext}
                             disabled={data.length === 0}
                             className="w-8 h-8 bg-smoke text-white rounded-full flex justify-center items-center hover:bg-primaryBusiness hover:text-dark"
