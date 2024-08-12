@@ -116,7 +116,7 @@ const Drawer: React.FC = () => {
                   ? "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryBusiness to-secondBusiness"
                   : userInfo?.role === "admin"
                   ? "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryAdmin to-secondAdmin"
-                  : "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryUser to-primaryBusiness"
+                  : "btn btn-circle btn-primary drawer-button xl:hidden bg-gradient-to-b from-primaryNoRole to-secondNoRole"
               }
             >
               <RxHamburgerMenu />
