@@ -45,7 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
         <div
           className={
             (!userInfo && thisPage === "/") || (userInfo && thisPage === "/")
-              ? "relative p-8 h-[700px]"
+              ? "relative p-8 h-full"
               : "relative"
           }
           style={
@@ -197,7 +197,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
             </button>
           </div>
           {(!userInfo && thisPage === "/") || (userInfo && thisPage === "/") ? (
-            <div className="flex items-center mt-[100px]">
+            <div className="flex items-center my-[65px] lg:my-[250px]">
               <Search />
             </div>
           ) : null}
