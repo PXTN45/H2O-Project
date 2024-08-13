@@ -5,6 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+
 export interface Image_room {
   _id: string;
   image: string;
@@ -12,6 +13,7 @@ export interface Image_room {
 export interface Facilities_Room {
   facilitiesName: string;
 }
+
 export interface Offer {
   price_homeStay: number;
   max_people: {
@@ -20,6 +22,8 @@ export interface Offer {
   };
   discount: number;
   facilitiesRoom: Facilities_Room[];
+  roomCount: number;
+  quantityRoom: number;
 }
 export interface RoomType {
   name_type_room: string;
@@ -28,6 +32,11 @@ export interface RoomType {
   sizeBedroom_homeStay: string;
   offer: Offer[];
   image_room: Image_room[];
+}
+
+export interface Facility {
+  _id: string;
+  facilities_name: string;
 }
 
 interface User {
@@ -51,6 +60,30 @@ interface PaymentData {
   offer: Offer;
   bookingUser: User;
   rating: number;
+}
+
+export interface Image {
+  _id: string;
+  image: string;
+}
+
+export interface HomeStay {
+  name_homeStay: string;
+  room_type: RoomType[];
+  max_people: number;
+  detail_homeStay: string;
+  time_checkIn_homeStay: string;
+  time_checkOut_homeStay: string;
+  policy_cancel_homeStay: string;
+  location: Location[];
+  image: Image[];
+  business_user: string[]; // Assuming you use ObjectId as string
+  review_rating_homeStay: number;
+  facilities: Facility[];
+  status_sell_homeStay: boolean;
+  discount: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface PaymentContextType {
