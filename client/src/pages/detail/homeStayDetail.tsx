@@ -22,9 +22,7 @@ import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { FaChildReaching } from "react-icons/fa6";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
 import axios from "axios";
-// import
-
-// types.ts
+import { useQuery } from "@tanstack/react-query";
 export interface Image_room {
   _id: string;
   image: string;
@@ -41,6 +39,8 @@ export interface Offer {
   };
   discount: number;
   facilitiesRoom: Facilities_Room[];
+  roomCount: number;
+  quantityRoom: number;
 }
 export interface RoomType {
   name_type_room: string;
@@ -51,48 +51,11 @@ export interface RoomType {
   image_room: Image_room[];
 }
 
-export interface Location {
-  name_location: string;
-  province_location: string;
-  house_no: string;
-  village?: string;
-  village_no: string;
-  alley?: string;
-  street?: string;
-  district_location: string;
-  subdistrict_location: string;
-  zipcode_location: number;
-  latitude_location: string;
-  longitude_location: string;
-  radius_location: number;
-}
-
-export interface Image {
-  image_upload: string;
-}
-
 export interface Facility {
+  _id: string;
   facilities_name: string;
 }
 
-export interface HomeStay {
-  name_homeStay: string;
-  room_type: RoomType[];
-  max_people: number;
-  detail_homeStay: string;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
-  location: Location[];
-  image: Image[];
-  business_user: string[]; // Assuming you use ObjectId as string
-  review_rating_homeStay: number;
-  facilities: Facility[];
-  status_sell_homeStay: boolean;
-  discount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
 interface User {
   _id?: string;
   name?: string;
@@ -115,6 +78,29 @@ interface PaymentData {
   bookingUser: User;
   rating: number;
 }
+export interface Image {
+  _id: string;
+  image: string;
+}
+
+export interface HomeStay {
+  name_homeStay: string;
+  room_type: RoomType[];
+  max_people: number;
+  detail_homeStay: string;
+  time_checkIn_homeStay: string;
+  time_checkOut_homeStay: string;
+  policy_cancel_homeStay: string;
+  location: Location[];
+  image: Image[];
+  business_user: string[]; // Assuming you use ObjectId as string
+  review_rating_homeStay: number;
+  facilities: Facility[];
+  status_sell_homeStay: boolean;
+  discount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 interface Review {
   _id: string;
   reviewer: string;
@@ -135,7 +121,6 @@ const homeStayDetail = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
   const [progress, setProgress] = useState(0);
-  // const [reviewer, setReviewer] = useState<User>();
   const [isLoading, setLoadPage] = useState<boolean>(false);
 
   if (!authContext) {
@@ -253,7 +238,7 @@ const homeStayDetail = () => {
       }
     };
 
-  const card = item?.room_type.map((data: RoomType, index: number) => {
+  const cardOffer = item?.room_type.map((data: RoomType, index: number) => {
     const handlePrev = () => {
       if (data.image_room.length) {
         setCurrentIndex((prevIndex) =>
@@ -271,22 +256,14 @@ const homeStayDetail = () => {
     };
 
     const offer = data.offer.map((offer: Offer, i: number) => {
-      const discount = (discount: number) => {
-        const price = offer.price_homeStay;
-        if (price > 0) {
-          const totalDiscount = (100 - discount) / 100;
-          const totalPrice = price * totalDiscount;
-          return totalPrice;
-        }
-      };
+      const price = offer.price_homeStay;
+      const discount = offer.discount;
+      const totalPrice = price > 0 ? price * ((100 - discount) / 100) : price;
 
-      // console.log(data.offer[index].facilitiesRoom[i].facilitiesName);
+      console.log(totalPrice);
 
       const facilitiesRoom = offer?.facilitiesRoom.map(
         (facility: Facilities_Room, index: number) => {
-          // console.log(facility.facilitiesName);
-          // console.log(facility.offer[index].facilitiesRoom[index].facilitiesName);
-
           return (
             <div key={index} className="flex items-center gap-4">
               <FaCheck />
@@ -296,18 +273,21 @@ const homeStayDetail = () => {
         }
       );
 
-      // console.log(i + "ผญ." + data.offer[i].max_people.adult + "ด" + data.offer[i].max_people.child);
-      // console.log(data.offer[i].max_people.child);
-
       const handleSelectAndProceed = (offer: Offer) => {
         if (item && userInfo && id) {
           // Set payment data
+          const roomTypeIndex =
+            Array.isArray(item.room_type) && item.room_type.length > 0
+              ? i < item.room_type.length
+                ? i
+                : 0
+              : 0;
           const paymentData: PaymentData = {
             homeStayId: id,
             homeStayName: item.name_homeStay,
-            totalPrice: offer.price_homeStay,
-            roomType: item.room_type[i],
-            offer: offer,
+            totalPrice: totalPrice,
+            roomType: item.room_type[roomTypeIndex],
+            offer: item.room_type[roomTypeIndex].offer[i],
             bookingUser: userInfo,
             rating: averageRating,
           };
@@ -318,6 +298,118 @@ const homeStayDetail = () => {
           navigate("/bookingDetail");
         }
       };
+
+      const fetchHomeStayData = async () => {
+        try {
+          const response = await axiosPrivateUser.get(`/homeStay/${id}`);
+          setItem(response.data);
+        } catch (error) {
+          console.error("Error fetching HomeStay data:", error);
+        }
+      };
+
+      const handleDecreaseQuantity = async (i) => {
+        try {
+          // ค้นหาข้อมูล HomeStay
+          const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
+          const roomType = homeStay.data.room_type.find((rt) => rt.offer[i]);
+
+          if (!roomType) {
+            console.log("Room type not found");
+            return;
+          }
+
+          const offer = roomType.offer[i];
+          const newQuantityRoom = offer.quantityRoom - 1;
+
+          if (newQuantityRoom < 1) {
+            console.log("Cannot decrease quantity further");
+            return;
+          }
+
+          // อัปเดตข้อมูล HomeStay ด้วยจำนวนห้องที่ลดลง
+          await axiosPrivateUser.put(`/homeStay/${id}`, {
+            ...homeStay.data,
+            room_type: homeStay.data.room_type.map((rt) =>
+              rt.offer[i]
+                ? {
+                    ...rt,
+                    offer: rt.offer.map((o, index: number) =>
+                      index === i ? { ...o, quantityRoom: newQuantityRoom } : o
+                    ),
+                  }
+                : rt
+            ),
+          });
+
+          // อัปเดตข้อมูลตะกร้าสินค้า
+          const cardOffer = {
+            homeStayId: id,
+            homeStayName: homeStay.data.name_homeStay,
+            totalPrice: totalPrice,
+            roomType: roomType,
+            offer: roomType.offer[i],
+            bookingUser: userInfo,
+            rating: averageRating,
+          };
+
+          await axiosPrivateUser.put(`/homestay/${id}`, cardOffer);
+
+          // เรียกใช้ฟังก์ชัน refetch เพื่อดึงข้อมูลล่าสุด
+          fetchHomeStayData();
+        } catch (error) {
+          console.error("Error updating quantity:", error);
+        }
+      };
+
+      const handleIncreaseQuantity = async (i: number) => {
+        try {
+          const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
+          const roomType = homeStay.data.room_type.find((rt) => rt.offer[i]);
+
+          if (!roomType) {
+            console.log("Room type not found");
+            return;
+          }
+
+          const offer = roomType.offer[i];
+          const newQuantityRoom = offer.quantityRoom + 1;
+
+          // อัปเดตข้อมูล HomeStay ด้วยจำนวนห้องที่ลดลง
+          await axiosPrivateUser.put(`/homeStay/${id}`, {
+            ...homeStay.data,
+            room_type: homeStay.data.room_type.map((rt) =>
+              rt.offer[i]
+                ? {
+                    ...rt,
+                    offer: rt.offer.map((o, index: number) =>
+                      index === i ? { ...o, quantityRoom: newQuantityRoom } : o
+                    ),
+                  }
+                : rt
+            ),
+          });
+
+          const cardOffer = {
+            homeStayId: id,
+            homeStayName: homeStay.data.name_homeStay,
+            totalPrice: totalPrice,
+            roomType: roomType,
+            offer: roomType.offer[i],
+            bookingUser: userInfo,
+            rating: averageRating,
+          };
+
+          await axiosPrivateUser.put(`/homestay/${id}`, cardOffer);
+
+          // เรียกใช้ฟังก์ชัน refetch เพื่อดึงข้อมูลล่าสุด
+          fetchHomeStayData();
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      console.log(offer.quantityRoom);
 
       return (
         <div key={i}>
@@ -356,7 +448,7 @@ const homeStayDetail = () => {
             <div className="w-2/6 flex flex-col justify-end border-r p-2">
               {offer.discount <= 0 ? (
                 <p className="flex justify-end font-bold text-alert text-3xl">
-                  {offer.price_homeStay} บาท
+                  {totalPrice} บาท
                 </p>
               ) : (
                 <div>
@@ -367,7 +459,7 @@ const homeStayDetail = () => {
                     <del>{offer.price_homeStay}</del> บาท
                   </p>
                   <p className="flex justify-end font-bold text-alert text-3xl">
-                    {discount(offer.discount) || 0} บาท
+                    {totalPrice} บาท
                   </p>
                 </div>
               )}
@@ -377,7 +469,29 @@ const homeStayDetail = () => {
                 (ก่อนรวมภาษีและค่าธรรมเนียม)
               </p>
             </div>
-            <div className="w-1/6 flex pl-3">
+            <div className="w-1/6 flex flex-col items-center pl-3">
+              <div className="flex my-2 gap-3">
+                <button
+                  className="text-2xl"
+                  onClick={() => handleDecreaseQuantity(i)}
+                >
+                  {" "}
+                  -{" "}
+                </button>
+                <input
+                  type="number"
+                  placeholder="1"
+                  className="input input-bordered w-[50px] h-[30px] max-w-xs"
+                  value={offer.quantityRoom}
+                />
+                <button
+                  className="text-2xl"
+                  onClick={() => handleIncreaseQuantity(i)}
+                >
+                  {" "}
+                  +{" "}
+                </button>
+              </div>
               <button
                 className=" bg-primaryUser shadow-boxShadow px-8 h-10 rounded-3xl hover:scale-110 
                 transition-transform duration-300 text-white"
@@ -694,7 +808,7 @@ const homeStayDetail = () => {
                 )}{" "}
                 ข้อเสนอ
               </h1>
-              {card}
+              {cardOffer}
             </div>
 
             {/* review */}

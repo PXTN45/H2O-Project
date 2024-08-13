@@ -3,6 +3,11 @@ import { usePaymentContext } from "../AuthContext/paymentContext";
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import {
+  MdOutlineBathroom,
+  MdOutlineBedroomChild,
+  MdOutlineBedroomParent,
+} from "react-icons/md";
 
 export interface Image_room {
   _id: string;
@@ -20,6 +25,8 @@ export interface Offer {
   };
   discount: number;
   facilitiesRoom: Facilities_Room[];
+  roomCount: number;
+  quantityRoom: number;
 }
 export interface RoomType {
   name_type_room: string;
@@ -30,27 +37,8 @@ export interface RoomType {
   image_room: Image_room[];
 }
 
-export interface Location {
-  name_location: string;
-  province_location: string;
-  house_no: string;
-  village?: string;
-  village_no: string;
-  alley?: string;
-  street?: string;
-  district_location: string;
-  subdistrict_location: string;
-  zipcode_location: number;
-  latitude_location: string;
-  longitude_location: string;
-  radius_location: number;
-}
-
-export interface Image {
-  image_upload: string;
-}
-
 export interface Facility {
+  _id: string;
   facilities_name: string;
 }
 
@@ -78,12 +66,35 @@ interface PaymentData {
   rating: number;
 }
 
-const detailBooking = () => {
+export interface Image {
+  _id: string;
+  image: string;
+}
+export interface HomeStay {
+  name_homeStay: string;
+  room_type: RoomType[];
+  max_people: number;
+  detail_homeStay: string;
+  time_checkIn_homeStay: string;
+  time_checkOut_homeStay: string;
+  policy_cancel_homeStay: string;
+  location: Location[];
+  image: Image[];
+  business_user: string[]; // Assuming you use ObjectId as string
+  review_rating_homeStay: number;
+  facilities: Facility[];
+  status_sell_homeStay: boolean;
+  discount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
   const { paymentData } = usePaymentContext();
+  
   if (!paymentData) {
     return <div>No booking details available.</div>;
   }
-  //   console.log(paymentData);
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -109,32 +120,81 @@ const detailBooking = () => {
         stopOnHover={true}
         dynamicHeight={true}
       >
-        {paymentData.roomType.image_room.map((image: Image_room, index: number) => (
-          <div key={image._id}>
-            <img className="rounded-xl" src={image.image} alt={`Image ${index}`} />
-          </div>
-        ))}
+        {paymentData.roomType?.image_room.map(
+          (image: Image_room, index: number) => (
+            <div key={image._id}>
+              <img
+                className="rounded-xl h-[250px] object-cover"
+                src={image.image}
+                alt={`Image ${index}`}
+              />
+            </div>
+          )
+        )}
       </Carousel>
     );
   };
 
   return (
-    <div className="w-1/3 rounded-xl ">
-      <div className="shadow-boxShadow p-5">
+    <div className="w-1/3">
+      <div className="shadow-boxShadow p-5 rounded-xl border-b mb-5">
         <div className="flex justify-between">
           <div className="text-md font-bold mb-2">
             {paymentData.homeStayName}
           </div>
           <div className="flex items-center text-primaryUser">
-            {/* <div className="mx-2">{paymentData?.rating}</div>  */}
-            {renderStars(paymentData?.rating)}
+            {renderStars(paymentData.rating)}
           </div>
         </div>
-        <div className="text-sm">{paymentData.roomType.name_type_room}</div>
-        <div className="text-sm my-5">{createImageCarousel(paymentData)}</div>
+        <div className="text-sm">
+          {paymentData.roomType.name_type_room}
+        </div>
+        <div className="my-5">{createImageCarousel(paymentData)}</div>
+        <div>
+          (x{paymentData.offer.quantityRoom}){" "}
+          {paymentData.roomType.name_type_room}
+        </div>
+        <div className="flex gap-2 items-center">
+          <MdOutlineBathroom className="text-xl" />
+          {paymentData.roomType.bathroom_homeStay} ห้อง
+        </div>
+        {paymentData.roomType.bedroom_homeStay > 1 ? (
+          <div className="border-b pb-5 flex gap-2 items-center">
+            <MdOutlineBedroomParent className="text-xl" />
+            {paymentData.roomType.bedroom_homeStay} เตียง
+          </div>
+        ) : (
+          <div className="border-b pb-5 flex gap-2 items-center">
+            <MdOutlineBedroomChild className="text-xl" />
+            {paymentData.roomType.bedroom_homeStay}
+          </div>
+        )}
+
+        <div className="pt-5">
+          <div className="flex justify-between">
+            <div>ราคาห้องพักรวม</div>
+            <div className="text-xs">
+              <del>
+                {paymentData.offer.price_homeStay.toLocaleString("th-TH", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                })} บาท
+              </del>
+            </div>
+          </div>
+          <div className="flex justify-between">
+            <div className="text-sm">1 ห้อง / 1 คืน</div>
+            <div className="text-alert font-bold text-lg">
+              {totalPrice.toLocaleString("th-TH", {
+                style: "decimal",
+                minimumFractionDigits: 2,
+              })} บาท
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default detailBooking;
+export default DetailBooking;

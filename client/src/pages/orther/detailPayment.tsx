@@ -1,13 +1,18 @@
 // DetailPayment.tsx
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
 import axiosPublic from "../../hook/axiosPublic";
+import DetailBooking from "../../components/detailBooking";
+import { usePaymentContext } from "../../AuthContext/paymentContext";
 
 const DetailPayment: React.FC = () => {
   const location = useLocation();
   const { amount } = location.state || { amount: 0 };
   const [qrCodeUrl, setQrCodeUrl] = useState<string | undefined>(undefined);
+  const { paymentData } = usePaymentContext();
+  if (!paymentData) {
+    return <div>No booking details available.</div>;
+  }
 
   useEffect(() => {
     const generateQR = async () => {
@@ -21,7 +26,7 @@ const DetailPayment: React.FC = () => {
       }
     };
     generateQR();
-  }, [amount]);
+  }, []);
 
   return (
     <div className="container-sm  mx-auto px-60">
@@ -35,46 +40,8 @@ const DetailPayment: React.FC = () => {
             <li className="step">รอการยืนยัน</li>
           </ul>
         </div>
+      <DetailBooking />
 
-        <div className="flex flex-row w-full">
-          <div className="w-2/3 shadow-lg rounded-lg mr-5">
-            <div className="p-2 bg-primaryUser rounded-t-lg"></div>
-            <h1 className="font-bold text-lg m-5">
-              <b>ข้อมูลการจอง</b>
-            </h1>
-
-            <div className="pl-10 pb-10">
-              <div className="mt-3 font-bold text-lg">
-                <h6>เทวัญ จอมเทียน พัทยา (Tevan Jomtien Hotel Pattaya)</h6>
-              </div>
-              <div className="flex mt-3">
-                <div className="flex flex-col gap-5 mr-5">
-                  <h1>ชื่อผู้เข้าพัก : </h1>
-                  <h1>ห้อง : </h1>
-                  <h1>เช็คอิน : </h1>
-                  <h1>เช็คเอ้า : </h1>
-                </div>
-                <div className="flex flex-col gap-5 ">
-                  <h1>Nattaphong Sriphaophan</h1>
-                  <h1>ซูพีเรีย เตียงใหญ่ (Superior Double Room)</h1>
-                  <h1>วันพุธที่ 24 กรกฎาคม 2567</h1>
-                  <h1>วันพฤหัสบดีที่ 25 กรกฎาคม 2567</h1>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="w-1/3 shadow-lg rounded-lg">
-            <div className="p-2 bg-primaryUser rounded-t-lg"></div>
-            <div className="m-5">
-              <h1 className="font-bold text-lg m-5">รายละเอียดการชำระเงิน</h1>
-            </div>
-            <div className="m-5 pl-5">
-              <h1>ยอด {amount} บาท</h1>
-              <h1>กำหนดชำระ</h1>
-            </div>
-          </div>
-        </div>
 
         <div className="shadow-lg m-5 rounded-lg w-full">
           <div className="p-2 bg-primaryUser rounded-t-lg"></div>
