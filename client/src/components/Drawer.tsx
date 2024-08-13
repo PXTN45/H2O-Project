@@ -294,7 +294,7 @@ const Drawer: React.FC = () => {
                     </Link>
                   </div>
                 ) : null}
-                <hr className="h-px my-4 line-darkmode border-0"></hr>
+                <hr className="h-px my-4 menu-SupportDarkMode border-0"></hr>
                 {userInfo?.role === "user" ? (
                   <div>
                     <Link to={"#"}>

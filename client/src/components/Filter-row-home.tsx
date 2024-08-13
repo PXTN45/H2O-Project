@@ -7,8 +7,12 @@ interface Image {
   image_upload: string;
 }
 
-interface Room {
+interface Offer {
   price_homeStay: number;
+}
+
+interface Room {
+  offer: Offer[];
 }
 
 interface Location {
@@ -62,8 +66,8 @@ const Filterpackage: React.FC = () => {
   }, [setLoadPage]);
 
   const getRandomProvinces = (data: Item[], count: number): string[] => {
-    const provinces = Array.from( // จะเปลี่ยน Set กลับมาเป็น Array ที่มีชื่อจังหวัดที่ไม่ซ้ำกัน
-      new Set(data.map((item) => item.location[0].province_location)) // จะทำการลบข้อมูลที่ซ้ำกันออกจากรายการ
+    const provinces = Array.from(
+      new Set(data.map((item) => item.location[0].province_location))
     );
     const shuffledProvinces = provinces.sort(() => 0.5 - Math.random());
     return shuffledProvinces.slice(0, count);
@@ -81,22 +85,19 @@ const Filterpackage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto mt-12">
-      <h1 className="text-2xl font-bold mb-4 my-[2rem] mx-[1.75rem]">
+    <div className="container mx-auto mt-12 px-4">
+      <h1 className="text-2xl font-semibold mb-4">
         Homestays Recommend
       </h1>
-      <div
-        id="butttonSelect-HomeStay"
-        className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]"
-      >
+      <div className="flex gap-4 mb-4 flex-wrap">
         <button
-          id="ทั้งหมด[1]"
+          id="ทั้งหมด[H]"
           onClick={() => filterByProvince("")}
-          className={
+          className={`btn px-4 py-2 rounded-md ${
             isType === ""
-              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-          }
+              ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white"
+              : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white menu-SupportDarkMode"
+          }`}
         >
           ทั้งหมด
         </button>
@@ -105,11 +106,11 @@ const Filterpackage: React.FC = () => {
             id={province}
             key={province}
             onClick={() => filterByProvince(province)}
-            className={
+            className={`btn px-4 py-2 rounded-md ${
               isType === province
-                ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-                : "btn border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-            }
+                ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white"
+                : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white menu-SupportDarkMode"
+            }`}
           >
             {province}
           </button>
@@ -117,9 +118,7 @@ const Filterpackage: React.FC = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredData.slice(0, 4).map((item, index) => (
-          <div key={index} className="w-full">
-            <Card item={item} />
-          </div>
+          <Card key={index} item={item} />
         ))}
       </div>
     </div>

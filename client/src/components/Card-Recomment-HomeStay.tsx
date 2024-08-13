@@ -34,10 +34,6 @@ interface CardProps {
   item: Item;
 }
 
-const seeDetail = (id: string) => {
-  console.log(id);
-};
-
 const Card: React.FC<CardProps> = ({ item }) => {
   const authContext = useContext(AuthContext);
 
@@ -71,8 +67,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
 
   return (
     <div
-      className="max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
-      onClick={() => seeDetail(item._id)}
+      className="card-box max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
     >
       <div onClick={handleCardClick}>
         <img

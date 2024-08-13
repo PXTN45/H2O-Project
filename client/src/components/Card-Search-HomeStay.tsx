@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 interface Image {
@@ -17,7 +18,7 @@ interface MaxPeople {
 interface Offer {
   price_homeStay: number;
   max_people: MaxPeople;
-  roomcount: number;
+  roomCount: number;
 }
 
 interface RoomType {
@@ -29,7 +30,7 @@ interface RoomType {
     adult: number;
     child: number;
   };
-  roomcount: number;
+  roomCount: number;
   offer: Offer[];
 }
 
@@ -51,17 +52,37 @@ interface CardProps {
   numChildren: number;
 }
 
-const seeDetail = (id: string) => {
-  console.log(id);
+const findLowestPrice = (offers: Offer[]) => {
+  if (offers.length === 0) return 0;
+  const lowestPrice = Math.min(...offers.map((offer) => offer.price_homeStay));
+  return lowestPrice;
 };
 
 const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
-  useEffect(() => {
-    const resultData = async () => {
-      console.log(item);
-    };
-    resultData();
-  }, [item]);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+
+  const handlePrev = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (item.image.length) {
+      event.stopPropagation();
+      setCurrentIndex((prevIndex) =>
+        prevIndex === 0 ? item.image.length - 1 : prevIndex - 1
+      );
+    }
+  };
+
+  const handleNext = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (item.image.length) {
+      event.stopPropagation();
+      setCurrentIndex((prevIndex) =>
+        prevIndex === item.image.length - 1 ? 0 : prevIndex + 1
+      );
+    }
+  };
+
+  const navigate = useNavigate();
+  const handleCardClick = () => {
+    navigate(`/homeStayDetail/${item._id}`);
+  };
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
@@ -82,23 +103,29 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
     return stars;
   };
 
-  const calculateRequiredRooms = (offers: Offer[], numAdults: number, numChildren: number) => {
+  const calculateRequiredRooms = (
+    offers: Offer[],
+    numAdults: number,
+    numChildren: number
+  ) => {
     let totalRooms = 0;
-    let remainingAdults = numAdults
-    let remainingChildren = numChildren
+    let remainingAdults = numAdults;
+    let remainingChildren = numChildren;
 
-    // จัดเรียง offer ตามจำนวนห้องที่มากไปน้อย
-    offers.sort((a, b) => b.roomcount - a.roomcount);
+    offers.sort((a, b) => b.roomCount - a.roomCount);
 
     for (const offer of offers) {
-      let availableRooms = offer.roomcount; // จำนวนห้อง
+      let availableRooms = offer.roomCount;
       const maxAdults = offer.max_people.adult;
       const maxChildren = offer.max_people.child;
 
-      while ((remainingAdults > 0 || remainingChildren > 0) && availableRooms > 0) {
+      while (
+        (remainingAdults > 0 || remainingChildren > 0) &&
+        availableRooms > 0
+      ) {
         const adultsInThisRoom = Math.min(remainingAdults, maxAdults);
         const childrenInThisRoom = Math.min(remainingChildren, maxChildren);
-        
+
         if (adultsInThisRoom > 0 || childrenInThisRoom > 0) {
           remainingAdults -= adultsInThisRoom;
           remainingChildren -= childrenInThisRoom;
@@ -116,33 +143,98 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   };
 
   if (!Array.isArray(item.room_type) || item.room_type.length === 0) {
-    return null; // ไม่แสดงการ์ดถ้า item.room_type ไม่มีข้อมูล
+    return null;
   }
 
-  // ดึง offer ทั้งหมดจาก room_type
-  const allOffers = item.room_type.flatMap(room => room.offer);
-
-  // คำนวณจำนวนห้องที่ต้องการตาม offers สำหรับผู้ใหญ่และเด็ก
-  const { totalRooms, remainingAdults, remainingChildren } = calculateRequiredRooms(allOffers, numPeople, numChildren);
+  const allOffers = item.room_type.flatMap((room) => room.offer);
   
+  const { totalRooms, remainingAdults, remainingChildren } =
+    calculateRequiredRooms(allOffers, numPeople, numChildren);
+    
+  const lowestPrice = findLowestPrice(allOffers);
+
   if (remainingAdults > 0 || remainingChildren > 0) {
-    return null; // ไม่แสดงการ์ดถ้าห้องไม่เพียงพอ
+    return null;
   }
 
   return (
-    <div
-      className="flex max-w-full rounded overflow-hidden shadow-boxShadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
-      onClick={() => seeDetail(item._id)}
-    >
-      <div id="image-Homestay" className="w-[25%]">
-        <img
-          id="imageCard-Homestay"
-          src={item.image[0].image_upload}
-          alt="images to cards"
-          className="w-full h-[15rem] object-cover"
-        />
+    <div onClick={handleCardClick} className="card-box flex flex-col xl:flex-row max-w-full rounded overflow-hidden shadow-boxShadow relative my-6 h-full hover:scale-105 transform transition duration-300">
+      <div id="image-Homestay" className="w-full xl:w-[25%]">
+        <div
+          id="default-carousel"
+          className="relative w-full carousel-container"
+          data-carousel="slide"
+        >
+          <div className="relative h-60 overflow-hidden">
+            {item?.image.map((src: Image, index: number) => (
+              <div
+                key={index}
+                className={`duration-700 ease-in-out ${
+                  currentIndex === index ? "block" : "hidden"
+                }`}
+                data-carousel-item
+              >
+                <img
+                  src={src.image_upload}
+                  className="absolute block w-full h-full object-cover"
+                  alt={`Slide ${index + 1}`}
+                />
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none hidden carousel-button"
+            onClick={handlePrev}
+            data-carousel-prev
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+              <svg
+                className="w-4 h-4 rtl:rotate-180"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 6 10"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 1 1 5l4 4"
+                />
+              </svg>
+              <span className="sr-only">Previous</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none hidden carousel-button"
+            onClick={handleNext}
+            data-carousel-next
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+              <svg
+                className="w-4 h-4 rtl:rotate-180"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 6 10"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m1 9 4-4-4-4"
+                />
+              </svg>
+              <span className="sr-only">Next</span>
+            </span>
+          </button>
+        </div>
       </div>
-      <div id="center-card-Homestay" className="w-[50%]">
+      <div id="center-card-Homestay" className="w-full xl:w-[50%]">
         <div id="detailCard-Homestay" className="px-6 py-4">
           <div id="Name-Homestay" className="font-bold text-xl mb-2">
             {truncateText(item.name_homeStay || "", 30)}
@@ -167,18 +259,20 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
           </div>
         </div>
       </div>
-      <div id="right-card" className="w-[25%] bg-whiteSmoke">
-        <div className="flex items-center justify-center mt-5">
-          <span className="mx-1">
-            <div className="w-full">
-              ใช้ห้องทั้งหมด: {totalRooms}
+      <div id="right-card" className="w-full xl:w-[25%] semi-bg">
+        <div className="flex flex-col ">
+          <div className="card-semiBox w-[75%] rounded-br-[10px]">
+            <span className="mx-1">
+              <div className="w-full mx-5">ใช้ห้องทั้งหมด: {totalRooms}</div>
+            </span>
+          </div>
+          <div id="Price-Homestay" className="mt-16 px-6 py-4">
+            <div className="flex flex-col items-end">
+              <span className="mx-1 font-bold text-[10px]">
+                ราคาเริ่มต้น (คืนละ)
+              </span>
+              <span className="mx-1 font-bold text-2xl">THB {lowestPrice}</span>
             </div>
-          </span>
-          <div
-            id="Price-Homestay"
-            className="absolute right-0 font-bold px-6 py-4"
-          >
-            <span className="mx-1">฿</span>
           </div>
         </div>
       </div>

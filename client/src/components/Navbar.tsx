@@ -5,17 +5,20 @@ import { AuthContext } from "../AuthContext/auth.provider";
 import Modal from "./Get-Stared";
 import ModalSelectRoles from "./Modal-SelectRoles";
 import { BsPersonWalking } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   image: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ image }) => {
+  const navigate = useNavigate();
+
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
-  const { thisPage, userInfo, handleLogout } = authContext;
+  const { thisPage, userInfo, handleLogout, setLoadPage } = authContext;
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -27,29 +30,37 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
     (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
   };
 
+  console.log(thisPage);
+
   return (
     <div>
       <nav
         className={
           thisPage === "/"
             ? "bg-white w-full relative"
-            : userInfo && userInfo.role === "user"
+            : userInfo &&
+              userInfo.role === "user" &&
+              thisPage !== "/search/search-result"
             ? "bg-gradient-to-r from-primaryUser to-secondUser w-full relative"
-            : userInfo && userInfo.role === "business"
+            : userInfo &&
+              userInfo.role === "business" &&
+              thisPage !== "/search/search-result"
             ? "bg-gradient-to-r from-primaryBusiness to-secondBusiness w-full relative"
-            : userInfo && userInfo.role === "admin"
+            : userInfo &&
+              userInfo.role === "admin" &&
+              thisPage !== "/search/search-result"
             ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin w-full relative"
-            : "bg-gradient-to-r from-primaryUser to-primaryBusiness w-full relative"
+            : "bg-gradient-to-r from-primaryNoRole to-secondNoRole w-full relative"
         }
       >
         <div
           className={
-            !userInfo && thisPage === "/" || (userInfo && thisPage === "/")
-              ? "relative p-8 h-[700px]"
+            (!userInfo && thisPage === "/") || (userInfo && thisPage === "/")
+              ? "relative p-8 h-full"
               : "relative"
           }
           style={
-            !userInfo && thisPage === "/" || (userInfo && thisPage === "/")
+            (!userInfo && thisPage === "/") || (userInfo && thisPage === "/")
               ? {
                   backgroundImage: `url(${image})`,
                   backgroundSize: "cover",
@@ -72,7 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               </span>
             </Link>
 
-            <div className="hidden md:flex flex-grow items-center justify-center text-lg">
+            <div className="hidden lg:flex flex-grow items-center justify-center text-lg">
               <ul className="font-medium flex space-x-8 rtl:space-x-reverse">
                 <li>
                   <Link to="/home" className="link-style ml-[50px]">
@@ -100,13 +111,26 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
             <button
               className="text-lg font-bold py-2 px-4 rounded"
               onClick={
-                !userInfo
+                !userInfo && thisPage === "/"
                   ? () => {
                       (
                         document.getElementById(
                           "Get-Started"
                         ) as HTMLDialogElement
                       )?.showModal();
+                    }
+                  : !userInfo && thisPage !== "/"
+                  ? () => {
+                      navigate(`/`);
+                      setLoadPage(false);
+                      setTimeout(() => {
+                        (
+                          document.getElementById(
+                            "Get-Started"
+                          ) as HTMLDialogElement
+                        )?.showModal();
+                        setLoadPage(true);
+                      }, 1000);
                     }
                   : toggleDropdown
               }
@@ -116,18 +140,19 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               ) : (
                 <>
                   <div className="relative">
-                    <img
-                      id="avatarButton"
-                      data-dropdown-toggle="userDropdown"
-                      data-dropdown-placement="bottom-start"
-                      className="w-10 h-10 rounded-full cursor-pointer"
-                      src={userInfo.image}
-                      alt="User dropdown"
-                    />
+                    <div className="flex items-center">
+                      <img
+                        id="avatarButton"
+                        className="w-8 h-8 rounded-full cursor-pointer"
+                        src={userInfo.image}
+                        alt="User avatar"
+                      />
+                    </div>
+
                     {isOpen && (
                       <div
                         id="userDropdown"
-                        className="z-10 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44"
+                        className="z-10 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44 card-box"
                       >
                         <div className="px-4 py-3 text-sm">
                           <div>
@@ -195,8 +220,8 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               )}
             </button>
           </div>
-          {!userInfo && thisPage === "/" || (userInfo && thisPage === "/") ? (
-            <div className="flex items-center mt-[100px]">
+          {(!userInfo && thisPage === "/") || (userInfo && thisPage === "/") ? (
+            <div className="flex items-center my-[65px] lg:my-[250px]">
               <Search />
             </div>
           ) : null}

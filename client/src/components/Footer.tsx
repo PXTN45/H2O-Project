@@ -35,7 +35,10 @@ const Footer = () => {
   };
 
   return (
-    <div id="footer" className={`relative w-full h-full ${isDarkMode ? "dark" : ""} `}>
+    <div
+      id="footer"
+      className={`relative mt-32 w-full h-full ${isDarkMode ? "dark" : ""} `}
+    >
       <div
         className={`fixed 
           ${isDarkMode ? "text-white" : "text-dark"}
@@ -45,13 +48,13 @@ const Footer = () => {
         <label
           className={
             isDarkMode
-              ? "swap swap-rotate bg-gradient-to-r from-primaryBusiness to-secondBusiness rounded-full w-14 h-14"
-              : "swap swap-rotate bg-gradient-to-r from-primaryUser to-secondUser rounded-full w-14 h-14"
+              ? "swap swap-rotate bg-gradient-to-r from-gray-800 to-gray-700 rounded-full w-14 h-14"
+              : "swap swap-rotate bg-gradient-to-r from-gray-200 to-gray-100 rounded-full w-14 h-14"
           }
         >
           <input
             type="checkbox"
-            className="theme-controller"
+            className="theme-controller hidden"
             checked={isDarkMode}
             onChange={toggleTheme}
           />
@@ -75,13 +78,19 @@ const Footer = () => {
       </div>
       <footer
         className={
-          userInfo?.role === "user" && thisPage !== "/"
+          userInfo?.role === "user" &&
+          thisPage !== "/" &&
+          thisPage !== "/search/search-result"
             ? "bg-gradient-to-l from-primaryUser to-secondUser mt-10 py-4"
-            : userInfo?.role === "business" && thisPage !== "/"
+            : userInfo?.role === "business" &&
+              thisPage !== "/" &&
+              thisPage !== "/search/search-result"
             ? "bg-gradient-to-l from-primaryBusiness to-secondBusiness mt-10 py-4"
-            : userInfo?.role === "admin" && thisPage !== "/"
+            : userInfo?.role === "admin" &&
+              thisPage !== "/" &&
+              thisPage !== "/search/search-result"
             ? "bg-gradient-to-l from-primaryAdmin to-secondAdmin mt-10 py-4"
-            : "bg-gradient-to-r from-primaryUser to-primaryBusiness mt-10 py-4"
+            : "bg-gradient-to-r from-primaryNoRole to-secondNoRole mt-10 py-4"
         }
       >
         <div className="container mx-auto flex justify-center items-center">

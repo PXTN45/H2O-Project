@@ -58,61 +58,57 @@ const Filterpackage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto my-20">
-      <h1 className="text-2xl font-bold mb-4 my-[2rem] mx-[1.75rem]">
-        Packages Recommend
-      </h1>
-      <div id="butttonSelect-Package" className="flex gap-4 mb-4 flex-wrap my-[2rem] mx-[1.75rem]">
+    <div className="container mx-auto my-12 px-4">
+      <h1 className="text-2xl font-semibold mb-6">Recommended Packages</h1>
+      <div className="flex gap-4 mb-6 flex-wrap">
         <button
-          id="ทั้งหมด[2]"
+          id="ทั้งหมด[P]"
           onClick={() => filterByType("")}
-          className={
+          className={`btn px-4 py-2 rounded-md ${
             isType === ""
-              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn border bg-white border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-          }
+              ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white"
+              : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white menu-SupportDarkMode"
+          }`}
         >
           ทั้งหมด
         </button>
         <button
           id="การท่องเที่ยวธรรมชาติ"
           onClick={() => filterByType("การท่องเที่ยวธรรมชาติ")}
-          className={
+          className={`btn px-4 py-2 rounded-md ${
             isType === "การท่องเที่ยวธรรมชาติ"
-              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn border bg-white border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-          }
+              ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white"
+              : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white menu-SupportDarkMode"
+          }`}
         >
           ธรรมชาติ
         </button>
         <button
-          id="การท่องเที่ยวทางน้ำ"
+          id="ทางน้ำ"
           onClick={() => filterByType("การท่องเที่ยวทางน้ำ")}
-          className={
+          className={`btn px-4 py-2 rounded-md ${
             isType === "การท่องเที่ยวทางน้ำ"
-              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn border bg-white border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-          }
+              ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white"
+              : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white menu-SupportDarkMode"
+          }`}
         >
           ทางน้ำ
         </button>
         <button
-          id="การท่องเที่ยวเชิงวัฒนธรรม"
+          id="วัฒนธรรม"
           onClick={() => filterByType("การท่องเที่ยวเชิงวัฒนธรรม")}
-          className={
+          className={`btn px-4 py-2 rounded-md ${
             isType === "การท่องเที่ยวเชิงวัฒนธรรม"
-              ? "btn border border-transparent bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white"
-              : "btn border bg-white border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white"
-          }
+              ? "bg-gradient-to-r from-blue-500 to-teal-400 text-white"
+              : "border border-blue-500 text-blue-500 hover:bg-gradient-to-r from-blue-500 to-teal-400 hover:text-white menu-SupportDarkMode"
+          }`}
         >
-          เชิงวัฒนธรรม
+          วัฒนธรรม
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredData.slice(0, 4).map((item, index) => (
-          <div key={index} className="w-full">
-            <Card item={item} />
-          </div>
+        {filteredData.slice(0, 4).map((item) => (
+          <Card key={item._id} item={item} />
         ))}
       </div>
     </div>

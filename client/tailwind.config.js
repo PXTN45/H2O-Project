@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import daisyui from "daisyui";
+import flowbite from "flowbite/plugin"
 export default {
   content: [
     "./index.html",
@@ -8,23 +9,22 @@ export default {
   ],
   theme: {
     colors: {
-      primaryUser: "#DC9832",
-      primaryBusiness: "#4B99FA",
-      primaryAdmin: "#29AB87",
-      secondUser: "#E1BF0E",
-      secondBusiness: "#72B1FF",
-      secondAdmin: "#C7EA46",
+      primaryUser: "#D4A85D",
+      primaryBusiness: "#7AA6E5",
+      primaryAdmin: "#65C4A3",
+      secondUser: "#EDD574",
+      secondBusiness: "#8A7BE5",
+      secondAdmin: "#CFEA7A",
+      primaryNoRole: '#3B82F6', // กำหนดสีหลักที่ไม่มีบทบาท
+      secondNoRole: '#4FD1C5', // กำหนดสีรองที่ไม่มีบทบาท
       alert: "#dc143c ",
       smoke: "#848884  ",
       white: "#FFFFFF",
       whiteSmoke: "#f1f1f1",
       dark: "#000",
-    },
-    extend: {
-      boxShadow: {
-        boxShadow: "0 0px 8px -3px rgba(0, 0, 0, 0.3)",
-      },
+      cardBackgroudDaekMode: "#2C2C2C ",
+      borderedDarkMode: "#3D3D3D ",
     },
   },
-  plugins: [daisyui, require('flowbite/plugin')],
+  plugins: [daisyui, flowbite],
 };
