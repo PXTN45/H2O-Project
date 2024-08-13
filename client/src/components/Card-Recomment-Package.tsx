@@ -20,10 +20,6 @@ interface CardProps {
   item: Item;
 }
 
-const seeDetail = (id: string) => {
-  console.log(id);
-};
-
 const Card: React.FC<CardProps> = ({ item }) => {
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
@@ -45,17 +41,15 @@ const Card: React.FC<CardProps> = ({ item }) => {
   };
 
   const navigate = useNavigate();
-  const handleCardClick = () => {
-    navigate(`/packageDetail/${item._id}`);
-  }
+  const seeDetail = (id: string) => {
+    navigate(`/packageDetail/${id}`);
+  };
+
   return (
     <div
       className="card-box max-w-full rounded overflow-hidden relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
       onClick={() => seeDetail(item._id)}
     >
-      <div onClick={handleCardClick}>
-
-      
       <img
         id="imageCard-Package"
         src={item.image[0].image_upload}
@@ -71,16 +65,21 @@ const Card: React.FC<CardProps> = ({ item }) => {
         </p>
       </div>
       <div className="flex items-center justify-center mt-5">
-        <div id="Stars-Package" className="absolute left-0 font-bold px-6 py-4 text-primaryUser">
+        <div
+          id="Stars-Package"
+          className="absolute left-0 font-bold px-6 py-4 text-primaryUser"
+        >
           <div className="flex">
             {renderStars(item.review_rating_package || 0)}
           </div>
         </div>
-        <div id="Price-Package" className="absolute right-0 font-bold px-6 py-4">
+        <div
+          id="Price-Package"
+          className="absolute right-0 font-bold px-6 py-4"
+        >
           <span className="mx-1">฿</span>
           {item.price_package}
         </div>
-      </div>
       </div>
     </div>
   );
