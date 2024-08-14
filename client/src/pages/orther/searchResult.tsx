@@ -624,7 +624,11 @@ const SearchResult: React.FC = () => {
                 <>
                   {sortData(dataPackage).map((item, index) => (
                     <div key={index} className="w-full">
-                      <CardPackage item={item} />
+                      <CardPackage
+                        item={item}
+                        numPeople={numPeople}
+                        numChildren={numChildren}
+                       />
                     </div>
                   ))}
                 </>
