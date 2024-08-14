@@ -25,6 +25,9 @@ export default {
       cardBackgroudDaekMode: "#2C2C2C ",
       borderedDarkMode: "#3D3D3D ",
     },
+    boxShadow: {
+      'boxShadow': '0 0px 3px 0px rgba(0, 0, 0, 0.3)',
+    },
   },
   plugins: [daisyui, flowbite],
 };

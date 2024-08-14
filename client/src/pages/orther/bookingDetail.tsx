@@ -7,6 +7,7 @@ export interface Image_room {
   _id: string;
   image: string;
 }
+
 export interface Facilities_Room {
   facilitiesName: string;
 }
@@ -22,6 +23,7 @@ export interface Offer {
   roomCount: number;
   quantityRoom: number;
 }
+
 export interface RoomType {
   name_type_room: string;
   bathroom_homeStay: number;
@@ -30,6 +32,7 @@ export interface RoomType {
   offer: Offer[];
   image_room: Image_room[];
 }
+
 interface User {
   _id?: string;
   name?: string;
@@ -43,6 +46,7 @@ interface User {
   birthday: Date;
   role: string;
 }
+
 interface PaymentData {
   homeStayId: string;
   homeStayName: string;
@@ -52,6 +56,7 @@ interface PaymentData {
   bookingUser: User;
   rating: number;
 }
+
 const BookingDetail: React.FC = () => {
   const { paymentData, setPaymentData } = usePaymentContext();
   const [totalFee, setTotalFee] = useState<number>(0);
@@ -60,33 +65,26 @@ const BookingDetail: React.FC = () => {
   const [feeAndTax, setFeeAndTax] = useState<number>(0);
   const navigate = useNavigate();
 
-  if (!paymentData) {
-    return <div>No booking details available.</div>;
-  }
+  console.log(paymentData);
+  
 
   useEffect(() => {
-    if (paymentData.offer) {
+    if (paymentData) {
       const price = paymentData.totalPrice * paymentData.offer.quantityRoom;
       const taxRate = 0.07;
       const feeRate = 0.1;
 
-      const calculateTaxesAndFees = (price: number) => {
-        const fee = price * feeRate;
-        const tax = (price + fee) * taxRate;
-        const feeAndTax = fee + tax;
-        const total = price + feeAndTax;
+      const fee = price * feeRate;
+      const tax = (price + fee) * taxRate;
+      const feeAndTax = fee + tax;
+      const total = price + feeAndTax;
 
-        setTotalFee(fee);
-        setTotalTax(tax);
-        setFeeAndTax(feeAndTax);
-        setTotalPrice(total);
-      };
-
-      calculateTaxesAndFees(price);
+      setTotalFee(fee);
+      setTotalTax(tax);
+      setFeeAndTax(feeAndTax);
+      setTotalPrice(total);
     }
-  }, [paymentData.totalPrice, paymentData.offer?.quantityRoom]);
-
-  console.log(totalPrice);
+  }, [paymentData]);
 
   const handleToPayment = () => {
     if (paymentData) {
@@ -106,6 +104,10 @@ const BookingDetail: React.FC = () => {
       navigate("/detailPayment");
     }
   };
+
+  if (!paymentData) {
+    return <div>No booking details available.</div>;
+  }
 
   return (
     <div className="container-sm mx-10 md:mx-40">
@@ -137,7 +139,7 @@ const BookingDetail: React.FC = () => {
                   <div>ราคาห้องพัก</div>
                   <div>
                     {" "}
-                    {paymentData.totalPrice.toLocaleString("th-TH", {
+                    {(paymentData.totalPrice * paymentData.offer.quantityRoom).toLocaleString("th-TH", {
                       style: "decimal",
                       minimumFractionDigits: 2,
                     })}{" "}
@@ -170,7 +172,7 @@ const BookingDetail: React.FC = () => {
                 <button
                   className="border w-full my-5 p-3 rounded-lg bg-primaryUser text-white font-bold text-xl hover:scale-105 
                 transition-transform duration-300"
-                  onClick={() => handleToPayment()}
+                  onClick={handleToPayment}
                 >
                   ชำระเงิน
                 </button>

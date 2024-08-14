@@ -22,7 +22,9 @@ import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { FaChildReaching } from "react-icons/fa6";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { IoMdTime } from "react-icons/io";
+import { MdOutlinePolicy } from "react-icons/md";
+import { number } from "prop-types";
 export interface Image_room {
   _id: string;
   image: string;
@@ -113,8 +115,6 @@ interface Review {
 
 const homeStayDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const authContext = useContext(AuthContext);
-  const { setPaymentData } = usePaymentContext();
   const navigate = useNavigate();
   const [item, setItem] = useState<HomeStay | undefined>();
   const [review, setReview] = useState<Review[]>([]);
@@ -122,7 +122,9 @@ const homeStayDetail = () => {
   const [averageRating, setAverageRating] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isLoading, setLoadPage] = useState<boolean>(false);
-
+  const authContext = useContext(AuthContext);
+  const { setPaymentData } = usePaymentContext();
+  
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
@@ -702,6 +704,27 @@ const homeStayDetail = () => {
       </div>
     );
   });
+  console.log(review);
+
+  const calculatePercentages = (review) => {
+    const totalReviews = review.length;
+    const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
+  
+    // นับจำนวนรีวิวสำหรับแต่ละดาว
+    review.forEach(review => {
+      if (review.rating >= 1 && review.rating <= 5) {
+        ratingCounts[review.rating - 1]++;
+      }
+    });
+  
+    // คำนวณเปอร์เซ็นต์
+    const percentages = ratingCounts.map(count => (count / totalReviews) * 100);
+  
+    return percentages;
+  };
+  
+  const percentages = calculatePercentages(review);
+  
   return (
     <div>
       {item ? (
@@ -810,6 +833,30 @@ const homeStayDetail = () => {
               </h1>
               {cardOffer}
             </div>
+            {/* policy */}
+            <div id="policy" className=" my-10">
+              <div className="text-2xl font-bold my-5">
+                นโยบายที่พักและข้อมูลทั่วไปของ - {item.name_homeStay}
+              </div>
+              <div className="w-full rounded-lg shadow-boxShadow p-5">
+                <div>
+                  <div className="flex items-center gap-2 text-lg font-bold">
+                    <IoMdTime /> เช็คอิน/เช็คเอ้า
+                  </div>
+                  <div className="ml-10">
+                    <div>เช็คอินตั้งแต่ : {item.time_checkIn_homeStay} น.</div>
+                    <div>เช็คเอ้าก่อน : {item.time_checkOut_homeStay} น.</div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 text-lg font-bold mt-5">
+                    <MdOutlinePolicy />
+                    นโยบาย
+                  </div>
+                  <div className="ml-10">{item.policy_cancel_homeStay}</div>
+                </div>
+              </div>
+            </div>
 
             {/* review */}
             <div>
@@ -832,85 +879,18 @@ const homeStayDetail = () => {
                       {averageRating}
                     </div>
                     <div className="flex flex-row items-center gap-10">
-                      <div className="flex flex-col-reverse ">
-                        <div>
-                          <div>ต้องปรับปรุง</div>
-                          <progress
-                            className="progress progress-info w-[200px] md:w-[600px] h-5"
-                            value={10}
-                            max="100"
-                          ></progress>
-                        </div>
-                        <div>
-                          <div>ปานกลาง</div>
-                          <progress
-                            className="progress progress-info w-[200px] md:w-[600px] h-5"
-                            value="20"
-                            max="100"
-                          ></progress>
-                        </div>
-                        <div>
-                          <div>ดี</div>
-                          <progress
-                            className="progress progress-info w-[200px] md:w-[600px] h-5"
-                            value="40"
-                            max="100"
-                          ></progress>
-                        </div>
-                        <div>
-                          <div>ดีมาก</div>
-                          <progress
-                            className="progress progress-info w-[200px] md:w-[600px] h-5"
-                            value="60"
-                            max="100"
-                          ></progress>
-                        </div>
-                        <div>
-                          <div>ดีเยี่ยม</div>
-                          <progress
-                            className="progress progress-info w-[200px] md:w-[600px] h-5"
-                            value="80"
-                            max="100"
-                          ></progress>
-                        </div>
+                      <div className="flex flex-col-reverse">
+                        {percentages.map((percentage, index) => (
+                          <div key={index}>
+                            <div>{`${index + 1} ดาว`}</div>
+                            <progress
+                              className="progress progress-info w-[200px] md:w-[600px] h-5"
+                              value={percentage}
+                              max="100"
+                            ></progress>
+                          </div>
+                        ))}
                       </div>
-                      {/* <div className="flex flex-col gap-5  text-xl text-primaryUser">
-                        <p className="flex gap-3 ">
-                          <FaStar />
-                          <FaStar />
-                          <FaStar />
-                          <FaStar />
-                          <FaStar />
-                        </p>
-                        <p className="flex gap-3">
-                          <FaStar />
-                          <FaStar />
-                          <FaStar />
-                          <FaStar />
-                          <FaRegStar />
-                        </p>
-                        <p className="flex gap-3">
-                          <FaStar />
-                          <FaStar />
-                          <FaStar />
-                          <FaRegStar />
-                          <FaRegStar />
-                        </p>
-                        <p className="flex gap-3">
-                          <FaStar />
-                          <FaStar />
-                          <FaRegStar />
-                          <FaRegStar />
-                          <FaRegStar />
-                        </p>
-                        <p className="flex gap-3">
-                          <FaStar />
-                          <FaRegStar />
-                          <FaRegStar />
-                          <FaRegStar />
-                          <FaRegStar />
-                        </p>
-                      </div> */}
                     </div>
                   </div>
                 </div>

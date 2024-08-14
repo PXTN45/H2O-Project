@@ -91,10 +91,6 @@ export interface HomeStay {
 
 const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
   const { paymentData } = usePaymentContext();
-  
-  if (!paymentData) {
-    return <div>No booking details available.</div>;
-  }
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -135,6 +131,10 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
     );
   };
 
+  if (!paymentData) {
+    return <div>No booking details available.</div>;
+  }
+
   return (
     <div className="w-1/3">
       <div className="shadow-boxShadow p-5 rounded-xl border-b mb-5">
@@ -146,10 +146,23 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
             {renderStars(paymentData.rating)}
           </div>
         </div>
-        <div className="text-sm">
-          {paymentData.roomType.name_type_room}
-        </div>
+        <div className="text-sm">{paymentData.roomType.name_type_room}</div>
         <div className="my-5">{createImageCarousel(paymentData)}</div>
+        <div className="flex justify-between items-center my-4 font-light">
+          <div className="shadow-boxShadow w-2/5 p-3 rounded-xl flex flex-col items-center text-sm">
+            <div>เช็คอิน</div>
+            <div>14/08/2567</div>
+            <div>ตั้งแต่ : 14.00 </div>
+          </div>
+          <div className="w-1/5 flex justify-center border-b">
+            <div className="text-sm"> 1 คืน</div>
+          </div>
+          <div className="shadow-boxShadow w-2/5 p-3 rounded-xl flex flex-col items-center text-sm">
+            <div>เช็คเอ้า</div>
+            <div>15/08/2567</div>
+            <div>ก่อน : 12.0</div>
+          </div>
+        </div>
         <div>
           (x{paymentData.offer.quantityRoom}){" "}
           {paymentData.roomType.name_type_room}
@@ -175,10 +188,14 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
             <div>ราคาห้องพักรวม</div>
             <div className="text-xs">
               <del>
-                {paymentData.offer.price_homeStay.toLocaleString("th-TH", {
+                {(
+                  paymentData.offer.price_homeStay *
+                  paymentData.offer.quantityRoom
+                ).toLocaleString("th-TH", {
                   style: "decimal",
                   minimumFractionDigits: 2,
-                })} บาท
+                })}{" "}
+                บาท
               </del>
             </div>
           </div>
@@ -188,7 +205,8 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
               {totalPrice.toLocaleString("th-TH", {
                 style: "decimal",
                 minimumFractionDigits: 2,
-              })} บาท
+              })}{" "}
+              บาท
             </div>
           </div>
         </div>
