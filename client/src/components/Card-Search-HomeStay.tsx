@@ -1,13 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import {
+  FaStar,
+  FaStarHalfAlt,
+  FaRegStar,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 
 interface Image {
   image_upload: string;
 }
 
 interface Location {
+  name_location: string;
   province_location: string;
+  house_no?: string;
+  village?: string;
+  village_no?: string;
+  alley?: string;
+  street?: string;
+  district_location?: string;
+  subdistrict_location?: string;
+  zipcode_location?: number;
 }
 
 interface MaxPeople {
@@ -61,7 +75,9 @@ const findLowestPrice = (offers: Offer[]) => {
 const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
-  const handlePrev = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handlePrev = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     if (item.image.length) {
       event.stopPropagation();
       setCurrentIndex((prevIndex) =>
@@ -70,7 +86,9 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
     }
   };
 
-  const handleNext = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleNext = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     if (item.image.length) {
       event.stopPropagation();
       setCurrentIndex((prevIndex) =>
@@ -147,9 +165,10 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   }
 
   const allOffers = item.room_type.flatMap((room) => room.offer);
-  
-  const { totalRooms, remainingAdults, remainingChildren } = calculateRequiredRooms(allOffers, numPeople, numChildren);
-    
+
+  const { totalRooms, remainingAdults, remainingChildren } =
+    calculateRequiredRooms(allOffers, numPeople, numChildren);
+
   const lowestPrice = findLowestPrice(allOffers);
 
   if (remainingAdults > 0 || remainingChildren > 0) {
@@ -157,7 +176,10 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
   }
 
   return (
-    <div onClick={handleCardClick} className="card-box flex flex-col xl:flex-row max-w-full rounded overflow-hidden shadow-boxShadow relative my-6 h-full hover:scale-105 transform transition duration-300">
+    <div
+      onClick={handleCardClick}
+      className="card-box flex flex-col xl:flex-row max-w-full rounded overflow-hidden shadow-boxShadow relative my-6 h-full hover:scale-105 transform transition duration-300"
+    >
       <div id="image-Homestay" className="w-full xl:w-[25%]">
         <div
           id="default-carousel"
@@ -244,10 +266,22 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
             </p>
           </div>
           <div className="mt-3">
-            <p id="Location-Homestay" className="text-base">
-              {item.location[0].province_location || ""}
-            </p>
+            {item.location.map((loc, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <FaMapMarkerAlt className="text-red-500 mr-2" />
+                <p className="text-base">
+                  {loc.house_no ? `${loc.house_no}` : ""}
+                  {loc.subdistrict_location
+                    ? ` ต.${loc.subdistrict_location}`
+                    : ""}
+                  {loc.district_location ? ` อ.${loc.district_location}` : ""}
+                  {loc.province_location ? ` จ.${loc.province_location}` : ""}
+                  {loc.zipcode_location ? ` ${loc.zipcode_location}` : ""}
+                </p>
+              </div>
+            ))}
           </div>
+
           <div
             id="Stars-Homestay"
             className="mt-3 font-bold py-4 text-primaryUser"

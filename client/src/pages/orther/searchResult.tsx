@@ -21,8 +21,17 @@ interface Image {
   image_upload: string;
 }
 interface Location {
+  name_location: string;
   province_location: string;
+  house_no?: string;
+  village?: string;
+  village_no?: string;
+  alley?: string;
+  street?: string;
+  district_location?: string;
+  subdistrict_location?: string;
   latitude_location: string;
+  zipcode_location?: number;
 }
 
 interface MaxPeople {
@@ -32,6 +41,7 @@ interface MaxPeople {
 
 interface Offer {
   price_homeStay: number;
+  price_package: number;
   max_people: MaxPeople;
   roomCount: number;
 }
@@ -49,11 +59,16 @@ interface RoomType {
   offer: Offer[];
 }
 
+interface Homestay {
+  _id: string;
+}
+
 interface Item {
   _id: string;
   image: Image[];
   room_type: RoomType[];
   location: Location[];
+  homestay: Homestay[];
   name_package?: string;
   name_homeStay?: string;
   price_package?: number;
@@ -61,6 +76,10 @@ interface Item {
   type_homestay?: string;
   max_people?: number;
   review_rating_homeStay?: number;
+  review_rating_package?: number;
+  isChildren: boolean;
+  isFood: boolean;
+  time_start_package: Date;
 }
 
 interface MapData {
@@ -117,6 +136,8 @@ const SearchResult: React.FC = () => {
     dataHomeStaysForPriceFilter,
     setDataHomeStaysdataHomeStaysForPriceFilter,
   ] = useState<Item[]>([]);
+  const [dataPackageForPriceFilter, setDataPackagedataHomeStaysForPriceFilter] =
+    useState<Item[]>([]);
   const [dataPackage, setDataPackage] = useState<Item[]>([]);
   const [homeStayCount, setHomeStayCount] = useState<number>(0);
   const [packageCount, setPackageCount] = useState<number>(0);
@@ -125,6 +146,7 @@ const SearchResult: React.FC = () => {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
+  console.log(dataPackageForPriceFilter);
 
   //Filter Price
   useEffect(() => {
@@ -137,7 +159,7 @@ const SearchResult: React.FC = () => {
         return offers.find((offer) => offer.price_homeStay === minPrice);
       });
 
-      const filteredData = minPrices.filter((offer) => {
+      const filteredDataHomestays = minPrices.filter((offer) => {
         if (offer === undefined || offer.price_homeStay === undefined) {
           return false;
         }
@@ -150,11 +172,36 @@ const SearchResult: React.FC = () => {
         );
       });
 
-      const validData = filteredData.filter((item) => item !== undefined);
+      const filteredDataPackage = dataPackage.filter((offer) => {
+        if (offer === undefined || offer.price_package === undefined) {
+          return false;
+        }
 
-      const sortedData = validData.sort((a, b) => {
-        const priceA = a.price_homeStay ?? 0;
-        const priceB = b.price_homeStay ?? 0;
+        const startPrice = drawerData?.drawerPrice?.startPrice ?? 0;
+        const endPrice = drawerData?.drawerPrice?.endPrice ?? Number.MAX_VALUE;
+
+        return (
+          offer.price_package > startPrice && offer.price_package <= endPrice
+        );
+      });
+
+      const validDataHomestays = filteredDataHomestays.filter(
+        (item) => item !== undefined
+      );
+      const validDataPackage = filteredDataPackage.filter(
+        (item) => item !== undefined
+      );
+
+      const sortedDataHomestays = validDataHomestays.sort((a, b) => {
+        const priceA = a.price_homeStay ?? Infinity;
+        const priceB = b.price_homeStay ?? Infinity;
+
+        return priceA - priceB;
+      });
+
+      const sortedDataPackage = validDataPackage.sort((a, b) => {
+        const priceA = a.price_package ?? Infinity;
+        const priceB = b.price_package ?? Infinity;
 
         return priceA - priceB;
       });
@@ -165,7 +212,7 @@ const SearchResult: React.FC = () => {
             (roomType) => roomType.offer
           );
           const filteredOffers = offers.filter((offer) =>
-            sortedData.includes(offer)
+            sortedDataHomestays.includes(offer)
           );
           if (filteredOffers.length > 0) {
             return {
@@ -183,10 +230,12 @@ const SearchResult: React.FC = () => {
         .filter((location) => location !== null);
 
       setDataHomeStaysdataHomeStaysForPriceFilter(formattedData);
+      setDataPackagedataHomeStaysForPriceFilter(sortedDataPackage);
     } else {
-      return;
+      setDataHomeStaysdataHomeStaysForPriceFilter([]);
+      setDataPackagedataHomeStaysForPriceFilter([]);
     }
-  }, [drawerData]);
+  }, [drawerData, dataHomeStays, dataPackage]);
 
   //Set Start Loads null in page
   useEffect(() => {
@@ -378,41 +427,52 @@ const SearchResult: React.FC = () => {
     switch (sortOption) {
       case "เรียงตามราคาสูงไปน้อย":
         return sortedData.sort((a, b) => {
-          const offersA = a.room_type[0].offer || [];
-          const offersB = b.room_type[0].offer || [];
-
-          const maxPriceA = offersA.length
-            ? Math.min(...offersA.map((o) => o.price_homeStay))
-            : 0;
-          const maxPriceB = offersB.length
-            ? Math.min(...offersB.map((o) => o.price_homeStay))
-            : 0;
-
-          return maxPriceB - maxPriceA;
-        });
-      case "เรียงตามราคาต่ำไปสูง":
-        return sortedData.sort((a, b) => {
-          const offersA = a.room_type[0].offer || [];
-          const offersB = b.room_type[0].offer || [];
+          const offersA = a.room_type?.[0]?.offer || [];
+          const offersB = b.room_type?.[0]?.offer || [];
 
           const minPriceA = offersA.length
             ? Math.min(...offersA.map((o) => o.price_homeStay))
-            : 0;
+            : Infinity;
+
           const minPriceB = offersB.length
             ? Math.min(...offersB.map((o) => o.price_homeStay))
-            : 0;
+            : Infinity;
 
-          return minPriceA - minPriceB;
+          const packagePriceA = a.price_package ?? Infinity;
+          const packagePriceB = b.price_package ?? Infinity;
+
+          return minPriceB - minPriceA || packagePriceB - packagePriceA;
         });
+      case "เรียงตามราคาน้อยไปสูง":
+        return sortedData.sort((a, b) => {
+          const offersA = a.room_type?.[0]?.offer || [];
+          const offersB = b.room_type?.[0]?.offer || [];
+
+          const minPriceA = offersA.length
+            ? Math.min(...offersA.map((o) => o.price_homeStay))
+            : Infinity;
+
+          const minPriceB = offersB.length
+            ? Math.min(...offersB.map((o) => o.price_homeStay))
+            : Infinity;
+
+          const packagePriceA = a.price_package ?? Infinity;
+          const packagePriceB = b.price_package ?? Infinity;
+
+          return minPriceA - minPriceB || packagePriceA - packagePriceB;
+        });
+
       case "เรียงตามดาวสูงไปน้อย":
         return sortedData.sort(
           (a, b) =>
-            (b.review_rating_homeStay ?? 0) - (a.review_rating_homeStay ?? 0)
+            (b.review_rating_homeStay ?? b.review_rating_package ?? 0) -
+            (a.review_rating_homeStay ?? a.review_rating_package ?? 0)
         );
       case "เรียงตามดาวน้อยไปสูง":
         return sortedData.sort(
           (a, b) =>
-            (a.review_rating_homeStay ?? 0) - (b.review_rating_homeStay ?? 0)
+            (a.review_rating_homeStay ?? a.review_rating_package ?? 0) -
+            (b.review_rating_homeStay ?? b.review_rating_package ?? 0)
         );
       default:
         return data;
@@ -622,15 +682,35 @@ const SearchResult: React.FC = () => {
             <div className="w-full">
               {dataPackage.length > 0 ? (
                 <>
-                  {sortData(dataPackage).map((item, index) => (
-                    <div key={index} className="w-full">
-                      <CardPackage
-                        item={item}
-                        numPeople={numPeople}
-                        numChildren={numChildren}
-                       />
-                    </div>
-                  ))}
+                  {(drawerData?.drawerPrice?.endPrice ?? 0) > 0 ? (
+                    <>
+                      {sortData(dataPackageForPriceFilter).map(
+                        (item, index) => (
+                          <div key={index} className="w-full">
+                            <CardPackage
+                              item={item}
+                              numPeople={numPeople}
+                              numChildren={numChildren}
+                              dateRange={dateRange}
+                            />
+                          </div>
+                        )
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {sortData(dataPackage).map((item, index) => (
+                        <div key={index} className="w-full">
+                          <CardPackage
+                            item={item}
+                            numPeople={numPeople}
+                            numChildren={numChildren}
+                            dateRange={dateRange}
+                          />
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </>
               ) : (
                 <div

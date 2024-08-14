@@ -30,8 +30,6 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
     (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
   };
 
-  console.log(thisPage);
-
   return (
     <div>
       <nav

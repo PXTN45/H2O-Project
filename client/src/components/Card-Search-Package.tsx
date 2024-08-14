@@ -1,34 +1,65 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import {
+  FaStar,
+  FaStarHalfAlt,
+  FaRegStar,
+  FaChild,
+  FaBed,
+  FaUtensils,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 
 interface Image {
   image_upload: string;
 }
 
 interface Location {
+  name_location: string;
   province_location: string;
+  house_no?: string;
+  village?: string;
+  village_no?: string;
+  alley?: string;
+  street?: string;
+  district_location?: string;
+  subdistrict_location?: string;
+  zipcode_location?: number;
+}
+
+interface Homestay {
+  _id: string;
 }
 
 interface Item {
   _id: string;
   image: Image[];
   location: Location[];
+  homestay: Homestay[];
   name_package?: string;
   detail_package?: string;
   type_package?: string;
   price_package?: number;
   review_rating_package?: number;
   max_people?: number;
+  isChildren: boolean;
+  isFood: boolean;
+  time_start_package: Date;
 }
 
 interface CardProps {
   item: Item;
   numPeople: number;
   numChildren: number;
+  dateRange: Date[];
 }
 
-const Card: React.FC<CardProps> = ({ item , numPeople , numChildren }) => {
+const Card: React.FC<CardProps> = ({
+  item,
+  numPeople,
+  numChildren,
+  dateRange,
+}) => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
   const handlePrev = (
@@ -79,45 +110,62 @@ const Card: React.FC<CardProps> = ({ item , numPeople , numChildren }) => {
 
   const calculateRequiredTicket = (
     items: Item[],
-    numAdults: number
+    numAdults: number,
+    numChildren: number
   ) => {
     let remainingAdults = numAdults;
-  
+    let remainingChildren = numChildren;
+    let requiredTickets = 0;
+
     for (const item of items) {
       let availableTicket = item.max_people ?? 0;
       while (remainingAdults > 0 && availableTicket > 0) {
-        const adultsInThisTicket = Math.min(remainingAdults, availableTicket);
-        remainingAdults -= adultsInThisTicket;
-        availableTicket -= adultsInThisTicket;      
+        const adultsInThisTicketAdults = Math.min(
+          remainingAdults,
+          availableTicket
+        );
+        const adultsInThisTicketChildren = Math.min(
+          remainingChildren,
+          availableTicket
+        );
+        remainingAdults -= adultsInThisTicketAdults;
+        remainingChildren -= adultsInThisTicketChildren;
+        availableTicket -= adultsInThisTicketAdults;
+        requiredTickets += adultsInThisTicketAdults;
       }
-  
-      if (remainingAdults <= 0) break;
+
+      if (remainingAdults <= 0 || remainingChildren <= 0) break;
     }
-  
-    return { remainingAdults };
+
+    if (numChildren > numAdults) {
+      requiredTickets += numChildren - numAdults;
+    }
+
+    return { remainingAdults, remainingChildren, requiredTickets };
   };
-  
-  
 
-  if (item.max_people === 0) {
+  const { remainingAdults, remainingChildren, requiredTickets } =
+    calculateRequiredTicket([item], numPeople, numChildren);
+
+  const startDate = new Date(item.time_start_package);
+  const isWithinDateRange =
+    startDate >= dateRange[0] && startDate <= dateRange[1];
+
+  if (
+    remainingAdults > 0 ||
+    remainingChildren > 0 ||
+    !isWithinDateRange ||
+    (!item.isChildren && numChildren > 0)
+  ) {
     return null;
   }
-  
-  const { remainingAdults } = calculateRequiredTicket([item], numPeople);
-
-
-  
-  if (remainingAdults > 0) {
-    return null;
-  }
-  
 
   return (
     <div
       onClick={() => seeDetail(item._id)}
       className="card-box flex flex-col xl:flex-row max-w-full rounded overflow-hidden shadow-boxShadow relative my-6 h-full hover:scale-105 transform transition duration-300"
     >
-      <div id="image-Homestay" className="w-full xl:w-[25%]">
+      <div id="image-Package" className="w-full xl:w-[25%]">
         <div
           id="default-carousel"
           className="relative w-full carousel-container"
@@ -192,23 +240,63 @@ const Card: React.FC<CardProps> = ({ item , numPeople , numChildren }) => {
           </button>
         </div>
       </div>
-      <div id="center-card-Homestay" className="w-full xl:w-[50%]">
-        <div id="detailCard-Homestay" className="px-6 py-4">
-          <div id="Name-Homestay" className="font-bold text-xl mb-2">
+      <div id="center-card-Package" className="w-full xl:w-[50%]">
+        <div id="detailCard-Package" className="px-6 py-4">
+          <div id="Name-Package" className="font-bold text-xl mb-2">
             {truncateText(item.name_package || "", 30)}
           </div>
           <div className="mt-3">
-            <p id="Detail-Homestay" className="text-base">
+            <p id="Detail-Package" className="text-base">
               {truncateText(item.detail_package || "", 150)}
             </p>
           </div>
           <div className="mt-3">
-            <p id="Location-Homestay" className="text-base">
-              {item.location[0].province_location || ""}
-            </p>
+            {item.location.map((loc, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <FaMapMarkerAlt className="text-red-500 mr-2" />
+                <p className="text-base">
+                  {loc.name_location ? `${loc.name_location}` : ""}
+                  {loc.subdistrict_location
+                    ? ` ต.${loc.subdistrict_location}`
+                    : ""}
+                  {loc.district_location ? ` อ.${loc.district_location}` : ""}
+                  {loc.province_location ? ` จ.${loc.province_location}` : ""}
+                  {loc.zipcode_location ? ` ${loc.zipcode_location}` : ""}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 flex space-x-4">
+            <span className="text-xl font-bold">FREE : </span>
+            {item.isChildren ? (
+              <div className="group relative flex items-center">
+                <FaChild className="text-xl group-hover:text-blue-500 cursor-pointer" />
+                <div className="absolute left-0 bottom-full mb-2 hidden w-56 p-2 bg-white text-sm text-gray-700 border border-gray-200 rounded shadow-lg group-hover:block">
+                  เหมาะสำหรับเด็กอายุ 0-12 ปี สะดวกสบายและปลอดภัยสำหรับครอบครัว
+                  ฟรี! (1คน/ที่นั่ง)
+                </div>
+              </div>
+            ) : null}
+            {item.homestay && item.homestay.length > 0 ? (
+              <div className="group relative flex items-center">
+                <FaBed className="text-xl group-hover:text-blue-500 cursor-pointer" />
+                <div className="absolute left-0 bottom-full mb-2 hidden w-56 p-2 bg-white text-sm text-gray-700 border border-gray-200 rounded shadow-lg group-hover:block">
+                  ห้องพักรวมในแพ็กเกจ ฟรี! ผ่อนคลายในที่พักสุดพิเศษ
+                </div>
+              </div>
+            ) : null}
+            {item.isFood ? (
+              <div className="group relative flex items-center">
+                <FaUtensils className="text-xl group-hover:text-blue-500 cursor-pointer" />
+                <div className="absolute left-0 bottom-full mb-2 hidden w-56 p-2 bg-white text-sm text-gray-700 border border-gray-200 rounded shadow-lg group-hover:block">
+                  อิ่มอร่อยกับอาหารเช้าและเย็น ฟรี!
+                  เต็มอิ่มกับรสชาติที่น่าประทับใจ
+                </div>
+              </div>
+            ) : null}
           </div>
           <div
-            id="Stars-Homestay"
+            id="Stars-Package"
             className="mt-3 font-bold py-4 text-primaryUser"
           >
             <div className="flex">
@@ -221,15 +309,19 @@ const Card: React.FC<CardProps> = ({ item , numPeople , numChildren }) => {
         <div className="flex flex-col ">
           <div className="card-semiBox w-[75%] rounded-br-[10px]">
             <span className="mx-1">
-              <div className="w-full mx-5">ใช้ทั้งหมด: {numPeople} ที่นั่ง</div>
+              <div className="w-full mx-5">
+                ใช้ทั้งหมด: {requiredTickets} ที่นั่ง
+              </div>
             </span>
           </div>
-          <div id="Price-Homestay" className="mt-16 px-6 py-4">
+          <div id="Price-Package" className="mt-16 px-6 py-4">
             <div className="flex flex-col items-end">
               <span className="mx-1 font-bold text-[10px]">
                 ราคาเริ่มต้น (ที่นั่ง)
               </span>
-              <span className="mx-1 font-bold text-2xl">THB {item.price_package}</span>
+              <span className="mx-1 font-bold text-2xl">
+                THB {item.price_package}
+              </span>
             </div>
           </div>
         </div>
