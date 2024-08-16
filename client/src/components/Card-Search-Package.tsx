@@ -84,9 +84,33 @@ const Card: React.FC<CardProps> = ({
     }
   };
 
+  const formatDate = (date: Date | null) => {
+    if (!date) return "Select Date";
+
+    return date.toLocaleDateString("th-TH", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+  
   const navigate = useNavigate();
   const seeDetail = (id: string) => {
-    navigate(`/packageDetail/${id}`);
+    const startDate = dateRange[0] ? formatDate(dateRange[0]) : "Not selected";
+    const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
+    const startDate_Time = dateRange[0];
+    const endDate_Time = dateRange[1];
+    const sendSearchToDetail = {
+      numPeople,
+      numChildren,
+      dateRange: {
+        startDate,
+        endDate,
+        startDate_Time,
+        endDate_Time,
+      },
+    };
+    navigate(`/packageDetail/${id}`, { state: { sendSearchToDetail } });
   };
 
   const truncateText = (text: string, maxLength: number) => {
