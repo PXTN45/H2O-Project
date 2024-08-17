@@ -734,6 +734,7 @@ const SearchResult: React.FC = () => {
                               item={item}
                               numPeople={numPeople}
                               numChildren={numChildren}
+                              dateRange={dateRange}
                             />
                           </div>
                         )
@@ -747,6 +748,7 @@ const SearchResult: React.FC = () => {
                             item={item}
                             numPeople={numPeople}
                             numChildren={numChildren}
+                            dateRange={dateRange}
                           />
                         </div>
                       ))}

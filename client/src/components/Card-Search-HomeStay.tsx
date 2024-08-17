@@ -64,6 +64,7 @@ interface CardProps {
   item: Item;
   numPeople: number;
   numChildren: number;
+  dateRange: Date[];
 }
 
 const findLowestPrice = (offers: Offer[]) => {
@@ -72,7 +73,7 @@ const findLowestPrice = (offers: Offer[]) => {
   return lowestPrice;
 };
 
-const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
+const Card: React.FC<CardProps> = ({ item, numPeople, numChildren , dateRange }) => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
   const handlePrev = (
@@ -97,9 +98,33 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren }) => {
     }
   };
 
+  const formatDate = (date: Date | null) => {
+    if (!date) return "Select Date";
+
+    return date.toLocaleDateString("th-TH", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+  
   const navigate = useNavigate();
   const handleCardClick = () => {
-    navigate(`/homeStayDetail/${item._id}`);
+    const startDate = dateRange[0] ? formatDate(dateRange[0]) : "Not selected";
+    const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
+    const startDate_Time = dateRange[0];
+    const endDate_Time = dateRange[1];
+    const sendSearchToDetail = {
+      numPeople,
+      numChildren,
+      dateRange: {
+        startDate,
+        endDate,
+        startDate_Time,
+        endDate_Time,
+      },
+    };
+    navigate(`/homeStayDetail/${item._id}`, { state: { sendSearchToDetail } });
   };
 
   const truncateText = (text: string, maxLength: number) => {
