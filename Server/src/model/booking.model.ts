@@ -2,32 +2,39 @@ import { Schema, model, Document } from "mongoose";
 
 
 export interface Booking extends Document {
-    booker : Schema.Types.ObjectId[];
-    homeStayDetail: Schema.Types.ObjectId[];
-    packageDetail :Schema.Types.ObjectId[];
-    bookingDate : Date;
+    booker : Schema.Types.ObjectId;
+    homestay?: Schema.Types.ObjectId;
+    package?:Schema.Types.ObjectId;
+    bookingStart : Date;
+    bookingEnd : Date;
+    night:number,
     bookingStatus : string;
-    paymentDetail: string; // เช่น "Credit Card", "PayPal", "Bank Transfer"
-    createdAt: Date;
-  updatedAt: Date;
+    paymentDetail: string; 
 }
 
 const BookingSchema = new Schema<Booking>({
-  booker : [{
+  booker : {
     type:Schema.Types.ObjectId , ref:"User",
     required:true
-  }],
-  homeStayDetail:[{
+  },
+  homestay:{
     type:Schema.Types.ObjectId, ref:"HomeStay",
-    required: true,
-  }],
-  packageDetail:[{
+    required:false,
+  },
+  package:{
     type: Schema.Types.ObjectId , ref:"Package",
-    required:true
-  }],
-  bookingDate:{
+    required:false
+  },
+  bookingStart:{
     type: Date,
-    default: Date.now
+    required:true
+  },
+  bookingEnd:{
+    type: Date,
+    required:true
+  },
+  night:{
+    type: Number,
   },
   bookingStatus:{
     type: String,
@@ -39,14 +46,6 @@ const BookingSchema = new Schema<Booking>({
   paymentDetail: {
     type: String,
     required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 
 });

@@ -204,6 +204,7 @@ import {
   getAllAdmin,
   updateUser,
   checkEmailExists,
+  getUserById,
 } from "../controller/user.controller";
 import verifyEmailToken from "../middlewares/verifyEmailToken";
 import { verifyToken } from "../middlewares/verifyToken";
@@ -236,6 +237,8 @@ const router = Router();
  *         description: Forbidden, user does not have admin privileges
  */
 router.get("/userData", getAllUser);
+
+router.get("/userData/:id", getUserById);
 
 /**
  * @swagger
