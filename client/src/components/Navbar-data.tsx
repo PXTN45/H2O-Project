@@ -29,7 +29,7 @@ const Navbar = () => {
     const handleDateChange = (dates: Date[]) => setDateRange(dates as [Date | null, Date | null]);
   
     return (
-      <nav className="bg-white-frosted sticky top-0 left-0 w-full z-40 shadow-b-md">
+      <nav className="bg-white-frosted sticky top-0 left-0 w-full z-40 shadow-boxShadow rounded-lg">
         <div className="flex flex-col items-center justify-between xl:flex-row w-full">
           {/* People Button */}
           <div className="relative w-full flex justify-start">
