@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
 import DetailBooking from "../../components/detailBooking";
 import { useNavigate } from "react-router-dom";
+import { IoMdTime } from "react-icons/io";
+import { MdOutlinePolicy } from "react-icons/md";
+import DetailPayment from "./detailPayment";
 
 export interface Image_room {
   _id: string;
@@ -55,8 +58,10 @@ interface PaymentData {
   offer: Offer;
   bookingUser: User;
   rating: number;
+  time_checkIn_homeStay: string;
+  time_checkOut_homeStay: string;
+  policy_cancel_homeStay: string;
 }
-
 const BookingDetail: React.FC = () => {
   const { paymentData, setPaymentData } = usePaymentContext();
   const [totalFee, setTotalFee] = useState<number>(0);
@@ -66,7 +71,6 @@ const BookingDetail: React.FC = () => {
   const navigate = useNavigate();
 
   console.log(paymentData);
-  
 
   useEffect(() => {
     if (paymentData) {
@@ -84,7 +88,7 @@ const BookingDetail: React.FC = () => {
       setFeeAndTax(feeAndTax);
       setTotalPrice(total);
     }
-  }, [paymentData]);
+  }, [paymentData?.totalPrice]);
 
   const handleToPayment = () => {
     if (paymentData) {
@@ -132,6 +136,38 @@ const BookingDetail: React.FC = () => {
             </div>
           </div>
           <div>
+            {/* policy */}
+            <div id="policy">
+              <div className="w-full rounded-lg shadow-boxShadow p-5">
+                <div className="text-xl font-bold mb-5">
+                  นโยบายที่พักและข้อมูลทั่วไปของ - {paymentData.homeStayName}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 text-md font-bold">
+                    <IoMdTime /> เช็คอิน/เช็คเอ้า
+                  </div>
+                  <div className="ml-10">
+                    <div>
+                      เช็คอินตั้งแต่ : {paymentData.time_checkIn_homeStay} น.
+                    </div>
+                    <div>
+                      เช็คเอ้าก่อน : {paymentData.time_checkOut_homeStay} น.
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 text-md font-bold mt-5">
+                    <MdOutlinePolicy />
+                    นโยบาย
+                  </div>
+                  <div className="ml-10">
+                    {paymentData.policy_cancel_homeStay}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
             <div className="shadow-boxShadow rounded-lg p-10">
               <div className="text-xl font-bold">รายละเอียดราคา</div>
               <div className="gap-2 mt-5 text-md border-b pb-5">
@@ -139,7 +175,9 @@ const BookingDetail: React.FC = () => {
                   <div>ราคาห้องพัก</div>
                   <div>
                     {" "}
-                    {(paymentData.totalPrice * paymentData.offer.quantityRoom).toLocaleString("th-TH", {
+                    {(
+                      paymentData.totalPrice * paymentData.offer.quantityRoom
+                    ).toLocaleString("th-TH", {
                       style: "decimal",
                       minimumFractionDigits: 2,
                     })}{" "}

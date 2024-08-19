@@ -79,6 +79,9 @@ interface PaymentData {
   offer: Offer;
   bookingUser: User;
   rating: number;
+  time_checkIn_homeStay: string
+  time_checkOut_homeStay: string
+  policy_cancel_homeStay: string
 }
 export interface Image {
   _id: string;
@@ -274,7 +277,8 @@ const homeStayDetail = () => {
           );
         }
       );
-
+      console.log(item);
+      
       const handleSelectAndProceed = (offer: Offer) => {
         if (item && userInfo && id) {
           // Set payment data
@@ -292,6 +296,9 @@ const homeStayDetail = () => {
             offer: item.room_type[roomTypeIndex].offer[i],
             bookingUser: userInfo,
             rating: averageRating,
+            time_checkIn_homeStay: item.time_checkIn_homeStay,
+            time_checkOut_homeStay: item.time_checkOut_homeStay,
+            policy_cancel_homeStay: item.policy_cancel_homeStay
           };
 
           localStorage.setItem("paymentData", JSON.stringify(paymentData));
