@@ -5,12 +5,8 @@ import { getBookingNights, isDateValid } from "../utils";
 import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
 
-<<<<<<< HEAD
-const getAllBooking = async (req: Request, res: Response): Promise<void> => {
-=======
 
-const getBooking = async (req: Request, res: Response): Promise<void> => {
->>>>>>> 493ab3d996b5078c1337dbfd49b4801d31afcbec
+const getAllBooking = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
   try {
     const data = (await Booking.find().populate([{path:"booker", select:"email name lastName"}]));
