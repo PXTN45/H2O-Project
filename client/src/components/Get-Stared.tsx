@@ -155,15 +155,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           user.role === role
       );
       const userRespone = userFilter[0];
-      console.log(userRespone);
-
+  
       if (userRespone) {
         if (!userRespone.password) {
           const userData = {
             email: userRespone.email,
             role: userRespone.role,
           };
-
+          
           try {
             setLoadPage(false);
             const response = await axiosPublic.post("/user/login", userData);
