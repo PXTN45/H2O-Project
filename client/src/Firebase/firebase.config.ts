@@ -10,13 +10,13 @@ import { getStorage } from 'firebase/storage';
 import { type UserCredential } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA6VFimSI3JXxVldFNKOHE1efqnuJf6fXU",
-  authDomain: "h2o-project-ts.firebaseapp.com",
-  projectId: "h2o-project-ts",
-  storageBucket: "h2o-project-ts.appspot.com",
-  messagingSenderId: "654241915133",
-  appId: "1:654241915133:web:0953ccf12f06cef3779e94",
-  measurementId: "G-HCQNE25WL5"
+  apiKey: "AIzaSyDb28-cH3G5svrBk1qBW3X7lpn7SzAGckQ",
+  authDomain: "final-project-h2o.firebaseapp.com",
+  projectId: "final-project-h2o",
+  storageBucket: "final-project-h2o.appspot.com",
+  messagingSenderId: "817851075980",
+  appId: "1:817851075980:web:be01ef946dec06d5ce1aa9",
+  measurementId: "G-YX2RQBRTYM"
 };
 
 const app = initializeApp(firebaseConfig);

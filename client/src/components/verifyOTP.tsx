@@ -32,7 +32,7 @@ const VerifyModal: React.FC<ModalProps> = ({
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [activeOTPIndex, setActiveOTPIndex] = useState<number>(0);
   const [invalidCounter, setInvalidCounter] = useState<number>(0);
-  const [counter, setCounter] = useState<number>(60000000000);
+  const [counter, setCounter] = useState<number>(60);
 
   const authContext = useContext(AuthContext);
 
