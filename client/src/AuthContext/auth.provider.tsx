@@ -478,7 +478,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error("Error:", (error as Error).message);
+      console.error("Error:", (error as Error).message);     
     }
   };
 
