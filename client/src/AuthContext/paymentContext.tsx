@@ -60,6 +60,9 @@ interface PaymentData {
   offer: Offer;
   bookingUser: User;
   rating: number;
+  time_checkIn_homeStay: string
+  time_checkOut_homeStay: string
+  policy_cancel_homeStay: string
 }
 
 export interface Image {

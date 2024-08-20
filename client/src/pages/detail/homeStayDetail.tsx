@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,useLocation} from "react-router-dom";
 import OpenStreetMap from "../../components/OpenStreetMap";
 import { useParams } from "react-router-dom";
 import { RxRulerSquare } from "react-icons/rx";
@@ -24,7 +24,7 @@ import { usePaymentContext } from "../../AuthContext/paymentContext";
 import axios from "axios";
 import { IoMdTime } from "react-icons/io";
 import { MdOutlinePolicy } from "react-icons/md";
-import { number } from "prop-types";
+import Navbar from "../../components/Navbar-data"
 export interface Image_room {
   _id: string;
   image: string;
@@ -79,6 +79,9 @@ interface PaymentData {
   offer: Offer;
   bookingUser: User;
   rating: number;
+  time_checkIn_homeStay: string
+  time_checkOut_homeStay: string
+  policy_cancel_homeStay: string
 }
 export interface Image {
   _id: string;
@@ -274,7 +277,8 @@ const homeStayDetail = () => {
           );
         }
       );
-
+      console.log(item);
+      
       const handleSelectAndProceed = (offer: Offer) => {
         if (item && userInfo && id) {
           // Set payment data
@@ -292,6 +296,9 @@ const homeStayDetail = () => {
             offer: item.room_type[roomTypeIndex].offer[i],
             bookingUser: userInfo,
             rating: averageRating,
+            time_checkIn_homeStay: item.time_checkIn_homeStay,
+            time_checkOut_homeStay: item.time_checkOut_homeStay,
+            policy_cancel_homeStay: item.policy_cancel_homeStay
           };
 
           localStorage.setItem("paymentData", JSON.stringify(paymentData));
@@ -730,6 +737,9 @@ const homeStayDetail = () => {
       {item ? (
         <div>
           <div id="homeStayDetail" className="container-sm mx-10 md:mx-40">
+          <div className="mt-5">
+            <Navbar />
+          </div>
             {/* รูปภาพ */}
             <div className="flex justify-center gap-4 mt-10 mb-5 ">
               <div>
