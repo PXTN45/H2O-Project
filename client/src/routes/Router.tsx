@@ -69,14 +69,6 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/create-business",
-        element: (
-          <PrivateRouterBusiness>
-            <SelectionCreate />
-          </PrivateRouterBusiness>
-        ),
-      },
-      {
         path: "/dashboard-user",
         element: (
           <PrivateRouterUser>
@@ -126,6 +118,14 @@ const router = createBrowserRouter([
       <PrivateVerifyEmail>
         <VerifyEmailSuccess />
       </PrivateVerifyEmail>
+    ),
+  },
+  {
+    path: "/create-business",
+    element: (
+      <PrivateRouterBusiness>
+        <SelectionCreate />
+      </PrivateRouterBusiness>
     ),
   },
 ]);
