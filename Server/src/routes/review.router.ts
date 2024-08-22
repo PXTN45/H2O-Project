@@ -69,12 +69,10 @@ import {
   updateReview,
   updateContent,
   getReviewByHomeStay,
-  getReviewByPackage,
+  getReviewByPackageId,
 } from "../controller/review.controller";
 
 const router = express.Router();
-
-
 
 /**
  * @swagger
@@ -266,6 +264,6 @@ router.get("/getReviewByHomeStay/:homeStayId", getReviewByHomeStay);
  *       200:
  *         description: Successfully retrieved reviews for the package.
  */
-router.get("/getReviewByPackage/:packageId", getReviewByPackage);
+router.get("/getReviewByPackage/:packageId", getReviewByPackageId);
 
 export default router;
