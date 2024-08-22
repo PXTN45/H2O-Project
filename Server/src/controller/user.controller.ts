@@ -219,26 +219,64 @@ const Login = async (req: Request, res: Response): Promise<void> => {
   let isPasswordValid: boolean = false;
 
   if (password) {
-    const isMatchedPasswordUser = user ? bcrypt.compareSync(password, user.password) : false;
-    const isMatchedPasswordBusiness = business ? bcrypt.compareSync(password, business.password) : false;
-    const isMatchedPasswordAdmin = admin ? bcrypt.compareSync(password, admin.password) : false;
+    const isMatchedPasswordUser = user
+      ? bcrypt.compareSync(password, user.password)
+      : false;
+    const isMatchedPasswordBusiness = business
+      ? bcrypt.compareSync(password, business.password)
+      : false;
+    const isMatchedPasswordAdmin = admin
+      ? bcrypt.compareSync(password, admin.password)
+      : false;
 
     checkPasswordUser = isMatchedPasswordUser;
     checkPasswordBusiness = isMatchedPasswordBusiness;
     checkPasswordAdmin = isMatchedPasswordAdmin;
-  }
 
-  if (checkPasswordUser || checkPasswordBusiness || checkPasswordAdmin) {
-    isPasswordValid = true;
+    if (checkPasswordUser || checkPasswordBusiness || checkPasswordAdmin) {
+      isPasswordValid = true;
+    } else {
+      isPasswordValid = false;
+      res.status(400).json("pass isn't compareSync");
+      return;
+    }
+
+    let userData: typeof user | typeof business | typeof admin | null = null;
+
+    if (isPasswordValid) {
+      if (role === "user") {
+        userData = user;
+      } else if (role === "business") {
+        userData = business;
+      } else if (role === "admin") {
+        userData = admin;
+      } else {
+        res.status(400).json("role isn't compare");
+        return;
+      }
+    } else {
+      res.status(400).json("Isn't verify");
+      return;
+    }
+
+    if (!userData) {
+      res.status(400).json("No user-data");
+      return;
+    }
+
+    if (userData) {
+      jwt.sign({ email, id: userData._id, role }, secret, {}, (err, token) => {
+        if (err) throw err;
+        res.cookie("token", token);
+        const { password, ...userWithOutPassword } = userData.toObject();
+        res.status(200).json({ ...userWithOutPassword });
+      });
+    } else {
+      res.status(400).json("Wrong credentials");
+    }
   } else {
-    isPasswordValid = false;
-    res.status(400).json("pass isn't compareSync");
-    return
-  }
+    let userData: typeof user | typeof business | typeof admin | null = null;
 
-  let userData: typeof user | typeof business | typeof admin | null = null;
-
-  if(isPasswordValid){
     if (role === "user") {
       userData = user;
     } else if (role === "business") {
@@ -249,25 +287,21 @@ const Login = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json("role isn't compare");
       return;
     }
-  }else{
-    res.status(400).json("Isn't verify");
-    return
-  }
 
-  if (!userData) {
-    res.status(400).json("No user-data");
-    return;
-  }
+    if (!userData) {
+      res.status(400).json("No user-data");
+      return;
+    }
 
-  if (userData) {
-    jwt.sign({ email, id: userData._id, role }, secret, {}, (err, token) => {
-      if (err) throw err;
-      res.cookie("token", token);
-      const { password, ...userWithOutPassword } = userData.toObject();
-      res.status(200).json({ ...userWithOutPassword });
-    });
-  } else {
-    res.status(400).json("Wrong credentials");
+    if (!userData.password) {
+      jwt.sign({ email, id: userData._id, role }, secret, {}, (err, token) => {
+        if (err) throw err;
+        res.cookie("token", token);
+        res.status(200).json(userData);
+      });
+    } else {
+      res.status(400).json("Wrong credentials");
+    }
   }
 };
 
