@@ -438,7 +438,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              text: "Invalid Password!",
+              text: "Invalid Email or Password!",
             }).then((result) => {
               if (result.isConfirmed) {
                 (
@@ -478,7 +478,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error("Error:", (error as Error).message);
+      console.error("Error:", (error as Error).message);     
     }
   };
 

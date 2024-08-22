@@ -155,15 +155,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           user.role === role
       );
       const userRespone = userFilter[0];
-      console.log(userRespone);
-
+  
       if (userRespone) {
         if (!userRespone.password) {
           const userData = {
             email: userRespone.email,
             role: userRespone.role,
           };
-
+          
           try {
             setLoadPage(false);
             const response = await axiosPublic.post("/user/login", userData);
@@ -438,43 +437,17 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Email</span>
-                  {errors.email && (
-                    <div className="tooltip">
-                      <span className="text-alert text-sm">
-                        <BsExclamationTriangle className="inline-block mr-1" />
-                        <span className="tooltip-text">
-                          {errors.email.message}
-                        </span>
-                      </span>
-                    </div>
-                  )}
                 </label>
                 <input
                   type="text"
                   placeholder="email"
                   className="input input-bordered"
-                  {...register("email", {
-                    required: "Please enter email",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email format",
-                    },
-                  })}
+                  {...register("email")}
                 />
               </div>
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Password</span>
-                  {errors.password && (
-                    <div className="tooltip">
-                      <span className="text-alert text-sm">
-                        <BsExclamationTriangle className="inline-block mr-1" />
-                        <span className="tooltip-text">
-                          {errors.password.message}
-                        </span>
-                      </span>
-                    </div>
-                  )}
                 </label>
                 <div className="relative w-full">
                   <input
@@ -486,18 +459,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                         WebkitTextSecurity: showPassword ? "none" : "disc",
                       } as InputProps
                     }
-                    {...register("password", {
-                      required: "Please enter a password",
-                      minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                      pattern: {
-                        value:
-                          /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
-                        message: "The password format is incorrect.",
-                      },
-                    })}
+                    {...register("password")}
                   />
                   <div
                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
@@ -532,7 +494,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                     {...register("name", {
                       required: "Please enter",
                       pattern: {
-                        value: /^[A-Za-zก-ฮ]+$/,
+                        value: /^[A-Za-z\u0E00-\u0E7F]+$/,
                         message: "Invalid format",
                       },
                     })}
@@ -559,7 +521,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                     {...register("lastName", {
                       required: "Please enter",
                       pattern: {
-                        value: /^[A-Za-zก-ฮ]+$/,
+                        value: /^[A-Za-z\u0E00-\u0E7F]+$/,
                         message: "Invalid format",
                       },
                     })}

@@ -153,7 +153,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
                         className="z-10 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44 card-box"
                       >
                         <div className="px-4 py-3 text-sm">
-                          <div>
+                          <div className="truncate">
                             {userInfo.role === "user" ||
                             userInfo.role === "admin"
                               ? `${userInfo.name} ${userInfo.lastName}`
@@ -162,7 +162,15 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
                               : null}
                           </div>
                           <div className="font-medium truncate">
-                            {userInfo.email}
+                            {userInfo.role && userInfo._id
+                              ? userInfo.role === "user"
+                                ? `USER`
+                                : userInfo.role === "business"
+                                ? `BUSINESS`
+                                : userInfo.role === "admin"
+                                ? `ADMIN`
+                                : null
+                              : "Welcome, Guest"}
                           </div>
                         </div>
                         <ul
