@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
 import DetailBooking from "../../components/detailBooking";
-import { useNavigate } from "react-router-dom";
 import { IoMdTime } from "react-icons/io";
 import { MdOutlinePolicy } from "react-icons/md";
-import DetailPayment from "./detailPayment";
+import axiosPrivateUser from "../../hook/axiosPrivateUser";
+
 
 export interface Image_room {
   _id: string;
@@ -63,12 +63,10 @@ interface PaymentData {
   policy_cancel_homeStay: string;
 }
 const BookingDetail: React.FC = () => {
-  const { paymentData, setPaymentData } = usePaymentContext();
-  const [totalFee, setTotalFee] = useState<number>(0);
-  const [totalTax, setTotalTax] = useState<number>(0);
+  const { paymentData } = usePaymentContext();
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [feeAndTax, setFeeAndTax] = useState<number>(0);
-  const navigate = useNavigate();
+
 
   console.log(paymentData);
 
@@ -82,33 +80,28 @@ const BookingDetail: React.FC = () => {
       const tax = (price + fee) * taxRate;
       const feeAndTax = fee + tax;
       const total = price + feeAndTax;
-
-      setTotalFee(fee);
-      setTotalTax(tax);
       setFeeAndTax(feeAndTax);
       setTotalPrice(total);
     }
   }, [paymentData?.totalPrice]);
 
-  const handleToPayment = () => {
-    if (paymentData) {
-      const dataToPayment: PaymentData = {
-        homeStayId: paymentData.homeStayId,
-        homeStayName: paymentData.homeStayName,
-        totalPrice: totalPrice,
-        roomType: paymentData.roomType,
-        offer: paymentData.offer,
-        bookingUser: paymentData.bookingUser,
-        rating: paymentData.rating,
-      };
-
-      localStorage.setItem("paymentData", JSON.stringify(dataToPayment));
-
-      setPaymentData(dataToPayment);
-      navigate("/detailPayment");
+  const makePayment = async () => {
+    try {
+      const response = await axiosPrivateUser.post('/create-checkout-session', {
+        products: paymentData,
+      });
+  
+      if (response.data && response.data.sessionUrl) {
+        window.location.href = response.data.sessionUrl;
+      } else {
+        throw new Error('No session URL returned');
+      }
+    } catch (error) {
+      console.error('Error making payment:', error);
     }
   };
-
+  
+  
   if (!paymentData) {
     return <div>No booking details available.</div>;
   }
@@ -210,7 +203,7 @@ const BookingDetail: React.FC = () => {
                 <button
                   className="border w-full my-5 p-3 rounded-lg bg-primaryUser text-white font-bold text-xl hover:scale-105 
                 transition-transform duration-300"
-                  onClick={handleToPayment}
+                  onClick={makePayment}
                 >
                   ชำระเงิน
                 </button>

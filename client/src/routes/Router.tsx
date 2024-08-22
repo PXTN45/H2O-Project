@@ -17,6 +17,7 @@ import SearchResult from "../pages/orther/searchResult";
 import HomeStayDetail from "../pages/detail/homeStayDetail";
 import PackageDetail from "../pages/detail/packageDetail";
 import { PaymentProvider } from "../AuthContext/paymentContext";
+import QR from "../testPromptPay";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/pay",
+        element: <QR />,
       },
       {
         path: "/detailPayment",
