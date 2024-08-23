@@ -4,7 +4,7 @@ import User from "../model/user.model";
 import { getBookingNights, isDateValid } from "../utils";
 import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
-
+import {differenceInDays} from "date-fns"
 
 const getAllBooking = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
@@ -144,16 +144,29 @@ const deleteBooking = async (req: Request , res: Response) : Promise<void> => {
 const cancelBooking = async (req: Request, res: Response): Promise<void> => {
   const bookingId = req.params.id;
   try {
-    const booking = await Booking.findByIdAndUpdate(
-      bookingId,
-      { bookingStatus: "Cancelled" },
-      { new: true }
-    );
-
+      
+    const booking = await Booking.findById(bookingId);
+  
     if (!booking) {
       res.status(404).send({ message: "Booking not found" });
       return;
     }
+
+    // Check if the booking can be canceled (within 3 days)
+    const today = new Date();
+    const daysUntilBooking = differenceInDays(new Date(booking.bookingStart), today);
+
+    if (daysUntilBooking < 0) {
+      res.status(400).send({ message: "Booking start date has already passed. Cannot cancel!" });
+      return;
+    } else if (daysUntilBooking > 3) {
+      res.status(400).send({ message: "Booking cannot be canceled after three days before the start date." });
+      return;
+    }
+
+    // Proceed to cancel the booking
+    booking.bookingStatus = "Cancelled";
+    await booking.save();
 
     res.status(200).send(booking);
   } catch (error) {
