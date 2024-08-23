@@ -6,7 +6,7 @@ import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
 
 
-const getBooking = async (req: Request, res: Response): Promise<void> => {
+const getAllBooking = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
   try {
     const data = (await Booking.find().populate([{path:"booker", select:"email name lastName"}]));
@@ -45,31 +45,43 @@ const getBookingPackageByUser = async (req: Request, res: Response): Promise<voi
   }
 }
 const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
-  const {homestay , bookingStart , bookingEnd , paymentDetail} = req.body
-  const userId = req.params.id
-  try {
-    if(!isDateValid(bookingStart , bookingEnd)) {
-      throw new BadRequestError("Please provide valid dates starting from today!!!!!!!!")
-    }
-    const differenceInDays = getBookingNights(bookingStart, bookingEnd);
-    if (differenceInDays < 1 ){
-      throw new BadRequestError("Return date must after start date!!!!!!!")
-    }
-    if (!isBookingAvailable) {
-      throw new BadRequestError("The homeStay is already booked!!")
-    }
-      const booking = await Booking.create({
-        booker:[userId],
-        homestay,
-        bookingStart,
-        bookingEnd,
-        night:differenceInDays,
-        paymentDetail,
+  const { homestay, bookingStart, bookingEnd, paymentDetail } = req.body;
+  const userId = req.params.userId;
+// console.log(userId);
 
-      })
-    res.status(201).json({booking});
+  try {
+    // Validate dates
+    if (!isDateValid(bookingStart, bookingEnd)) {
+      throw new BadRequestError("Please provide valid dates starting from today!");
+    }
+
+    // Calculate the number of nights
+    const differenceInDays = getBookingNights(bookingStart, bookingEnd);
+    if (differenceInDays < 1) {
+      throw new BadRequestError("Return date must be after the start date!");
+    }
+
+    // Check if the homestay is available (assuming you have an isBookingAvailable function)
+    const isAvailable = await isBookingAvailable(homestay, bookingStart, bookingEnd);
+    if (!isAvailable) {
+      throw new BadRequestError("The homestay is already booked!");
+    }
+
+    // Create the booking
+    const booking = await Booking.create({
+      booker: userId,  // userId is directly assigned since booker is a single ObjectId
+      homestay,
+      bookingStart,
+      bookingEnd,
+      night: differenceInDays,
+      bookingStatus: "Pending",  // This will use the default, but explicitly setting it
+      paymentDetail,
+    });
+
+    // Respond with the created booking
+    res.status(201).json({ booking });
   } catch (error) {
-    console.error("Error while booking home stay:", error);
+    console.error("Error while booking homestay:", error);
     res.status(500).json({ message: "Server Error", error });
   }
 };
@@ -173,7 +185,7 @@ export {
   bookHomeStay,
   confirmBooking,
   bookPackage,
-  getBooking,
+  getAllBooking,
   editPackageBooking,
   editHomeStayBooking,
   cancelBooking,
