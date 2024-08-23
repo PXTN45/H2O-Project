@@ -133,6 +133,7 @@ const homeStayDetail = () => {
   }
   const { userInfo } = authContext;
 
+
   useEffect(() => {
     const fetchData = async () => {
       setLoadPage(true);
@@ -188,9 +189,10 @@ const homeStayDetail = () => {
     fetchData();
   }, [id]);
 
-  if (isLoading == true) {
-    <p>no Item</p>;
-  }
+  // if (!item) {
+  //   return <div>No booking details available.</div>;
+  // }
+
 
   const images = item?.image.slice(1, 7).map((img: any, index: number) => {
     const specialClasses: { [key: number]: string } = {
@@ -232,6 +234,8 @@ const homeStayDetail = () => {
     }
     return stars;
   };
+  console.log(review);
+  
 
   const handleScrollToElement =
     (id: string) =>
@@ -317,7 +321,7 @@ const homeStayDetail = () => {
         }
       };
 
-      const handleDecreaseQuantity = async (i) => {
+      const handleDecreaseQuantity = async (i: number) => {
         try {
           // ค้นหาข้อมูล HomeStay
           const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
@@ -691,10 +695,10 @@ const homeStayDetail = () => {
           <div className="flex gap-2 items-center text-xl">
             <div className="avatar">
               <div className="w-12 rounded-full object-cover">
-                <img src={reviewHomeStay?.reviewer.image} />
+                <img src={reviewHomeStay?.reviewer?.image} />
               </div>
             </div>
-            <div>{reviewHomeStay?.reviewer.name}</div>
+            <div>{reviewHomeStay?.reviewer?.name}</div>
             <div className="bg-primaryUser rounded-2xl px-3 py-1 text-white">
               <div className="text-sm">{reviewHomeStay?.rating}/5</div>
             </div>
@@ -829,7 +833,7 @@ const homeStayDetail = () => {
             </div>
 
             {/* ส่วนการ์ดประเภทห้อง */}
-            <div className="mb-5">
+            <div id="detailTypeRoom" className="mb-5">
               <h1 id="detailRoom" className="font-bold text-3xl">
                 ประเภทห้อง
               </h1>
