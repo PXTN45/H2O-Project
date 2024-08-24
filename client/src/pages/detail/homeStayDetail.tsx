@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect, useContext } from "react";
-import { useNavigate ,useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import OpenStreetMap from "../../components/OpenStreetMap";
 import { useParams } from "react-router-dom";
 import { RxRulerSquare } from "react-icons/rx";
@@ -24,7 +24,7 @@ import { usePaymentContext } from "../../AuthContext/paymentContext";
 import axios from "axios";
 import { IoMdTime } from "react-icons/io";
 import { MdOutlinePolicy } from "react-icons/md";
-import Navbar from "../../components/Navbar-data"
+import Navbar from "../../components/Navbar-data";
 export interface Image_room {
   _id: string;
   image: string;
@@ -79,9 +79,9 @@ interface PaymentData {
   offer: Offer;
   bookingUser: User;
   rating: number;
-  time_checkIn_homeStay: string
-  time_checkOut_homeStay: string
-  policy_cancel_homeStay: string
+  time_checkIn_homeStay: string;
+  time_checkOut_homeStay: string;
+  policy_cancel_homeStay: string;
 }
 export interface Image {
   _id: string;
@@ -127,12 +127,11 @@ const homeStayDetail = () => {
   const [isLoading, setLoadPage] = useState<boolean>(false);
   const authContext = useContext(AuthContext);
   const { setPaymentData } = usePaymentContext();
-  
+
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { userInfo } = authContext;
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -193,7 +192,6 @@ const homeStayDetail = () => {
   //   return <div>No booking details available.</div>;
   // }
 
-
   const images = item?.image.slice(1, 7).map((img: any, index: number) => {
     const specialClasses: { [key: number]: string } = {
       2: "rounded-tr-lg",
@@ -203,7 +201,7 @@ const homeStayDetail = () => {
     return (
       <div key={index} className="w-full h-full">
         <img
-          className={`w-[250px] h-full object-cover rounded-md ${
+          className={`w-[250px] h-[200px] object-cover rounded-md ${
             specialClasses[index] || ""
           }`}
           src={img.image_upload}
@@ -234,8 +232,6 @@ const homeStayDetail = () => {
     }
     return stars;
   };
-  console.log(review);
-  
 
   const handleScrollToElement =
     (id: string) =>
@@ -247,30 +243,49 @@ const homeStayDetail = () => {
       }
     };
 
+  const roomTypes = item?.room_type || [];
+  const [currentIndices, setCurrentIndices] = useState<number[]>(
+    roomTypes.map(() => 0)
+  );
+
+  // ใช้ useEffect เพื่อตั้งค่า currentIndices เมื่อ roomTypes เปลี่ยนแปลง
+  useEffect(() => {
+    setCurrentIndices(roomTypes.map(() => 0));
+  }, [roomTypes]);
+
+  const handlePrev = (index: number) => {
+    setCurrentIndices((prevIndices) =>
+      prevIndices.map((currentIndex, i) => {
+        const imageRoomLength = roomTypes[i]?.image_room.length ?? 0;
+
+        return i === index
+          ? currentIndex === 0
+            ? imageRoomLength - 1
+            : currentIndex - 1
+          : currentIndex;
+      })
+    );
+  };
+
+  const handleNext = (index: number) => {
+    setCurrentIndices((prevIndices) =>
+      prevIndices.map((currentIndex, i) => {
+        const imageRoomLength = roomTypes[i]?.image_room.length ?? 0;
+
+        return i === index
+          ? currentIndex === imageRoomLength - 1
+            ? 0
+            : currentIndex + 1
+          : currentIndex;
+      })
+    );
+  };
+
   const cardOffer = item?.room_type.map((data: RoomType, index: number) => {
-    const handlePrev = () => {
-      if (data.image_room.length) {
-        setCurrentIndex((prevIndex) =>
-          prevIndex === 0 ? data.image_room.length - 1 : prevIndex - 1
-        );
-      }
-    };
-
-    const handleNext = () => {
-      if (data.image_room.length) {
-        setCurrentIndex((prevIndex) =>
-          prevIndex === data.image_room.length - 1 ? 0 : prevIndex + 1
-        );
-      }
-    };
-
     const offer = data.offer.map((offer: Offer, i: number) => {
       const price = offer.price_homeStay;
       const discount = offer.discount;
       const totalPrice = price > 0 ? price * ((100 - discount) / 100) : price;
-
-      console.log(totalPrice);
-
       const facilitiesRoom = offer?.facilitiesRoom.map(
         (facility: Facilities_Room, index: number) => {
           return (
@@ -281,9 +296,8 @@ const homeStayDetail = () => {
           );
         }
       );
-      console.log(item);
-      
-      const handleSelectAndProceed = (offer: Offer) => {
+
+      const handleSelectAndProceed = () => {
         if (item && userInfo && id) {
           // Set payment data
           const roomTypeIndex =
@@ -302,7 +316,7 @@ const homeStayDetail = () => {
             rating: averageRating,
             time_checkIn_homeStay: item.time_checkIn_homeStay,
             time_checkOut_homeStay: item.time_checkOut_homeStay,
-            policy_cancel_homeStay: item.policy_cancel_homeStay
+            policy_cancel_homeStay: item.policy_cancel_homeStay,
           };
 
           localStorage.setItem("paymentData", JSON.stringify(paymentData));
@@ -422,8 +436,6 @@ const homeStayDetail = () => {
         }
       };
 
-      console.log(offer.quantityRoom);
-
       return (
         <div key={i}>
           <div className="shadow-boxShadow flex rounded-lg p-10 my-5">
@@ -518,136 +530,138 @@ const homeStayDetail = () => {
       );
     });
 
-    return (
-      <div key={index} className="my-5">
-        {data ? (
-          <div className="rounded-lg shadow-boxShadow p-10">
-            <div className="font-bold text-2xl">
-              {item.room_type[index].name_type_room}
-            </div>
-            <div className="flex flex-wrap  gap-4 my-3">
-              <div className="w-full md:w-[350px]">
-                <p className="my-2">ห้องพัก</p>
-                {/* carousel */}
-                <div>
-                  <div
-                    id="default-carousel"
-                    className="relative w-full"
-                    data-carousel="slide"
-                  >
-                    <div className="relative h-60 overflow-hidden rounded-lg ">
-                      {data?.image_room.map(
-                        (src: Image_room, index: number) => (
-                          <div
-                            key={index}
-                            className={`duration-700 ease-in-out ${
-                              currentIndex === index ? "block" : "hidden"
-                            }`}
-                            data-carousel-item
-                          >
-                            <img
-                              src={src.image}
-                              className="absolute block w-full h-full object-cover rounded-xl"
-                              alt={`Slide ${index + 1}`}
-                            />
-                          </div>
-                        )
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-                      onClick={handlePrev}
-                      data-carousel-prev
-                    >
-                      <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                        <svg
-                          className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 6 10"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 1 1 5l4 4"
-                          />
-                        </svg>
-                        <span className="sr-only">Previous</span>
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-                      onClick={handleNext}
-                      data-carousel-next
-                    >
-                      <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                        <svg
-                          className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 6 10"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="m1 9 4-4-4-4"
-                          />
-                        </svg>
-                        <span className="sr-only">Next</span>
-                      </span>
-                    </button>
-                  </div>
-                </div>
+    return <div>{offer}</div>;
 
-                <div className="mt-4">
-                  <ul className="flex flex-col gap-3">
-                    <li className="flex items-center">
-                      <RxRulerSquare className="mr-2 text-2xl" />{" "}
-                      {item.room_type[index].sizeBedroom_homeStay}
-                    </li>
-                    <li className="flex items-center">
-                      <MdOutlineBathroom className="mr-2 text-2xl" />{" "}
-                      {item.room_type[index].bathroom_homeStay} ห้องน้ำ
-                    </li>
+    // return (
+    //   <div key={index} className="my-5">
+    //     {data ? (
+    //       <div className="rounded-lg shadow-boxShadow p-10">
+    //         <div className="font-bold text-2xl">
+    //           {item.room_type[index].name_type_room}
+    //         </div>
+    //         <div className="flex flex-wrap gap-4 my-3">
+    //           <div className="w-full md:w-[350px]">
+    //             <p className="my-2">ห้องพัก</p>
+    //             {/* carousel */}
+    //             <div>
+    //               <div
+    //                 id={`carousel-${index}`} // unique ID for each carousel
+    //                 className="relative w-full"
+    //                 data-carousel="slide"
+    //               >
+    //                 <div className="relative h-60 overflow-hidden rounded-lg">
+    //                   {data?.image_room.map(
+    //                     (src: Image_room, imageIndex: number) => (
+    //                       <div
+    //                         key={imageIndex}
+    //                         className={`duration-700 ease-in-out ${
+    //                           currentIndex === imageIndex ? "block" : "hidden"
+    //                         }`}
+    //                         data-carousel-item
+    //                       >
+    //                         <img
+    //                           src={src.image}
+    //                           className="absolute block w-full h-full object-cover rounded-xl"
+    //                           alt={`Slide ${imageIndex + 1}`}
+    //                         />
+    //                       </div>
+    //                     )
+    //                   )}
+    //                 </div>
+    //                 <button
+    //                   type="button"
+    //                   className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+    //                   onClick={handlePrev}
+    //                   data-carousel-prev
+    //                 >
+    //                   <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+    //                     <svg
+    //                       className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+    //                       aria-hidden="true"
+    //                       xmlns="http://www.w3.org/2000/svg"
+    //                       fill="none"
+    //                       viewBox="0 0 6 10"
+    //                     >
+    //                       <path
+    //                         stroke="currentColor"
+    //                         strokeLinecap="round"
+    //                         strokeLinejoin="round"
+    //                         strokeWidth="2"
+    //                         d="M5 1 1 5l4 4"
+    //                       />
+    //                     </svg>
+    //                     <span className="sr-only">Previous</span>
+    //                   </span>
+    //                 </button>
+    //                 <button
+    //                   type="button"
+    //                   className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+    //                   onClick={handleNext}
+    //                   data-carousel-next
+    //                 >
+    //                   <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+    //                     <svg
+    //                       className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+    //                       aria-hidden="true"
+    //                       xmlns="http://www.w3.org/2000/svg"
+    //                       fill="none"
+    //                       viewBox="0 0 6 10"
+    //                     >
+    //                       <path
+    //                         stroke="currentColor"
+    //                         strokeLinecap="round"
+    //                         strokeLinejoin="round"
+    //                         strokeWidth="2"
+    //                         d="m1 9 4-4-4-4"
+    //                       />
+    //                     </svg>
+    //                     <span className="sr-only">Next</span>
+    //                   </span>
+    //                 </button>
+    //               </div>
+    //             </div>
 
-                    {item.room_type[index].bedroom_homeStay > 1 ? (
-                      <li className="flex items-center">
-                        <MdOutlineBedroomParent className="mr-2 text-2xl" />{" "}
-                        {item.room_type[index].bedroom_homeStay} เตียงคู่
-                      </li>
-                    ) : (
-                      <li className="flex items-center">
-                        <MdOutlineBedroomChild className="mr-2 text-2xl" />{" "}
-                        {item.room_type[index].bedroom_homeStay} เตียงเดี่ยว
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              </div>
+    //             <div className="mt-4">
+    //               <ul className="flex flex-col gap-3">
+    //                 <li className="flex items-center">
+    //                   <RxRulerSquare className="mr-2 text-2xl" />{" "}
+    //                   {item.room_type[index].sizeBedroom_homeStay}
+    //                 </li>
+    //                 <li className="flex items-center">
+    //                   <MdOutlineBathroom className="mr-2 text-2xl" />{" "}
+    //                   {item.room_type[index].bathroom_homeStay} ห้องน้ำ
+    //                 </li>
 
-              <div className="w-full md:w-[750px]">
-                <div className="flex flex-row mb-5">
-                  <h1 className="w-2/5">สิทธิประโยชน์</h1>
-                  <h1 className="w-1/5">ผู้เข้าพัก</h1>
-                  <p className="w-2/5">ราคา ต่อห้อง ต่อคืน</p>
-                </div>
-                {offer}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div>no data</div>
-        )}
-      </div>
-    );
+    //                 {item.room_type[index].bedroom_homeStay > 1 ? (
+    //                   <li className="flex items-center">
+    //                     <MdOutlineBedroomParent className="mr-2 text-2xl" />{" "}
+    //                     {item.room_type[index].bedroom_homeStay} เตียงคู่
+    //                   </li>
+    //                 ) : (
+    //                   <li className="flex items-center">
+    //                     <MdOutlineBedroomChild className="mr-2 text-2xl" />{" "}
+    //                     {item.room_type[index].bedroom_homeStay} เตียงเดี่ยว
+    //                   </li>
+    //                 )}
+    //               </ul>
+    //             </div>
+    //           </div>
+
+    //           <div className="w-full md:w-[750px]">
+    //             <div className="flex flex-row mb-5">
+    //               <h1 className="w-2/5">สิทธิประโยชน์</h1>
+    //               <h1 className="w-1/5">ผู้เข้าพัก</h1>
+    //               <p className="w-2/5">ราคา ต่อห้อง ต่อคืน</p>
+    //             </div>
+    //             {offer}
+    //           </div>
+    //         </div>
+    //       </div>
+    //     ) : (
+    //       <div>no data</div>
+    //     )}
+    //   </div>
+    // );
   });
   // ฟังก์ชันคำนวณค่าเฉลี่ยของ rating
   const calculateAverageRating = (reviews: Review[]): number => {
@@ -715,40 +729,124 @@ const homeStayDetail = () => {
       </div>
     );
   });
-  console.log(review);
 
   const calculatePercentages = (review) => {
     const totalReviews = review.length;
     const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
-  
+
     // นับจำนวนรีวิวสำหรับแต่ละดาว
-    review.forEach(review => {
+    review.forEach((review) => {
       if (review.rating >= 1 && review.rating <= 5) {
         ratingCounts[review.rating - 1]++;
       }
     });
-  
+
     // คำนวณเปอร์เซ็นต์
-    const percentages = ratingCounts.map(count => (count / totalReviews) * 100);
-  
+    const percentages = ratingCounts.map(
+      (count) => (count / totalReviews) * 100
+    );
+
     return percentages;
   };
-  
+
   const percentages = calculatePercentages(review);
-  
+
+  // Debugging: ตรวจสอบค่า currentIndices และ roomTypes
+  console.log("Current Indices:", currentIndices);
+  console.log("Room Types:", roomTypes);
+
+  const test = roomTypes.map((roomType, index) => (
+    <div key={index} className="mb-8 relative">
+      <h2 className="text-xl font-bold mb-4">{roomType.name_type_room}</h2>
+      <div
+        id={`carousel-${index}`}
+        className="relative w-full"
+        data-carousel="slide"
+      >
+        <div className="relative h-60 rounded-lg">
+          {roomType.image_room.map((image, imageIndex) => (
+            <div
+              key={imageIndex}
+              className={`duration-700 ease-in-out ${
+                currentIndices[index] === imageIndex ? "block" : "hidden"
+              }`}
+              data-carousel-item
+            >
+              <img
+                src={image.image}
+                className="absolute block w-full h-full object-cover rounded-xl"
+                alt={`Slide ${imageIndex + 1}`}
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+            onClick={() => handlePrev(index)}
+            data-carousel-prev
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+              <svg
+                className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 6 10"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 1 1 5l4 4"
+                />
+              </svg>
+              <span className="sr-only">Previous</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+            onClick={() => handleNext(index)}
+            data-carousel-next
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+              <svg
+                className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 6 10"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m1 9 4-4-4-4"
+                />
+              </svg>
+              <span className="sr-only">Next</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  ));
+
   return (
     <div>
       {item ? (
         <div>
           <div id="homeStayDetail" className="container-sm mx-10 md:mx-40">
-          <div className="mt-5">
-            <Navbar />
-          </div>
+            <div className="mt-5">
+              <Navbar />
+            </div>
             {/* รูปภาพ */}
             <div className="flex justify-center gap-4 mt-10 mb-5 ">
               <div>
                 <img
-                  className="w-[600px] h-full object-cover rounded-l-lg  rounded-r-md"
+                  className="w-[600px] h-[420px] object-cover rounded-l-lg  rounded-r-md"
                   src={item.image[0].image_upload}
                   alt=""
                 />
@@ -838,14 +936,102 @@ const homeStayDetail = () => {
                 ประเภทห้อง
               </h1>
               <h1 className="text-lg mb-5">
-                ห้องพัก {item.room_type.length} ประเภท | มี{" "}
+                ห้องพัก {item?.room_type.length} ประเภท | มี{" "}
                 {item.room_type.reduce(
                   (total, room) => total + room.offer.length,
                   0
                 )}{" "}
                 ข้อเสนอ
               </h1>
-              {cardOffer}
+              {/* <div>
+                {roomTypes.map((roomType, index) => (
+                  <div key={index} className="mb-8 relative">
+                    <h2 className="text-xl font-bold mb-4">
+                      {roomType.name_type_room}
+                    </h2>
+                    <div
+                      id={`carousel-${index}`}
+                      className="relative w-full"
+                      data-carousel="slide"
+                    >
+                      <div className="relative h-60 overflow-hidden rounded-lg">
+                        {roomType.image_room.map((image, imageIndex) => (
+                          <div
+                            key={`${index}-${imageIndex}`}
+                            className={`duration-700 ease-in-out ${
+                              currentIndices[index] === imageIndex
+                                ? "block"
+                                : "hidden"
+                            }`}
+                            data-carousel-item
+                          >
+                            <img
+                              src={image.image}
+                              className="absolute block w-full h-full object-cover rounded-xl"
+                              alt={`Slide ${imageIndex + 1}`}
+                            />
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+                          onClick={() => handlePrev(index)}
+                          data-carousel-prev
+                        >
+                          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+                            <svg
+                              className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 6 10"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 1 1 5l4 4"
+                              />
+                            </svg>
+                            <span className="sr-only">Previous</span>
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+                          onClick={() => handleNext(index)}
+                          data-carousel-next
+                        >
+                          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+                            <svg
+                              className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 6 10"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="m1 9 4-4-4-4"
+                              />
+                            </svg>
+                            <span className="sr-only">Next</span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div> */}
+              <div>
+              <div>{test}</div>
+
+              </div>
+
             </div>
             {/* policy */}
             <div id="policy" className=" my-10">
