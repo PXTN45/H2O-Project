@@ -9,6 +9,7 @@ import homeStayRouter from "./routes/homestay.router"
 import bookingRouter from "./routes/booking.router"
 import userRouter from "./routes/user.router";
 import generateQR from "./routes/generateQR.router";
+import review from "./routes/review.router";
 import jwt  from "jsonwebtoken";
 // const cookieParser = require("cookie-parser");
 import cookieParser from "cookie-parser";
@@ -111,6 +112,7 @@ app.use("/", homeStayRouter)
 app.use("/", bookingRouter)
 app.use("/user", userRouter);
 app.use("/payment", generateQR);
+app.use("/review", review);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<h1> Welcome to H2O Project</h1>");
