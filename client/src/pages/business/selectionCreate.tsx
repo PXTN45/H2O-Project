@@ -5,7 +5,7 @@ const LeftSide = () => {
   return (
     <div className="w-full h-full md:h-screen flex flex-col items-center justify-center relative">
       <a
-        href="https://www.youtube.com/"
+        href="http://localhost:5173/createHomeStay"
         className="relative group w-full text-center shadow-xl"
       >
         <div className="text-overlay text-[24px] md:text-[34px] xl:text-[100px] font-bold">
