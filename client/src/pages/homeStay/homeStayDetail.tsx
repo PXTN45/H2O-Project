@@ -4,6 +4,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import OpenStreetMap from "../../components/OpenStreetMap";
 import { useParams } from "react-router-dom";
 import { RxRulerSquare } from "react-icons/rx";
+import { TbRuler3 } from "react-icons/tb";
+import { LuBedSingle } from "react-icons/lu";
+import { LuBedDouble } from "react-icons/lu";
 import {
   FaStar,
   FaStarHalfAlt,
@@ -140,43 +143,6 @@ const homeStayDetail = () => {
         if (res.data) {
           setItem(res.data);
         }
-
-        try {
-          const reviewsResponse = await axios.get<Review[]>("/review.json");
-          if (reviewsResponse.data) {
-            const filteredReviews = reviewsResponse.data.filter(
-              (review) => review.homestay === id
-            );
-
-            // ดึงข้อมูล reviewer ทั้งหมดในเวลาเดียวกัน
-            const reviewersPromises = filteredReviews.map(async (review) => {
-              try {
-                const userData = await axios.get(
-                  `http://localhost:3000/user/userData/${review.reviewer}`
-                );
-                return {
-                  ...review,
-                  reviewer: userData.data, // เพิ่มข้อมูลผู้รีวิวเข้าไปในรีวิวแต่ละรายการ
-                };
-              } catch (userError) {
-                console.error(
-                  `เกิดข้อผิดพลาดในการดึงรายละเอียด reviewer สำหรับ review ID: ${review._id}`,
-                  userError
-                );
-                return review;
-              }
-            });
-
-            // รอจนดึงข้อมูลผู้รีวิวเสร็จทั้งหมด
-            const reviewsWithReviewerData = await Promise.all(
-              reviewersPromises
-            );
-
-            setReview(reviewsWithReviewerData);
-          }
-        } catch (reviewError) {
-          console.error("เกิดข้อผิดพลาดในการดึงข้อมูลรีวิว:", reviewError);
-        }
       } catch (error) {
         console.error("เกิดข้อผิดพลาดในการดึงรายละเอียด homestay:", error);
       } finally {
@@ -186,6 +152,29 @@ const homeStayDetail = () => {
 
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    const fetchReview = async () => {
+      setLoadPage(true);
+      try {
+        const reviewsResponse = await axios.get<Review[]>("/review.json");
+        if (reviewsResponse.data) {
+          const filteredReviews = reviewsResponse.data.filter(
+            (review) => review.homestay === id
+          );
+
+          setReview(filteredReviews);
+        }
+      } catch (reviewError) {
+        console.error("เกิดข้อผิดพลาดในการดึงข้อมูลรีวิว:", reviewError);
+      }
+    };
+
+    fetchReview();
+  }, [id]);
+
+  console.log(review);
+  
 
   const images = item?.image.slice(1, 7).map((img: any, index: number) => {
     const specialClasses: { [key: number]: string } = {
@@ -280,7 +269,8 @@ const homeStayDetail = () => {
   const calculateAverageRating = (reviews: Review[]): number => {
     if (reviews.length === 0) return 0;
     const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return totalRating / reviews.length;
+    const averageRating = totalRating / reviews.length;
+    return parseFloat(averageRating.toFixed(1));
   };
 
   // ฟังก์ชันคำนวณความก้าวหน้า (progress)
@@ -369,7 +359,6 @@ const homeStayDetail = () => {
   // console.log("Room Types:", roomTypes);
 
   const carousel = roomTypes.map((roomType, index) => {
-    console.log(roomType);
     const offer = roomType.offer.map((offer: Offer, i: number) => {
       const price = offer.price_homeStay;
       const discount = offer.discount;
@@ -411,116 +400,6 @@ const homeStayDetail = () => {
 
           setPaymentData(paymentData);
           navigate("/bookingDetail");
-        }
-      };
-
-      const fetchHomeStayData = async () => {
-        try {
-          const response = await axiosPrivateUser.get(`/homeStay/${id}`);
-          setItem(response.data);
-        } catch (error) {
-          console.error("Error fetching HomeStay data:", error);
-        }
-      };
-
-      const handleDecreaseQuantity = async (i: number) => {
-        try {
-          // ค้นหาข้อมูล HomeStay
-          const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
-          const roomType = homeStay.data.room_type.find((rt) => rt.offer[i]);
-
-          if (!roomType) {
-            console.log("Room type not found");
-            return;
-          }
-
-          const offer = roomType.offer[i];
-          const newQuantityRoom = offer.quantityRoom - 1;
-
-          if (newQuantityRoom < 1) {
-            console.log("Cannot decrease quantity further");
-            return;
-          }
-
-          // อัปเดตข้อมูล HomeStay ด้วยจำนวนห้องที่ลดลง
-          await axiosPrivateUser.put(`/homeStay/${id}`, {
-            ...homeStay.data,
-            room_type: homeStay.data.room_type.map((rt) =>
-              rt.offer[i]
-                ? {
-                    ...rt,
-                    offer: rt.offer.map((o, index: number) =>
-                      index === i ? { ...o, quantityRoom: newQuantityRoom } : o
-                    ),
-                  }
-                : rt
-            ),
-          });
-
-          // อัปเดตข้อมูลตะกร้าสินค้า
-          const cardOffer = {
-            homeStayId: id,
-            homeStayName: homeStay.data.name_homeStay,
-            totalPrice: totalPrice,
-            roomType: roomType,
-            offer: roomType.offer[i],
-            bookingUser: userInfo,
-            rating: averageRating,
-          };
-
-          await axiosPrivateUser.put(`/homestay/${id}`, cardOffer);
-
-          // เรียกใช้ฟังก์ชัน refetch เพื่อดึงข้อมูลล่าสุด
-          fetchHomeStayData();
-        } catch (error) {
-          console.error("Error updating quantity:", error);
-        }
-      };
-
-      const handleIncreaseQuantity = async (i: number) => {
-        try {
-          const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
-          const roomType = homeStay.data.room_type.find((rt) => rt.offer[i]);
-
-          if (!roomType) {
-            console.log("Room type not found");
-            return;
-          }
-
-          const offer = roomType.offer[i];
-          const newQuantityRoom = offer.quantityRoom + 1;
-
-          // อัปเดตข้อมูล HomeStay ด้วยจำนวนห้องที่ลดลง
-          await axiosPrivateUser.put(`/homeStay/${id}`, {
-            ...homeStay.data,
-            room_type: homeStay.data.room_type.map((rt) =>
-              rt.offer[i]
-                ? {
-                    ...rt,
-                    offer: rt.offer.map((o, index: number) =>
-                      index === i ? { ...o, quantityRoom: newQuantityRoom } : o
-                    ),
-                  }
-                : rt
-            ),
-          });
-
-          const cardOffer = {
-            homeStayId: id,
-            homeStayName: homeStay.data.name_homeStay,
-            totalPrice: totalPrice,
-            roomType: roomType,
-            offer: roomType.offer[i],
-            bookingUser: userInfo,
-            rating: averageRating,
-          };
-
-          await axiosPrivateUser.put(`/homestay/${id}`, cardOffer);
-
-          // เรียกใช้ฟังก์ชัน refetch เพื่อดึงข้อมูลล่าสุด
-          fetchHomeStayData();
-        } catch (error) {
-          console.log(error);
         }
       };
 
@@ -583,28 +462,6 @@ const homeStayDetail = () => {
               </p>
             </div>
             <div className="w-1/6 flex flex-col items-center pl-3">
-              <div className="flex my-2 gap-3">
-                <button
-                  className="text-2xl"
-                  onClick={() => handleDecreaseQuantity(i)}
-                >
-                  {" "}
-                  -{" "}
-                </button>
-                <input
-                  type="number"
-                  placeholder="1"
-                  className="input input-bordered w-[50px] h-[30px] max-w-xs"
-                  value={offer.quantityRoom}
-                />
-                <button
-                  className="text-2xl"
-                  onClick={() => handleIncreaseQuantity(i)}
-                >
-                  {" "}
-                  +{" "}
-                </button>
-              </div>
               <button
                 className=" bg-primaryUser shadow-boxShadow px-8 h-10 rounded-3xl hover:scale-110 
                 transition-transform duration-300 text-white"
@@ -696,8 +553,25 @@ const homeStayDetail = () => {
                 </button>
               </div>
             </div>
+            <div className="my-5">
+              <div className="flex items-center gap-2">
+                <MdOutlineBathroom className="text-xl" />
+                {roomTypes[index].bathroom_homeStay} ห้อง
+              </div>
+              <div className="flex items-center gap-2">
+                {roomTypes[index].bedroom_homeStay < 2 ? (
+                  <LuBedSingle className="text-xl" />
+                ) : (
+                  <LuBedDouble className="text-xl" />
+                )}
+                {roomTypes[index].bedroom_homeStay} เตียง
+              </div>
+              <div className="flex items-center gap-2">
+                <TbRuler3 className="text-xl" />
+                {roomTypes[index].sizeBedroom_homeStay}
+              </div>
+            </div>
           </div>
-
           <div className="w-2/3 flex flex-col gap-2">{offer}</div>
         </div>
       </div>
