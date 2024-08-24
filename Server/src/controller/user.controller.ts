@@ -10,7 +10,7 @@ import AdminModel from "../model/admin.model ";
 dotenv.config();
 
 const getUserById = async (req: Request, res: Response): Promise<void> => {
-  const userId = req.params.id
+  const userId = req.params.id;
   try {
     const userData = await UserModel.findById(userId);
     res.status(200).json(userData);
@@ -313,7 +313,6 @@ const Login = async (req: Request, res: Response): Promise<void> => {
     }
   }
 };
-
 
 const checkEmailExists = async (req: Request, res: Response): Promise<void> => {
   const { email, role } = req.body;

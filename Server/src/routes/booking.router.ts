@@ -3,7 +3,7 @@ import {
   bookHomeStay,
   bookPackage,
   confirmBooking,
-  getBooking,
+  getAllBooking,
   editPackageBooking,
   editHomeStayBooking,
   cancelBooking,
@@ -16,7 +16,7 @@ import verifyUser from "../middlewares/verifyUser";
 import verifyBusiness from "../middlewares/verifyBusiness";
 import verifyAdmin from "../middlewares/verifyAdmin";
 const router = express.Router();
-router.get("/booking",getBooking , verifyAdmin,verifyToken)
+router.get("/booking",getAllBooking , verifyAdmin,verifyToken)
 router.get("/homestay-booking/:userId",getBookingHomeStayByUser , verifyUser,verifyToken)
 router.get("/package-booking/:userId",getBookingPackageByUser , verifyUser,verifyToken)
 router.post("/bookingHomeStay/:userId", bookHomeStay,verifyUser,verifyToken);
