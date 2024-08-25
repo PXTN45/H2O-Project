@@ -1,10 +1,12 @@
-import express, { Request, Response } from 'express';
-import QRCode from 'qrcode';
-import generatePayload from 'promptpay-qr';
-import _ from 'lodash';
+import express, { Request, Response } from "express";
+import QRCode from "qrcode";
+import generatePayload from "promptpay-qr";
+import _ from "lodash";
 import Stripe from "stripe";
-import BookingModel from '../model/booking.model';
-
+import BookingModel from "../model/booking.model";
+import { getBookingNights, isDateValid } from "../utils";
+import BadRequestError from "../error/badrequest";
+import isBookingAvailable from "../utils/date/isBookingAvailable";
 // interface QRRequestBody {
 //     amount: number;
 // }
@@ -39,43 +41,80 @@ import BookingModel from '../model/booking.model';
 
 const YOUR_DOMAIN = "http://localhost:3000/";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-06-20",
-  })
+  apiVersion: "2024-06-20",
+});
 
 const payment = async (req: Request, res: Response) => {
-    const { products } = req.body;
-    try {
-      // กำหนดค่า tax และ fee
-      // const taxRate = 0.07; // ตัวอย่าง ค่าภาษี 7%
-      // const fee = 0.1; // ตัวอย่าง ค่าธรรมเนียมเป็นบาท
-  
-      // // คำนวณค่า tax และ fee
-      // const taxAmount = Math.round(products.totalPrice * taxRate);
-      // const totalAmount = products.totalPrice + taxAmount + fee;
-      const session = await stripe.checkout.sessions.create({
-        line_items: [
-          {
-            price_data: {
-              currency: "thb",
-              product_data: {
-                name: products.homeStayName,
-              },
-              unit_amount: products.totalPrice  * 100, // ราคาเป็นจำนวนเต็มในหน่วยย่อย (เช่น สตางค์)
-            },
-            quantity: products.offer.quantityRoom,
-          },
-        ],
-        mode: "payment",
-        success_url: `http://localhost:5173/`,
-        cancel_url: `${YOUR_DOMAIN}?canceled=true`,
+  const {
+    totalPrice,
+    homestayName,
+    bookingStart,
+    bookingEnd,
+    booker,
+    homestay,
+    paymentDetail,
+  } = req.body;
+  try {
+    // ตรวจสอบวันที่ก่อนสร้าง session
+    if (!isDateValid(bookingStart, bookingEnd)) {
+      return res.status(400).json({
+        message: "Please provide valid dates starting from today!",
       });
-  
-      // ส่ง URL กลับไปยัง frontend
-      res.json({ sessionUrl: session.url });
-    } catch (error) {
-      console.error("Error creating checkout session:", error);
-      res.status(500).send("Internal Server Error");
     }
-}
+
+    const differenceInDays = getBookingNights(bookingStart, bookingEnd);
+    if (differenceInDays < 1) {
+      return res.status(400).json({
+        message: "Return date must be after start date!",
+      });
+    }
+
+    if (!isBookingAvailable) {
+      return res.status(400).json({
+        message: "The homeStay is already booked!",
+      });
+    }
+
+    // สร้าง session ของ Stripe
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price_data: {
+            currency: "thb",
+            product_data: {
+              name: homestayName,
+            },
+            unit_amount: totalPrice * 100, // ราคาเป็นจำนวนเต็มในหน่วยย่อย (เช่น สตางค์)
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `http://localhost:5173/`,
+      cancel_url: `${YOUR_DOMAIN}?canceled=true`,
+    });
+
+    // สร้างข้อมูลการจอง
+    const booking = await BookingModel.create({
+      booker,
+      homestay,
+      bookingStart,
+      bookingEnd,
+      night: differenceInDays,
+      paymentDetail,
+    });
+
+    // ส่ง URL กลับไปยัง frontend
+    res.status(201).json({
+      sessionUrl: session.url,
+      booking,
+    });
+
+  } catch (error) {
+    console.error("Error creating checkout session or booking:", error);
+    res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
 
 export default payment;
