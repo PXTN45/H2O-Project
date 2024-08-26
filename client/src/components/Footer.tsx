@@ -35,23 +35,26 @@ const Footer = () => {
   };
 
   return (
-    <div id="footer" className={`relative w-full h-full ${isDarkMode ? "dark" : ""}`}>
+    <div
+      id="footer"
+      className={`relative mt-32 w-full h-full ${isDarkMode ? "dark" : ""} `}
+    >
       <div
         className={`fixed 
           ${isDarkMode ? "text-white" : "text-dark"}
           ${isFooterVisible ? "bottom-[calc(64px)]" : "bottom-5"} 
-          right-5 z-10 transition-all`}
+          right-5 transition-all`}
       >
         <label
           className={
             isDarkMode
-              ? "swap swap-rotate bg-gradient-to-r from-primaryBusiness to-secondBusiness rounded-full w-14 h-14"
-              : "swap swap-rotate bg-gradient-to-r from-primaryUser to-secondUser rounded-full w-14 h-14"
+              ? "swap swap-rotate bg-gradient-to-r from-gray-800 to-gray-700 rounded-full w-14 h-14"
+              : "swap swap-rotate bg-gradient-to-r from-gray-200 to-gray-100 rounded-full w-14 h-14"
           }
         >
           <input
             type="checkbox"
-            className="theme-controller"
+            className="theme-controller hidden"
             checked={isDarkMode}
             onChange={toggleTheme}
           />
@@ -75,13 +78,19 @@ const Footer = () => {
       </div>
       <footer
         className={
-          userInfo?.role === "user" && thisPage !== "/"
-            ? "bg-gradient-to-l from-primaryUser to-secondUser py-4"
-            : userInfo?.role === "business" && thisPage !== "/"
-            ? "bg-gradient-to-l from-primaryBusiness to-secondBusiness py-4"
-            : userInfo?.role === "admin" && thisPage !== "/"
-            ? "bg-gradient-to-l from-primaryAdmin to-secondAdmin py-4"
-            : "bg-gradient-to-r from-primaryUser to-primaryBusiness py-4"
+          userInfo?.role === "user" &&
+          thisPage !== "/" &&
+          thisPage !== "/search/search-result"
+            ? "bg-gradient-to-l from-primaryUser to-secondUser mt-10 py-4"
+            : userInfo?.role === "business" &&
+              thisPage !== "/" &&
+              thisPage !== "/search/search-result"
+            ? "bg-gradient-to-l from-primaryBusiness to-secondBusiness mt-10 py-4"
+            : userInfo?.role === "admin" &&
+              thisPage !== "/" &&
+              thisPage !== "/search/search-result"
+            ? "bg-gradient-to-l from-primaryAdmin to-secondAdmin mt-10 py-4"
+            : "bg-gradient-to-r from-primaryNoRole to-secondNoRole mt-10 py-4"
         }
       >
         <div className="container mx-auto flex justify-center items-center">

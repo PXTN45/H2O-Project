@@ -1,4 +1,4 @@
-import React, { useContext , useRef  } from "react";
+import React, { useContext, useRef } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import { BsCamera } from "react-icons/bs";
@@ -171,23 +171,13 @@ const Drawer: React.FC = () => {
               <RxHamburgerMenu />
             </label>
           </div>
-          <div className="drawer-side">
+          <div className="drawer-side z-10">
             <label
               htmlFor="my-drawer-2"
               aria-label="close sidebar"
               className="drawer-overlay"
             />
-            <ul
-              className={
-                userInfo?.role === "user"
-                  ? "menu p-4 w-80 min-h-full bg-gradient-to-b from-primaryUser to-secondUser text-dark text-xl"
-                  : userInfo?.role === "business"
-                  ? "menu p-4 w-80 min-h-full bg-gradient-to-b from-primaryBusiness to-secondBusiness text-dark text-xl"
-                  : userInfo?.role === "admin"
-                  ? "menu p-4 w-80 min-h-full bg-gradient-to-b from-primaryAdmin to-secondAdmin text-dark text-xl"
-                  : "menu p-4 w-80 min-h-full bg-gradient-to-b from-dark to-smoke text-white text-xl"
-              }
-            >
+            <ul className="menu p-4 w-80 min-h-full text-xl">
               <div className="flex items-center justify-center mt-5">
                 <div className="relative group">
                   <div className="rounded-full h-28 w-28 object-cover bg-dark">
@@ -241,14 +231,14 @@ const Drawer: React.FC = () => {
               <div className="text-darkmode">
                 {userInfo?.role === "user" ? (
                   <div>
-                    <Link to={"/dashboard-user/ProfileUser"}>
+                    <Link to={"/dashboard-user/Profile-User"}>
                       <li>
-                        <a>Profile</a>
+                        <a>Profile(UC17)</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
                       <li>
-                        <a>My Bookings</a>
+                        <a>My Bookings(UC11-13-14)</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
@@ -266,12 +256,17 @@ const Drawer: React.FC = () => {
                   <div>
                     <Link to={"/dashboard-business/ProfileBusiness"}>
                       <li>
-                        <a>Profile</a>
+                        <a>Profile(UC17)</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
                       <li>
-                        <a>My Business</a>
+                        <a>My Business (UC10 และ UC9)</a>
+                      </li>
+                    </Link>
+                    <Link to={"#"}>
+                      <li>
+                        <a>Booking List (UC14)</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
@@ -294,12 +289,12 @@ const Drawer: React.FC = () => {
                     </Link>
                   </div>
                 ) : null}
-                <hr className="h-px my-4 line-darkmode border-0"></hr>
+                <hr className="h-px my-4 menu-SupportDarkMode border-0"></hr>
                 {userInfo?.role === "user" ? (
                   <div>
                     <Link to={"#"}>
                       <li>
-                        <a>History Booking</a>
+                        <a>History Booking(UC8)</a>
                       </li>
                     </Link>
                   </div>
@@ -307,7 +302,12 @@ const Drawer: React.FC = () => {
                   <div>
                     <Link to={"#"}>
                       <li>
-                        <a>How to get money</a>
+                        <a>History Booking(UC8)</a>
+                      </li>
+                    </Link>
+                    <Link to={"#"}>
+                      <li>
+                        <a>How to get money(UC17)</a>
                       </li>
                     </Link>
                   </div>

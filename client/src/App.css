@@ -1,182 +1,167 @@
 @import url("https://fonts.googleapis.com/css2?family=K2D:wght@100&family=Kanit:ital@1&family=Noto+Sans+Cypro+Minoan&family=Open+Sans:ital,wght@0,300;0,400;1,400;1,500&display=swap");
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: black;
-    color: white;
-  }
-
-  .modal-box {
-    background-color: black;
-    color: white;
-  }
-
-  .side-box {
-    background-color: black;
-    color: white;
-  }
-
-  .input {
-    background-color: black;
-    color: white;
-    border: 1px solid white;
-  }
-
-  .label-text {
-    font-size: 0.95rem;
-    font-weight: bold;
-    line-height: 1.25rem;
-    --tw-text-opacity: 1;
-    color: white;
-  }
-
-  .label-text-alt {
-    font-size: 0.9rem;
-    font-weight: bold;
-    line-height: 1rem;
-    --tw-text-opacity: 1;
-    color: white;
-  }
-}
-
 body {
-  font-family: "K2D", sans-serif;
+  font: "K2D";
   background-color: white;
   color: black;
 }
 
-.text-darkmode {
-  color: white;
+.semi-bg {
+  background-color: #f1f1f1;
 }
 
-.text-darkmode-oneColor {
-  color: black;
-}
-
-
-.line-darkmode {
+.menu-SupportDarkMode {
   background-color: white;
 }
 
-.modal-box {
-  background-color: white;
+.label-text{
   color: black;
 }
 
 .input {
   background-color: white;
-  border: 1px solid black;
   color: black;
 }
 
-.label-text,
-.label-text-alt {
-  color: black;
-}
-
-.shadow {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-}
-
-.btn {
+.modal-box {
   background-color: white;
 }
 
-.otp {
+.card-box {
   background-color: white;
-  border: 1px solid black;
-  color: black;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.input-otp {
+.card-semiBox{
   background-color: white;
-  color: black;
-}
-
-.btn-text {
-  color: black;
-}
-
-.border:hover {
-  border: 1px solid white;
-}
-
-.divide {
-  background-color: white;
-}
-
-body.dark {
-  font-family: "K2D", sans-serif;
-  background-color: black;
-  color: white;
-}
-
-body.dark .text-darkmode {
-  color: black;
-}
-
-body.dark .text-darkmode-oneColor {
-  color: black;
-}
-
-body.dark .line-darkmode {
-  background-color: black;
-}
-
-body.dark .border:hover {
-  border: 1px solid black;
-}
-
-body.dark .shadow {
-  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.5);
-}
-
-body.dark .btn {
-  background-color: black;
-}
-
-body.dark .btn-text {
-  color: white;
-}
-
-body.dark .modal-box,
-body.dark .side-box,
-body.dark .input {
-  background-color: black;
-  color: white;
-  border: 1px solid white;
-}
-
-body.dark .otp {
-  background-color: black;
-  color: white;
-  border: 1px solid white;
-}
-
-body.dark .input-otp {
-  background-color: black;
-  color: white;
-}
-
-body.dark .label-text,
-body.dark .label-text-alt {
-  color: white;
-}
-
-body.dark .divide {
-  background-color: black;
 }
 
 .shadow-text {
   text-shadow: 12px 12px 14px rgba(0, 0, 0, 0.3);
 }
 
-.bg-gif {
-  background-image: url('https://img.freepik.com/free-photo/3d-background-with-white-cubes_23-2150472987.jpg?w=1060&t=st=1718023373~exp=1718023973~hmac=630ada289e901f0d0a37628436ca63482923254a75c74e179a9450bc4bd93fb3');
+.swal2-popup {
+  background-color: white;
+}
+
+.swal2-title {
+  color: black;
+}
+.swal-text{
+  color: black;
+}
+
+.swal2-content {
+  color: black;
+}
+
+.swal2-actions button {
+  color: black;
+}
+
+.swal2-select {
+  background-color: white;
+}
+
+.reCAPTCHA{
+  background-color: white;
+}
+
+.otp{
+  background-color: white;
+}
+
+body.dark {
+  font: "K2D";
+  background-color: black;
+  color: white;
+}
+
+body.dark .semi-bg {
+  background-color: #3D3D3D;
+}
+
+body.dark .menu-SupportDarkMode {
+  background-color: black;
+}
+
+body.dark .modal-box {
+  background-color: #2C2C2C;
+}
+
+body.dark .card-box {
+  background-color: #2c2c2c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+body.dark .card-semiBox {
+  background-color: #2c2c2c;
+}
+
+body.dark .label-text{
+  color: white;
+}
+
+body.dark .input {
+  background-color: #3D3D3D;
+  color: white;
+}
+
+body.dark .input::placeholder {
+  color: #B0B0B0;
+  opacity: 1;
+}
+
+body.dark .shadow-text {
+  text-shadow: 12px 12px 14px rgba(255, 255, 255, 0.3);
+}
+
+body.dark .swal2-popup {
+  background-color: #2C2C2C;
+}
+
+body.dark .swal2-title {
+  color: white;
+}
+
+body.dark .swal-text{
+  color: white;
+}
+
+body.dark .swal2-content {
+  color: white;
+}
+
+body.dark .swal2-actions button {
+  color: white;
+}
+
+body.dark .swal2-select {
+  background-color: white;
+}
+
+body.dark .reCAPTCHA{
+  background-color: #2C2C2C;
+}
+
+body.dark .otp{
+  background-color: #2C2C2C;
+}
+
+.bg-create {
+  background-image: url('https://wallpaperaccess.com/full/868908.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   z-index: 0;
+}
+
+.bg-map {
+  background-image: url('https://cdn6.agoda.net/images/MAPS-1213/default/bkg-map-entry.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .bg-custom-bg2 {
@@ -214,6 +199,10 @@ body.dark .divide {
   transition: color 0.3s ease-in-out;
 }
 
+.shadow-rb {
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 .group:hover .text-overlay {
   color: white;
 }
@@ -221,6 +210,11 @@ body.dark .divide {
 .group:hover .overlay {
   opacity: 1;
 }
+
+.carousel-container:hover .carousel-button {
+  display: block;
+}
+
 
 @media only screen and (max-width: 640px) {
   .container {
@@ -407,4 +401,16 @@ body.dark .tooltip-text {
     max-width: 100%;
     overflow-x: hidden;
   }
+}
+
+/* navdata */
+.bg-white-frosted {
+  background-color: rgba(255, 255, 255, 0.3); /* ปรับค่าโปร่งใสเป็น 0.3 เพื่อความใสมากขึ้น */
+  backdrop-filter: blur(15px); /* เพิ่มความเบลอเป็น 15px เพื่อให้ใสและนุ่มนวล */
+  border: 1px solid rgba(255, 255, 255, 0.4); /* เพิ่มขอบเพื่อให้ดูเป็นกระจก */
+}
+
+
+.shadow-b-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }

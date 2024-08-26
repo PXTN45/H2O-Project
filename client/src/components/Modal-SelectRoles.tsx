@@ -95,7 +95,7 @@ const ModalSelectRoles = ({ name }: { name: string }) => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "Invalid Password!",
+          text: "Invalid Email or Password!",
         }).then((result) => {
           if (result.isConfirmed) {
             (
@@ -138,7 +138,7 @@ const ModalSelectRoles = ({ name }: { name: string }) => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "Invalid Password!",
+          text: "Invalid Email or Password!",
         }).then((result) => {
           if (result.isConfirmed) {
             (
@@ -181,7 +181,7 @@ const ModalSelectRoles = ({ name }: { name: string }) => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "Invalid Password!",
+          text: "Invalid Email or Password!",
         }).then((result) => {
           if (result.isConfirmed) {
             (

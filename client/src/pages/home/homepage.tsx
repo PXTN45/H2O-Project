@@ -3,7 +3,7 @@ import Package from "../../components/Filter-row-package";
 
 const Home = () => {
   return (
-    <div>
+        <div>
         <HomeStay/>
         <Package/>
     </div>

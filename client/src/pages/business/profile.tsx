@@ -64,6 +64,7 @@ const Profile: React.FC = () => {
             </button>
           </div>
         </div>
+        
       </div>
     );
   }

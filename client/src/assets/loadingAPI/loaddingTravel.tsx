@@ -12,7 +12,7 @@ const Loader: React.FC = () => {
         <div className="absolute mt-5 w-full text-center text-primaryUser text-sm font-bold">
           <span className="animate-pulse">Loading...</span>
           <div className="absolute mt-2 left-0 right-0 h-1 bg-dark">
-            <div className="w-1/6 h-full bg-gradient-to-r from-primaryUser to-primaryBusiness animate-slide"></div>
+            <div className="w-1/6 h-full bg-gradient-to-r from-primaryNoRole to-secondNoRole animate-slide"></div>
           </div>
         </div>
         <div className="absolute w-12 h-12 rounded-full animate-orbit">

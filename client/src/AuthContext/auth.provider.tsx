@@ -63,6 +63,41 @@ interface UserRegister {
   role: string;
 }
 
+interface Location {
+  latitude_location: number;
+  longitude_location: number;
+}
+
+interface HomeStayAndPackage {
+  _id: string;
+  location: Location[];
+}
+
+interface Coordinate extends HomeStayAndPackage {
+  lat: number;
+  lng: number;
+}
+
+interface Coordinates {
+  HomeStay: Coordinate[];
+  Packages: Coordinate[];
+}
+
+interface mapDataCoordinates {
+  coordinates: Coordinates[];
+  places: string[];
+}
+
+interface DrawerPrice {
+  startPrice: number;
+  endPrice: number;
+}
+
+interface DraweSearch {
+  drawerTextSearch: string;
+  drawerPrice: DrawerPrice;
+}
+
 interface AuthContextType {
   thisPage: string;
   setThisPage: React.Dispatch<React.SetStateAction<string>>;
@@ -83,6 +118,10 @@ interface AuthContextType {
   setWhatUser: React.Dispatch<React.SetStateAction<User[]>>;
   signUpWithGoogle: SignInWithPopupFunction;
   handleLogout: () => void;
+  mapData: mapDataCoordinates | null;
+  setMapData: React.Dispatch<React.SetStateAction<mapDataCoordinates | null>>;
+  drawerData: DraweSearch | null;
+  setDrawerData: React.Dispatch<React.SetStateAction<DraweSearch | null>>;
 }
 
 interface AuthProviderProps {
@@ -114,6 +153,8 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+  const [mapData, setMapData] = useState<mapDataCoordinates | null>(null);
+  const [drawerData, setDrawerData] = useState<DraweSearch | null>(null);
 
   useEffect(() => {
     if (userInfo) {
@@ -397,7 +438,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              text: "Invalid Password!",
+              text: "Invalid Email or Password!",
             }).then((result) => {
               if (result.isConfirmed) {
                 (
@@ -437,7 +478,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error("Error:", (error as Error).message);
+      console.error("Error:", (error as Error).message);     
     }
   };
 
@@ -519,6 +560,9 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
               inputOptions: inputOptions,
               inputPlaceholder: "Select a role",
               showCancelButton: true,
+              customClass: {
+                input: "swal2-select",
+              },
               inputValidator: (value) => {
                 if (!value) {
                   return "You need to select a role";
@@ -628,6 +672,10 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setThisSunOrMoon,
     isDarkMode,
     setIsDarkMode,
+    mapData,
+    setMapData,
+    drawerData,
+    setDrawerData,
   };
 
   return (

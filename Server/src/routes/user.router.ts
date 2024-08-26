@@ -444,7 +444,7 @@ router.post("/checkEmailExists", checkEmailExists);
  *       500:
  *         description: Internal server error
  */
-router.put("/updateUser/:id", verifyToken, updateUser);
+router.put("/updateUser/:id", updateUser);
 
 
 /**

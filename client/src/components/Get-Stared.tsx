@@ -155,15 +155,14 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           user.role === role
       );
       const userRespone = userFilter[0];
-      console.log(userRespone);
-
+  
       if (userRespone) {
         if (!userRespone.password) {
           const userData = {
             email: userRespone.email,
             role: userRespone.role,
           };
-
+          
           try {
             setLoadPage(false);
             const response = await axiosPublic.post("/user/login", userData);
@@ -438,43 +437,17 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Email</span>
-                  {errors.email && (
-                    <div className="tooltip">
-                      <span className="text-alert text-sm">
-                        <BsExclamationTriangle className="inline-block mr-1" />
-                        <span className="tooltip-text">
-                          {errors.email.message}
-                        </span>
-                      </span>
-                    </div>
-                  )}
                 </label>
                 <input
                   type="text"
                   placeholder="email"
                   className="input input-bordered"
-                  {...register("email", {
-                    required: "Please enter email",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email format",
-                    },
-                  })}
+                  {...register("email")}
                 />
               </div>
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Password</span>
-                  {errors.password && (
-                    <div className="tooltip">
-                      <span className="text-alert text-sm">
-                        <BsExclamationTriangle className="inline-block mr-1" />
-                        <span className="tooltip-text">
-                          {errors.password.message}
-                        </span>
-                      </span>
-                    </div>
-                  )}
                 </label>
                 <div className="relative w-full">
                   <input
@@ -486,18 +459,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                         WebkitTextSecurity: showPassword ? "none" : "disc",
                       } as InputProps
                     }
-                    {...register("password", {
-                      required: "Please enter a password",
-                      minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                      pattern: {
-                        value:
-                          /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/,
-                        message: "The password format is incorrect.",
-                      },
-                    })}
+                    {...register("password")}
                   />
                   <div
                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
@@ -532,7 +494,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                     {...register("name", {
                       required: "Please enter",
                       pattern: {
-                        value: /^[A-Za-zก-ฮ]+$/,
+                        value: /^[A-Za-z\u0E00-\u0E7F]+$/,
                         message: "Invalid format",
                       },
                     })}
@@ -559,7 +521,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
                     {...register("lastName", {
                       required: "Please enter",
                       pattern: {
-                        value: /^[A-Za-zก-ฮ]+$/,
+                        value: /^[A-Za-z\u0E00-\u0E7F]+$/,
                         message: "Invalid format",
                       },
                     })}
@@ -710,7 +672,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               </label>
               <div className="flex flex-row justify-between">
                 <div>
-                  <select className="input input-bordered w-[4.4rem]">
+                  <select className="input input-bordered w-[5.5rem]">
                     <option value="+66">
                       +66 {String.fromCharCode(160)} ( Thailand )
                     </option>
@@ -908,7 +870,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               </label>
               <div className="flex flex-row justify-between">
                 <div>
-                  <select className="input input-bordered w-[4.4rem]">
+                  <select className="input input-bordered w-[5.5rem]">
                     <option value="+66">
                       +66 {String.fromCharCode(160)} ( Thailand )
                     </option>
@@ -943,10 +905,10 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               <label className="label ml-auto mt-5">
                 <a
                   href="#"
-                  className="label-text-alt link link-hover"
+                  className="link link-hover hover:text-smoke font-semibold"
                   onClick={handleForgotPasswordClick}
                 >
-                  Forgot password?
+                  Forgot password ?
                 </a>
               </label>
             )}
@@ -958,7 +920,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               value={activePage === "login" ? "Login" : "Sign Up"}
               className={
                 activePage === "login"
-                  ? "btn bg-gradient-to-r from-primaryUser to-primaryBusiness transition-opacity group-hover:opacity-100 text-white border-white"
+                  ? "btn bg-gradient-to-r from-primaryNoRole to-secondNoRole transition-opacity group-hover:opacity-100 text-white border-white"
                   : activePage === "signup-user" && userInfo?.role !== "admin"
                   ? "btn bg-gradient-to-r from-primaryUser to-secondUser transition-opacity group-hover:opacity-100 text-white border-white"
                   : activePage === "signup-business"
@@ -971,38 +933,41 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
           </div>
           <p className="text-center my-2 font-bold text-[0.9rem] ">
             {activePage === "login"
-              ? "Don't have an account?"
+              ? "Don't have an account ?"
               : (activePage === "signup-user" ||
                   activePage === "signup-business") &&
                 userInfo?.role !== "admin"
-              ? "Already have an account?"
+              ? "Already have an account ?"
               : "For administrators only"}{" "}
-            <button
+            <a
+              id="NoAccount-HaveAccount"
+              href="#"
               type="button"
-              className="underline text-red-700 ml-1"
+              className="underline ml-1 hover:text-smoke"
               onClick={() =>
                 toggleForm(activePage === "login" ? "signup-user" : "login")
               }
             >
               {activePage === "login"
-                ? "Sign Up Now"
+                ? "Sign Up"
                 : (activePage === "signup-user" ||
                     activePage === "signup-business") &&
                   userInfo?.role !== "admin"
                 ? "Login"
                 : null}
-            </button>
+            </a>
           </p>
         </form>
         {activePage === "signup-user" && userInfo?.role === "admin" ? null : (
           <div className="max-w-screen-xl flex items-center justify-between">
             <hr
               className={
-                activePage === "login" ||
-                (activePage === "signup-user" && userInfo?.role !== "admin")
+                activePage === "signup-user" && userInfo?.role !== "admin"
                   ? "w-[50vw] border-t-2 border-primaryUser shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
                   : userInfo?.role === "admin"
                   ? "w-[50vw] border-t-2 border-primaryAdmin shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+                  : activePage === "login"
+                  ? "w-[50vw] border-t-2 border-primaryNoRole shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
                   : "w-[50vw] border-t-2 border-primaryBusiness shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
               }
             />
@@ -1011,11 +976,12 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
             </div>
             <hr
               className={
-                activePage === "login" ||
-                (activePage === "signup-business" && userInfo?.role !== "admin")
+                activePage === "signup-business" && userInfo?.role !== "admin"
                   ? "w-[50vw] border-t-2 border-primaryBusiness shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
                   : userInfo?.role === "admin"
                   ? "w-[50vw] border-t-2 border-primaryAdmin shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
+                  : activePage === "login"
+                  ? "w-[50vw] border-t-2 border-secondNoRole shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
                   : "w-[50vw] border-t-2 border-primaryUser shadow-lg flex items-center space-x-3 rtl:space-x-reverse"
               }
             />
@@ -1027,7 +993,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
               id="Google"
               className={
                 activePage === "login"
-                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryBusiness text-primaryUser hover:bg-gradient-to-r from-primaryUser to-primaryBusiness hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
+                  ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryNoRole text-primaryNoRole hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                   : activePage === "signup-user" && userInfo?.role !== "admin"
                   ? "rounded-[0.5rem] w-full h-10 relative overflow-hidden focus:outline-none border border-primaryUser text-primaryUser hover:bg-primaryUser hover:text-white hover:border-white hover:shadow-lg transition-transform transform-gpu hover:-translate-y-2"
                   : activePage === "signup-business"
@@ -1074,7 +1040,7 @@ const Modal: React.FC<ModalProps> = ({ name }) => {
         <div
           className={
             activePage === "login"
-              ? "bg-gradient-to-r from-primaryUser to-primaryBusiness absolute left-0 right-0 h-6"
+              ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole absolute left-0 right-0 h-6"
               : activePage === "signup-user" && userInfo?.role !== "admin"
               ? "bg-primaryUser absolute left-0 right-0 h-6"
               : activePage === "signup-business"

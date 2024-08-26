@@ -9,9 +9,16 @@ import VerifyEmailSuccess from "../pages/orther/emailIsVerify";
 import ProfileUser from "../pages/user/profile";
 import ProfileBusiness from "../pages/business/profile";
 import SelectionCreate from "../pages/business/selectionCreate";
-import Payment from "../pages/orther/MakePayment";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
+import BookingDetail from "../pages/orther/bookingDetail";
+import DetailPayment from "../pages/orther/detailPayment";
+import SearchResult from "../pages/orther/searchResult";
+import HomeStayDetail from "../pages/detail/homeStayDetail";
+import PackageDetail from "../pages/detail/packageDetail";
+import { PaymentProvider } from "../AuthContext/paymentContext";
+import CreateHomeStay from "../pages/business/createHomeStay";
+import QR from "../testPromptPay";
 
 const router = createBrowserRouter([
   {
@@ -23,26 +30,49 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/Payment",
-        element: <Payment />,
+        path: "/pay",
+        element: <QR />,
+      },
+      {
+        path: "/detailPayment",
+        element: (
+          <PaymentProvider>
+            <DetailPayment />
+          </PaymentProvider>
+        ),
+      },
+      {
+        path: "/homeStayDetail/:id",
+        element: (
+          <PrivateRouterUser>
+            <PaymentProvider>
+              <HomeStayDetail />
+            </PaymentProvider>
+          </PrivateRouterUser>
+        ),
+      },
+      {
+        path: "/bookingDetail",
+        element: (
+          <PaymentProvider>
+            <BookingDetail />
+          </PaymentProvider>
+        ),
+      },
+
+      {
+        path: "/packageDetail/:id",
+        element: <PackageDetail />,
       },
       {
         path: "/search",
-        element: (<DrawerSearch />),
-        children:[
+        element: <DrawerSearch />,
+        children: [
           {
-            path: "/search/1",
-            element: <ProfileUser />,
+            path: "/search/search-result",
+            element: <SearchResult />,
           },
         ],
-      },
-      {
-        path: "/create-business",
-        element: (
-          <PrivateRouterBusiness>
-            <SelectionCreate />
-          </PrivateRouterBusiness>
-        ),
       },
       {
         path: "/dashboard-user",
@@ -86,6 +116,14 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/createHomeStay",
+        element:(
+          <PrivateRouterBusiness>
+            <CreateHomeStay/>
+          </PrivateRouterBusiness>
+        )
+      }
     ],
   },
   {
@@ -94,6 +132,14 @@ const router = createBrowserRouter([
       <PrivateVerifyEmail>
         <VerifyEmailSuccess />
       </PrivateVerifyEmail>
+    ),
+  },
+  {
+    path: "/create-business",
+    element: (
+      <PrivateRouterBusiness>
+        <SelectionCreate />
+      </PrivateRouterBusiness>
     ),
   },
 ]);
