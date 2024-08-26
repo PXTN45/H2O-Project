@@ -35,6 +35,7 @@ const BookingSchema = new Schema<Booking>({
   },
   night:{
     type: Number,
+    required:true
   },
   bookingStatus:{
     type: String,

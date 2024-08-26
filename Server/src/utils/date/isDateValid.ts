@@ -7,7 +7,7 @@ const isDateValid = (start_date: string | Date, end_date: string | Date): boolea
     const timeDiffStart = dateStart.getTime() - today.getTime();
     const dayDiffStart = timeDiffStart / (1000* 3600 * 24);
 
-    if (dayDiffStart < 0) {
+    if (dayDiffStart >= 0) {
         return false;
     }
     const timeDiffEnd = dateEnd.getTime() - today.getTime();
