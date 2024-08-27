@@ -4,6 +4,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import OpenStreetMap from "../../components/OpenStreetMap";
 import { useParams } from "react-router-dom";
 import { RxRulerSquare } from "react-icons/rx";
+import { TbRuler3 } from "react-icons/tb";
+import { LuBedSingle } from "react-icons/lu";
+import { LuBedDouble } from "react-icons/lu";
 import {
   FaStar,
   FaStarHalfAlt,
@@ -75,6 +78,7 @@ interface PaymentData {
   homeStayId: string;
   homeStayName: string;
   totalPrice: number;
+  pricePerRoom: number;
   roomType: RoomType;
   offer: Offer;
   bookingUser: User;
@@ -140,43 +144,6 @@ const homeStayDetail = () => {
         if (res.data) {
           setItem(res.data);
         }
-
-        try {
-          const reviewsResponse = await axios.get<Review[]>("/review.json");
-          if (reviewsResponse.data) {
-            const filteredReviews = reviewsResponse.data.filter(
-              (review) => review.homestay === id
-            );
-
-            // ดึงข้อมูล reviewer ทั้งหมดในเวลาเดียวกัน
-            const reviewersPromises = filteredReviews.map(async (review) => {
-              try {
-                const userData = await axios.get(
-                  `http://localhost:3000/user/userData/${review.reviewer}`
-                );
-                return {
-                  ...review,
-                  reviewer: userData.data, // เพิ่มข้อมูลผู้รีวิวเข้าไปในรีวิวแต่ละรายการ
-                };
-              } catch (userError) {
-                console.error(
-                  `เกิดข้อผิดพลาดในการดึงรายละเอียด reviewer สำหรับ review ID: ${review._id}`,
-                  userError
-                );
-                return review;
-              }
-            });
-
-            // รอจนดึงข้อมูลผู้รีวิวเสร็จทั้งหมด
-            const reviewsWithReviewerData = await Promise.all(
-              reviewersPromises
-            );
-
-            setReview(reviewsWithReviewerData);
-          }
-        } catch (reviewError) {
-          console.error("เกิดข้อผิดพลาดในการดึงข้อมูลรีวิว:", reviewError);
-        }
       } catch (error) {
         console.error("เกิดข้อผิดพลาดในการดึงรายละเอียด homestay:", error);
       } finally {
@@ -187,6 +154,28 @@ const homeStayDetail = () => {
     fetchData();
   }, [id]);
 
+  useEffect(() => {
+    const fetchReview = async () => {
+      setLoadPage(true);
+      try {
+        const reviewsResponse = await axios.get<Review[]>("/review.json");
+        if (reviewsResponse.data) {
+          const filteredReviews = reviewsResponse.data.filter(
+            (review) => review.homestay === id
+          );
+
+          setReview(filteredReviews);
+        }
+      } catch (reviewError) {
+        console.error("เกิดข้อผิดพลาดในการดึงข้อมูลรีวิว:", reviewError);
+      }
+    };
+
+    fetchReview();
+  }, [id]);
+
+  console.log(review);
+
   const images = item?.image.slice(1, 7).map((img: any, index: number) => {
     const specialClasses: { [key: number]: string } = {
       2: "rounded-tr-lg",
@@ -196,7 +185,7 @@ const homeStayDetail = () => {
     return (
       <div key={index} className="w-full h-full">
         <img
-          className={`w-[250px] h-[200px] object-cover rounded-md ${
+          className={`w-[250px] md:w-60 h-[100px] md:h-[140px] object-cover rounded-md ${
             specialClasses[index] || ""
           }`}
           src={img.image_upload}
@@ -208,8 +197,11 @@ const homeStayDetail = () => {
 
   // ตรวจสอบว่า item.facilities ถูกกำหนดก่อนการ map
   const facilities = item?.facilities.map((facility: any, index: number) => (
-    <div key={index} className="flex items-center text-md gap-4">
-      <FaCheck className="text-xs" />
+    <div
+      key={index}
+      className="flex flex-col md:flex-row lg:flex-row xl:flex-row items-center text-sm md:text-md gap-4"
+    >
+      <div>✓</div>
       {facility.facilities_name}
     </div>
   ));
@@ -280,7 +272,8 @@ const homeStayDetail = () => {
   const calculateAverageRating = (reviews: Review[]): number => {
     if (reviews.length === 0) return 0;
     const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return totalRating / reviews.length;
+    const averageRating = totalRating / reviews.length;
+    return parseFloat(averageRating.toFixed(1));
   };
 
   // ฟังก์ชันคำนวณความก้าวหน้า (progress)
@@ -361,6 +354,7 @@ const homeStayDetail = () => {
 
     return percentages;
   };
+  // console.log(numRoom);
 
   const percentages = calculatePercentages(review);
 
@@ -369,17 +363,16 @@ const homeStayDetail = () => {
   // console.log("Room Types:", roomTypes);
 
   const carousel = roomTypes.map((roomType, index) => {
-    console.log(roomType);
     const offer = roomType.offer.map((offer: Offer, i: number) => {
       const price = offer.price_homeStay;
       const discount = offer.discount;
-      const totalPrice = price > 0 ? price * ((100 - discount) / 100) : price;
+      const totalPrice =
+        discount > 0 ? price * ((100 - discount) / 100) : price;
       const facilitiesRoom = offer?.facilitiesRoom.map(
         (facility: Facilities_Room, index: number) => {
           return (
             <div key={index} className="flex items-center gap-4">
-              <FaCheck />
-              {facility.facilitiesName}
+              ✓{facility.facilitiesName}
             </div>
           );
         }
@@ -398,6 +391,7 @@ const homeStayDetail = () => {
             homeStayId: id,
             homeStayName: item.name_homeStay,
             totalPrice: totalPrice,
+            pricePerRoom: price,
             roomType: item.room_type[roomTypeIndex],
             offer: item.room_type[roomTypeIndex].offer[i],
             bookingUser: userInfo,
@@ -414,119 +408,9 @@ const homeStayDetail = () => {
         }
       };
 
-      const fetchHomeStayData = async () => {
-        try {
-          const response = await axiosPrivateUser.get(`/homeStay/${id}`);
-          setItem(response.data);
-        } catch (error) {
-          console.error("Error fetching HomeStay data:", error);
-        }
-      };
-
-      const handleDecreaseQuantity = async (i: number) => {
-        try {
-          // ค้นหาข้อมูล HomeStay
-          const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
-          const roomType = homeStay.data.room_type.find((rt) => rt.offer[i]);
-
-          if (!roomType) {
-            console.log("Room type not found");
-            return;
-          }
-
-          const offer = roomType.offer[i];
-          const newQuantityRoom = offer.quantityRoom - 1;
-
-          if (newQuantityRoom < 1) {
-            console.log("Cannot decrease quantity further");
-            return;
-          }
-
-          // อัปเดตข้อมูล HomeStay ด้วยจำนวนห้องที่ลดลง
-          await axiosPrivateUser.put(`/homeStay/${id}`, {
-            ...homeStay.data,
-            room_type: homeStay.data.room_type.map((rt) =>
-              rt.offer[i]
-                ? {
-                    ...rt,
-                    offer: rt.offer.map((o, index: number) =>
-                      index === i ? { ...o, quantityRoom: newQuantityRoom } : o
-                    ),
-                  }
-                : rt
-            ),
-          });
-
-          // อัปเดตข้อมูลตะกร้าสินค้า
-          const cardOffer = {
-            homeStayId: id,
-            homeStayName: homeStay.data.name_homeStay,
-            totalPrice: totalPrice,
-            roomType: roomType,
-            offer: roomType.offer[i],
-            bookingUser: userInfo,
-            rating: averageRating,
-          };
-
-          await axiosPrivateUser.put(`/homestay/${id}`, cardOffer);
-
-          // เรียกใช้ฟังก์ชัน refetch เพื่อดึงข้อมูลล่าสุด
-          fetchHomeStayData();
-        } catch (error) {
-          console.error("Error updating quantity:", error);
-        }
-      };
-
-      const handleIncreaseQuantity = async (i: number) => {
-        try {
-          const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
-          const roomType = homeStay.data.room_type.find((rt) => rt.offer[i]);
-
-          if (!roomType) {
-            console.log("Room type not found");
-            return;
-          }
-
-          const offer = roomType.offer[i];
-          const newQuantityRoom = offer.quantityRoom + 1;
-
-          // อัปเดตข้อมูล HomeStay ด้วยจำนวนห้องที่ลดลง
-          await axiosPrivateUser.put(`/homeStay/${id}`, {
-            ...homeStay.data,
-            room_type: homeStay.data.room_type.map((rt) =>
-              rt.offer[i]
-                ? {
-                    ...rt,
-                    offer: rt.offer.map((o, index: number) =>
-                      index === i ? { ...o, quantityRoom: newQuantityRoom } : o
-                    ),
-                  }
-                : rt
-            ),
-          });
-
-          const cardOffer = {
-            homeStayId: id,
-            homeStayName: homeStay.data.name_homeStay,
-            totalPrice: totalPrice,
-            roomType: roomType,
-            offer: roomType.offer[i],
-            bookingUser: userInfo,
-            rating: averageRating,
-          };
-
-          await axiosPrivateUser.put(`/homestay/${id}`, cardOffer);
-
-          // เรียกใช้ฟังก์ชัน refetch เพื่อดึงข้อมูลล่าสุด
-          fetchHomeStayData();
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
       return (
         <div key={i}>
-          <div className="shadow-boxShadow flex rounded-lg p-10">
+          <div className="shadow-boxShadow flex rounded-lg px-5 py-10">
             <div className="w-2/6 border-r text-sm">{facilitiesRoom}</div>
             {roomType.offer[i].max_people.child > 0 &&
             roomType.offer[i].max_people.adult > 0 &&
@@ -583,30 +467,8 @@ const homeStayDetail = () => {
               </p>
             </div>
             <div className="w-1/6 flex flex-col items-center pl-3">
-              <div className="flex my-2 gap-3">
-                <button
-                  className="text-2xl"
-                  onClick={() => handleDecreaseQuantity(i)}
-                >
-                  {" "}
-                  -{" "}
-                </button>
-                <input
-                  type="number"
-                  placeholder="1"
-                  className="input input-bordered w-[50px] h-[30px] max-w-xs"
-                  value={offer.quantityRoom}
-                />
-                <button
-                  className="text-2xl"
-                  onClick={() => handleIncreaseQuantity(i)}
-                >
-                  {" "}
-                  +{" "}
-                </button>
-              </div>
               <button
-                className=" bg-primaryUser shadow-boxShadow px-8 h-10 rounded-3xl hover:scale-110 
+                className=" bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
                 transition-transform duration-300 text-white"
                 onClick={() => handleSelectAndProceed()}
               >
@@ -621,8 +483,8 @@ const homeStayDetail = () => {
     return (
       <div key={index} className="mb-8 relative">
         <h2 className="text-xl font-bold mb-4">{roomType.name_type_room}</h2>
-        <div className="flex shadow-boxShadow p-5 gap-2 rounded-lg">
-          <div className="w-1/3">
+        <div className="flex flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap shadow-boxShadow p-5 gap-2 rounded-lg">
+          <div className="w-full md:full lg:w-1/3">
             <div
               id={`carousel-${index}`}
               className="relative w-full shadow-boxShadow rounded-xl"
@@ -696,9 +558,28 @@ const homeStayDetail = () => {
                 </button>
               </div>
             </div>
+            <div className="my-5">
+              <div className="flex items-center gap-2">
+                <MdOutlineBathroom className="text-xl" />
+                {roomTypes[index].bathroom_homeStay} ห้อง
+              </div>
+              <div className="flex items-center gap-2">
+                {roomTypes[index].bedroom_homeStay < 2 ? (
+                  <LuBedSingle className="text-xl" />
+                ) : (
+                  <LuBedDouble className="text-xl" />
+                )}
+                {roomTypes[index].bedroom_homeStay} เตียง
+              </div>
+              <div className="flex items-center gap-2">
+                <TbRuler3 className="text-xl" />
+                {roomTypes[index].sizeBedroom_homeStay}
+              </div>
+            </div>
           </div>
-
-          <div className="w-2/3 flex flex-col gap-2">{offer}</div>
+          <div className="flex flex-col gap-2 w-full md:full lg:w-2/3">
+            {offer}
+          </div>
         </div>
       </div>
     );
@@ -708,7 +589,10 @@ const homeStayDetail = () => {
     <div>
       {item ? (
         <div>
-          <div id="homeStayDetail" className="container-sm mx-10 md:mx-40">
+          <div
+            id="homeStayDetail"
+            className="container-xl mx-6 md:mx-8 lg:mx-24 xl:mx-40"
+          >
             <div className="mt-5">
               <Navbar />
             </div>
@@ -716,12 +600,12 @@ const homeStayDetail = () => {
             <div className="flex justify-center gap-4 mt-10 mb-5 ">
               <div>
                 <img
-                  className="w-[600px] h-[420px] object-cover rounded-l-lg  rounded-r-md"
+                  className="w-[400px] md:w-[600px] h-[220px] md:h-[300px]  object-cover rounded-lg"
                   src={item.image[0].image_upload}
                   alt=""
                 />
               </div>
-              <div className="grid grid-cols-3 gap-4">{images}</div>
+              <div className="grid grid-cols-3 gap-4 ">{images}</div>
             </div>
 
             <div className="sticky z-10 top-0 bg-white flex shadow-boxShadow rounded-lg w-full mb-5 p-5">
@@ -758,9 +642,9 @@ const homeStayDetail = () => {
             </div>
 
             {/* homeStay Detail */}
-            <div className="flex flex-row flex-wrap  mb-10 gap-4">
+            <div className="flex flex-row flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap mb-10 gap-4">
               {/* Left Column */}
-              <div className="flex flex-col w-full md:w-4/5">
+              <div className="flex flex-col w-full md:w-full lg:w-3/4 xl:w-3/4">
                 <div className="rounded-lg shadow-boxShadow p-10 mb-5">
                   <div className="flex items-center">
                     <div className="flex items-center flex-wrap gap-4">
@@ -790,12 +674,12 @@ const homeStayDetail = () => {
                   className="rounded-lg shadow-boxShadow p-10 mb-5"
                 >
                   <h1 className="font-bold text-xl mb-5">สิ่งอำนวยความสะดวก</h1>
-                  <div className="grid grid-cols-3 gap-4">{facilities}</div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">{facilities}</div>
                 </div>
               </div>
 
               {/* Maps */}
-              <div className="flex w-full md:w-[220px] h-60 shadow-boxShadow">
+              <div className="flex w-full md:w-full lg:w-1/4 xl:w-1/4 h-60 shadow-boxShadow rounded-lg">
                 <OpenStreetMap />
               </div>
             </div>
@@ -935,7 +819,7 @@ const homeStayDetail = () => {
               <div id="review" className="shadow-boxShadow rounded-lg p-10">
                 <div className="text-xl"> คะแนนรีวิวโดยรวม</div>
                 <div>
-                  <div className="flex flex-row flex-wrap gap-10 justify-around items-center p-10">
+                  <div className="flex  flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap gap-10 justify-around items-center p-10">
                     <div
                       className="radial-progress  text-primaryUser text-5xl font-bold "
                       style={{
@@ -953,7 +837,7 @@ const homeStayDetail = () => {
                           <div key={index}>
                             <div>{`${index + 1} ดาว`}</div>
                             <progress
-                              className="progress progress-info w-[200px] md:w-[600px] h-5"
+                              className="progress progress-info w-[15rem] md:w-[500px] lg:w-[400px] xl:w-[500px] h-5"
                               value={percentage}
                               max="100"
                             ></progress>

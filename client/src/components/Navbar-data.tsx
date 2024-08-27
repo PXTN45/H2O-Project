@@ -5,6 +5,7 @@ import { LiaChildSolid } from "react-icons/lia";
 import { RxExit } from "react-icons/rx";
 import Calendar from "react-calendar";
 import { useLocation } from "react-router-dom";
+import { GoHome } from "react-icons/go";
 
 const Navbar = () => {
   const location = useLocation();
@@ -17,6 +18,9 @@ const Navbar = () => {
   );
   const [numChildren, setNumChildren] = useState<number>(
     sendSearchToDetail?.numChildren ?? 0
+  );
+  const [numRoom, setNumRoom] = useState<number>(
+    sendSearchToDetail?.numRoom ?? 0
   );
 
   const tomorrow = new Date();
@@ -53,6 +57,11 @@ const Navbar = () => {
     setNumChildren(numChildren > 0 ? numChildren - 1 : 0);
 
   const handleIncreaseChildren = () => setNumChildren(numChildren + 1);
+  
+  const handleDecreaseRoom = () =>
+    setNumRoom(numRoom > 0 ? numRoom - 1 : 1);
+
+  const handleIncreaseRoom = () => setNumRoom(numRoom + 1);
 
   const handleDateChange = (dates: [Date | null, Date | null]) => {
     setDateRange(dates);
@@ -76,6 +85,7 @@ const Navbar = () => {
   const dataNav = {
     numPeople,
     numChildren,
+    numRoom,
     dateRange: {
       startDate,
       endDate,
@@ -103,6 +113,9 @@ const Navbar = () => {
               <span className="mr-2 sm:mr-3">/</span>
               <span>เด็ก</span>
               <span className="mx-1 sm:mx-2">{numChildren}</span>
+              <span className="mr-2 sm:mr-3">/</span>
+              <span>ห้อง</span>
+              <span className="mx-1 sm:mx-2">{numRoom}</span>
             </span>
           </button>
           {showPeopleMenu && (
@@ -144,6 +157,27 @@ const Navbar = () => {
                   <button
                     className="text-primaryUser rounded-full p-2 ml-2"
                     onClick={handleIncreaseChildren}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                  <GoHome  className="w-5 h-5 mr-5" />
+                  <span className="w-5 h-5">ห้อง</span>
+                </div>
+                <div>
+                  <button
+                    className="text-primaryBusiness rounded-full p-2 mr-2"
+                    onClick={handleDecreaseRoom}
+                  >
+                    -
+                  </button>
+                  <span className="text-lg">{numRoom}</span>
+                  <button
+                    className="text-primaryUser rounded-full p-2 ml-2"
+                    onClick={handleIncreaseRoom}
                   >
                     +
                   </button>
