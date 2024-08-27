@@ -7,37 +7,6 @@ import BookingModel from "../model/booking.model";
 import { getBookingNights, isDateValid } from "../utils";
 import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
-// interface QRRequestBody {
-//     amount: number;
-// }
-
-// const generateQR = (req: Request<{}, {}, QRRequestBody>, res: Response) => {
-//     const amount: number = parseFloat(String(_.get(req, ["body", "amount"])));
-//     const mobileNumber: string = '0928983405';
-//     const payload: string = generatePayload(mobileNumber, { amount });
-//     const option = {
-//         color: {
-//             dark: '#000',
-//             light: '#fff'
-//         }
-//     };
-
-//     QRCode.toDataURL(payload, (err: any, url) => {
-//         if (err) {
-//             console.error('การสร้าง QR Code ล้มเหลว:', err);
-//             return res.status(400).json({
-//                 RespCode: 400,
-//                 RespMessage: 'การสร้าง QR code ล้มเหลว: ' + err.message
-//             });
-//         } else {
-//             return res.status(200).json({
-//                 RespCode: 200,
-//                 RespMessage: 'สร้าง QR code สำเร็จ',
-//                 Result: url
-//             });
-//         }
-//     });
-// };
 
 const YOUR_DOMAIN = "http://localhost:3000/";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {

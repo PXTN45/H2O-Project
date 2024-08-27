@@ -3,7 +3,7 @@ const getBookingNights = (start_date: string | Date, end_date: string | Date): n
     const endDate = new Date(end_date)
 
     const differenceInTime = endDate.getTime() - startDate.getTime();
-    const differenceInDays = differenceInTime / (100 * 3600 * 24);
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
     return differenceInDays
 }
 export default getBookingNights;
