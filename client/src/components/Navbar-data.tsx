@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect  } from "react";
 import { MdFamilyRestroom } from "react-icons/md";
 import { IoPeopleSharp, IoRemoveOutline } from "react-icons/io5";
 import { LiaChildSolid } from "react-icons/lia";
@@ -6,10 +6,12 @@ import { RxExit } from "react-icons/rx";
 import Calendar from "react-calendar";
 import { useLocation } from "react-router-dom";
 import { GoHome } from "react-icons/go";
+import { usePaymentContext } from "../AuthContext/paymentContext";
 
 const Navbar = () => {
   const location = useLocation();
   const sendSearchToDetail = location.state?.sendSearchToDetail;
+  const { dataNav, setDataNav } = usePaymentContext();
 
   const [showPeopleMenu, setShowPeopleMenu] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -82,20 +84,23 @@ const Navbar = () => {
   const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
   const startDate_Time = dateRange[0];
   const endDate_Time = dateRange[1];
-  const dataNav = {
-    numPeople,
-    numChildren,
-    numRoom,
-    dateRange: {
-      startDate,
-      endDate,
-      startDate_Time,
-      endDate_Time,
-    },
-  };
+ 
+  useEffect(() => {
+    const newDataNav = {
+      numPeople: numPeople,
+      numChildren: numChildren,
+      numRoom: numRoom,
+      dateRange: {
+        startDate: startDate,           
+        endDate: endDate,               
+        startDate_Time: startDate_Time, 
+        endDate_Time: endDate_Time,     
+      },
+    };
 
-  console.log(dataNav);
-  
+    setDataNav(newDataNav);
+  }, [numPeople, numChildren, numRoom, startDate, endDate, startDate_Time, endDate_Time]);
+ 
   return (
     <nav className="bg-white-frosted sticky top-0 left-0 w-full z-40 shadow-b-md">
       <div className="flex flex-col items-center justify-between xl:flex-row w-full">

@@ -6,6 +6,19 @@ import React, {
   ReactNode,
 } from "react";
 
+export interface DateRange {
+  startDate: string;      
+  endDate: string;        
+  startDate_Time: Date | null; 
+  endDate_Time: Date | null;   
+}
+
+export interface DataNav {
+  numPeople: number;
+  numChildren: number;
+  numRoom: number;
+  dateRange: DateRange;
+}
 export interface Image_room {
   _id: string;
   image: string;
@@ -60,9 +73,9 @@ interface PaymentData {
   offer: Offer;
   bookingUser: User;
   rating: number;
-  time_checkIn_homeStay: string
-  time_checkOut_homeStay: string
-  policy_cancel_homeStay: string
+  time_checkIn_homeStay: string;
+  time_checkOut_homeStay: string;
+  policy_cancel_homeStay: string;
 }
 
 export interface Image {
@@ -92,17 +105,21 @@ export interface HomeStay {
 interface PaymentContextType {
   paymentData: PaymentData | null;
   setPaymentData: (data: PaymentData) => void;
+  dataNav: DataNav | null;
+  setDataNav: (data: DataNav) => void;
 }
 
 interface PaymentProviderProps {
   children: ReactNode;
 }
+
 const PaymentContext = createContext<PaymentContextType | undefined>(undefined);
 
 export const PaymentProvider: React.FC<PaymentProviderProps> = ({
   children,
 }) => {
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
+  const [dataNav, setDataNav] = useState<DataNav | null>(null);
 
   // โหลดข้อมูลจาก localStorage เมื่อคอมโพเนนต์ถูกสร้างใหม่
   useEffect(() => {
@@ -110,10 +127,22 @@ export const PaymentProvider: React.FC<PaymentProviderProps> = ({
     if (savedPaymentData) {
       setPaymentData(JSON.parse(savedPaymentData));
     }
+    
+    const savedDataNav = localStorage.getItem("dataNav");
+    if (savedDataNav) {
+      setDataNav(JSON.parse(savedDataNav));
+    }
   }, []);
 
+  // บันทึกข้อมูลลง localStorage เมื่อมีการเปลี่ยนแปลง
+  useEffect(() => {
+    if (dataNav) {
+      localStorage.setItem("dataNav", JSON.stringify(dataNav));
+    }
+  }, [dataNav]);
+
   return (
-    <PaymentContext.Provider value={{ paymentData, setPaymentData }}>
+    <PaymentContext.Provider value={{ paymentData, setPaymentData, dataNav, setDataNav }}>
       {children}
     </PaymentContext.Provider>
   );

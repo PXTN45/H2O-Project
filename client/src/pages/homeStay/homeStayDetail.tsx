@@ -3,22 +3,11 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import OpenStreetMap from "../../components/OpenStreetMap";
 import { useParams } from "react-router-dom";
-import { RxRulerSquare } from "react-icons/rx";
 import { TbRuler3 } from "react-icons/tb";
 import { LuBedSingle } from "react-icons/lu";
 import { LuBedDouble } from "react-icons/lu";
-import {
-  FaStar,
-  FaStarHalfAlt,
-  FaRegStar,
-  FaCheck,
-  FaMale,
-} from "react-icons/fa";
-import {
-  MdOutlineBathroom,
-  MdOutlineBedroomChild,
-  MdOutlineBedroomParent,
-} from "react-icons/md";
+import { FaStar, FaStarHalfAlt, FaRegStar, FaMale } from "react-icons/fa";
+import { MdOutlineBathroom } from "react-icons/md";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
@@ -129,7 +118,7 @@ const homeStayDetail = () => {
   const [progress, setProgress] = useState(0);
   const [isLoading, setLoadPage] = useState<boolean>(false);
   const authContext = useContext(AuthContext);
-  const { setPaymentData } = usePaymentContext();
+  const { setPaymentData, dataNav } = usePaymentContext();
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
@@ -230,44 +219,6 @@ const homeStayDetail = () => {
       }
     };
 
-  const roomTypes = item?.room_type || [];
-  const [currentIndices, setCurrentIndices] = useState<number[]>(
-    roomTypes.map(() => 0)
-  );
-
-  // ใช้ useEffect เพื่อตั้งค่า currentIndices เมื่อ roomTypes เปลี่ยนแปลง
-  useEffect(() => {
-    setCurrentIndices(roomTypes.map(() => 0));
-  }, [roomTypes]);
-
-  const handlePrev = (index: number) => {
-    setCurrentIndices((prevIndices) =>
-      prevIndices.map((currentIndex, i) => {
-        const imageRoomLength = roomTypes[i]?.image_room.length ?? 0;
-
-        return i === index
-          ? currentIndex === 0
-            ? imageRoomLength - 1
-            : currentIndex - 1
-          : currentIndex;
-      })
-    );
-  };
-
-  const handleNext = (index: number) => {
-    setCurrentIndices((prevIndices) =>
-      prevIndices.map((currentIndex, i) => {
-        const imageRoomLength = roomTypes[i]?.image_room.length ?? 0;
-
-        return i === index
-          ? currentIndex === imageRoomLength - 1
-            ? 0
-            : currentIndex + 1
-          : currentIndex;
-      })
-    );
-  };
-
   // ฟังก์ชันคำนวณค่าเฉลี่ยของ rating
   const calculateAverageRating = (reviews: Review[]): number => {
     if (reviews.length === 0) return 0;
@@ -356,6 +307,43 @@ const homeStayDetail = () => {
   };
   // console.log(numRoom);
 
+  const roomTypes = item?.room_type || [];
+  const [currentIndices, setCurrentIndices] = useState<number[]>(
+    roomTypes.map(() => 0)
+  );
+
+  // ใช้ useEffect เพื่อตั้งค่า currentIndices เมื่อ roomTypes เปลี่ยนแปลง
+  useEffect(() => {
+    setCurrentIndices(roomTypes.map(() => 0));
+  }, [roomTypes]);
+
+  const handlePrev = (index: number) => {
+    setCurrentIndices((prevIndices) =>
+      prevIndices.map((currentIndex, i) => {
+        const imageRoomLength = roomTypes[i]?.image_room.length ?? 0;
+
+        return i === index
+          ? currentIndex === 0
+            ? imageRoomLength - 1
+            : currentIndex - 1
+          : currentIndex;
+      })
+    );
+  };
+
+  const handleNext = (index: number) => {
+    setCurrentIndices((prevIndices) =>
+      prevIndices.map((currentIndex, i) => {
+        const imageRoomLength = roomTypes[i]?.image_room.length ?? 0;
+
+        return i === index
+          ? currentIndex === imageRoomLength - 1
+            ? 0
+            : currentIndex + 1
+          : currentIndex;
+      })
+    );
+  };
   const percentages = calculatePercentages(review);
 
   // Debugging: ตรวจสอบค่า currentIndices และ roomTypes
@@ -372,39 +360,56 @@ const homeStayDetail = () => {
         (facility: Facilities_Room, index: number) => {
           return (
             <div key={index} className="flex items-center gap-4">
-              ✓{facility.facilitiesName}
+              <div>✓</div>
+              {facility.facilitiesName}
             </div>
           );
         }
       );
 
       const handleSelectAndProceed = () => {
-        if (item && userInfo && id) {
-          // Set payment data
-          const roomTypeIndex =
-            Array.isArray(item.room_type) && item.room_type.length > 0
-              ? i < item.room_type.length
-                ? i
-                : 0
-              : 0;
-          const paymentData: PaymentData = {
-            homeStayId: id,
-            homeStayName: item.name_homeStay,
-            totalPrice: totalPrice,
-            pricePerRoom: price,
-            roomType: item.room_type[roomTypeIndex],
-            offer: item.room_type[roomTypeIndex].offer[i],
-            bookingUser: userInfo,
-            rating: averageRating,
-            time_checkIn_homeStay: item.time_checkIn_homeStay,
-            time_checkOut_homeStay: item.time_checkOut_homeStay,
-            policy_cancel_homeStay: item.policy_cancel_homeStay,
-          };
+        if (
+          dataNav &&
+          dataNav.numPeople !== undefined &&
+          dataNav.numRoom !== undefined
+        ) {
+          if (
+            dataNav.numPeople >= 1 &&
+            dataNav.numRoom >= 1 &&
+            dataNav.dateRange.endDate !== "Not selected" &&
+            dataNav.dateRange.startDate !== "Not selected"
+          ) {
+            // ทำบางสิ่งที่ต้องการ
+            if (item && userInfo && id) {
+              // Set payment data
+              const roomTypeIndex =
+                Array.isArray(item.room_type) && item.room_type.length > 0
+                  ? i < item.room_type.length
+                    ? i
+                    : 0
+                  : 0;
+              const paymentData: PaymentData = {
+                homeStayId: id,
+                homeStayName: item.name_homeStay,
+                totalPrice: totalPrice,
+                pricePerRoom: price,
+                roomType: item.room_type[roomTypeIndex],
+                offer: item.room_type[roomTypeIndex].offer[i],
+                bookingUser: userInfo,
+                rating: averageRating,
+                time_checkIn_homeStay: item.time_checkIn_homeStay,
+                time_checkOut_homeStay: item.time_checkOut_homeStay,
+                policy_cancel_homeStay: item.policy_cancel_homeStay,
+              };
 
-          localStorage.setItem("paymentData", JSON.stringify(paymentData));
+              localStorage.setItem("paymentData", JSON.stringify(paymentData));
 
-          setPaymentData(paymentData);
-          navigate("/bookingDetail");
+              setPaymentData(paymentData);
+              navigate("/bookingDetail");
+            }
+          } else {
+            console.log("plese enter the value");
+          }
         }
       };
 
@@ -664,7 +669,7 @@ const homeStayDetail = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="">
+                  <div>
                     <div className="mt-2">{item.detail_homeStay}</div>
                   </div>
                 </div>
@@ -674,7 +679,9 @@ const homeStayDetail = () => {
                   className="rounded-lg shadow-boxShadow p-10 mb-5"
                 >
                   <h1 className="font-bold text-xl mb-5">สิ่งอำนวยความสะดวก</h1>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">{facilities}</div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {facilities}
+                  </div>
                 </div>
               </div>
 
