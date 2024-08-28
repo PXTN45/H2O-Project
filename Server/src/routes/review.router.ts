@@ -60,14 +60,11 @@
 
 import express, { Request, Response } from "express";
 import {
-  createContent,
   createReview,
   deleteReview,
   getAllReview,
   getRating,
-  setRating,
   updateReview,
-  updateContent,
   getReviewByHomeStay,
   getReviewByPackageId,
 } from "../controller/review.controller";
@@ -175,7 +172,6 @@ router.delete("/deleteReview/:id", deleteReview);
  *       201:
  *         description: Successfully created content.
  */
-router.post("/createContent", createContent);
 
 /**
  * @swagger
@@ -193,7 +189,6 @@ router.post("/createContent", createContent);
  *       200:
  *         description: Successfully updated the content.
  */
-router.put("/updateContent", updateContent);
 
 /**
  * @swagger
@@ -226,7 +221,6 @@ router.get("/getRating", getRating);
  *       200:
  *         description: Successfully set the rating.
  */
-router.put("/setRating", setRating);
 
 /**
  * @swagger

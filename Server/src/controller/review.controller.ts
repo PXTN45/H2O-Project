@@ -1,201 +1,158 @@
 import { Request, Response } from "express";
 import reviewModel from "../model/review.model";
-import bookingModel from "../model/booking.model";
+import BookingModel from "../model/booking.model";
 
-// get all review สำหรับการเรียกดูรีวิวทั้งหมด
+// ฟังก์ชันสำหรับการเรียกดูรีวิวทั้งหมด
 const getAllReview = async (req: Request, res: Response): Promise<void> => {
     try {
-        //const review = await reviewModel.find()
-        const review = await reviewModel.find().populate({path :"reviewer" , strictPopulate:false});
-        res.status(200).json(review);
-    } catch (error:any) {
-        res.status(500).json({ message: error.message});
+        // ดึงข้อมูลรีวิวทั้งหมด พร้อมดึงข้อมูลรีวิวเวอร์มาแสดงด้วย และจัดเรียงตามวันที่สร้าง (ใหม่ไปเก่า)
+        const reviews = await reviewModel.find().populate("reviewer").sort({ createdAt: -1 });
+        res.status(200).json(reviews);
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
     }
 };
 
-// สำหรับการสร้างรีวิวใหม่ ลูกค้าต้องทำการจองก่อนถึงจะสามารถสร้างรีวิวได้
+// ฟังก์ชันสำหรับการสร้างรีวิวใหม่ ลูกค้าต้องทำการจองก่อนถึงจะสามารถสร้างรีวิวได้
 const createReview = async (req: Request, res: Response): Promise<void> => {
-    // ดึง homestayId และ userId จาก body ของ request
-    const { homestayId, userId } = req.body;
-
     try {
-        // ตรวจสอบว่าลูกค้ามีการจองโฮมสเตย์นี้และการจองนั้นถูกยืนยันแล้วหรือไม่
-        const existingBooking = await bookingModel.findOne({
-            homestay: homestayId, 
-            user: userId, 
-            bookingStatus: "Confirmed" // ตรวจสอบว่าการจองได้รับการยืนยันแล้ว
-        });
+        const { reviewer, content, rating, homestay, package: packageId } = req.body;
 
-        // ถ้าไม่มีการจองหรือการจองยังไม่ได้รับการยืนยัน
-        if (!existingBooking) {
-            // ส่งสถานะ 403 (Forbidden) พร้อมข้อความแจ้งเตือน
-            res.status(403).json({ message: "คุณต้องทำการจองและได้รับการยืนยันก่อนถึงจะสามารถรีวิวได้" });
-            return; // หยุดการทำงานถ้าเงื่อนไขไม่ผ่าน
+        // ตรวจสอบข้อมูลที่ได้รับ
+        if (!reviewer || !content || !rating || (!homestay && !packageId)) {
+            res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+            return; // ออกจากฟังก์ชันถ้าเกิดข้อผิดพลาด
         }
 
-        // ถ้ามีการจองและการจองได้รับการยืนยันแล้ว
-        // ดึงข้อมูลการรีวิวจาก body ของ request เพื่อเตรียมสร้างรีวิวใหม่
-        const createReview = req.body;
-        const newReview = new reviewModel(createReview); // สร้างอินสแตนซ์ของ reviewModel ด้วยข้อมูลที่ได้รับ
+        // ตรวจสอบว่าคะแนนอยู่ในช่วงที่ถูกต้อง
+        if (rating < 1 || rating > 5) {
+            res.status(400).json({ message: 'คะแนนรีวิวต้องอยู่ระหว่าง 1 ถึง 5' });
+            return;
+        }
 
-        // บันทึกรีวิวใหม่ลงในฐานข้อมูล
+        // ตรวจสอบสถานะการจองของลูกค้าสำหรับ homestay หรือ package
+        const booking = await BookingModel.findOne({ reviewer, $or: [{ homestay }, { package: packageId }] });
+
+        if (!booking) {
+            // หากไม่พบการจองที่เกี่ยวข้อง
+            res.status(404).json({ message: 'ไม่พบการจองที่เกี่ยวข้อง' });
+            return; // ออกจากฟังก์ชันถ้าไม่พบการจอง
+        }
+
+        if (booking.bookingStatus !== 'Confirmed') {
+            // หากสถานะการจองไม่ใช่ Confirmed
+            res.status(403).json({ message: 'ลูกค้าที่มีสถานะ Confirmed เท่านั้นที่สามารถเขียนรีวิวได้' });
+            return; // ออกจากฟังก์ชันถ้าสถานะการจองไม่ใช่ Confirmed
+        }
+
+        // สร้างรีวิวใหม่
+        const newReview = new reviewModel({
+            reviewer,
+            content,
+            rating,
+            homestay,
+            package: packageId,
+        });
+
+        // บันทึกรีวิวลงในฐานข้อมูล
         const savedReview = await newReview.save();
-
-        // ส่งสถานะ 201 (Created) พร้อมข้อมูลรีวิวที่ถูกบันทึก
-        res.status(201).json(savedReview);
+        res.status(201).json(savedReview); // ส่งผลลัพธ์กลับไป
     } catch (error: any) {
-        // จัดการข้อผิดพลาดและบันทึกลงใน console
-        console.error("เกิดข้อผิดพลาดในการสร้างรีวิว:", error);
-
-        // ส่งสถานะ 500 (Internal Server Error) พร้อมข้อความข้อผิดพลาด
-        res.status(500).json({ message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์", error: error.message });
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
     }
 };
 
-// สำหรับการอัพเดตรีวิวตาม id
+// ฟังก์ชันสำหรับการอัพเดตรีวิวตาม id
 const updateReview = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id;
     const data = req.body;
     try {
-        const updateReview = await reviewModel.findByIdAndUpdate(id, data, {
-            new: true,
+        // ตรวจสอบว่าคะแนนที่อัพเดตอยู่ในช่วงที่ถูกต้องหรือไม่
+        if (data.rating && (data.rating < 1 || data.rating > 5)) {
+            res.status(400).json({ message: 'คะแนนรีวิวต้องอยู่ระหว่าง 1 ถึง 5' });
+            return;
+        }
+
+        // อัพเดตข้อมูลรีวิวที่ตรงกับ id ที่ได้รับ
+        const updatedReview = await reviewModel.findByIdAndUpdate(id, data, {
+            new: true, // ส่งค่าที่อัพเดตกลับไป
+            runValidators: true, // เปิดใช้ validators เพื่อเช็คความถูกต้องของข้อมูลที่อัพเดต
         });
-        if (!updateReview) {
-            res.status(404).json({ message: "Review Not Found"});
+        if (!updatedReview) {
+            res.status(404).json({ message: "ไม่พบรีวิว" });
         } else {
-            res.status(200).json({ message: "Review Updated", updateReview});
+            res.status(200).json(updatedReview);
         }
     } catch (error: any) {
-        res.status(500).json({ messaeg: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
-// สำหรับการลบรีวิวตาม id
+// ฟังก์ชันสำหรับการลบรีวิวตาม id
 const deleteReview = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id;
     try {
-        const data = await reviewModel.findByIdAndDelete(id);
-        if(!data) {
-            res.status(404).json({ messaeg: "Review Not Found"});
+        // ลบรีวิวที่ตรงกับ id ที่ได้รับ
+        const deletedReview = await reviewModel.findByIdAndDelete(id);
+        if (!deletedReview) {
+            res.status(404).json({ message: "ไม่พบรีวิว" });
         } else {
-            res.status(200).json(data);
+            res.status(200).json({ message: "ลบรีวิวเรียบร้อยแล้ว", deletedReview });
         }
     } catch (error: any) {
-        res.status(500).json({ messaeg: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
-// สำหรับการสร้างเนื้อหาใหม่
-const createContent = async (req: Request, res: Response): Promise<void> => {
-
-    const createContent = req.body;
-    const newContent = new reviewModel (createContent)
-    console.log(createContent);
-
-    try {
-        const savedContent = await newContent.save();
-        res.status(201).json(savedContent);
-    } catch (error: any) {
-        res.status(500).json({ message: error.message});
-    }
-};
-
-// สำหรับการอัพเดตเนื้อหาตาม id
-const updateContent = async (req: Request, res: Response): Promise<void> => {
-    const id = req.params.id;
-    const data = req.body;
-    try {
-        const updateContent = await reviewModel.findByIdAndUpdate(id, data, {
-            new: true,
-        });
-        if (!updateContent) {
-            res.status(404).json({ message: "Content Not Found"});
-        } else {
-            res.status(200).json({ message: "Content Updated", updateContent}); 
-        }
-    } catch (error: any) {
-        res.status(500).json ({ message: error.message});
-    }
-};
-   // สำหรับการดึงค่ารวมของคะแนนรีวิว
+// ฟังก์ชันสำหรับการดึงค่ารวมของคะแนนรีวิวทั้งหมดและคะแนนเฉลี่ย
 const getRating = async (req: Request, res: Response): Promise<void> => {
     try {
         const reviews = await reviewModel.find();
+        // คำนวณค่ารวมของคะแนนรีวิว
         const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-        res.status(200).json({ totalRating });
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
-};
- // สำหรับการตั้งค่าคะแนนของรีวิวทั้งหมด
-const setRating = async (req: Request, res: Response): Promise<void> => {
-    const { rating } = req.body;
-
-    if (typeof rating !== 'number' || rating < 1 || rating > 5) {
-        res.status(400).json({ message: "Invalid rating value. Rating must be an integer between 1 and 5." });
-        return;
-    }
-
-    try {
-        const result = await reviewModel.updateMany({}, { rating });
-        res.status(200).json({ message: `Rating updated for ${result.modifiedCount} reviews.` });
+        const averageRating = reviews.length ? totalRating / reviews.length : 0;
+        res.status(200).json({ totalRating, averageRating });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// สำหรับการดึงรีวิวตาม HomeStay ID
+// ฟังก์ชันสำหรับการดึงรีวิวตาม HomeStay ID
 const getReviewByHomeStay = async (req: Request, res: Response): Promise<void> => {
-    // รับ homeStayId จากพารามิเตอร์
-    const homeStayId = req.params.homeStayId;
-
+    const homestayId = req.params.homestayId;
     try {
-        // ค้นหาข้อมูลรีวิวโดยใช้ findById ซึ่งจะไม่ทำงานตามที่คาดหวัง
-        const review = await reviewModel.findById(homeStayId); // ข้อผิดพลาดที่นี่
-        // ตรวจสอบว่ามีรีวิวหรือไม่
-        if (!review) {
-            res.status(404).json({ message: "No reviews found for this HomeStay" }); // ไม่มีรีวิว
+        const reviews = await reviewModel.find({ homestay: homestayId }).populate("reviewer");
+        if (reviews.length === 0) {
+            res.status(404).json({ message: "ไม่พบรีวิวสำหรับ Homestay นี้" });
         } else {
-            res.status(200).json(review); // ส่งรีวิวที่พบกลับ
+            res.status(200).json(reviews);
         }
     } catch (error: any) {
-        res.status(500).json({ message: error.message }); // ส่งข้อความแสดงข้อผิดพลาด
+        res.status(500).json({ message: error.message });
     }
 };
 
-// สำหรับการดึงรีวิวตาม Package ID
-
+// ฟังก์ชันสำหรับการดึงรีวิวตาม Package ID
 const getReviewByPackageId = async (req: Request, res: Response): Promise<void> => {
-    const packageId = req.params.packageId; // ดึง packageId จากพารามิเตอร์ของคำขอ
-
+    const packageId = req.params.packageId;
     try {
-        const review = await reviewModel.findById(packageId); // ค้นหารีวิวโดยใช้ packageId ในกรณีที่ packageId ตรงกับ _id ของรีวิว
-
-        if (!review) { // ตรวจสอบว่ามีรีวิวที่ตรงกับ packageId หรือไม่
-            res.status(404).json({ message: "ไม่พบรีวิวสำหรับแพ็คเกจนี้" }); // ส่งข้อความถ้าไม่พบรีวิว
+        const reviews = await reviewModel.find({ package: packageId }).populate("reviewer");
+        if (reviews.length === 0) {
+            res.status(404).json({ message: "ไม่พบรีวิวสำหรับแพ็คเกจนี้" });
         } else {
-            res.status(200).json(review); // ส่งรีวิวที่พบไปยังผู้ใช้
+            res.status(200).json(reviews);
         }
     } catch (error: any) {
-        res.status(500).json({ message: error.message }); // ส่งข้อความผิดพลาดถ้ามีข้อผิดพลาดในการค้นหา
+        res.status(500).json({ message: error.message });
     }
-}
-
-export default getReviewByPackageId;
-
-
-
-
+};
 
 export {
     getAllReview,
     createReview,
     updateReview,
-    deleteReview,
-    createContent,
-    updateContent,
+    deleteReview, 
     getRating,
-    setRating,
     getReviewByHomeStay,
     getReviewByPackageId,
-}
+};
