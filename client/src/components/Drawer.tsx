@@ -178,9 +178,9 @@ const Drawer: React.FC = () => {
               className="drawer-overlay"
             />
             <ul className="menu p-4 w-80 min-h-full text-xl">
-              <div className="flex items-center justify-center mt-5">
+              <div className="flex items-center justify-start mt-5 rounded-full">
                 <div className="relative group">
-                  <div className="rounded-full h-28 w-28 object-cover bg-dark">
+                  <div className="rounded-full h-14 w-14 object-cover bg-dark">
                     <img
                       src={userInfo?.image}
                       alt="Profile"
@@ -191,7 +191,7 @@ const Drawer: React.FC = () => {
                     className="absolute inset-0 bg-opacity-50 text-white text-lg cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     style={{ textAlign: "center" }}
                   >
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center justify-center text-xs">
                       <div className="flex flex-col items-center justify-center">
                         <p>
                           <BsCamera />
@@ -207,26 +207,17 @@ const Drawer: React.FC = () => {
                     />
                   </label>
                 </div>
-              </div>
-              <div className="flex flex-row items-center justify-center my-5">
-                <button
-                  className={
-                    userInfo?.role === "user"
-                      ? "btn btn-sm rounded-full btn-text hover:bg-gradient-to-r from-primaryUser to-secondUser hover:text-white"
+                <div className=" w-full flex items-center justify-center">
+                  <span className="truncate max-w-44">
+                    {userInfo?.role === "user" || userInfo?.role === "admin"
+                      ? `${userInfo?.name} ${userInfo?.lastName}`
                       : userInfo?.role === "business"
-                      ? "btn btn-sm rounded-full btn-text hover:bg-gradient-to-r from-primaryBusiness to-secondBusiness hover:text-white"
-                      : userInfo?.role === "admin"
-                      ? "btn btn-sm rounded-full btn-text hover:bg-gradient-to-r from-primaryAdmin to-secondAdmin hover:text-white"
-                      : "btn btn-sm rounded-full btn-text hover:bg-gradient-to-r from-dark to-smoke hover:text-white"
-                  }
-                >
-                  {userInfo?.role === "user" || userInfo?.role === "admin"
-                    ? `${userInfo?.name} ${userInfo?.lastName}`
-                    : userInfo?.role === "business"
-                    ? `${userInfo?.businessName}`
-                    : null}
-                </button>
+                      ? `${userInfo?.businessName}`
+                      : null}
+                  </span>
+                </div>
               </div>
+              <hr className="h-px my-4 bg-primaryUser border-0"></hr>
               {/* Sidebar content here */}
               <div className="text-darkmode">
                 {userInfo?.role === "user" ? (
@@ -289,7 +280,7 @@ const Drawer: React.FC = () => {
                     </Link>
                   </div>
                 ) : null}
-                <hr className="h-px my-4 menu-SupportDarkMode border-0"></hr>
+                <hr className="h-px my-4 bg-primaryUser border-0"></hr>
                 {userInfo?.role === "user" ? (
                   <div>
                     <Link to={"#"}>
