@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import UserModel from "../model/user.model";
 import { sendEmail } from "../utils/sendEmail";
 import BusinessModel from "../model/business.model";
-import AdminModel from "../model/admin.model ";
+import AdminModel from "../model/admin.model";
 
 dotenv.config();
 

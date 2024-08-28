@@ -8,6 +8,7 @@ import packgeRouter from "./routes/package.router";
 import homeStayRouter from "./routes/homestay.router"
 import bookingRouter from "./routes/booking.router"
 import userRouter from "./routes/user.router";
+import chatRouter from "./routes/chat.router";
 import generateQR from "./routes/generateQR.router";
 import review from "./routes/review.router";
 import jwt  from "jsonwebtoken";
@@ -110,6 +111,7 @@ app.get("/swagger.json", (req: Request, res: Response) => {
 app.use("/", packgeRouter);
 app.use("/", homeStayRouter)
 app.use("/", bookingRouter)
+app.use("/help", chatRouter)
 app.use("/user", userRouter);
 app.use("/payment", generateQR);
 app.use("/review", review);
