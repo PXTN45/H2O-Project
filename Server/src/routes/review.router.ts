@@ -158,40 +158,6 @@ router.delete("/deleteReview/:id", deleteReview);
 
 /**
  * @swagger
- * /createContent:
- *   post:
- *     summary: Create new content
- *     tags: [Content]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Content'
- *     responses:
- *       201:
- *         description: Successfully created content.
- */
-
-/**
- * @swagger
- * /updateContent:
- *   put:
- *     summary: Update existing content
- *     tags: [Content]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Content'
- *     responses:
- *       200:
- *         description: Successfully updated the content.
- */
-
-/**
- * @swagger
  * /getRating:
  *   get:
  *     summary: Get rating details
@@ -201,26 +167,6 @@ router.delete("/deleteReview/:id", deleteReview);
  *         description: Successfully retrieved rating details.
  */
 router.get("/getRating", getRating);
-
-/**
- * @swagger
- * /setRating:
- *   put:
- *     summary: Set a rating
- *     tags: [Rating]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               rating:
- *                 type: number
- *     responses:
- *       200:
- *         description: Successfully set the rating.
- */
 
 /**
  * @swagger

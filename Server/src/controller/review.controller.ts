@@ -1,15 +1,38 @@
 import { Request, Response } from "express";
 import reviewModel from "../model/review.model";
 import BookingModel from "../model/booking.model";
+import { Review } from "../model/review.model";
 
 // ฟังก์ชันสำหรับการเรียกดูรีวิวทั้งหมด
 const getAllReview = async (req: Request, res: Response): Promise<void> => {
     try {
-        // ดึงข้อมูลรีวิวทั้งหมด พร้อมดึงข้อมูลรีวิวเวอร์มาแสดงด้วย และจัดเรียงตามวันที่สร้าง (ใหม่ไปเก่า)
-        const reviews = await reviewModel.find().populate("reviewer").sort({ createdAt: -1 });
-        res.status(200).json(reviews);
+        const { page = 1, limit = 10 } = req.query;
+
+        // ตรวจสอบให้แน่ใจว่า page และ limit เป็นตัวเลข
+        const pageNumber = parseInt(page as string, 10);
+        const limitNumber = parseInt(limit as string, 10);
+
+        if (isNaN(pageNumber) || isNaN(limitNumber)) {
+            res.status(400).json({ message: "Invalid page or limit parameter" });
+            return;
+        }
+
+        // ดึงข้อมูลรีวิวทั้งหมด พร้อมดึงข้อมูลผู้รีวิวมาแสดงด้วย และจัดเรียงตามวันที่สร้าง (ใหม่ไปเก่า)
+        const reviews = await reviewModel.find()
+            .populate("reviewer", "name") // ดึงเฉพาะฟิลด์ 'name' ของ User
+            .sort({ createdAt: -1 })
+            .skip((pageNumber - 1) * limitNumber)
+            .limit(limitNumber);
+
+        if (!reviews || reviews.length === 0) {
+            res.status(404).json({ message: "ไม่พบรีวิว" });
+            return;
+        }
+
+        res.status(200).json(reviews); // ส่งข้อมูลรีวิวกลับในรูปแบบ JSON
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        console.error("Error fetching reviews:", error.message);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
     }
 };
 
@@ -21,7 +44,7 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
         // ตรวจสอบข้อมูลที่ได้รับ
         if (!reviewer || !content || !rating || (!homestay && !packageId)) {
             res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
-            return; // ออกจากฟังก์ชันถ้าเกิดข้อผิดพลาด
+            return;
         }
 
         // ตรวจสอบว่าคะแนนอยู่ในช่วงที่ถูกต้อง
@@ -31,18 +54,22 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
         }
 
         // ตรวจสอบสถานะการจองของลูกค้าสำหรับ homestay หรือ package
-        const booking = await BookingModel.findOne({ reviewer, $or: [{ homestay }, { package: packageId }] });
+        const booking = await BookingModel.findOne({ 
+            booker: reviewer, 
+            $or: [
+                { homestay },
+                { package: packageId }
+            ]
+        });
 
         if (!booking) {
-            // หากไม่พบการจองที่เกี่ยวข้อง
             res.status(404).json({ message: 'ไม่พบการจองที่เกี่ยวข้อง' });
-            return; // ออกจากฟังก์ชันถ้าไม่พบการจอง
+            return;
         }
 
         if (booking.bookingStatus !== 'Confirmed') {
-            // หากสถานะการจองไม่ใช่ Confirmed
             res.status(403).json({ message: 'ลูกค้าที่มีสถานะ Confirmed เท่านั้นที่สามารถเขียนรีวิวได้' });
-            return; // ออกจากฟังก์ชันถ้าสถานะการจองไม่ใช่ Confirmed
+            return;
         }
 
         // สร้างรีวิวใหม่
@@ -56,8 +83,9 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
 
         // บันทึกรีวิวลงในฐานข้อมูล
         const savedReview = await newReview.save();
-        res.status(201).json(savedReview); // ส่งผลลัพธ์กลับไป
+        res.status(201).json(savedReview);
     } catch (error: any) {
+        console.error('ข้อผิดพลาดในการสร้างรีวิว:', error.message);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
     }
 };
@@ -77,14 +105,16 @@ const updateReview = async (req: Request, res: Response): Promise<void> => {
         const updatedReview = await reviewModel.findByIdAndUpdate(id, data, {
             new: true, // ส่งค่าที่อัพเดตกลับไป
             runValidators: true, // เปิดใช้ validators เพื่อเช็คความถูกต้องของข้อมูลที่อัพเดต
-        });
+        }).populate("reviewer", "name"); // ดึงเฉพาะฟิลด์ 'name' ของ User
+        
         if (!updatedReview) {
             res.status(404).json({ message: "ไม่พบรีวิว" });
         } else {
             res.status(200).json(updatedReview);
         }
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        console.error('ข้อผิดพลาดในการอัพเดตรีวิว:', error.message);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
     }
 };
 
@@ -100,20 +130,22 @@ const deleteReview = async (req: Request, res: Response): Promise<void> => {
             res.status(200).json({ message: "ลบรีวิวเรียบร้อยแล้ว", deletedReview });
         }
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        console.error('ข้อผิดพลาดในการลบรีวิว:', error.message);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
     }
 };
 
 // ฟังก์ชันสำหรับการดึงค่ารวมของคะแนนรีวิวทั้งหมดและคะแนนเฉลี่ย
 const getRating = async (req: Request, res: Response): Promise<void> => {
     try {
-        const reviews = await reviewModel.find();
+        const reviews = await reviewModel.find().populate("reviewer", "name");
         // คำนวณค่ารวมของคะแนนรีวิว
-        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+        const totalRating = reviews.reduce((sum: number, review: Review) => sum + review.rating, 0);
         const averageRating = reviews.length ? totalRating / reviews.length : 0;
         res.status(200).json({ totalRating, averageRating });
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        console.error('ข้อผิดพลาดในการคำนวณคะแนน:', error.message);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
     }
 };
 
@@ -121,14 +153,15 @@ const getRating = async (req: Request, res: Response): Promise<void> => {
 const getReviewByHomeStay = async (req: Request, res: Response): Promise<void> => {
     const homestayId = req.params.homestayId;
     try {
-        const reviews = await reviewModel.find({ homestay: homestayId }).populate("reviewer");
+        const reviews = await reviewModel.find({ homestay: homestayId }).populate("reviewer", "name");
         if (reviews.length === 0) {
             res.status(404).json({ message: "ไม่พบรีวิวสำหรับ Homestay นี้" });
         } else {
             res.status(200).json(reviews);
         }
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        console.error('ข้อผิดพลาดในการดึงรีวิวตาม Homestay:', error.message);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
     }
 };
 
@@ -136,14 +169,15 @@ const getReviewByHomeStay = async (req: Request, res: Response): Promise<void> =
 const getReviewByPackageId = async (req: Request, res: Response): Promise<void> => {
     const packageId = req.params.packageId;
     try {
-        const reviews = await reviewModel.find({ package: packageId }).populate("reviewer");
+        const reviews = await reviewModel.find({ package: packageId }).populate("reviewer", "name");
         if (reviews.length === 0) {
             res.status(404).json({ message: "ไม่พบรีวิวสำหรับแพ็คเกจนี้" });
         } else {
             res.status(200).json(reviews);
         }
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        console.error('ข้อผิดพลาดในการดึงรีวิวตาม Package:', error.message);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
     }
 };
 
