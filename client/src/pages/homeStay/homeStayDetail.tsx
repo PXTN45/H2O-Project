@@ -2,21 +2,22 @@ import React from "react";
 import { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import OpenStreetMap from "../../components/OpenStreetMap";
+import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { useParams } from "react-router-dom";
-import { TbRuler3 } from "react-icons/tb";
-import { LuBedSingle } from "react-icons/lu";
-import { LuBedDouble } from "react-icons/lu";
-import { FaStar, FaStarHalfAlt, FaRegStar, FaMale } from "react-icons/fa";
-import { MdOutlineBathroom } from "react-icons/md";
+import Navbar from "../../components/Navbar-data";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
-import { FaChildReaching } from "react-icons/fa6";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
 import axios from "axios";
+import { FaChildReaching } from "react-icons/fa6";
+import { MdOutlineBathroom } from "react-icons/md";
+import { FaStar, FaStarHalfAlt, FaRegStar, FaMale } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
 import { MdOutlinePolicy } from "react-icons/md";
-import Navbar from "../../components/Navbar-data";
+import { TbRuler3 } from "react-icons/tb";
+import { LuBedSingle, LuBedDouble } from "react-icons/lu";
+
 export interface Image_room {
   _id: string;
   image: string;
@@ -80,6 +81,21 @@ export interface Image {
   _id: string;
   image: string;
 }
+interface Location {
+  name_location: string;
+  province_location: string;
+  house_no: string;
+  village?: string; // Optional property
+  village_no: string;
+  alley?: string; // Optional property
+  street?: string; // Optional property
+  district_location: string;
+  subdistrict_location: string;
+  zipcode_location: number;
+  latitude_location: number;
+  longitude_location: number;
+  radius_location: number;
+}
 
 export interface HomeStay {
   name_homeStay: string;
@@ -117,8 +133,8 @@ const homeStayDetail = () => {
   const [averageRating, setAverageRating] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isLoading, setLoadPage] = useState<boolean>(false);
-  const authContext = useContext(AuthContext);
   const { setPaymentData, dataNav } = usePaymentContext();
+  const authContext = useContext(AuthContext);
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
@@ -162,8 +178,6 @@ const homeStayDetail = () => {
 
     fetchReview();
   }, [id]);
-
-  console.log(review);
 
   const images = item?.image.slice(1, 7).map((img: any, index: number) => {
     const specialClasses: { [key: number]: string } = {
@@ -686,8 +700,13 @@ const homeStayDetail = () => {
               </div>
 
               {/* Maps */}
-              <div className="flex w-full md:w-full lg:w-1/4 xl:w-1/4 h-60 shadow-boxShadow rounded-lg">
-                <OpenStreetMap />
+              <div className="flex flex-col w-full md:w-full lg:w-1/4 xl:w-1/4">
+                <div className="shadow-boxShadow rounded-lg">
+                  <OpenStreetMapShoData
+                    lat={item?.location[0].latitude_location}
+                    lng={item?.location[0].longitude_location}
+                  />
+                </div>
               </div>
             </div>
 

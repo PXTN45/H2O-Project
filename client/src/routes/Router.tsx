@@ -15,7 +15,7 @@ import BookingDetail from "../pages/homeStay/bookingDetail";
 import DetailPayment from "../pages/orther/detailPayment";
 import SearchResult from "../pages/orther/searchResult";
 import HomeStayDetail from "../pages/homeStay/homeStayDetail";
-import PackageDetail from "../pages/detail/packageDetail";
+import PackageDetail from "../pages/package/packageDetail";
 import { PaymentProvider } from "../AuthContext/paymentContext";
 import CreateHomeStay from "../pages/business/createHomeStay";
 import QR from "../testPromptPay";

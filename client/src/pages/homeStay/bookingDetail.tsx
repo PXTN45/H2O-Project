@@ -99,7 +99,7 @@ const BookingDetail: React.FC = () => {
       console.log("Start date is not defined");
       bookingStart = "default-start-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
-  console.log(bookingStart);
+  // console.log(bookingStart);
   
 
   // การจัดการวันที่สิ้นสุด (end date)
@@ -114,7 +114,7 @@ const BookingDetail: React.FC = () => {
     bookingEnd = "default-end-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
 
-  console.log(bookingEnd);
+  // console.log(bookingEnd);
   
   const booker = paymentData?.bookingUser._id;
   const paymentDetail = "promptpay";
@@ -123,12 +123,12 @@ const BookingDetail: React.FC = () => {
   const makePayment = async () => {
     try {
       const response = await axiosPrivateUser.post("/create-checkout-session", {
-        homestayName: homeStayName,
+        name: homeStayName,
         totalPrice: totalPrice,
         bookingStart: bookingStart,
         bookingEnd: bookingEnd,
         booker: booker,
-        homestay: homestayId,
+        homestayId: homestayId,
         paymentDetail: paymentDetail,
       });
 
