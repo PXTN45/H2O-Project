@@ -12,13 +12,11 @@ import SelectionCreate from "../pages/business/selectionCreate";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
 import BookingDetail from "../pages/orther/bookingDetail";
-import DetailPayment from "../pages/orther/detailPayment";
 import SearchResult from "../pages/orther/searchResult";
 import HomeStayDetail from "../pages/detail/homeStayDetail";
 import PackageDetail from "../pages/detail/packageDetail";
 import { PaymentProvider } from "../AuthContext/paymentContext";
 import CreateHomeStay from "../pages/business/createHomeStay";
-import QR from "../testPromptPay";
 
 const router = createBrowserRouter([
   {
@@ -28,18 +26,6 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
-      },
-      {
-        path: "/pay",
-        element: <QR />,
-      },
-      {
-        path: "/detailPayment",
-        element: (
-          <PaymentProvider>
-            <DetailPayment />
-          </PaymentProvider>
-        ),
       },
       {
         path: "/homeStayDetail/:id",

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
-import axios from "axios";
 
 const PackageDetail = () => {
   const [item, setItem] = useState<any >([]);

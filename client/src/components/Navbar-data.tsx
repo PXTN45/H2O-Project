@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { MdFamilyRestroom } from "react-icons/md";
 import { IoPeopleSharp, IoRemoveOutline } from "react-icons/io5";
 import { LiaChildSolid } from "react-icons/lia";

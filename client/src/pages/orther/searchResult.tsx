@@ -193,8 +193,8 @@ const SearchResult: React.FC = () => {
       );
 
       const sortedDataHomestays = validDataHomestays.sort((a, b) => {
-        const priceA = a.price_homeStay ?? Infinity;
-        const priceB = b.price_homeStay ?? Infinity;
+        const priceA = a?.price_homeStay ?? Infinity;
+        const priceB = b?.price_homeStay ?? Infinity;
 
         return priceA - priceB;
       });
@@ -207,7 +207,7 @@ const SearchResult: React.FC = () => {
       });
 
       const formattedData = dataHomeStays
-        .map((location) => {
+        ?.map((location) => {
           const offers = location.room_type.flatMap(
             (roomType) => roomType.offer
           );

@@ -1,9 +1,9 @@
 import React from "react";
 import { useState, useEffect, useContext } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import OpenStreetMap from "../../components/OpenStreetMap";
 import { useParams } from "react-router-dom";
-import { RxRulerSquare } from "react-icons/rx";
+
 import {
   FaStar,
   FaStarHalfAlt,
@@ -11,11 +11,7 @@ import {
   FaCheck,
   FaMale,
 } from "react-icons/fa";
-import {
-  MdOutlineBathroom,
-  MdOutlineBedroomChild,
-  MdOutlineBedroomParent,
-} from "react-icons/md";
+
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
@@ -187,6 +183,10 @@ const homeStayDetail = () => {
     fetchData();
   }, [id]);
 
+  if (isLoading == true) {
+    
+  }
+
   const images = item?.image.slice(1, 7).map((img: any, index: number) => {
     const specialClasses: { [key: number]: string } = {
       2: "rounded-tr-lg",
@@ -343,12 +343,12 @@ const homeStayDetail = () => {
     );
   });
 
-  const calculatePercentages = (review) => {
+  const calculatePercentages = (review: any) => {
     const totalReviews = review.length;
     const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
 
     // นับจำนวนรีวิวสำหรับแต่ละดาว
-    review.forEach((review) => {
+    review.forEach((review: any) => {
       if (review.rating >= 1 && review.rating <= 5) {
         ratingCounts[review.rating - 1]++;
       }
@@ -369,7 +369,7 @@ const homeStayDetail = () => {
   // console.log("Room Types:", roomTypes);
 
   const carousel = roomTypes.map((roomType, index) => {
-    console.log(roomType);
+    // console.log(roomType);
     const offer = roomType.offer.map((offer: Offer, i: number) => {
       const price = offer.price_homeStay;
       const discount = offer.discount;
@@ -427,7 +427,7 @@ const homeStayDetail = () => {
         try {
           // ค้นหาข้อมูล HomeStay
           const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
-          const roomType = homeStay.data.room_type.find((rt) => rt.offer[i]);
+          const roomType = homeStay.data.room_type.find((rt: any) => rt.offer[i]);
 
           if (!roomType) {
             console.log("Room type not found");
@@ -445,11 +445,11 @@ const homeStayDetail = () => {
           // อัปเดตข้อมูล HomeStay ด้วยจำนวนห้องที่ลดลง
           await axiosPrivateUser.put(`/homeStay/${id}`, {
             ...homeStay.data,
-            room_type: homeStay.data.room_type.map((rt) =>
+            room_type: homeStay.data.room_type.map((rt: any) =>
               rt.offer[i]
                 ? {
                     ...rt,
-                    offer: rt.offer.map((o, index: number) =>
+                    offer: rt.offer.map((o: any, index: number) =>
                       index === i ? { ...o, quantityRoom: newQuantityRoom } : o
                     ),
                   }
@@ -480,7 +480,7 @@ const homeStayDetail = () => {
       const handleIncreaseQuantity = async (i: number) => {
         try {
           const homeStay = await axiosPrivateUser.get(`/homeStay/${id}`);
-          const roomType = homeStay.data.room_type.find((rt) => rt.offer[i]);
+          const roomType = homeStay.data.room_type.find((rt: any) => rt.offer[i]);
 
           if (!roomType) {
             console.log("Room type not found");
@@ -493,11 +493,11 @@ const homeStayDetail = () => {
           // อัปเดตข้อมูล HomeStay ด้วยจำนวนห้องที่ลดลง
           await axiosPrivateUser.put(`/homeStay/${id}`, {
             ...homeStay.data,
-            room_type: homeStay.data.room_type.map((rt) =>
+            room_type: homeStay.data.room_type.map((rt: any) =>
               rt.offer[i]
                 ? {
                     ...rt,
-                    offer: rt.offer.map((o, index: number) =>
+                    offer: rt.offer.map((o: any, index: number) =>
                       index === i ? { ...o, quantityRoom: newQuantityRoom } : o
                     ),
                   }
