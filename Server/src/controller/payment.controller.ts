@@ -47,34 +47,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const payment = async (req: Request, res: Response) => {
   const {
     totalPrice,
-    homestayName,
+    name,
     bookingStart,
     bookingEnd,
     booker,
-    homestay,
+    homestayId,
+    packageId,
     paymentDetail,
   } = req.body;
+
+  console.log(req.body);
+
   try {
-    // ตรวจสอบวันที่ก่อนสร้าง session
-    if (!isDateValid(bookingStart, bookingEnd)) {
-      return res.status(400).json({
-        message: "Please provide valid dates starting from today!",
-      });
-    }
-
-    const differenceInDays = getBookingNights(bookingStart, bookingEnd);
-    if (differenceInDays < 1) {
-      return res.status(400).json({
-        message: "Return date must be after start date!",
-      });
-    }
-
-    if (!isBookingAvailable) {
-      return res.status(400).json({
-        message: "The homeStay is already booked!",
-      });
-    }
-
     // สร้าง session ของ Stripe
     const session = await stripe.checkout.sessions.create({
       line_items: [
@@ -82,7 +66,7 @@ const payment = async (req: Request, res: Response) => {
           price_data: {
             currency: "thb",
             product_data: {
-              name: homestayName,
+              name: name,
             },
             unit_amount: totalPrice * 100, // ราคาเป็นจำนวนเต็มในหน่วยย่อย (เช่น สตางค์)
           },
@@ -94,27 +78,48 @@ const payment = async (req: Request, res: Response) => {
       cancel_url: `${YOUR_DOMAIN}?canceled=true`,
     });
 
-    // สร้างข้อมูลการจอง
-    const booking = await BookingModel.create({
-      booker,
-      homestay,
-      bookingStart,
-      bookingEnd,
-      night: differenceInDays,
-      paymentDetail,
-    });
+    if (session) {
+      if (!isDateValid(bookingStart, bookingEnd)) {
+        return res.status(400).json({
+          message: "Please provide valid dates starting from today!",
+        });
+      }
 
-    // ส่ง URL กลับไปยัง frontend
-    res.status(201).json({
-      sessionUrl: session.url,
-      booking,
-    });
+      const differenceInDays = getBookingNights(bookingStart, bookingEnd);
+      if (differenceInDays < 1) {
+        return res.status(400).json({
+          message: "Return date must be after start date!",
+        });
+      }
 
+      if (!isBookingAvailable) {
+        return res.status(400).json({
+          message: "The homeStay is already booked!",
+        });
+      }
+
+      // สร้างข้อมูลการจอง
+      const booking = await BookingModel.create({
+        booker,
+        homestay: homestayId,
+        package: packageId,
+        bookingStart,
+        bookingEnd,
+        night: differenceInDays,
+        paymentDetail,
+      });
+
+      // ส่ง URL กลับไปยัง frontend
+      res.status(201).json({
+        sessionUrl: session.url,
+        booking,
+      });
+    }
+    // ตรวจสอบวันที่ก่อนสร้าง session
   } catch (error) {
     console.error("Error creating checkout session or booking:", error);
     res.status(500).json({ message: "Internal Server Error", error });
   }
 };
-
 
 export default payment;
