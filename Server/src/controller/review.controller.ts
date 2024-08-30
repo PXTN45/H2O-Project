@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import reviewModel from "../model/review.model";
 import BookingModel from "../model/booking.model";
-import { Review } from "../model/review.model";
+import mongoose from "mongoose";
 
 // ฟังก์ชันสำหรับการเรียกดูรีวิวทั้งหมด
 const getAllReview = async (req: Request, res: Response): Promise<void> => {
@@ -20,7 +20,7 @@ const getAllReview = async (req: Request, res: Response): Promise<void> => {
         // ดึงข้อมูลรีวิวทั้งหมด พร้อมดึงข้อมูลผู้รีวิวมาแสดงด้วย และจัดเรียงตามวันที่สร้าง (ใหม่ไปเก่า)
         const reviews = await reviewModel.find()
             .populate("reviewer", "name") // ดึงเฉพาะฟิลด์ 'name' ของ User
-            .sort({ createdAt: -1 })
+            .sort({ createdAt: -1 }) // เรียงตามวันที่สร้างจากใหม่ไปเก่า
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber);
 
@@ -36,12 +36,12 @@ const getAllReview = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-// ฟังก์ชันสำหรับการสร้างรีวิวใหม่ ลูกค้าต้องทำการจองก่อนถึงจะสามารถสร้างรีวิวได้
+// ฟังก์ชันสำหรับการสร้างรีวิว
 const createReview = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { reviewer, content, rating, homestay, package: packageId } = req.body;
+        const { reviewer, content, rating, homestay, packageId } = req.body;
 
-        // ตรวจสอบข้อมูลที่ได้รับ
+        // ตรวจสอบข้อมูลที่ได้รับ: ต้องมี reviewer, content, และ rating และต้องมี homestay หรือ package อย่างน้อยหนึ่งอย่าง
         if (!reviewer || !content || !rating || (!homestay && !packageId)) {
             res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
             return;
@@ -49,11 +49,11 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
 
         // ตรวจสอบว่าคะแนนอยู่ในช่วงที่ถูกต้อง
         if (rating < 1 || rating > 5) {
-            res.status(400).json({ message: 'คะแนนรีวิวต้องอยู่ระหว่าง 1 ถึง 5' });
+            res.status(400).json({ message: 'คะแนนต้องอยู่ระหว่าง 1 ถึง 5' });
             return;
         }
 
-        // ตรวจสอบสถานะการจองของลูกค้าสำหรับ homestay หรือ package
+        // ตรวจสอบการจองที่เกี่ยวข้องกับ homestay หรือ package
         const booking = await BookingModel.findOne({ 
             booker: reviewer, 
             $or: [
@@ -72,13 +72,13 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        // สร้างรีวิวใหม่
+        // สร้างรีวิวใหม่โดยพิจารณาจากเงื่อนไขของ homestay และ package
         const newReview = new reviewModel({
             reviewer,
             content,
             rating,
-            homestay,
-            package: packageId,
+            homestay: homestay || null, // ตั้งค่า homestay เป็น null ถ้าไม่ได้รับค่า
+            package: packageId || null   // ตั้งค่า package เป็น null ถ้าไม่ได้รับค่า
         });
 
         // บันทึกรีวิวลงในฐานข้อมูล
@@ -90,23 +90,29 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-// ฟังก์ชันสำหรับการอัพเดตรีวิวตาม id
+// ฟังก์ชันสำหรับการอัพเดตรีวิว
 const updateReview = async (req: Request, res: Response): Promise<void> => {
-    const id = req.params.id;
-    const data = req.body;
     try {
-        // ตรวจสอบว่าคะแนนที่อัพเดตอยู่ในช่วงที่ถูกต้องหรือไม่
-        if (data.rating && (data.rating < 1 || data.rating > 5)) {
-            res.status(400).json({ message: 'คะแนนรีวิวต้องอยู่ระหว่าง 1 ถึง 5' });
+        const { id } = req.params;
+        const data = req.body;
+
+        // ตรวจสอบข้อมูลที่ได้รับ
+        if (!data.reviewer || !data.content || !data.rating) {
+            res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
             return;
         }
 
-        // อัพเดตข้อมูลรีวิวที่ตรงกับ id ที่ได้รับ
+        // ตรวจสอบว่าคะแนนอยู่ในช่วงที่ถูกต้อง
+        if (data.rating < 1 || data.rating > 5) {
+            res.status(400).json({ message: 'คะแนนต้องอยู่ระหว่าง 1 ถึง 5' });
+            return;
+        }
+
         const updatedReview = await reviewModel.findByIdAndUpdate(id, data, {
             new: true, // ส่งค่าที่อัพเดตกลับไป
             runValidators: true, // เปิดใช้ validators เพื่อเช็คความถูกต้องของข้อมูลที่อัพเดต
         }).populate("reviewer", "name"); // ดึงเฉพาะฟิลด์ 'name' ของ User
-        
+
         if (!updatedReview) {
             res.status(404).json({ message: "ไม่พบรีวิว" });
         } else {
@@ -118,12 +124,13 @@ const updateReview = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-// ฟังก์ชันสำหรับการลบรีวิวตาม id
+// ฟังก์ชันสำหรับการลบรีวิว
 const deleteReview = async (req: Request, res: Response): Promise<void> => {
-    const id = req.params.id;
     try {
-        // ลบรีวิวที่ตรงกับ id ที่ได้รับ
+        const { id } = req.params;
+
         const deletedReview = await reviewModel.findByIdAndDelete(id);
+
         if (!deletedReview) {
             res.status(404).json({ message: "ไม่พบรีวิว" });
         } else {
@@ -139,9 +146,11 @@ const deleteReview = async (req: Request, res: Response): Promise<void> => {
 const getRating = async (req: Request, res: Response): Promise<void> => {
     try {
         const reviews = await reviewModel.find().populate("reviewer", "name");
+
         // คำนวณค่ารวมของคะแนนรีวิว
-        const totalRating = reviews.reduce((sum: number, review: Review) => sum + review.rating, 0);
+        const totalRating = reviews.reduce((sum: number, review) => sum + review.rating, 0);
         const averageRating = reviews.length ? totalRating / reviews.length : 0;
+
         res.status(200).json({ totalRating, averageRating });
     } catch (error: any) {
         console.error('ข้อผิดพลาดในการคำนวณคะแนน:', error.message);
@@ -152,8 +161,14 @@ const getRating = async (req: Request, res: Response): Promise<void> => {
 // ฟังก์ชันสำหรับการดึงรีวิวตาม HomeStay ID
 const getReviewByHomeStay = async (req: Request, res: Response): Promise<void> => {
     const homestayId = req.params.homestayId;
+
     try {
-        const reviews = await reviewModel.find({ homestay: homestayId }).populate("reviewer", "name");
+        // เปลี่ยน homestayId เป็น ObjectId โดยใช้ new
+        const objectId = new mongoose.Types.ObjectId(homestayId);
+
+        // ดึงรีวิวจากฐานข้อมูลตาม HomeStay ID
+        const reviews = await reviewModel.find({ homestay: objectId }).populate("reviewer", "name");
+
         if (reviews.length === 0) {
             res.status(404).json({ message: "ไม่พบรีวิวสำหรับ Homestay นี้" });
         } else {
@@ -168,8 +183,14 @@ const getReviewByHomeStay = async (req: Request, res: Response): Promise<void> =
 // ฟังก์ชันสำหรับการดึงรีวิวตาม Package ID
 const getReviewByPackageId = async (req: Request, res: Response): Promise<void> => {
     const packageId = req.params.packageId;
+
     try {
-        const reviews = await reviewModel.find({ package: packageId }).populate("reviewer", "name");
+        // เปลี่ยน packageId เป็น ObjectId โดยใช้ new
+        const objectId = new mongoose.Types.ObjectId(packageId);
+
+        // ดึงรีวิวจากฐานข้อมูลตาม Package ID
+        const reviews = await reviewModel.find({ package: objectId }).populate("reviewer", "name");
+
         if (reviews.length === 0) {
             res.status(404).json({ message: "ไม่พบรีวิวสำหรับแพ็คเกจนี้" });
         } else {
@@ -179,14 +200,14 @@ const getReviewByPackageId = async (req: Request, res: Response): Promise<void> 
         console.error('ข้อผิดพลาดในการดึงรีวิวตาม Package:', error.message);
         res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
     }
-};
+};;
 
 export {
     getAllReview,
     createReview,
     updateReview,
-    deleteReview, 
+    deleteReview,
     getRating,
     getReviewByHomeStay,
-    getReviewByPackageId,
+    getReviewByPackageId
 };
