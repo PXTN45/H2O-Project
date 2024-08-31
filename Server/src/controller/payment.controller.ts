@@ -8,7 +8,7 @@ import { getBookingNights, isDateValid } from "../utils";
 import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
 
-const YOUR_DOMAIN = "http://localhost:3000/";
+const YOUR_DOMAIN = "http://localhost:5173";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-06-20",
 });
@@ -44,8 +44,8 @@ const payment = async (req: Request, res: Response) => {
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:5173/paymentSuccess`,
-      cancel_url: `${YOUR_DOMAIN}?canceled=true`,
+      success_url: `${YOUR_DOMAIN}/paymentSuccess`,
+      cancel_url: `${YOUR_DOMAIN}/paymentFailure`,
       customer_email: email,
     });
 
