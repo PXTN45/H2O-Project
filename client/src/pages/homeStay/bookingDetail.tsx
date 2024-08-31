@@ -5,6 +5,8 @@ import { IoMdTime } from "react-icons/io";
 import { MdOutlinePolicy } from "react-icons/md";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
+import { useContext } from "react";
+import { AuthContext } from "../../AuthContext/auth.provider";
 
 export interface Image_room {
   _id: string;
@@ -66,8 +68,14 @@ const BookingDetail: React.FC = () => {
   const { paymentData, dataNav } = usePaymentContext();
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [feeAndTax, setFeeAndTax] = useState<number>(0);
+  const authContext = useContext(AuthContext);
 
-  console.log(dataNav);
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+  const { userInfo } = authContext;
+
+  console.log(userInfo);
 
   useEffect(() => {
     if (paymentData && dataNav) {
@@ -84,23 +92,25 @@ const BookingDetail: React.FC = () => {
     }
   }, [paymentData?.totalPrice]);
 
+  console.log(paymentData?.bookingUser.email);
+
+  const email = userInfo?.email;
   const homeStayName = paymentData?.homeStayName;
 
   // การจัดการวันที่เริ่มต้น (start date)
   const startStr = dataNav?.dateRange.startDate_Time;
   let bookingStart: string;
-  
+
   if (startStr) {
-      const dateStart = new Date(startStr);
-      const offset = dateStart.getTimezoneOffset() * 60000; // Offset เป็น milliseconds
-      const localDate = new Date(dateStart.getTime() - offset);
-      bookingStart = localDate.toISOString().split('T')[0];
+    const dateStart = new Date(startStr);
+    const offset = dateStart.getTimezoneOffset() * 60000; // Offset เป็น milliseconds
+    const localDate = new Date(dateStart.getTime() - offset);
+    bookingStart = localDate.toISOString().split("T")[0];
   } else {
-      console.log("Start date is not defined");
-      bookingStart = "default-start-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
+    console.log("Start date is not defined");
+    bookingStart = "default-start-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
   // console.log(bookingStart);
-  
 
   // การจัดการวันที่สิ้นสุด (end date)
   const endStr = dataNav?.dateRange.endDate_Time;
@@ -115,7 +125,7 @@ const BookingDetail: React.FC = () => {
   }
 
   // console.log(bookingEnd);
-  
+
   const booker = paymentData?.bookingUser._id;
   const paymentDetail = "promptpay";
   const homestayId = paymentData?.homeStayId;
@@ -130,12 +140,23 @@ const BookingDetail: React.FC = () => {
         booker: booker,
         homestayId: homestayId,
         paymentDetail: paymentDetail,
+        email: email,
       });
 
-      if (response.data && response.data.sessionUrl) {
-        window.location.href = response.data.sessionUrl;
+      if (response.data) {
+        const { sessionUrl, booking, totalPrice, email, name } = response.data;
+
+        if (sessionUrl) {
+          // Save booking details in localStorage
+          localStorage.setItem("bookingDetails", JSON.stringify( booking, totalPrice, email));
+
+          // Redirect to Stripe Checkout
+          window.location.href = sessionUrl;
+        } else {
+          throw new Error("No session URL returned");
+        }
       } else {
-        throw new Error("No session URL returned");
+        throw new Error("Invalid response format");
       }
     } catch (error) {
       console.error("Error making payment:", error);

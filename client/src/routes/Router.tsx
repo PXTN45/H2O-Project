@@ -19,7 +19,7 @@ import PackageDetail from "../pages/package/packageDetail";
 import { PaymentProvider } from "../AuthContext/paymentContext";
 import CreateHomeStay from "../pages/business/createHomeStay";
 import QR from "../testPromptPay";
-// import PaymentSuus
+import PaymentSuccess from "../pages/homeStay/paymentSuccess";
 
 const router = createBrowserRouter([
   {
@@ -60,7 +60,6 @@ const router = createBrowserRouter([
           </PaymentProvider>
         ),
       },
-
       {
         path: "/packageDetail/:id",
         element: <PackageDetail />,
@@ -119,12 +118,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/createHomeStay",
-        element:(
+        element: (
           <PrivateRouterBusiness>
-            <CreateHomeStay/>
+            <CreateHomeStay />
           </PrivateRouterBusiness>
-        )
-      }
+        ),
+      },
     ],
   },
   {
@@ -141,6 +140,14 @@ const router = createBrowserRouter([
       <PrivateRouterBusiness>
         <SelectionCreate />
       </PrivateRouterBusiness>
+    ),
+  },
+  {
+    path: "/paymentSuccess",
+    element: (
+      <PaymentProvider>
+        <PaymentSuccess />
+      </PaymentProvider>
     ),
   },
 ]);
