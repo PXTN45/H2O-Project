@@ -1,4 +1,4 @@
-import React, { useState,useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { MdFamilyRestroom } from "react-icons/md";
 import { IoPeopleSharp, IoRemoveOutline } from "react-icons/io5";
 import { LiaChildSolid } from "react-icons/lia";
@@ -59,16 +59,15 @@ const Navbar = () => {
     setNumChildren(numChildren > 0 ? numChildren - 1 : 0);
 
   const handleIncreaseChildren = () => setNumChildren(numChildren + 1);
-  
-  const handleDecreaseRoom = () =>
-    setNumRoom(numRoom > 0 ? numRoom - 1 : 1);
+
+  const handleDecreaseRoom = () => setNumRoom(numRoom > 0 ? numRoom - 1 : 1);
 
   const handleIncreaseRoom = () => setNumRoom(numRoom + 1);
 
   const handleDateChange = (dates: [Date | null, Date | null]) => {
     setDateRange(dates);
     setShowCalendar(false);
-  }
+  };
 
   const formatDate = (date: Date | null) => {
     if (!date) return "Select Date";
@@ -84,23 +83,63 @@ const Navbar = () => {
   const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
   const startDate_Time = dateRange[0];
   const endDate_Time = dateRange[1];
- 
+  
+  const calculateNights = (
+    startDateTime?: Date | null,
+    endDateTime?: Date | null
+  ): number => {
+    if (!startDateTime || !endDateTime) {
+      console.error("Start date or end date is missing or invalid");
+      return 0;
+    }
+
+    // ตรวจสอบว่าค่าเป็น Date หรือไม่ ถ้าไม่ใช่ให้แปลง
+    const start =
+      typeof startDateTime === "string"
+        ? new Date(startDateTime)
+        : startDateTime;
+    const end =
+      typeof endDateTime === "string" ? new Date(endDateTime) : endDateTime;
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      console.error("Invalid start or end date");
+      return 0;
+    }
+
+    const differenceInTime = end.getTime() - start.getTime();
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24) - 1;
+
+    return Math.ceil(differenceInDays);
+  };
+
+  const numberOfNights = calculateNights(startDate_Time, endDate_Time);
+  // console.log(`จำนวนคืน: ${numberOfNights}`);
+
   useEffect(() => {
     const newDataNav = {
       numPeople: numPeople,
       numChildren: numChildren,
       numRoom: numRoom,
       dateRange: {
-        startDate: startDate,           
-        endDate: endDate,               
-        startDate_Time: startDate_Time, 
-        endDate_Time: endDate_Time,     
+        startDate: startDate,
+        endDate: endDate,
+        startDate_Time: startDate_Time,
+        endDate_Time: endDate_Time,
+        numberOfNights: numberOfNights,
       },
     };
 
     setDataNav(newDataNav);
-  }, [numPeople, numChildren, numRoom, startDate, endDate, startDate_Time, endDate_Time]);
- 
+  }, [
+    numPeople,
+    numChildren,
+    numRoom,
+    startDate,
+    endDate,
+    startDate_Time,
+    endDate_Time,
+  ]);
+
   return (
     <nav className="bg-white-frosted sticky top-0 left-0 w-full z-40 shadow-b-md">
       <div className="flex flex-col items-center justify-between xl:flex-row w-full">
@@ -169,7 +208,7 @@ const Navbar = () => {
               </div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center">
-                  <GoHome  className="w-5 h-5 mr-5" />
+                  <GoHome className="w-5 h-5 mr-5" />
                   <span className="w-5 h-5">ห้อง</span>
                 </div>
                 <div>

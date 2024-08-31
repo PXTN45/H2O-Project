@@ -79,7 +79,7 @@ const BookingDetail: React.FC = () => {
 
   useEffect(() => {
     if (paymentData && dataNav) {
-      const price = paymentData.totalPrice * dataNav?.numRoom;
+      const price = (paymentData.totalPrice * dataNav?.numRoom)* dataNav.dateRange.numberOfNights
       const taxRate = 0.07;
       const feeRate = 0.1;
 
@@ -124,7 +124,7 @@ const BookingDetail: React.FC = () => {
     bookingEnd = "default-end-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
 
-  // console.log(bookingEnd);
+  console.log(dataNav);
 
   const booker = paymentData?.bookingUser._id;
   const paymentDetail = "promptpay";

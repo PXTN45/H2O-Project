@@ -134,34 +134,34 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
   if (!paymentData) {
     return <div>No booking details available.</div>;
   }
-  // console.log(dataNav?.dateRange.startDate);
-  const calculateNights = (startDateTime?: Date | null, endDateTime?: Date | null): number => {
-    if (!startDateTime || !endDateTime) {
-      console.error("Start date or end date is missing or invalid");
-      return 0;
-    }
+  // // console.log(dataNav?.dateRange.startDate);
+  // const calculateNights = (startDateTime?: Date | null, endDateTime?: Date | null): number => {
+  //   if (!startDateTime || !endDateTime) {
+  //     console.error("Start date or end date is missing or invalid");
+  //     return 0;
+  //   }
   
-    // ตรวจสอบว่าค่าเป็น Date หรือไม่ ถ้าไม่ใช่ให้แปลง
-    const start = typeof startDateTime === 'string' ? new Date(startDateTime) : startDateTime;
-    const end = typeof endDateTime === 'string' ? new Date(endDateTime) : endDateTime;
+  //   // ตรวจสอบว่าค่าเป็น Date หรือไม่ ถ้าไม่ใช่ให้แปลง
+  //   const start = typeof startDateTime === 'string' ? new Date(startDateTime) : startDateTime;
+  //   const end = typeof endDateTime === 'string' ? new Date(endDateTime) : endDateTime;
   
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      console.error("Invalid start or end date");
-      return 0;
-    }
+  //   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+  //     console.error("Invalid start or end date");
+  //     return 0;
+  //   }
   
-    const differenceInTime = end.getTime() - start.getTime();
-    const differenceInDays =( differenceInTime / (1000 * 3600 * 24)-1);
+  //   const differenceInTime = end.getTime() - start.getTime();
+  //   const differenceInDays =( differenceInTime / (1000 * 3600 * 24)-1);
   
-    return Math.ceil(differenceInDays);
-  };
+  //   return Math.ceil(differenceInDays);
+  // };
   
-  // การใช้งานฟังก์ชัน
-  const startDate_Time = dataNav?.dateRange.startDate_Time;
-  const endDate_Time = dataNav?.dateRange.endDate_Time;    
+  // // การใช้งานฟังก์ชัน
+  // const startDate_Time = dataNav?.dateRange.startDate_Time;
+  // const endDate_Time = dataNav?.dateRange.endDate_Time;    
   
-  const numberOfNights = calculateNights(startDate_Time, endDate_Time);
-  console.log(`จำนวนคืน: ${numberOfNights}`); // แสดงผลลัพธ์
+  // const numberOfNights = calculateNights(startDate_Time, endDate_Time);
+  // console.log(`จำนวนคืน: ${numberOfNights}`); 
   
   
   
@@ -186,7 +186,7 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
             <div>ตั้งแต่ : 14.00 </div>
           </div>
           <div className="w-1/5 flex justify-center border-b">
-            <div className="text-sm"> {numberOfNights} คืน</div>
+            <div className="text-sm"> {dataNav?.dateRange.numberOfNights} คืน</div>
           </div>
           <div className="shadow-boxShadow w-2/5 p-3 rounded-xl flex flex-col items-center text-sm">
             <div>เช็คเอ้า</div>
@@ -231,7 +231,7 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
             </div>
           </div>
           <div className="flex justify-between">
-            <div className="text-sm">{dataNav?.numRoom} ห้อง / {numberOfNights} คืน</div>
+            <div className="text-sm">{dataNav?.numRoom} ห้อง / {dataNav?.dateRange.numberOfNights} คืน</div>
             <div className="text-alert font-bold text-lg">
               {totalPrice.toLocaleString("th-TH", {
                 style: "decimal",

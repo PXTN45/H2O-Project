@@ -141,6 +141,8 @@ const homeStayDetail = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { userInfo } = authContext;
+  console.log(dataNav);
+  
 
   useEffect(() => {
     const fetchData = async () => {

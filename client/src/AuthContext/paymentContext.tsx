@@ -8,7 +8,8 @@ import React, {
 
 export interface DateRange {
   startDate: string;      
-  endDate: string;        
+  endDate: string;     
+  numberOfNights: number;   
   startDate_Time: Date | null; 
   endDate_Time: Date | null;   
 }
