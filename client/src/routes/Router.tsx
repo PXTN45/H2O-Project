@@ -20,6 +20,7 @@ import { PaymentProvider } from "../AuthContext/paymentContext";
 import CreateHomeStay from "../pages/business/createHomeStay";
 import QR from "../testPromptPay";
 import PaymentSuccess from "../pages/homeStay/paymentSuccess";
+import PaymentFailure from "../pages/homeStay/paymentFailure";
 
 const router = createBrowserRouter([
   {
@@ -147,6 +148,14 @@ const router = createBrowserRouter([
     element: (
       <PaymentProvider>
         <PaymentSuccess />
+      </PaymentProvider>
+    ),
+  },
+  {
+    path: "/paymentFailure",
+    element: (
+      <PaymentProvider>
+        <PaymentFailure />
       </PaymentProvider>
     ),
   },
