@@ -231,7 +231,7 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
             </div>
           </div>
           <div className="flex justify-between">
-            <div className="text-sm">{dataNav?.numRoom} ห้อง / 1 คืน</div>
+            <div className="text-sm">{dataNav?.numRoom} ห้อง / {numberOfNights} คืน</div>
             <div className="text-alert font-bold text-lg">
               {totalPrice.toLocaleString("th-TH", {
                 style: "decimal",
