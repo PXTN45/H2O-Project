@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import OpenStreetMap from "../../components/OpenStreetMap";
 import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
@@ -96,7 +96,6 @@ interface Location {
   longitude_location: number;
   radius_location: number;
 }
-
 export interface HomeStay {
   name_homeStay: string;
   room_type: RoomType[];
@@ -133,6 +132,8 @@ const homeStayDetail = () => {
   const [averageRating, setAverageRating] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isLoading, setLoadPage] = useState<boolean>(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const alertRef = useRef(null);
   const { setPaymentData, dataNav } = usePaymentContext();
   const authContext = useContext(AuthContext);
 
@@ -320,7 +321,7 @@ const homeStayDetail = () => {
     return percentages;
   };
   // console.log(numRoom);
-
+  const percentages = calculatePercentages(review);
   const roomTypes = item?.room_type || [];
   const [currentIndices, setCurrentIndices] = useState<number[]>(
     roomTypes.map(() => 0)
@@ -358,7 +359,6 @@ const homeStayDetail = () => {
       })
     );
   };
-  const percentages = calculatePercentages(review);
 
   // Debugging: ตรวจสอบค่า currentIndices และ roomTypes
   // console.log("Current Indices:", currentIndices);
@@ -422,7 +422,11 @@ const homeStayDetail = () => {
               navigate("/bookingDetail");
             }
           } else {
-            console.log("plese enter the value");
+            setShowAlert(true);
+            // เลื่อนหน้าไปยังตำแหน่งของ alert
+            if (alertRef.current) {
+              alertRef.current.scrollIntoView({ behavior: "smooth" });
+            }
           }
         }
       };
@@ -610,10 +614,33 @@ const homeStayDetail = () => {
         <div>
           <div
             id="homeStayDetail"
+            ref={alertRef}
             className="container-xl mx-6 md:mx-8 lg:mx-24 xl:mx-40"
           >
-            <div className="mt-5">
+            <div className="mt-5 ">
               <Navbar />
+              <div className="mt-2  flex  justify-end">
+                {showAlert && (
+                  <div className="alert alert-error text-white w-1/3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 shrink-0 stroke-current"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span>
+                      เงื่อนไขไม่ผ่าน กรุณาใส่ข้อมูลให้ครบ
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
             {/* รูปภาพ */}
             <div className="flex justify-center gap-4 mt-10 mb-5 ">
@@ -723,93 +750,8 @@ const homeStayDetail = () => {
                 )}{" "}
                 ข้อเสนอ
               </h1>
-              {/* <div>
-                {roomTypes.map((roomType, index) => (
-                  <div key={index} className="mb-8 relative">
-                    <h2 className="text-xl font-bold mb-4">
-                      {roomType.name_type_room}
-                    </h2>
-                    <div
-                      id={`carousel-${index}`}
-                      className="relative w-full"
-                      data-carousel="slide"
-                    >
-                      <div className="relative h-60 overflow-hidden rounded-lg">
-                        {roomType.image_room.map((image, imageIndex) => (
-                          <div
-                            key={`${index}-${imageIndex}`}
-                            className={`duration-700 ease-in-out ${
-                              currentIndices[index] === imageIndex
-                                ? "block"
-                                : "hidden"
-                            }`}
-                            data-carousel-item
-                          >
-                            <img
-                              src={image.image}
-                              className="absolute block w-full h-full object-cover rounded-xl"
-                              alt={`Slide ${imageIndex + 1}`}
-                            />
-                          </div>
-                        ))}
-                        <button
-                          type="button"
-                          className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-                          onClick={() => handlePrev(index)}
-                          data-carousel-prev
-                        >
-                          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                            <svg
-                              className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 6 10"
-                            >
-                              <path
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M5 1 1 5l4 4"
-                              />
-                            </svg>
-                            <span className="sr-only">Previous</span>
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-                          onClick={() => handleNext(index)}
-                          data-carousel-next
-                        >
-                          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                            <svg
-                              className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 6 10"
-                            >
-                              <path
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="m1 9 4-4-4-4"
-                              />
-                            </svg>
-                            <span className="sr-only">Next</span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div> */}
               <div>
                 <div>{carousel}</div>
-                {/* <div>{cardOffer}</div> */}
               </div>
             </div>
             {/* policy */}
