@@ -83,10 +83,7 @@ const payment = async (req: Request, res: Response) => {
       // ส่ง URL กลับไปยัง frontend
       res.status(201).json({
         sessionUrl: session.url,
-        booking,
-        totalPrice,
-        email,
-        name
+        booking
       });
     }
     // ตรวจสอบวันที่ก่อนสร้าง session
