@@ -31,7 +31,13 @@ const searchByTypePackage = async (
 const getByIdPackage = async (req: Request, res: Response): Promise<void> => {
   try {
     const packageId = req.params.id;
-    const data = await PackageModel.findById(packageId);
+    console.log(packageId);
+
+    const data = await PackageModel.findById(packageId).populate({
+      path: "homestay",
+      model: "HomeStay",
+    });
+    console.log(data);
     if (!data) {
       res.status(404).json({ message: "Package not found" });
     } else {
@@ -79,7 +85,6 @@ const updatePackage = async (req: Request, res: Response): Promise<void> => {
       new: true,
     });
     if (!updatedPackage) {
-      
       res.status(404).json({ message: "Package Not Found" });
     } else {
       res.status(200).json({ message: "Package Updated!", updatedPackage });
