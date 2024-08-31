@@ -144,11 +144,11 @@ const BookingDetail: React.FC = () => {
       });
 
       if (response.data) {
-        const { sessionUrl, booking, totalPrice, email, name } = response.data;
+        const { sessionUrl, booking } = response.data;
 
         if (sessionUrl) {
           // Save booking details in localStorage
-          localStorage.setItem("bookingDetails", JSON.stringify( booking, totalPrice, email));
+          localStorage.setItem("bookingDetails", JSON.stringify(booking));
 
           // Redirect to Stripe Checkout
           window.location.href = sessionUrl;
