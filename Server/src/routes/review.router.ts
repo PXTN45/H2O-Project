@@ -158,15 +158,22 @@ router.delete("/deleteReview/:id", deleteReview);
 
 /**
  * @swagger
- * /getRating:
+ * /getRating/{homestayId}:
  *   get:
- *     summary: Get rating details
+ *     summary: Get rating details by homestay ID
  *     tags: [Rating]
+ *     parameters:
+ *       - in: path
+ *         name: homestayId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the homestay to retrieve rating details for
  *     responses:
  *       200:
- *         description: Successfully retrieved rating details.
+ *         description: Successfully retrieved rating details for the homestay.
  */
-router.get("/getRating", getRating);
+router.get("/getRating/:homestayId", getRating);
 
 /**
  * @swagger

@@ -145,26 +145,61 @@ const deleteReview = async (req: Request, res: Response): Promise<void> => {
 // ฟังก์ชันสำหรับการดึงค่ารวมของคะแนนรีวิวทั้งหมดและคะแนนเฉลี่ย
 const getRating = async (req: Request, res: Response): Promise<void> => {
     try {
+        // ดึงข้อมูลรีวิวทั้งหมดจาก MongoDB และรวมข้อมูลรีวิวเวอร์ (ชื่อ) ผ่านการใช้ .populate()
         const reviews = await reviewModel.find().populate("reviewer", "name");
 
-        // คำนวณค่ารวมของคะแนนรีวิว
-        const totalRating = reviews.reduce((sum: number, review) => sum + review.rating, 0);
-        const averageRating = reviews.length ? totalRating / reviews.length : 0;
+        // ฟังก์ชันเพื่อหาค่าเฉลี่ยของคะแนนรีวิว และปัดเศษคะแนนให้เป็นทศนิยม 0.5
+        const getRoundedAverage = (reviews: any[]) => {
+            // คำนวณผลรวมของคะแนนทั้งหมด
+            const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+            // หาค่าเฉลี่ยของคะแนน
+            const avg = reviews.length ? total / reviews.length : 0;
+            // ปัดเศษคะแนนให้เป็นทศนิยม 0.5 (เช่น 4.25 จะปัดเป็น 4.5)
+            return Math.round(avg * 2) / 2;
+        };
 
-        res.status(200).json({ totalRating, averageRating });
+        // ดึง ID ของที่พักจาก URL parameter
+        const { homestayId } = req.params;
+
+        // ตรวจสอบว่า ID ของที่พักได้รับการส่งมาในคำขอหรือไม่
+        if (!homestayId) {
+            res.status(400).json({ message: "Homestay ID is required" });
+            return;
+        }
+
+        // กรองเฉพาะรีวิวที่มี ID ของที่พักที่ต้องการ
+        const filteredReviews = reviews.filter(review => review.homestay && review.homestay.toString() === homestayId);
+
+        // ตรวจสอบว่าไม่มีรีวิวสำหรับที่พักที่ระบุ
+        if (filteredReviews.length === 0) {
+            res.status(404).json({ message: "No reviews found for this homestay" });
+            return;
+        }
+
+        // คำนวณคะแนนรวมและค่าเฉลี่ยของรีวิวที่เกี่ยวข้องกับที่พักเฉพาะ
+        const homestayRating = {
+            homestayId: homestayId, // เพิ่ม ID ของที่พักที่นี่
+            totalRating: filteredReviews.reduce((sum, r) => sum + r.rating, 0),
+            averageRating: getRoundedAverage(filteredReviews)
+        };
+
+        // ส่งค่าผลลัพธ์ (homestay rating) กลับไปที่ client ด้วยสถานะ 200
+        res.status(200).json({ homestayRating });
     } catch (error: any) {
-        console.error('ข้อผิดพลาดในการคำนวณคะแนน:', error.message);
-        res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
+        // ในกรณีเกิดข้อผิดพลาด แสดงข้อความข้อผิดพลาด และส่งสถานะ 500 กลับไปที่ client
+        console.error('Error calculating rating:', error.message);
+        res.status(500).json({ message: "System error occurred" });
     }
 };
 
 // ฟังก์ชันสำหรับการดึงรีวิวตาม HomeStay ID
 const getReviewByHomeStay = async (req: Request, res: Response): Promise<void> => {
-    const homestayId = req.params.homestayId;
-
+    const homeStayId = req.params.homeStayId;
+    console.log(homeStayId);
+    
     try {
         // เปลี่ยน homestayId เป็น ObjectId โดยใช้ new
-        const objectId = new mongoose.Types.ObjectId(homestayId);
+        const objectId = new mongoose.Types.ObjectId(homeStayId);
 
         // ดึงรีวิวจากฐานข้อมูลตาม HomeStay ID
         const reviews = await reviewModel.find({ homestay: objectId }).populate("reviewer", "name");
