@@ -21,6 +21,8 @@ import CreateHomeStay from "../pages/business/createHomeStay";
 import QR from "../testPromptPay";
 import PaymentSuccess from "../pages/homeStay/paymentSuccess";
 import PaymentFailure from "../pages/homeStay/paymentFailure";
+import Contact from "../pages/orther/Contact";
+import ContactOnlyAdmin from "../pages/orther/Contact.OnlyAdmin";
 
 const router = createBrowserRouter([
   {
@@ -123,6 +125,18 @@ const router = createBrowserRouter([
           <PrivateRouterBusiness>
             <CreateHomeStay />
           </PrivateRouterBusiness>
+        ),
+      },
+      {
+        path: "/help",
+        element: (
+            <Contact />
+        ),
+      },
+      {
+        path: "/helpOnlyAdmin",
+        element: (
+            <ContactOnlyAdmin />
         ),
       },
     ],
