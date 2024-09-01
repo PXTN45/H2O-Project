@@ -14,35 +14,34 @@ const UserChat: React.FC = () => {
   const chatId = "66d35d1e00e2007dbfcb1272"; // แทนที่ด้วย chatId จริงๆ
   const sender = "user"; // กำหนดผู้ส่งเป็น user
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
+
+  // ฟังก์ชันในการดึงข้อมูลข้อความจากเซิร์ฟเวอร์
+  const fetchMessages = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/help/messages?chatId=${chatId}`
+      );
+      setMessages(response.data);
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3000/help/messages?chatId=${chatId}`);
-        setMessages(response.data);
-      } catch (error) {
-        console.error("Error fetching chat messages:", error);
-      }
-    };
-
-    fetchMessages(); // Initial fetch
-
-    const interval = setInterval(() => {
-      fetchMessages(); // Fetch messages periodically
-    }, 5000); // Adjust the interval as needed (e.g., every 5 seconds)
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    fetchMessages();
   }, [chatId]);
 
   useEffect(() => {
+    // เชื่อมต่อกับ Socket.IO
     const socket: Socket = io("http://localhost:3000");
+    socketRef.current = socket;
+
     socket.emit("joinChat", chatId);
 
     socket.on("message", (newMessage: Message) => {
-      setMessages((prevMessages) => {
-        const updatedMessages = [...prevMessages, newMessage];
-        return updatedMessages;
-      });
+      console.log("Received new message:", newMessage);
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
 
     return () => {
@@ -54,7 +53,7 @@ const UserChat: React.FC = () => {
     if (endOfMessagesRef.current) {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages]); // ใช้ messages เป็น dependency เพื่อเลื่อนลงเมื่อมีการอัปเดต
 
   const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
