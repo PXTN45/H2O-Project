@@ -18,16 +18,20 @@ const UserChat: React.FC = () => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/help/messages?chatId=${chatId}`
-        );
+        const response = await axios.get(`http://localhost:3000/help/messages?chatId=${chatId}`);
         setMessages(response.data);
       } catch (error) {
         console.error("Error fetching chat messages:", error);
       }
     };
 
-    fetchMessages();
+    fetchMessages(); // Initial fetch
+
+    const interval = setInterval(() => {
+      fetchMessages(); // Fetch messages periodically
+    }, 5000); // Adjust the interval as needed (e.g., every 5 seconds)
+
+    return () => clearInterval(interval); // Clean up the interval on component unmount
   }, [chatId]);
 
   useEffect(() => {
@@ -35,10 +39,8 @@ const UserChat: React.FC = () => {
     socket.emit("joinChat", chatId);
 
     socket.on("message", (newMessage: Message) => {
-      console.log("Received new message:", newMessage);
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages, newMessage];
-        console.log("Updated messages:", updatedMessages);
         return updatedMessages;
       });
     });
