@@ -81,16 +81,16 @@ const Footer = () => {
           userInfo?.role === "user" &&
           thisPage !== "/" &&
           thisPage !== "/search/search-result"
-            ? "bg-gradient-to-l from-primaryUser to-secondUser mt-10 py-4"
+            ? "bg-gradient-to-l from-primaryUser to-secondUser py-4"
             : userInfo?.role === "business" &&
               thisPage !== "/" &&
               thisPage !== "/search/search-result"
-            ? "bg-gradient-to-l from-primaryBusiness to-secondBusiness mt-10 py-4"
+            ? "bg-gradient-to-l from-primaryBusiness to-secondBusiness py-4"
             : userInfo?.role === "admin" &&
               thisPage !== "/" &&
               thisPage !== "/search/search-result"
-            ? "bg-gradient-to-l from-primaryAdmin to-secondAdmin mt-10 py-4"
-            : "bg-gradient-to-r from-primaryNoRole to-secondNoRole mt-10 py-4"
+            ? "bg-gradient-to-l from-primaryAdmin to-secondAdmin py-4"
+            : "bg-gradient-to-r from-primaryNoRole to-secondNoRole py-4"
         }
       >
         <div className="container mx-auto flex justify-center items-center">
