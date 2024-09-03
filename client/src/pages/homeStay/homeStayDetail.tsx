@@ -696,7 +696,7 @@ const homeStayDetail = () => {
                 <div className="rounded-lg shadow-boxShadow p-10 mb-5">
                   <div className="flex items-center">
                     <div className="flex items-center flex-wrap gap-4">
-                      <div className="font-bold text-xl">
+                      <div id="homeStayName" className="font-bold text-xl">
                         {item.name_homeStay}
                       </div>
                       {/* ดาว */}
@@ -729,7 +729,7 @@ const homeStayDetail = () => {
               </div>
 
               {/* Maps */}
-              <div className="flex flex-col w-full md:w-full lg:w-1/4 xl:w-1/4">
+              <div id="maps" className="flex flex-col w-full md:w-full lg:w-1/4 xl:w-1/4">
                 <div className="shadow-boxShadow rounded-lg">
                   <OpenStreetMapShoData
                     lat={item?.location[0].latitude_location}
