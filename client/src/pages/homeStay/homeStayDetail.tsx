@@ -142,7 +142,6 @@ const homeStayDetail = () => {
   }
   const { userInfo } = authContext;
   console.log(dataNav);
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -637,9 +636,7 @@ const homeStayDetail = () => {
                         d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span>
-                      เงื่อนไขไม่ผ่าน กรุณาใส่ข้อมูลให้ครบ
-                    </span>
+                    <span>เงื่อนไขไม่ผ่าน กรุณาใส่ข้อมูลให้ครบ</span>
                   </div>
                 )}
               </div>
@@ -659,6 +656,7 @@ const homeStayDetail = () => {
             <div className="sticky z-10 top-0 bg-white flex shadow-boxShadow rounded-lg w-full mb-5 p-5">
               <div className="flex items-center gap-4 w-full">
                 <a
+                  id="buttonHomeStayDetail"
                   href="homeStayDetail"
                   className="text-decoration text-md "
                   onClick={handleScrollToElement("homeStayDetail")}
@@ -666,6 +664,7 @@ const homeStayDetail = () => {
                   รายละเอียดที่พัก
                 </a>
                 <a
+                  id="buttonFacilities"
                   href="facilities"
                   className="text-decoration"
                   onClick={handleScrollToElement("facilities")}
@@ -673,6 +672,7 @@ const homeStayDetail = () => {
                   สิ่งอำนวยความสะดวก
                 </a>
                 <a
+                  id="buttonDetailRoom"
                   href="detailRoom"
                   className="text-decoration"
                   onClick={handleScrollToElement("detailRoom")}
@@ -680,6 +680,7 @@ const homeStayDetail = () => {
                   ห้องพัก
                 </a>
                 <a
+                  id="buttonReview"
                   href="review"
                   className="text-decoration"
                   onClick={handleScrollToElement("review")}
@@ -696,7 +697,7 @@ const homeStayDetail = () => {
                 <div className="rounded-lg shadow-boxShadow p-10 mb-5">
                   <div className="flex items-center">
                     <div className="flex items-center flex-wrap gap-4">
-                      <div className="font-bold text-xl">
+                      <div id="homeStayName" className="font-bold text-xl">
                         {item.name_homeStay}
                       </div>
                       {/* ดาว */}
@@ -729,7 +730,10 @@ const homeStayDetail = () => {
               </div>
 
               {/* Maps */}
-              <div className="flex flex-col w-full md:w-full lg:w-1/4 xl:w-1/4">
+              <div
+                id="maps"
+                className="flex flex-col w-full md:w-full lg:w-1/4 xl:w-1/4"
+              >
                 <div className="shadow-boxShadow rounded-lg">
                   <OpenStreetMapShoData
                     lat={item?.location[0].latitude_location}
