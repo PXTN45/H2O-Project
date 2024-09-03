@@ -83,7 +83,7 @@ const Navbar = () => {
   const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
   const startDate_Time = dateRange[0];
   const endDate_Time = dateRange[1];
-  
+
   const calculateNights = (
     startDateTime?: Date | null,
     endDateTime?: Date | null
@@ -171,6 +171,7 @@ const Navbar = () => {
                 </div>
                 <div>
                   <button
+                    id="DecreasePeople"
                     className="text-primaryBusiness rounded-full p-2 mr-2"
                     onClick={handleDecreasePeople}
                   >
@@ -178,6 +179,7 @@ const Navbar = () => {
                   </button>
                   <span className="text-lg">{numPeople}</span>
                   <button
+                    id="IncreasePeople"
                     className="text-primaryUser rounded-full p-2 ml-2"
                     onClick={handleIncreasePeople}
                   >
@@ -192,6 +194,7 @@ const Navbar = () => {
                 </div>
                 <div>
                   <button
+                    id="DecreaseChildren"
                     className="text-primaryBusiness rounded-full p-2 mr-2"
                     onClick={handleDecreaseChildren}
                   >
@@ -199,6 +202,7 @@ const Navbar = () => {
                   </button>
                   <span className="text-lg">{numChildren}</span>
                   <button
+                    id="IncreaseChildren"
                     className="text-primaryUser rounded-full p-2 ml-2"
                     onClick={handleIncreaseChildren}
                   >
@@ -213,6 +217,7 @@ const Navbar = () => {
                 </div>
                 <div>
                   <button
+                    id="DecreaseRoom"
                     className="text-primaryBusiness rounded-full p-2 mr-2"
                     onClick={handleDecreaseRoom}
                   >
@@ -220,6 +225,7 @@ const Navbar = () => {
                   </button>
                   <span className="text-lg">{numRoom}</span>
                   <button
+                    id="IncreaseRoom"
                     className="text-primaryUser rounded-full p-2 ml-2"
                     onClick={handleIncreaseRoom}
                   >
