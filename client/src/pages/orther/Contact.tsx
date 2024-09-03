@@ -13,8 +13,9 @@ const UserChat: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const chatId = "66d35d1e00e2007dbfcb1272"; // แทนที่ด้วย chatId จริงๆ
   const sender = "user"; // กำหนดผู้ส่งเป็น user
-  const endOfMessagesRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
+  const [userIsScrolling, setUserIsScrolling] = useState(false);
 
   // ฟังก์ชันในการดึงข้อมูลข้อความจากเซิร์ฟเวอร์
   const fetchMessages = async () => {
@@ -30,7 +31,7 @@ const UserChat: React.FC = () => {
 
   useEffect(() => {
     fetchMessages();
-  }, [chatId]);
+  }, [chatId , messages]);
 
   useEffect(() => {
     // เชื่อมต่อกับ Socket.IO
@@ -50,10 +51,10 @@ const UserChat: React.FC = () => {
   }, [chatId]);
 
   useEffect(() => {
-    if (endOfMessagesRef.current) {
-      endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
+    if (!userIsScrolling && chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [messages]); // ใช้ messages เป็น dependency เพื่อเลื่อนลงเมื่อมีการอัปเดต
+  }, [messages, userIsScrolling]);
 
   const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
@@ -86,9 +87,20 @@ const UserChat: React.FC = () => {
     }
   };
 
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      setUserIsScrolling(scrollTop + clientHeight < scrollHeight);
+    }
+  };
+
   return (
     <div className="flex flex-col h-[88vh] p-4 bg-gray-100">
-      <div className="flex-1 overflow-y-auto mb-4">
+      <div
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto mb-4"
+        onScroll={handleScroll}
+      >
         {messages.length === 0 ? (
           <p>No messages yet</p>
         ) : (
@@ -116,7 +128,6 @@ const UserChat: React.FC = () => {
             </div>
           ))
         )}
-        <div ref={endOfMessagesRef} />
       </div>
       <div className="flex items-center">
         <input
