@@ -7,7 +7,6 @@ import isBookingAvailable from "../utils/date/isBookingAvailable";
 
 
 const getAllBooking = async (req: Request, res: Response): Promise<void> => {
-  const id = req.params.id;
   try {
     const data = (await Booking.find().populate([{path:"booker", select:"email name lastName"}]));
     res.status(201).json(data);
@@ -15,6 +14,19 @@ const getAllBooking = async (req: Request, res: Response): Promise<void> => {
     res.status(404).json({ message: "Error cannot get this booking:", error });
   }
 };
+const getBookingByPending = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const data = await Booking.find({ bookingStatus: "Pending" }).populate([
+      { path: "booker", select: "email name lastName" }
+    ]);
+    console.log(data.length);
+    
+    res.status(201).json(data);
+  } catch (error: any) {
+    res.status(404).json({ message: "Error cannot get this booking:", error });
+  }
+};
+
 const getBookingHomeStayByUser = async (req: Request, res: Response): Promise<void> =>{
   const userId = req.params.id
   
@@ -191,5 +203,6 @@ export {
   cancelBooking,
   deleteBooking,
   getBookingHomeStayByUser,
-  getBookingPackageByUser
+  getBookingPackageByUser,
+  getBookingByPending
 };
