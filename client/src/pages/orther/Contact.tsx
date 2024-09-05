@@ -6,13 +6,24 @@ import { io, Socket } from "socket.io-client";
 interface Message {
   sender: string;
   content: string;
-  timestamp: Date;
+  timestamp: string;
+  _id: string;
 }
 
 interface Chat {
   _id: string;
-  userId?: { _id: string };
-  businessId?: { _id: string };
+  businessId?: {
+    _id: string;
+    businessName: string;
+    image: string;
+  };
+  adminId?: {
+    _id: string;
+    name: string;
+    image: string;
+  };
+  isClosed: boolean;
+  messages: Message[];
 }
 
 const UserChat: React.FC = () => {
@@ -39,15 +50,16 @@ const UserChat: React.FC = () => {
       console.error("Error fetching chat messages:", error);
     }
   };
+
   const fetchChats = async () => {
     try {
       const response = await axios.get<Chat[]>(
         `http://localhost:3000/help/chats`
       );
-      const filteredChats = response.data.filter((chat: Chat) => {
+      const filteredChats = response.data.filter((chat) => {
         return (
-          chat.userId?._id === userInfo?._id ||
-          chat.businessId?._id === userInfo?._id
+          chat.businessId?._id === userInfo?._id ||
+          chat.adminId?._id === userInfo?._id
         );
       });
       if (filteredChats.length > 0) {
@@ -65,7 +77,7 @@ const UserChat: React.FC = () => {
           `http://localhost:3000/help/create`,
           id
         );
-        setChatId(createResponse.data._id); // อัปเดต chatId เป็น ID ของแชทที่ถูกสร้างใหม่
+        setChatId(createResponse.data._id);
       }
     } catch (error) {
       console.error("Error fetching chat messages:", error);
@@ -79,27 +91,28 @@ const UserChat: React.FC = () => {
   useEffect(() => {
     if (chatId !== "") {
       fetchMessages();
-    } else {
-      return;
     }
-  }, [chatId, messages]);
+  }, [chatId]);
 
   useEffect(() => {
     const socket: Socket = io("http://localhost:3000");
     socketRef.current = socket;
-
+  
+    console.log("Socket connected:", chatId);
+  
     socket.emit("joinChat", chatId);
-
+  
     socket.on("message", (newMessage: Message) => {
       console.log("Received new message:", newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
-
+  
     return () => {
+      console.log("Socket disconnected");
       socket.disconnect();
     };
   }, [chatId]);
-
+  
   useEffect(() => {
     if (!userIsScrolling && chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -107,30 +120,30 @@ const UserChat: React.FC = () => {
     }
   }, [messages, userIsScrolling]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (inputValue.trim() === "") return;
-
+  
     const newMessage: Message = {
       sender,
       content: inputValue,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
+      _id: Date.now().toString(),
     };
-
-    // อัปเดตสถานะ messages ทันที
+  
+    // ส่งข้อความผ่าน Socket.IO
+    socketRef.current?.emit("sendMessage", {
+      chatId,
+      sender,
+      content: inputValue,
+    });
+  
+    // อัปเดตข้อความใน UI
     setMessages((prevMessages) => [...prevMessages, newMessage]);
-
-    try {
-      await axios.post("http://localhost:3000/help/send", {
-        chatId,
-        sender,
-        content: inputValue,
-      });
-      setInputValue(""); // เคลียร์ช่องข้อความหลังจากส่งข้อความ
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+  
+    // ล้างค่า input
+    setInputValue("");
   };
-
+  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -150,43 +163,59 @@ const UserChat: React.FC = () => {
     <div className="flex flex-col h-[88vh] p-4 bg-gray-100">
       <div
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto mb-4"
+        className="flex-1 overflow-y-auto mb-4 bg-white p-4 rounded-lg shadow-inner"
         onScroll={handleScroll}
       >
         {messages.length === 0 ? (
-          <p>No messages yet</p>
+          <p className="text-center text-gray-500">No messages yet</p>
         ) : (
-          messages.map((message, index) => {
+          messages.map((message) => {
             const isSender =
               message.sender === userInfo?.name ||
               message.sender === userInfo?.businessName;
 
             return (
               <div
-                key={index}
+                key={message._id}
                 className={`flex ${
                   isSender ? "justify-end" : "justify-start"
                 } mb-2`}
               >
-                <div
-                  className={`flex flex-col max-w-[50%] ${
-                    isSender ? "items-end" : "items-start"
-                  }`}
-                >
+                <div className="flex items-start space-x-2">
+                  {!isSender && userInfo?.image && (
+                    <img
+                      src={userInfo.image}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
                   <div
-                    className={`p-2 rounded-lg ${
-                      isSender
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-900"
+                    className={`flex flex-col max-w-full ${
+                      isSender ? "items-end" : "items-start"
                     }`}
                   >
-                    <p className="break-words whitespace-pre-wrap max-w-[30ch]">
-                      {message.content}
+                    <div
+                      className={`p-3 rounded-lg shadow-md ${
+                        isSender
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-900"
+                      }`}
+                    >
+                      <p className="break-words whitespace-pre-wrap max-w-[25ch]">
+                        {message.content}
+                      </p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1 w-20">
+                      {new Date(message.timestamp).toLocaleTimeString()}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {new Date(message.timestamp).toLocaleTimeString()}
-                  </p>
+                  {isSender && userInfo?.image && (
+                    <img
+                      src={userInfo.image}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
                 </div>
               </div>
             );

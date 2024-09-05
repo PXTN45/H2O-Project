@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { io, Socket } from "socket.io-client";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 interface Message {
   sender: string;
@@ -43,7 +43,7 @@ const AdminChat: React.FC = () => {
     setSocket(newSocket);
 
     return () => {
-      newSocket.disconnect(); // ใช้ newSocket แทน socket จาก state
+      newSocket.disconnect();
     };
   }, []);
 
@@ -58,7 +58,6 @@ const AdminChat: React.FC = () => {
       });
     }
 
-    // Clean up the listener when activeChat changes
     return () => {
       if (socket && activeChat) {
         socket.off("message");
@@ -70,14 +69,16 @@ const AdminChat: React.FC = () => {
     if (activeChat) {
       fetchMessages();
     }
-  }, [activeChat , messages]);
+  }, [activeChat]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50; // ถ้าใกล้ถึงด้านล่าง
+      const { scrollTop, scrollHeight, clientHeight } =
+        chatContainerRef.current;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
       if (!isUserScrolling || isAtBottom) {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
       }
     }
   }, [messages, isUserScrolling]);
@@ -119,30 +120,28 @@ const AdminChat: React.FC = () => {
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!inputValue.trim() || !activeChat) return;
 
-    try {
-      const newMessage: Message = {
-        sender: "Admin",
-        content: inputValue,
-        timestamp: new Date().toISOString(),
-      };
+    const newMessage: Message = {
+      sender: "Admin",
+      content: inputValue,
+      timestamp: new Date().toISOString(),
+    };
 
-      await axios.post("http://localhost:3000/help/send", {
-        chatId: activeChat._id,
-        ...newMessage,
-      });
+    // ส่งข้อความผ่าน Socket.IO
+    socket?.emit("sendMessage", {
+      chatId: activeChat._id,
+      sender: newMessage.sender,
+      content: newMessage.content,
+      timestamp: newMessage.timestamp,
+    });
 
-      setMessages([...messages, newMessage]);
-      setInputValue("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+    // ล้างค่า input
+    setInputValue("");
   };
 
   const handleAssignChat = async (chat: Chat) => {
-    // Check if the chat is already assigned
     if (chat.adminId) {
       Swal.fire({
         title: "Already Assigned",
@@ -153,7 +152,6 @@ const AdminChat: React.FC = () => {
       return;
     }
 
-    // Check how many chats are assigned to this admin
     try {
       const response = await axios.get("http://localhost:3000/help/chats");
       const assignedChats = response.data;
@@ -164,7 +162,6 @@ const AdminChat: React.FC = () => {
       ).length;
 
       if (assignedCount >= 5) {
-        // Adjust the number according to your requirement
         Swal.fire({
           title: "Limit Exceeded",
           text: "You cannot assign more than five chats at a time.",
@@ -174,13 +171,12 @@ const AdminChat: React.FC = () => {
         return;
       }
 
-      // Proceed with assigning the chat
       await axios.post("http://localhost:3000/help/assign", {
         chatId: chat._id,
-        adminId: "668f0a1531ff843f51f1855b", // ใส่ admin id ของคุณที่นี่
+        adminId: "668f0a1531ff843f51f1855b",
       });
 
-      fetchChats(); // รีเฟรชรายชื่อแชทหลังจาก assign
+      fetchChats();
 
       Swal.fire({
         title: "Success",
@@ -207,12 +203,12 @@ const AdminChat: React.FC = () => {
 
   const handleScroll = () => {
     if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50; // ถ้าใกล้ถึงด้านล่าง
+      const { scrollTop, scrollHeight, clientHeight } =
+        chatContainerRef.current;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
       setIsUserScrolling(!isAtBottom);
     }
   };
-
   return (
     <div className="h-[88vh] flex flex-col md:flex-row">
       <div className="w-full md:w-1/3 bg-white border-r border-gray-200 md:border-r-0 md:border-b">
