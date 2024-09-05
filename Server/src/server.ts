@@ -114,7 +114,7 @@ app.use("/", homeStayRouter);
 app.use("/", bookingRouter);
 app.use("/help", chatRouter);
 app.use("/user", userRouter);
-app.use("/payment", generateQR);
+app.use("/", payment);
 app.use("/review", review);
 
 app.get("/", (req: Request, res: Response) => {
