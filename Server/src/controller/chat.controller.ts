@@ -101,6 +101,11 @@ export const getChats = async (req: Request, res: Response) => {
         path: "businessId",
         select: "businessName image", // ระบุฟิลด์ที่ต้องการดึง
         strictPopulate: false
+      })
+      .populate({
+        path: "adminId",
+        select: "name image", // ระบุฟิลด์ที่ต้องการดึง
+        strictPopulate: false
       });
     res.json(chats);
   } catch (error) {
