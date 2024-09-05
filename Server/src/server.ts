@@ -123,23 +123,19 @@ app.get("/", (req: Request, res: Response) => {
 
 // Socket.IO setup
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
 
   socket.on('joinChat', (chatId) => {
     socket.join(chatId);
-    console.log(`User ${socket.id} joined chat: ${chatId}`);
   });
 
   socket.on('sendMessage', async ({ chatId, sender, content }) => {
     const timestamp = new Date();
-    console.log(`Message received: ${content} for chatId ${chatId}`);
     try {
       const chat = await ChatModel.findById(chatId);
       if (chat) {
         chat.messages.push({ sender, content, timestamp });
         await chat.save();
         io.to(chatId).emit('message', { sender, content, timestamp });
-        console.log(`Message emitted to chatId ${chatId}`);
       }
     } catch (error) {
       console.error('Error saving message:', error);
