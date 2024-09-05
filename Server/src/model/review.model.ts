@@ -1,6 +1,6 @@
 import { Schema, model, Document } from "mongoose";
 
-// Define the interface for the Review schema
+// Interface สำหรับ Review
 export interface Review extends Document {
   reviewer: Schema.Types.ObjectId;
   content: string;
@@ -9,14 +9,40 @@ export interface Review extends Document {
   homestay: Schema.Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
+  responses: Response[]; // ฟิลด์สำหรับการตอบกลับ
 }
 
+// Interface สำหรับ Response
+export interface Response {
+  responder: Schema.Types.ObjectId; // ผู้ตอบกลับ (admin)
+  content: string; // เนื้อหาของการตอบกลับ
+  createdAt: Date; // วันที่ตอบกลับ
+}
+
+// สร้าง schema สำหรับ response (การตอบกลับ)
+const responseSchema = new Schema<Response>({
+  responder: {
+    type: Schema.Types.ObjectId,
+    ref: "User", // เชื่อมโยงกับ User collection
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now, // ตั้งวันที่ตอบกลับเป็นวันปัจจุบัน
+  }
+}, { _id: false }); // ปิดการสร้าง _id สำหรับ response เนื่องจากเป็น subdocument
+
+// สร้าง schema สำหรับ review (รีวิว)
 const reviewSchema = new Schema<Review>({
   reviewer: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
-    index: true, // เพิ่ม index สำหรับการค้นหาที่เร็วขึ้น
+    index: true,
   },
   content: {
     type: String,
@@ -26,32 +52,28 @@ const reviewSchema = new Schema<Review>({
     type: Number,
     required: true,
     validate: {
-      validator: function(value: number) {
+      validator: function (value: number) {
         return value >= 1 && value <= 5;
       },
-      message: 'Rating must be between 1 and 5',
+      message: 'คะแนนต้องอยู่ระหว่าง 1 ถึง 5',
     },
   },
   package: {
     type: Schema.Types.ObjectId,
     ref: "Package",
     default: null,
-    index: true, // เพิ่ม index สำหรับการค้นหาที่เร็วขึ้น
+    index: true,
   },
   homestay: {
     type: Schema.Types.ObjectId,
     ref: "HomeStay",
     default: null,
-    index: true, // เพิ่ม index สำหรับการค้นหาที่เร็วขึ้น
+    index: true,
   },
-}, { timestamps: true }); // ใช้ timestamps เพื่อจัดการ createdAt และ updatedAt อัตโนมัติ
+  responses: [responseSchema], // ใช้ schema สำหรับ responses ใน array
+}, { timestamps: true });
 
-// ก่อนบันทึก อัปเดตฟิลด์ updatedAt
-reviewSchema.pre("save", function (next) {
-  this.updatedAt = new Date();
-  next();
-});
-
+// สร้างโมเดล review และส่งออก (export)
 const reviewModel = model<Review>("Review", reviewSchema);
 
 export default reviewModel;

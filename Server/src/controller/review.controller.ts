@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import reviewModel from "../model/review.model";
 import BookingModel from "../model/booking.model";
 import mongoose from "mongoose";
+import AdminModel from "../model/admin.model ";
 
 // ฟังก์ชันสำหรับการเรียกดูรีวิวทั้งหมด
 const getAllReview = async (req: Request, res: Response): Promise<void> => {
@@ -144,6 +145,7 @@ const deleteReview = async (req: Request, res: Response): Promise<void> => {
 
 // ฟังก์ชันสำหรับการดึงค่ารวมของคะแนนรีวิวทั้งหมดและคะแนนเฉลี่ย
 const getRating = async (req: Request, res: Response): Promise<void> => {
+
     try {
         // ดึงข้อมูลรีวิวทั้งหมดจาก MongoDB และรวมข้อมูลรีวิวเวอร์ (ชื่อ) ผ่านการใช้ .populate()
         const reviews = await reviewModel.find().populate("reviewer", "name");
@@ -155,7 +157,7 @@ const getRating = async (req: Request, res: Response): Promise<void> => {
             // หาค่าเฉลี่ยของคะแนน
             const avg = reviews.length ? total / reviews.length : 0;
             // ปัดเศษคะแนนให้เป็นทศนิยม 0.5 (เช่น 4.25 จะปัดเป็น 4.5)
-            return Math.round(avg * 2) / 2;
+            return Math.round(avg * 10) / 10;
         };
 
         // ดึง ID ของที่พักจาก URL parameter
@@ -175,6 +177,7 @@ const getRating = async (req: Request, res: Response): Promise<void> => {
             res.status(404).json({ message: "No reviews found for this homestay" });
             return;
         }
+        console.log('Filtered Reviews:', filteredReviews);
 
         // คำนวณคะแนนรวมและค่าเฉลี่ยของรีวิวที่เกี่ยวข้องกับที่พักเฉพาะ
         const homestayRating = {
@@ -237,6 +240,46 @@ const getReviewByPackageId = async (req: Request, res: Response): Promise<void> 
     }
 };;
 
+// ฟังก์ชันสำหรับการตอบกลับรีวิว
+// ฟังก์ชันสำหรับตอบกลับรีวิว
+const respondToReview = async (req: Request, res: Response): Promise<Response> => {
+    const { id } = req.params; // รหัสรีวิวที่ต้องการเพิ่มการตอบกลับ
+    const { responder, content } = req.body; // ข้อมูลการตอบกลับ
+
+    if (!id || !responder || !content) {
+        return res.status(400).json({ message: 'กรุณาระบุข้อมูลที่ครบถ้วน' });
+    }
+
+    try {
+        // ตรวจสอบว่าผู้ตอบกลับเป็นแอดมินหรือไม่
+        const admin = await AdminModel.findById(responder);
+        if (!admin || admin.role !== 'admin') {
+            return res.status(403).json({ message: 'เฉพาะแอดมินเท่านั้นที่สามารถตอบกลับรีวิวได้' });
+        }
+
+        // ตรวจสอบว่ามีรีวิวที่ตรงกับ id หรือไม่
+        const review = await reviewModel.findById(id);
+        if (!review) {
+            return res.status(404).json({ message: 'ไม่พบรีวิวที่ระบุ' });
+        }
+
+        // เพิ่มการตอบกลับในรีวิว
+        review.responses.push({ responder, content, createdAt: new Date() });
+        await review.save();
+
+        // Populate the review data
+        const updatedReview = await reviewModel.findById(id)
+            .populate('reviewer', 'name')
+            .populate('responses.responder', 'name')
+            .exec();
+
+        return res.status(200).json(updatedReview);
+    } catch (error: any) {
+        console.error('ข้อผิดพลาดในการตอบกลับรีวิว:', error.message);
+        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
+    }
+};
+
 export {
     getAllReview,
     createReview,
@@ -244,5 +287,6 @@ export {
     deleteReview,
     getRating,
     getReviewByHomeStay,
-    getReviewByPackageId
+    getReviewByPackageId,
+    respondToReview
 };

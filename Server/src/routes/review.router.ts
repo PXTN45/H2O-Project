@@ -1,61 +1,42 @@
+
 /**
  * @swagger
- * components:
- *   schemas:
- *     Review:
- *       type: object
- *       required:
- *         - reviewer
- *         - content
- *         - rating
- *         - package
- *         - homestay
- *       properties:
- *         reviewer:
+ * /respondToReview/{id}:
+ *   post:
+ *     summary: Respond to a review
+ *     tags: [Review]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
  *           type: string
- *           description: The ID of the reviewer
- *         content:
- *           type: string
- *           description: The content of the review
- *         rating:
- *           type: number
- *           description: The rating of the review
- *         package:
- *           type: string
- *           description: The ID of the associated package
- *         homestay:
- *           type: string
- *           description: The ID of the associated homestay
- *       example:
- *         reviewer: "user123"
- *         content: "Great stay, very comfortable!"
- *         rating: 4.5
- *         package: "package456"
- *         homestay: "homestay789"
- * 
- *     Content:
- *       type: object
- *       required:
- *         - title
- *         - body
- *       properties:
- *         title:
- *           type: string
- *           description: The title of the content
- *         body:
- *           type: string
- *           description: The body of the content
- *       example:
- *         title: "Amazing Experience"
- *         body: "This was one of the best trips we've ever had!"
- * 
- * tags:
- *   - name: Review
- *     description: API for managing reviews
- *   - name: Content
- *     description: API for managing content
- *   - name: Rating
- *     description: API for managing ratings
+ *         description: The ID of the review to respond to
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               responder:
+ *                 type: string
+ *                 description: The ID of the admin responding to the review
+ *               content:
+ *                 type: string
+ *                 description: The content of the response
+ *             example:
+ *               responder: "668f17e531ff843f51f18852"
+ *               content: "ขอบคุณสำหรับรีวิวของคุณ!"
+ *     responses:
+ *       200:
+ *         description: Successfully responded to the review.
+ *       403:
+ *         description: Forbidden. Only admins can respond to reviews.
+ *       404:
+ *         description: Review not found.
+ *       500:
+ *         description: Internal server error.
  */
 
 import express, { Request, Response } from "express";
@@ -67,6 +48,7 @@ import {
   updateReview,
   getReviewByHomeStay,
   getReviewByPackageId,
+  respondToReview
 } from "../controller/review.controller";
 
 const router = express.Router();
@@ -131,6 +113,9 @@ router.post("/createReview", createReview);
  *                 type: string
  *               rating:
  *                 type: number
+ *             example:
+ *               content: "Updated review content"
+ *               rating: 4
  *     responses:
  *       200:
  *         description: Successfully updated the review.
@@ -212,5 +197,7 @@ router.get("/getReviewByHomeStay/:homeStayId", getReviewByHomeStay);
  *         description: Successfully retrieved reviews for the package.
  */
 router.get("/getReviewByPackage/:packageId", getReviewByPackageId);
+
+router.post("/respondToReview/:id", respondToReview);
 
 export default router;
