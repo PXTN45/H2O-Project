@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -8,17 +9,13 @@ import packgeRouter from "./routes/package.router";
 import homeStayRouter from "./routes/homestay.router";
 import bookingRouter from "./routes/booking.router";
 import userRouter from "./routes/user.router";
-import payment from "./routes/payment.router";
-import jwt from "jsonwebtoken";
-// const cookieParser = require("cookie-parser");
+import chatRouter from "./routes/chat.router";
+import generateQR from "./routes/payment.router";
+import review from "./routes/review.router";
 import cookieParser from "cookie-parser";
+import { Server } from "socket.io";
+import ChatModel from "./model/chat.model";
 
-
-// Initialize Stripe with your test secret API key
-// const stripe = new Stripe();
-;
-
-// Load environment variables from .env file
 dotenv.config();
 
 // Swagger definition
@@ -27,15 +24,14 @@ const swaggerDefinition = {
   info: {
     title: "H2O API Project",
     version: "1.0.0",
-    description:
-      "This is a REST API application made with Express. It retrieves data from JSONPlaceholder.",
+    description: "This is a REST API application made with Express.",
     license: {
       name: "Licensed Under MIT",
       url: "https://spdx.org/licenses/MIT.html",
     },
     contact: {
-      name: "JSONPlaceholder",
-      url: "https://jsonplaceholder.typicode.com",
+      name: "H2O Project",
+      url: "http://localhost:3000",
     },
   },
   externalDocs: {
@@ -68,14 +64,7 @@ const swaggerDefinition = {
 // Swagger options
 const options = {
   swaggerDefinition,
-  apis: [
-    "src/routes/package.router.ts",
-    "src/routes/homestay.router.ts",
-    "src/routes/user.router.ts",
-  ], // Adjust this if the paths to the routes change
-  connectTimeoutMS: 10000, // Set timeout for the connection
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  apis: ["src/routes/*.ts"], // Adjust this if the paths to the routes change
 };
 
 // Generate Swagger specification
@@ -83,39 +72,39 @@ const swaggerSpec = swaggerJSDoc(options);
 
 // Create Express app
 const app = express();
-app.use(express.static("public"));
-const CLIENT_URL = process.env.CLIENT_URL || "";
-
-const corsOptions = {
-  origin: "http://localhost:5173", // URL ของไคลเอนต์
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-  preflightContinue: false, // เพิ่มตัวเลือกนี้หากไม่ได้เปิดไว้
-  optionsSuccessStatus: 204, // เพื่อหลีกเลี่ยงปัญหาในบางเบราว์เซอร์
-};
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
 
 // Middleware setup
-app.use(cors(corsOptions));
+app.use(cors({
+  credentials: true,
+  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // MongoDB connection
 const MONGODB_URL = process.env.MONGODB_URL || "";
-mongoose
-  .connect(MONGODB_URL)
+mongoose.connect(MONGODB_URL)
   .then(() => {
-    console.log("connected");
+    console.log("Connected to MongoDB");
   })
   .catch((error) => {
-    console.error("disconnected", error);
+    console.error("Error connecting to MongoDB", error);
   });
 
 // Swagger setup
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get("/swagger.json", (req: Request, res: Response) => {
-  res.header("Content-Type", "application/swagger.json");
+  res.header("Content-Type", "application/json");
   res.send(swaggerSpec);
 });
 
@@ -123,15 +112,49 @@ app.get("/swagger.json", (req: Request, res: Response) => {
 app.use("/", packgeRouter);
 app.use("/", homeStayRouter);
 app.use("/", bookingRouter);
+app.use("/help", chatRouter);
 app.use("/user", userRouter);
-app.use("/", payment);
+app.use("/payment", generateQR);
+app.use("/review", review);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("<h1> Welcome to H2O Project</h1>");
+  res.send("<h1>Welcome to H2O Project</h1>");
 });
 
-// Server setup
+// Socket.IO setup
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('joinChat', (chatId) => {
+    socket.join(chatId);
+    console.log(`User ${socket.id} joined chat: ${chatId}`);
+  });
+
+  socket.on('sendMessage', async ({ chatId, sender, content }) => {
+    const timestamp = new Date();
+    console.log(`Message received: ${content} for chatId ${chatId}`);
+    try {
+      const chat = await ChatModel.findById(chatId);
+      if (chat) {
+        chat.messages.push({ sender, content, timestamp });
+        await chat.save();
+        io.to(chatId).emit('message', { sender, content, timestamp });
+        console.log(`Message emitted to chatId ${chatId}`);
+      }
+    } catch (error) {
+      console.error('Error saving message:', error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+
+
+// Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Server is running  on http://localhost:" + PORT);
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

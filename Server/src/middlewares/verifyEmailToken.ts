@@ -1,6 +1,6 @@
 import BusinessModel from "../model/business.model";
 import UserModel from "../model/user.model";
-import AdminModel from "../model/admin.model ";
+import AdminModel from "../model/admin.model";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
