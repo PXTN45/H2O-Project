@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import axios from "axios";
+import { AuthContext } from "../../AuthContext/auth.provider";
 import { io, Socket } from "socket.io-client";
 
 interface Message {
@@ -8,16 +9,26 @@ interface Message {
   timestamp: Date;
 }
 
+interface Chat {
+  _id: string;
+  userId?: { _id: string };
+  businessId?: { _id: string };
+}
+
 const UserChat: React.FC = () => {
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+  const { userInfo } = authContext;
   const [messages, setMessages] = useState<Message[]>([]);
+  const [chatId, setChatId] = useState<string>("");
   const [inputValue, setInputValue] = useState("");
-  const chatId = "66d35d1e00e2007dbfcb1272"; // แทนที่ด้วย chatId จริงๆ
-  const sender = "user"; // กำหนดผู้ส่งเป็น user
+  const sender = userInfo?.name || userInfo?.businessName || "User";
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const [userIsScrolling, setUserIsScrolling] = useState(false);
 
-  // ฟังก์ชันในการดึงข้อมูลข้อความจากเซิร์ฟเวอร์
   const fetchMessages = async () => {
     try {
       const response = await axios.get(
@@ -28,13 +39,52 @@ const UserChat: React.FC = () => {
       console.error("Error fetching chat messages:", error);
     }
   };
+  const fetchChats = async () => {
+    try {
+      const response = await axios.get<Chat[]>(
+        `http://localhost:3000/help/chats`
+      );
+      const filteredChats = response.data.filter((chat: Chat) => {
+        return (
+          chat.userId?._id === userInfo?._id ||
+          chat.businessId?._id === userInfo?._id
+        );
+      });
+      if (filteredChats.length > 0) {
+        setChatId(filteredChats[0]._id);
+      } else {
+        const id: { userId?: string; businessId?: string } = {};
+
+        if (userInfo?.role === "user") {
+          id.userId = userInfo._id;
+        } else if (userInfo?.role === "business") {
+          id.businessId = userInfo._id;
+        }
+
+        const createResponse = await axios.post(
+          `http://localhost:3000/help/create`,
+          id
+        );
+        setChatId(createResponse.data._id); // อัปเดต chatId เป็น ID ของแชทที่ถูกสร้างใหม่
+      }
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+    }
+  };
 
   useEffect(() => {
-    fetchMessages();
-  }, [chatId , messages]);
+    fetchChats();
+  }, []);
 
   useEffect(() => {
-    // เชื่อมต่อกับ Socket.IO
+    if (chatId !== "") {
+      fetchMessages();
+    } else {
+      return;
+    }
+  }, [chatId, messages]);
+
+  useEffect(() => {
     const socket: Socket = io("http://localhost:3000");
     socketRef.current = socket;
 
@@ -52,7 +102,8 @@ const UserChat: React.FC = () => {
 
   useEffect(() => {
     if (!userIsScrolling && chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [messages, userIsScrolling]);
 
@@ -89,7 +140,8 @@ const UserChat: React.FC = () => {
 
   const handleScroll = () => {
     if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      const { scrollTop, scrollHeight, clientHeight } =
+        chatContainerRef.current;
       setUserIsScrolling(scrollTop + clientHeight < scrollHeight);
     }
   };
@@ -104,29 +156,41 @@ const UserChat: React.FC = () => {
         {messages.length === 0 ? (
           <p>No messages yet</p>
         ) : (
-          messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                message.sender === "user" ? "justify-end" : "justify-start"
-              } mb-2`}
-            >
-              <div className={`flex flex-col max-w-[50%] ${message.sender === "user" ? "items-end" : "items-start"}`}>
+          messages.map((message, index) => {
+            const isSender =
+              message.sender === userInfo?.name ||
+              message.sender === userInfo?.businessName;
+
+            return (
+              <div
+                key={index}
+                className={`flex ${
+                  isSender ? "justify-end" : "justify-start"
+                } mb-2`}
+              >
                 <div
-                  className={`p-2 rounded-lg ${
-                    message.sender === "user"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-900"
+                  className={`flex flex-col max-w-[50%] ${
+                    isSender ? "items-end" : "items-start"
                   }`}
                 >
-                  <p className="break-words whitespace-pre-wrap max-w-[50ch]">{message.content}</p>
+                  <div
+                    className={`p-2 rounded-lg ${
+                      isSender
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-900"
+                    }`}
+                  >
+                    <p className="break-words whitespace-pre-wrap max-w-[30ch]">
+                      {message.content}
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {new Date(message.timestamp).toLocaleTimeString()}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  {new Date(message.timestamp).toLocaleTimeString()}
-                </p>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
       <div className="flex items-center">

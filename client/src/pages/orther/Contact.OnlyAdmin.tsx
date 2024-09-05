@@ -35,6 +35,8 @@ const AdminChat: React.FC = () => {
     "unassigned"
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   useEffect(() => {
     const newSocket = io("http://localhost:3000");
@@ -55,19 +57,30 @@ const AdminChat: React.FC = () => {
         setMessages((prevMessages) => [...prevMessages, message]);
       });
     }
+
+    // Clean up the listener when activeChat changes
+    return () => {
+      if (socket && activeChat) {
+        socket.off("message");
+      }
+    };
   }, [socket, activeChat]);
 
   useEffect(() => {
     if (activeChat) {
       fetchMessages();
     }
-  }, [activeChat]);
+  }, [activeChat , messages]);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50; // ถ้าใกล้ถึงด้านล่าง
+      if (!isUserScrolling || isAtBottom) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
     }
-  }, [messages]);
+  }, [messages, isUserScrolling]);
 
   const fetchChats = async () => {
     try {
@@ -154,7 +167,7 @@ const AdminChat: React.FC = () => {
         // Adjust the number according to your requirement
         Swal.fire({
           title: "Limit Exceeded",
-          text: "You cannot assign more than one chat at a time.",
+          text: "You cannot assign more than five chats at a time.",
           icon: "warning",
           confirmButtonText: "OK",
         });
@@ -189,6 +202,14 @@ const AdminChat: React.FC = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSendMessage();
+    }
+  };
+
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50; // ถ้าใกล้ถึงด้านล่าง
+      setIsUserScrolling(!isAtBottom);
     }
   };
 
@@ -263,7 +284,11 @@ const AdminChat: React.FC = () => {
                 activeChat.businessId?.businessName ||
                 "No users"}
             </h2>
-            <div className="flex-1 overflow-y-auto bg-white border rounded p-4">
+            <div
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto bg-white border rounded p-4"
+              onScroll={handleScroll}
+            >
               {messages.map((message, index) => (
                 <div
                   key={index}
