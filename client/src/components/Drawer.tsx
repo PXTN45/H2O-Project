@@ -227,7 +227,7 @@ const Drawer: React.FC = () => {
                         <a>Profile(UC17)</a>
                       </li>
                     </Link>
-                    <Link to={"#"}>
+                    <Link to={"/dashboard-user/Booking-user"}>
                       <li>
                         <a>My Bookings(UC11-13-14)</a>
                       </li>

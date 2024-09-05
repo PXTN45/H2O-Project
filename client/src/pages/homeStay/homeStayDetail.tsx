@@ -114,9 +114,16 @@ export interface HomeStay {
   createdAt: Date;
   updatedAt: Date;
 }
+
+
+interface Reviewer {
+  image: string;
+  name: string;
+  email: string;
+}
 interface Review {
   _id: string;
-  reviewer: string;
+  reviewer: Reviewer;
   content: string;
   rating: number;
   package: string;
@@ -257,8 +264,6 @@ const homeStayDetail = () => {
       const progress = radialProgress(averageRating);
       setAverageRating(averageRating);
       setProgress(progress);
-      // console.log("Average Rating:", averageRating);
-      // console.log("Progress:", progress);
     }
   }, [review]);
 
@@ -282,7 +287,7 @@ const homeStayDetail = () => {
           <div className="flex gap-2 items-center text-xl">
             <div className="avatar">
               <div className="w-12 rounded-full object-cover">
-                <img src={reviewHomeStay?.reviewer?.image} />
+                <img src={reviewHomeStay?.reviewer.image} />
               </div>
             </div>
             <div>{reviewHomeStay?.reviewer?.name}</div>
@@ -303,7 +308,10 @@ const homeStayDetail = () => {
     );
   });
 
-  const calculatePercentages = (review) => {
+  const calculatePercentages = (review: Review[]) => {
+    console.log(review);
+    console.log(review.length);
+    
     const totalReviews = review.length;
     const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
 

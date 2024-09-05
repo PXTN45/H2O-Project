@@ -150,7 +150,7 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
                     {isOpen && (
                       <div
                         id="userDropdown"
-                        className="z-10 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44 card-box"
+                        className="z-50 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44 card-box"
                       >
                         <div className="px-4 py-3 text-sm">
                           <div className="truncate">
