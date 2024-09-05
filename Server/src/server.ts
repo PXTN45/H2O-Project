@@ -10,7 +10,7 @@ import homeStayRouter from "./routes/homestay.router";
 import bookingRouter from "./routes/booking.router";
 import userRouter from "./routes/user.router";
 import chatRouter from "./routes/chat.router";
-import generateQR from "./routes/payment.router";
+import payment from "./routes/payment.router";
 import review from "./routes/review.router";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
