@@ -123,22 +123,12 @@ const UserChat: React.FC = () => {
   const handleSendMessage = () => {
     if (inputValue.trim() === "") return;
   
-    const newMessage: Message = {
-      sender,
-      content: inputValue,
-      timestamp: new Date().toISOString(),
-      _id: Date.now().toString(),
-    };
-  
     // ส่งข้อความผ่าน Socket.IO
     socketRef.current?.emit("sendMessage", {
       chatId,
       sender,
       content: inputValue,
     });
-  
-    // อัปเดตข้อความใน UI
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
   
     // ล้างค่า input
     setInputValue("");
