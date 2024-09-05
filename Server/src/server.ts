@@ -141,10 +141,6 @@ io.on('connection', (socket) => {
       console.error('Error saving message:', error);
     }
   });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
 });
 
 
