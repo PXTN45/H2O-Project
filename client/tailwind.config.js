@@ -27,6 +27,8 @@ export default {
     },
     boxShadow: {
       'boxShadow': '0 0px 3px 0px rgba(0, 0, 0, 0.3)',
+      'buttonShadow': '0 0px 10px 0px rgba(0, 0, 0, 0.3)',
+      
     },
   },
   plugins: [daisyui, flowbite],
