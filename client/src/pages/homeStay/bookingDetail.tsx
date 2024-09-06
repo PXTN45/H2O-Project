@@ -79,7 +79,10 @@ const BookingDetail: React.FC = () => {
 
   useEffect(() => {
     if (paymentData && dataNav) {
-      const price = (paymentData.totalPrice * dataNav?.numRoom)* dataNav.dateRange.numberOfNights
+      const price =
+        paymentData.totalPrice *
+        dataNav?.numRoom *
+        dataNav.dateRange.numberOfNights;
       const taxRate = 0.07;
       const feeRate = 0.1;
 
@@ -135,26 +138,24 @@ const BookingDetail: React.FC = () => {
       const response = await axiosPrivateUser.post("/create-checkout-session", {
         name: homeStayName,
         totalPrice: totalPrice,
-        bookingStart: bookingStart,
-        bookingEnd: bookingEnd,
-        booker: booker,
-        homestayId: homestayId,
-        paymentDetail: paymentDetail,
         email: email,
       });
 
       if (response.data) {
-        const { sessionUrl, booking } = response.data;
+        const { sessionUrl } = response.data;
 
-        if (sessionUrl) {
-          // Save booking details in localStorage
-          localStorage.setItem("bookingDetails", JSON.stringify(booking));
+        // เก็บข้อมูลการจองใน localStorage
+        const bookingDetails = {
+          bookingStart,
+          bookingEnd,
+          booker,
+          homestayId,
+          paymentDetail,
+        };
+        localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
 
-          // Redirect to Stripe Checkout
-          window.location.href = sessionUrl;
-        } else {
-          throw new Error("No session URL returned");
-        }
+        // เปลี่ยนไปยังหน้าการชำระเงิน
+        window.location.href = sessionUrl;
       } else {
         throw new Error("Invalid response format");
       }

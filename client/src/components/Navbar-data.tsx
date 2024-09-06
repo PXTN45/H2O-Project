@@ -259,7 +259,7 @@ const Navbar = () => {
             )}
           </button>
           {showCalendar && (
-            <div className="absolute z-10 mt-[4.5rem] left-0 right-0 semi-bg text-dark shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
+            <div className="absolute z-20 mt-[4.5rem] left-0 right-0 semi-bg text-dark shadow-lg p-4 w-full rounded-[1.25rem] rounded-tr-[0rem]">
               <div className="flex items-center justify-center">
                 <Calendar
                   onChange={(dates) => {

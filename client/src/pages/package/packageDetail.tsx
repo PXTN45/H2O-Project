@@ -115,17 +115,34 @@ export interface HomeStay {
   createdAt: Date;
   updatedAt: Date;
 }
+interface Reviewer {
+  image: string;
+  name: string;
+  email: string;
+}
+interface Review {
+  _id: string;
+  reviewer: Reviewer;
+  content: string;
+  rating: number;
+  package: string;
+  homestay: string;
+  createdAt: string;
+}
 
 const PackageDetail = () => {
   const [item, setItem] = useState<any>();
   const { id } = useParams(); // Destructure id from useParams
+  const [review, setReview] = useState<Review[]>([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [isLoading, setLoadPage] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const roomTypes = item?.homestay.room_type || [];
-  console.log(roomTypes);
   const [currentIndices, setCurrentIndices] = useState<number[]>(
     roomTypes.map(() => 0)
   );
-  console.log(currentIndices);
+  // console.log(currentIndices);
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
@@ -148,15 +165,128 @@ const PackageDetail = () => {
       fetchData();
     }
   }, [id]); // Add id to dependency array
+
+  useEffect(() => {
+    const fetchReview = async () => {
+      setLoadPage(true);
+      try {
+        const reviewsResponse = await axios.get<Review[]>(
+          "/reviewPackage.json"
+        );
+        if (reviewsResponse.data) {
+          const filteredReviews = reviewsResponse.data.filter(
+            (review) => review.package === id
+          );
+
+          setReview(filteredReviews);
+        }
+      } catch (reviewError) {
+        console.error("เกิดข้อผิดพลาดในการดึงข้อมูลรีวิว:", reviewError);
+      }
+    };
+
+    fetchReview();
+  }, [id]);
   // ใช้ useEffect เพื่อตั้งค่า currentIndices เมื่อ roomTypes เปลี่ยนแปลง
   useEffect(() => {
     setCurrentIndices(roomTypes.map(() => 0));
   }, [roomTypes]);
 
+
+  console.log(review);
+
+  // ฟังก์ชันคำนวณค่าเฉลี่ยของ rating
+  const calculateAverageRating = (reviews: Review[]): number => {
+    if (reviews.length === 0) return 0;
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = totalRating / reviews.length;
+    return parseFloat(averageRating.toFixed(1));
+  };
+
+  // ฟังก์ชันคำนวณความก้าวหน้า (progress)
+  const radialProgress = (rating: number): number => {
+    if (rating) {
+      return (rating * 100) / 5;
+    }
+    return 0;
+  };
+
+  useEffect(() => {
+    if (review.length > 0) {
+      const averageRating = calculateAverageRating(review);
+      const progress = radialProgress(averageRating);
+      setAverageRating(averageRating);
+      setProgress(progress);
+    }
+  }, [review]);
+
+  const reviews = review?.map((reviewHomeStay: Review, reviewIndex: number) => {
+    // console.log(reviewHomeStay);
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("th-TH", {
+        day: "numeric",
+        month: "numeric",
+        year: "numeric",
+      });
+    };
+
+    return (
+      <div
+        key={reviewIndex}
+        className="flex flex-wrap gap-4 my-5 shadow-boxShadow rounded-xl p-5"
+      >
+        <div className="w-full p-5 flex flex-wrap justify-between">
+          <div className="flex gap-2 items-center text-xl">
+            <div className="avatar">
+              <div className="w-12 rounded-full object-cover">
+                <img src={reviewHomeStay?.reviewer.image} />
+              </div>
+            </div>
+            <div>{reviewHomeStay?.reviewer?.name}</div>
+            <div className="bg-primaryUser rounded-2xl px-3 py-1 text-white">
+              <div className="text-sm">{reviewHomeStay?.rating}/5</div>
+            </div>
+          </div>
+          <div>
+            <div>
+              <div>{formatDate(reviewHomeStay?.createdAt)}</div>
+            </div>
+          </div>
+        </div>
+        <div className="w-full  rounded-lg">
+          <div>{reviewHomeStay?.content}</div>
+        </div>
+      </div>
+    );
+  });
+
+  const calculatePercentages = (review: Review[]) => {
+    console.log(review);
+    console.log(review.length);
+
+    const totalReviews = review.length;
+    const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
+
+    // นับจำนวนรีวิวสำหรับแต่ละดาว
+    review.forEach((review) => {
+      if (review.rating >= 1 && review.rating <= 5) {
+        ratingCounts[review.rating - 1]++;
+      }
+    });
+
+    // คำนวณเปอร์เซ็นต์
+    const percentages = ratingCounts.map(
+      (count) => (count / totalReviews) * 100
+    );
+
+    return percentages;
+  };
+  // console.log(numRoom);
+  const percentages = calculatePercentages(review);
   if (!item) {
     return <p>No item data available</p>;
   }
-  console.log(item);
 
   const handleNextPackage = () => {
     setCurrentIndex((prevIndex) =>
@@ -524,19 +654,28 @@ const PackageDetail = () => {
   const makePayment = async () => {
     try {
       const response = await axiosPrivateUser.post("/create-checkout-session", {
-        name: packageName,
+        name: homeStayName,
         totalPrice: totalPrice,
-        bookingStart: bookingStart,
-        bookingEnd: bookingEnd,
-        booker: booker,
-        packageId: packageId,
-        paymentDetail: paymentDetail,
+        email: email,
       });
 
-      if (response.data && response.data.sessionUrl) {
-        window.location.href = response.data.sessionUrl;
+      if (response.data) {
+        const { sessionUrl } = response.data;
+
+        // เก็บข้อมูลการจองใน localStorage
+        const bookingDetails = {
+          bookingStart,
+          bookingEnd,
+          booker,
+          packageId,
+          paymentDetail,
+        };
+        localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+
+        // เปลี่ยนไปยังหน้าการชำระเงิน
+        window.location.href = sessionUrl;
       } else {
-        throw new Error("No session URL returned");
+        throw new Error("Invalid response format");
       }
     } catch (error) {
       console.error("Error making payment:", error);
@@ -640,7 +779,9 @@ const PackageDetail = () => {
               </div>
             </div>
             {/* package offer */}
-            <h1 className="text-3xl my-5 font-bold ">แพ็กเกจสำหรับ - {item.name_package}</h1>
+            <h1 className="text-2xl my-5 font-bold ">
+              แพ็กเกจสำหรับ - {item.name_package}
+            </h1>
             <div className="shadow-boxShadow rounded-lg p-5">
               <span className="text-2xl font-bold">{item.name_package}</span>
               <div className=" flex gap-4 p-5">
@@ -795,8 +936,50 @@ const PackageDetail = () => {
               </div>
             </div>
             {/* homeStay */}
-            <h1 className="text-3xl mt-10 font-bold ">ที่พักสำหรับแพ็กเกจ - {item.name_package}</h1>
+            <h1 className="text-2xl mt-10 font-bold ">
+              ที่พักสำหรับแพ็กเกจ - {item.name_package}
+            </h1>
             <div>{carousel}</div>
+            {/* review */}
+            <div>
+              <div id="review" className="text-2xl font-bold mb-5">
+                รีวิวจากผู้เข้าพักจริง - {item.name_package}
+              </div>
+              <div id="review" className="shadow-boxShadow rounded-lg p-10">
+                <div className="text-xl"> คะแนนรีวิวโดยรวม</div>
+                <div>
+                  <div className="flex  flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap gap-10 justify-around items-center p-10">
+                    <div
+                      className="radial-progress  text-primaryUser text-5xl font-bold "
+                      style={{
+                        "--value": `${progress}`,
+                        "--size": "12rem",
+                        "--thickness": "2rem",
+                      }}
+                      role="progressbar"
+                    >
+                      {averageRating}
+                    </div>
+                    <div className="flex flex-row items-center gap-10">
+                      <div className="flex flex-col-reverse">
+                        {percentages.map((percentage, index) => (
+                          <div key={index}>
+                            <div>{`${index + 1} ดาว`}</div>
+                            <progress
+                              className="progress progress-info w-[15rem] md:w-[500px] lg:w-[400px] xl:w-[500px] h-5"
+                              value={percentage}
+                              max="100"
+                            ></progress>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Review */}
+                {reviews}
+              </div>
+            </div>
           </div>
         </div>
       ) : (

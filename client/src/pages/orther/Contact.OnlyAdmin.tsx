@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { io, Socket } from "socket.io-client";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 interface Message {
   sender: string;
@@ -35,13 +35,15 @@ const AdminChat: React.FC = () => {
     "unassigned"
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   useEffect(() => {
     const newSocket = io("http://localhost:3000");
     setSocket(newSocket);
 
     return () => {
-      newSocket.disconnect(); // ใช้ newSocket แทน socket จาก state
+      newSocket.disconnect();
     };
   }, []);
 
@@ -55,6 +57,12 @@ const AdminChat: React.FC = () => {
         setMessages((prevMessages) => [...prevMessages, message]);
       });
     }
+
+    return () => {
+      if (socket && activeChat) {
+        socket.off("message");
+      }
+    };
   }, [socket, activeChat]);
 
   useEffect(() => {
@@ -64,10 +72,16 @@ const AdminChat: React.FC = () => {
   }, [activeChat]);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } =
+        chatContainerRef.current;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+      if (!isUserScrolling || isAtBottom) {
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
+      }
     }
-  }, [messages]);
+  }, [messages, isUserScrolling]);
 
   const fetchChats = async () => {
     try {
@@ -106,30 +120,28 @@ const AdminChat: React.FC = () => {
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!inputValue.trim() || !activeChat) return;
 
-    try {
-      const newMessage: Message = {
-        sender: "Admin",
-        content: inputValue,
-        timestamp: new Date().toISOString(),
-      };
+    const newMessage: Message = {
+      sender: "Admin",
+      content: inputValue,
+      timestamp: new Date().toISOString(),
+    };
 
-      await axios.post("http://localhost:3000/help/send", {
-        chatId: activeChat._id,
-        ...newMessage,
-      });
+    // ส่งข้อความผ่าน Socket.IO
+    socket?.emit("sendMessage", {
+      chatId: activeChat._id,
+      sender: newMessage.sender,
+      content: newMessage.content,
+      timestamp: newMessage.timestamp,
+    });
 
-      setMessages([...messages, newMessage]);
-      setInputValue("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+    // ล้างค่า input
+    setInputValue("");
   };
 
   const handleAssignChat = async (chat: Chat) => {
-    // Check if the chat is already assigned
     if (chat.adminId) {
       Swal.fire({
         title: "Already Assigned",
@@ -140,7 +152,6 @@ const AdminChat: React.FC = () => {
       return;
     }
 
-    // Check how many chats are assigned to this admin
     try {
       const response = await axios.get("http://localhost:3000/help/chats");
       const assignedChats = response.data;
@@ -151,23 +162,21 @@ const AdminChat: React.FC = () => {
       ).length;
 
       if (assignedCount >= 5) {
-        // Adjust the number according to your requirement
         Swal.fire({
           title: "Limit Exceeded",
-          text: "You cannot assign more than one chat at a time.",
+          text: "You cannot assign more than five chats at a time.",
           icon: "warning",
           confirmButtonText: "OK",
         });
         return;
       }
 
-      // Proceed with assigning the chat
       await axios.post("http://localhost:3000/help/assign", {
         chatId: chat._id,
-        adminId: "668f0a1531ff843f51f1855b", // ใส่ admin id ของคุณที่นี่
+        adminId: "668f0a1531ff843f51f1855b",
       });
 
-      fetchChats(); // รีเฟรชรายชื่อแชทหลังจาก assign
+      fetchChats();
 
       Swal.fire({
         title: "Success",
@@ -192,6 +201,14 @@ const AdminChat: React.FC = () => {
     }
   };
 
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } =
+        chatContainerRef.current;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+      setIsUserScrolling(!isAtBottom);
+    }
+  };
   return (
     <div className="h-[88vh] flex flex-col md:flex-row">
       <div className="w-full md:w-1/3 bg-white border-r border-gray-200 md:border-r-0 md:border-b">
@@ -263,7 +280,11 @@ const AdminChat: React.FC = () => {
                 activeChat.businessId?.businessName ||
                 "No users"}
             </h2>
-            <div className="flex-1 overflow-y-auto bg-white border rounded p-4">
+            <div
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto bg-white border rounded p-4"
+              onScroll={handleScroll}
+            >
               {messages.map((message, index) => (
                 <div
                   key={index}

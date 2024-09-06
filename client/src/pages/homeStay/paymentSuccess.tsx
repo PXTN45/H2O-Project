@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import axiosPrivateUser from '../../hook/axiosPrivateUser';
 
 const paymentSuccess = () => {
   const [booking, setBooking] = useState(null);
 
   useEffect(() => {
-    // Retrieve booking details from localStorage
-    const bookingData = localStorage.getItem('bookingDetails');
-    console.log(bookingData);
-    
-    if (bookingData) {
-      setBooking(JSON.parse(bookingData));
-      localStorage.removeItem('bookingDetails'); // Clean up
+    // ดึงข้อมูลการจองจาก localStorage
+    const Data = localStorage.getItem("bookingDetails");
+    console.log(Data);
+    const createBooking = async () => { 
+      if (Data) {
+        const bookingData = JSON.parse(Data)
+        const booking = await axiosPrivateUser.post("/create-booking", {bookingData})
+        localStorage.removeItem("bookingDetails");
+      }
     }
+    createBooking()
   }, []);
   console.log(booking);
   
