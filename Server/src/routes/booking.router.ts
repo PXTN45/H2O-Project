@@ -9,7 +9,8 @@ import {
   cancelBooking,
   deleteBooking,
   getBookingHomeStayByUser,
-  getBookingPackageByUser
+  getBookingPackageByUser,
+  getBookingByPending
 } from "../controller/booking.controller";
 import { verifyToken } from "../middlewares/verifyToken";
 import verifyUser from "../middlewares/verifyUser";
@@ -17,6 +18,7 @@ import verifyBusiness from "../middlewares/verifyBusiness";
 import verifyAdmin from "../middlewares/verifyAdmin";
 const router = express.Router();
 router.get("/booking",getAllBooking , verifyAdmin,verifyToken)
+router.get("/booking-pending",getBookingByPending)
 router.get("/homestay-booking/:userId",getBookingHomeStayByUser , verifyUser,verifyToken)
 router.get("/package-booking/:userId",getBookingPackageByUser , verifyUser,verifyToken)
 router.post("/bookingHomeStay/:userId", bookHomeStay,verifyUser,verifyToken);

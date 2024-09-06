@@ -14,17 +14,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 const payment = async (req: Request, res: Response) => {
-  const {
-    totalPrice,
-    name,
-    bookingStart,
-    bookingEnd,
-    booker,
-    homestayId,
-    packageId,
-    paymentDetail,
-    email,
-  } = req.body;
+  const { totalPrice, name, email } = req.body;
 
   console.log(req.body);
 
@@ -48,49 +38,61 @@ const payment = async (req: Request, res: Response) => {
       cancel_url: `${YOUR_DOMAIN}/paymentFailure`,
       customer_email: email,
     });
+    res.status(201).json({
+      sessionUrl: session.url,
 
-    if (session) {
-      if (!isDateValid(bookingStart, bookingEnd)) {
-        return res.status(400).json({
-          message: "Please provide valid dates starting from today!",
-        });
-      }
-
-      const differenceInDays = getBookingNights(bookingStart, bookingEnd);
-      if (differenceInDays < 1) {
-        return res.status(400).json({
-          message: "Return date must be after start date!",
-        });
-      }
-
-      if (!isBookingAvailable) {
-        return res.status(400).json({
-          message: "The homeStay is already booked!",
-        });
-      }
-
-      // สร้างข้อมูลการจอง
-      const booking = await BookingModel.create({
-        booker,
-        homestay: homestayId,
-        package: packageId,
-        bookingStart,
-        bookingEnd,
-        night: differenceInDays,
-        paymentDetail,
-      });
-
-      // ส่ง URL กลับไปยัง frontend
-      res.status(201).json({
-        sessionUrl: session.url,
-        booking
-      });
-    }
-    // ตรวจสอบวันที่ก่อนสร้าง session
+    });
   } catch (error) {
     console.error("Error creating checkout session or booking:", error);
     res.status(500).json({ message: "Internal Server Error", error });
   }
 };
 
-export default payment;
+const booking = async (req: Request, res: Response) => {
+  // const { bookingData } = req.body;
+  const {
+    bookingStart,
+    bookingEnd,
+    booker,
+    homestayId,
+    packageId,
+    paymentDetail,
+  } = req.body.bookingData;
+
+  try {
+    if (!isDateValid(bookingStart, bookingEnd)) {
+      return res.status(400).json({
+        message: "Please provide valid dates starting from today!",
+      });
+    }
+
+    const differenceInDays = getBookingNights(bookingStart, bookingEnd);
+    if (differenceInDays < 1) {
+      return res.status(400).json({
+        message: "Return date must be after start date!",
+      });
+    }
+
+    if (!isBookingAvailable) {
+      return res.status(400).json({
+        message: "The homeStay is already booked!",
+      });
+    }
+    // สร้างข้อมูลการจอง
+    const booking = await BookingModel.create({
+      booker,
+      homestay: homestayId,
+      package: packageId,
+      bookingStart,
+      bookingEnd,
+      night: differenceInDays,
+      paymentDetail,
+    });
+    res.status(201).json({ booking });
+  } catch (error) {
+    console.error("Error creating checkout session or booking:", error);
+    res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+export { payment, booking };
