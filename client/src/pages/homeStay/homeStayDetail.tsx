@@ -64,23 +64,6 @@ interface User {
   birthday: Date;
   role: string;
 }
-interface PaymentData {
-  homeStayId: string;
-  homeStayName: string;
-  totalPrice: number;
-  pricePerRoom: number;
-  roomType: RoomType;
-  offer: Offer;
-  bookingUser: User;
-  rating: number;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
-}
-export interface Image {
-  _id: string;
-  image: string;
-}
 interface Location {
   name_location: string;
   province_location: string;
@@ -96,6 +79,25 @@ interface Location {
   longitude_location: number;
   radius_location: number;
 }
+interface PaymentData {
+  homeStayId: string;
+  homeStayName: string;
+  totalPrice: number;
+  pricePerRoom: number;
+  location: Location[];
+  roomType: RoomType;
+  offer: Offer;
+  bookingUser: User;
+  rating: number;
+  time_checkIn_homeStay: string;
+  time_checkOut_homeStay: string;
+  policy_cancel_homeStay: string;
+}
+export interface Image {
+  _id: string;
+  image: string;
+}
+
 export interface HomeStay {
   name_homeStay: string;
   room_type: RoomType[];
@@ -114,8 +116,6 @@ export interface HomeStay {
   createdAt: Date;
   updatedAt: Date;
 }
-
-
 interface Reviewer {
   image: string;
   name: string;
@@ -416,8 +416,9 @@ const homeStayDetail = () => {
                 homeStayName: item.name_homeStay,
                 totalPrice: totalPrice,
                 pricePerRoom: price,
+                location: item?.location,
                 roomType: item.room_type[roomTypeIndex],
-                offer: item.room_type[roomTypeIndex].offer[i],
+                offer: roomType.offer[i],
                 bookingUser: userInfo,
                 rating: averageRating,
                 time_checkIn_homeStay: item.time_checkIn_homeStay,

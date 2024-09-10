@@ -12,8 +12,6 @@ import { GrSync } from "react-icons/gr";
 import { FaChildReaching } from "react-icons/fa6";
 import { MdOutlineBathroom } from "react-icons/md";
 import { FaMale } from "react-icons/fa";
-import { IoMdTime } from "react-icons/io";
-import { MdOutlinePolicy } from "react-icons/md";
 import { TbRuler3 } from "react-icons/tb";
 import { LuBedSingle, LuBedDouble } from "react-icons/lu";
 export interface Image {
@@ -64,19 +62,6 @@ interface User {
   address: string;
   birthday: Date;
   role: string;
-}
-interface PaymentData {
-  homeStayId: string;
-  homeStayName: string;
-  totalPrice: number;
-  pricePerRoom: number;
-  roomType: RoomType;
-  offer: Offer;
-  bookingUser: User;
-  rating: number;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
 }
 export interface Image {
   _id: string;
@@ -192,9 +177,6 @@ const PackageDetail = () => {
     setCurrentIndices(roomTypes.map(() => 0));
   }, [roomTypes]);
 
-
-  console.log(review);
-
   // ฟังก์ชันคำนวณค่าเฉลี่ยของ rating
   const calculateAverageRating = (reviews: Review[]): number => {
     if (reviews.length === 0) return 0;
@@ -262,9 +244,6 @@ const PackageDetail = () => {
   });
 
   const calculatePercentages = (review: Review[]) => {
-    console.log(review);
-    console.log(review.length);
-
     const totalReviews = review.length;
     const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
 
@@ -647,14 +626,16 @@ const PackageDetail = () => {
 
   const packageName = item?.name_package;
   const booker = userInfo?._id;
-  const paymentDetail = "promptpay";
+  const email = userInfo?.email;
   const packageId = id;
+  const homestayId = " ";
+  const offer: Offer[] = [];
   const totalPrice = item.price_package;
 
   const makePayment = async () => {
     try {
       const response = await axiosPrivateUser.post("/create-checkout-session", {
-        name: homeStayName,
+        name: packageName,
         totalPrice: totalPrice,
         email: email,
       });
@@ -667,8 +648,9 @@ const PackageDetail = () => {
           bookingStart,
           bookingEnd,
           booker,
+          homestayId,
+          offer,
           packageId,
-          paymentDetail,
         };
         localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
 

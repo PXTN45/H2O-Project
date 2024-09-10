@@ -1,12 +1,10 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import HistoryPackage from "../../components/HistoryPackage";
 import HistoryHomeStay from "../../components/HistoryHomeStay";
-import BookingHomeStay from "../../components/BookingHomesaty";
-import BookingPackage from "../../components/BookingPackage";
 
 export interface Booker {
   _id: string;
@@ -105,7 +103,7 @@ export interface Booking {
   night: number;
 }
 
-const Booking = () => {
+const historyBooking = () => {
   const [myBooking, setMyBooking] = useState<Booking[]>([]);
   const [activeButton, setActiveButton] = useState<string>("homestay");
   const authContext = useContext(AuthContext);
@@ -142,7 +140,7 @@ const Booking = () => {
       {myBooking ? (
         <div className="container w-full px-6 my-5">
           <div>
-            <span className="text-2xl">การจอง</span>
+            <span className="text-2xl">ประวัติการจอง</span>
           </div>
 
           <div className="flex w-[35rem] md:w-[37rem] lg:w-[35rem] xl:w-[49em]  2xl:w-[65rem] gap-5 my-5">
@@ -176,11 +174,11 @@ const Booking = () => {
 
           {activeButton == "homestay" ? (
             <div>
-              <BookingHomeStay />
+              <HistoryHomeStay />
             </div>
           ) : activeButton == "package" ? (
             <div>
-              <BookingPackage />
+              <HistoryPackage />
             </div>
           ) : (
             <div>
@@ -197,4 +195,4 @@ const Booking = () => {
   );
 };
 
-export default Booking;
+export default historyBooking;

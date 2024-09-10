@@ -27,6 +27,7 @@ export interface Offer {
   facilitiesRoom: Facilities_Room[];
   roomCount: number;
   quantityRoom: number;
+  _id: string;
 }
 
 export interface RoomType {
@@ -38,32 +39,6 @@ export interface RoomType {
   image_room: Image_room[];
 }
 
-interface User {
-  _id?: string;
-  name?: string;
-  lastName?: string;
-  businessName?: string;
-  email: string;
-  password: string;
-  phone: string | undefined;
-  image: string;
-  address: string;
-  birthday: Date;
-  role: string;
-}
-
-interface PaymentData {
-  homeStayId: string;
-  homeStayName: string;
-  totalPrice: number;
-  roomType: RoomType;
-  offer: Offer;
-  bookingUser: User;
-  rating: number;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
-}
 const BookingDetail: React.FC = () => {
   const { paymentData, dataNav } = usePaymentContext();
   const [totalPrice, setTotalPrice] = useState<number>(0);
@@ -113,9 +88,6 @@ const BookingDetail: React.FC = () => {
     console.log("Start date is not defined");
     bookingStart = "default-start-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
-  // console.log(bookingStart);
-
-  // การจัดการวันที่สิ้นสุด (end date)
   const endStr = dataNav?.dateRange.endDate_Time;
   let bookingEnd: string;
 
@@ -126,11 +98,22 @@ const BookingDetail: React.FC = () => {
     console.log("End date is not defined");
     bookingEnd = "default-end-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
+  console.log(paymentData);
+  
 
-  console.log(dataNav);
-
+  const offer = {
+    discount: paymentData?.offer.discount,
+    adult: dataNav?.numPeople,
+    child: dataNav?.numChildren,
+    room: dataNav?.numRoom,
+    name_type_room: paymentData?.roomType.name_type_room,
+    image_room: paymentData?.roomType.image_room,
+    totalPrice: totalPrice
+  };
+  console.log(paymentData);
+  
   const booker = paymentData?.bookingUser._id;
-  const paymentDetail = "promptpay";
+  // const paymentDetail = "promptpay";
   const homestayId = paymentData?.homeStayId;
 
   const makePayment = async () => {
@@ -150,7 +133,7 @@ const BookingDetail: React.FC = () => {
           bookingEnd,
           booker,
           homestayId,
-          paymentDetail,
+          offer
         };
         localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
 

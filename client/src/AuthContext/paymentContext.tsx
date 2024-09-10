@@ -38,6 +38,7 @@ export interface Offer {
   facilitiesRoom: Facilities_Room[];
   roomCount: number;
   quantityRoom: number;
+  _id: string;
 }
 export interface RoomType {
   name_type_room: string;
@@ -66,10 +67,26 @@ interface User {
   birthday: Date;
   role: string;
 }
+interface Location {
+  name_location: string;
+  province_location: string;
+  house_no: string;
+  village?: string; // Optional property
+  village_no: string;
+  alley?: string; // Optional property
+  street?: string; // Optional property
+  district_location: string;
+  subdistrict_location: string;
+  zipcode_location: number;
+  latitude_location: number;
+  longitude_location: number;
+  radius_location: number;
+}
 interface PaymentData {
   homeStayId: string;
   homeStayName: string;
   totalPrice: number;
+  location: Location[];
   roomType: RoomType;
   offer: Offer;
   bookingUser: User;
@@ -78,12 +95,10 @@ interface PaymentData {
   time_checkOut_homeStay: string;
   policy_cancel_homeStay: string;
 }
-
 export interface Image {
   _id: string;
   image: string;
 }
-
 export interface HomeStay {
   name_homeStay: string;
   room_type: RoomType[];
@@ -102,7 +117,6 @@ export interface HomeStay {
   createdAt: Date;
   updatedAt: Date;
 }
-
 interface PaymentContextType {
   paymentData: PaymentData | null;
   setPaymentData: (data: PaymentData) => void;

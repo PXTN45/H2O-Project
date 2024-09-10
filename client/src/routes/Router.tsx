@@ -24,7 +24,7 @@ import PaymentFailure from "../pages/homeStay/paymentFailure";
 import Contact from "../pages/orther/Contact";
 import ContactOnlyAdmin from "../pages/orther/Contact.OnlyAdmin";
 import Booking from "../pages/user/Booking";
-
+import HistoryBooking from "../pages/user/historyBooking";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -93,6 +93,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard-user/Booking-user",
             element: <Booking />,
+          },
+          {
+            path: "/dashboard-user/HistiryBooking-user",
+            element: <HistoryBooking />,
           },
         ],
       },

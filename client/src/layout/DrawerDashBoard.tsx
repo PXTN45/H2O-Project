@@ -3,12 +3,14 @@ import { Outlet } from "react-router-dom";
 
 const DashBoard = () => {
   return (
-      <div className="flex">
+    <div className="flex sm:flex-col md:flex-row md:px-5 items-start">
+      <div>
         <Drawer />
-        <div className="md:w-1.5/4 ">
-          <Outlet />
-        </div>
       </div>
+      <div className="w-full sm:px-10 md:w-full lg:w-3/4 xl:w-3/4 flex items-center ">
+        <Outlet />
+      </div>
+    </div>
   );
 };
 
