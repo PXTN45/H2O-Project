@@ -40,7 +40,6 @@ const payment = async (req: Request, res: Response) => {
     });
     res.status(201).json({
       sessionUrl: session.url,
-
     });
   } catch (error) {
     console.error("Error creating checkout session or booking:", error);
@@ -49,17 +48,13 @@ const payment = async (req: Request, res: Response) => {
 };
 
 const booking = async (req: Request, res: Response) => {
-  // const { bookingData } = req.body;
-  const {
-    bookingStart,
-    bookingEnd,
-    booker,
-    homestayId,
-    packageId,
-    paymentDetail,
-  } = req.body.bookingData;
-
+  const { bookingStart, bookingEnd, booker, homestayId = "", offer = [], packageId } =
+    req.body.bookingData;
+  
+  console.log(req.body);
+  
   try {
+    // ตรวจสอบความถูกต้องของวันที่
     if (!isDateValid(bookingStart, bookingEnd)) {
       return res.status(400).json({
         message: "Please provide valid dates starting from today!",
@@ -75,24 +70,27 @@ const booking = async (req: Request, res: Response) => {
 
     if (!isBookingAvailable) {
       return res.status(400).json({
-        message: "The homeStay is already booked!",
+        message: "The homestay is already booked!",
       });
     }
+
     // สร้างข้อมูลการจอง
     const booking = await BookingModel.create({
       booker,
-      homestay: homestayId,
-      package: packageId,
+      homestay: homestayId, 
+      detail_offer: offer, 
+      package: packageId || null, // กำหนดให้ packageId เป็น null หากไม่มีค่า
       bookingStart,
       bookingEnd,
       night: differenceInDays,
-      paymentDetail,
     });
+
     res.status(201).json({ booking });
   } catch (error) {
     console.error("Error creating checkout session or booking:", error);
     res.status(500).json({ message: "Internal Server Error", error });
   }
 };
+
 
 export { payment, booking };
