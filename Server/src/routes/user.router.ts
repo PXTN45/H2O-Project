@@ -284,7 +284,6 @@ router.get("/businessData", getAllBusiness);
  */
 router.get("/adminData", getAllAdmin);
 
-
 /**
  * @swagger
  * /user/userRegister:
