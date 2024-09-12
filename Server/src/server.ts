@@ -123,9 +123,11 @@ app.get("/", (req: Request, res: Response) => {
 
 // Socket.IO setup
 io.on('connection', (socket) => {
+  console.log('New client connected');
 
   socket.on('joinChat', (chatId) => {
     socket.join(chatId);
+    console.log(`Client joined chat: ${chatId}`);
   });
 
   socket.on('sendMessage', async ({ chatId, sender, content }) => {
@@ -135,13 +137,19 @@ io.on('connection', (socket) => {
       if (chat) {
         chat.messages.push({ sender, content, timestamp });
         await chat.save();
+        // ส่งข้อความใหม่ไปยังห้องที่เกี่ยวข้อง
         io.to(chatId).emit('message', { sender, content, timestamp });
       }
     } catch (error) {
       console.error('Error saving message:', error);
     }
   });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
+
 
 
 
