@@ -58,8 +58,8 @@ const BookingDetail: React.FC = () => {
         paymentData.totalPrice *
         dataNav?.numRoom *
         dataNav.dateRange.numberOfNights;
-      const taxRate = 0.07;
-      const feeRate = 0.1;
+      const taxRate = 0.03;
+      const feeRate = 0.05;
 
       const fee = price * feeRate;
       const tax = (price + fee) * taxRate;

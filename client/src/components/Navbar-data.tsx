@@ -22,7 +22,7 @@ const Navbar = () => {
     sendSearchToDetail?.numChildren ?? 0
   );
   const [numRoom, setNumRoom] = useState<number>(
-    sendSearchToDetail?.numRoom ?? 0
+    sendSearchToDetail?.numRoom ?? 1
   );
 
   const tomorrow = new Date();
@@ -60,7 +60,7 @@ const Navbar = () => {
 
   const handleIncreaseChildren = () => setNumChildren(numChildren + 1);
 
-  const handleDecreaseRoom = () => setNumRoom(numRoom > 0 ? numRoom - 1 : 1);
+  const handleDecreaseRoom = () => setNumRoom(numRoom > 1 ? numRoom - 1 : 1);
 
   const handleIncreaseRoom = () => setNumRoom(numRoom + 1);
 

@@ -5,6 +5,9 @@ import { FaMapLocationDot } from "react-icons/fa6";
 import OpenStreetMapShowData from "../components/OpenStreetMapShowData";
 import { TbMapQuestion } from "react-icons/tb";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
+import { GoHome } from "react-icons/go";
+import { LiaChildSolid } from "react-icons/lia";
+import { IoPeopleSharp } from "react-icons/io5";
 
 export interface Booker {
   _id: string;
@@ -572,6 +575,21 @@ const HistoryHomeStay = () => {
                         myBooking[index]?.bookingStart,
                         myBooking[index]?.bookingEnd
                       )}
+                    </span>
+                  </div>
+                  <div className="text-md">
+                    <span className="flex items-center gap-2">
+                      <div className="flex items-center">
+                        <IoPeopleSharp /> {myBooking[0]?.detail_offer[0].adult}
+                      </div>
+                      <div className="flex items-center">
+                        <LiaChildSolid />
+                        {myBooking[index]?.detail_offer[0].child}
+                      </div>
+                      <div className="flex items-center">
+                        <GoHome />
+                        {myBooking[index]?.detail_offer[0].room}
+                      </div>
                     </span>
                   </div>
                 </div>
