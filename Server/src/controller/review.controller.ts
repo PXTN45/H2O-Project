@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import reviewModel from "../model/review.model";
-import bookingModel from "../model/booking.model";
+import BookingModel from "../model/booking.model";
 
 // get all review สำหรับการเรียกดูรีวิวทั้งหมด
 const getAllReview = async (req: Request, res: Response): Promise<void> => {
@@ -15,42 +15,58 @@ const getAllReview = async (req: Request, res: Response): Promise<void> => {
 
 // สำหรับการสร้างรีวิวใหม่ ลูกค้าต้องทำการจองก่อนถึงจะสามารถสร้างรีวิวได้
 const createReview = async (req: Request, res: Response): Promise<void> => {
-    // ดึง homestayId และ userId จาก body ของ request
-    const { homestayId, userId } = req.body;
-
     try {
-        // ตรวจสอบว่าลูกค้ามีการจองโฮมสเตย์นี้และการจองนั้นถูกยืนยันแล้วหรือไม่
-        const existingBooking = await bookingModel.findOne({
-            homestay: homestayId, 
-            user: userId, 
-            bookingStatus: "Confirmed" // ตรวจสอบว่าการจองได้รับการยืนยันแล้ว
-        });
+        const { reviewer, content, rating, homestay, packageId } = req.body;
 
-        // ถ้าไม่มีการจองหรือการจองยังไม่ได้รับการยืนยัน
-        if (!existingBooking) {
-            // ส่งสถานะ 403 (Forbidden) พร้อมข้อความแจ้งเตือน
-            res.status(403).json({ message: "คุณต้องทำการจองและได้รับการยืนยันก่อนถึงจะสามารถรีวิวได้" });
-            return; // หยุดการทำงานถ้าเงื่อนไขไม่ผ่าน
+        // ตรวจสอบข้อมูลที่ได้รับ: ต้องมี reviewer, content, และ rating และต้องมี homestay หรือ package อย่างน้อยหนึ่งอย่าง
+        if (!reviewer || !content || !rating || (!homestay && !packageId)) {
+            res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+            return;
         }
 
-        // ถ้ามีการจองและการจองได้รับการยืนยันแล้ว
-        // ดึงข้อมูลการรีวิวจาก body ของ request เพื่อเตรียมสร้างรีวิวใหม่
-        const createReview = req.body;
-        const newReview = new reviewModel(createReview); // สร้างอินสแตนซ์ของ reviewModel ด้วยข้อมูลที่ได้รับ
+        // ตรวจสอบว่าคะแนนอยู่ในช่วงที่ถูกต้อง
+        if (rating < 1 || rating > 5) {
+            res.status(400).json({ message: 'คะแนนต้องอยู่ระหว่าง 1 ถึง 5' });
+            return;
+        }
 
-        // บันทึกรีวิวใหม่ลงในฐานข้อมูล
+        // ตรวจสอบการจองที่เกี่ยวข้องกับ homestay หรือ package
+        const booking = await BookingModel.findOne({ 
+            booker: reviewer, 
+            $or: [
+                { homestay },
+                { package: packageId }
+            ]
+        });
+
+        if (!booking) {
+            res.status(404).json({ message: 'ไม่พบการจองที่เกี่ยวข้อง' });
+            return;
+        }
+
+        if (booking.bookingStatus !== 'Confirmed') {
+            res.status(403).json({ message: 'ลูกค้าที่มีสถานะ Confirmed เท่านั้นที่สามารถเขียนรีวิวได้' });
+            return;
+        }
+
+        // สร้างรีวิวใหม่โดยพิจารณาจากเงื่อนไขของ homestay และ package
+        const newReview = new reviewModel({
+            reviewer,
+            content,
+            rating,
+            homestay: homestay || null, // ตั้งค่า homestay เป็น null ถ้าไม่ได้รับค่า
+            package: packageId || null   // ตั้งค่า package เป็น null ถ้าไม่ได้รับค่า
+        });
+
+        // บันทึกรีวิวลงในฐานข้อมูล
         const savedReview = await newReview.save();
-
-        // ส่งสถานะ 201 (Created) พร้อมข้อมูลรีวิวที่ถูกบันทึก
         res.status(201).json(savedReview);
     } catch (error: any) {
-        // จัดการข้อผิดพลาดและบันทึกลงใน console
-        console.error("เกิดข้อผิดพลาดในการสร้างรีวิว:", error);
-
-        // ส่งสถานะ 500 (Internal Server Error) พร้อมข้อความข้อผิดพลาด
-        res.status(500).json({ message: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์", error: error.message });
+        console.error('ข้อผิดพลาดในการสร้างรีวิว:', error.message);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
     }
 };
+
 
 // สำหรับการอัพเดตรีวิวตาม id
 const updateReview = async (req: Request, res: Response): Promise<void> => {

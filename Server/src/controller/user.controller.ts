@@ -212,7 +212,7 @@ const Login = async (req: Request, res: Response): Promise<void> => {
   const user = await UserModel.findOne({ email }).collation({
     locale: "en",
     strength: 2,
-  }); //strength โดยพื้นฐานมี 4 ละดับการใช้ต่างกันศึกษาเพิ่มโดยหาเอกสาร
+  }); //strength โดยพื้นฐานมี 4 ละดับการใช้ต่างกันขึ้นอยู่กับความเข้มงวด ระดับที่ 2 จะนับตัวเล็กตัวใหญ่ได้หมด
   const business = await BusinessModel.findOne({ email }).collation({
     locale: "en",
     strength: 2,
