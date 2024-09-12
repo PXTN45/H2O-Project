@@ -210,7 +210,7 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
         ) : (
           <div className="border-b pb-5 flex gap-2 items-center">
             <MdOutlineBedroomChild className="text-xl" />
-            {paymentData.roomType.bedroom_homeStay}
+            {paymentData.roomType.bedroom_homeStay} เตียง
           </div>
         )}
 
