@@ -182,9 +182,9 @@ const Drawer: React.FC = () => {
               aria-label="close sidebar"
               className="drawer-overlay"
             />
-            <ul className="menu p-4 w-80 min-h-full text-xl">
-              <div className="flex items-center justify-start mt-5 rounded-full">
-                <div className="relative group">
+            <ul className="menu bg-white text-black min-h-full w-80 p-4 text-xl">
+              <div className="flex items-center justify-start my-5 rounded-full">
+                <div className="relative group ">
                   <div className="rounded-full h-14 w-14 object-cover bg-dark">
                     <img
                       src={userInfo?.image}
@@ -251,7 +251,7 @@ const Drawer: React.FC = () => {
                         <a>การจอง</a>
                       </li>
                     </Link>
-                    <Link to="#">
+                    <Link to="/dashboard-user/HistiryReview-user">
                       <li
                         onClick={() => handleClick("My review")}
                         className={`cursor-pointer rounded-md ${

@@ -74,7 +74,30 @@ interface Location {
   radius_location: number;
 }
 
+export interface ActivityPackage {
+  activity_days: ActivityDays[];
+}
+
+export interface IPackage {
+  _id: string; // ObjectId ของ package จาก MongoDB
+  name_package: string;
+  type_package: string;
+  max_people: number;
+  detail_package: string;
+  activity_package: ActivityPackage[];
+  time_start_package: Date;
+  time_end_package: Date;
+  policy_cancel_package: string;
+  location: Location[];
+  image: Image[];
+  price_package: number;
+  homestay?: string; // ObjectId ของ Homestay (optional field)
+  business_user: string; // ObjectId ของ business_user
+  review_rating_package: number;
+}
+
 export interface HomeStay {
+  _id: string; // ObjectId ของ package จาก MongoDB
   name_homeStay: string;
   room_type: RoomType[];
   max_people: number;
@@ -101,7 +124,15 @@ export interface Booking {
   bookingStatus: string;
   detail_offer: DetailOffer[];
   homestay: HomeStay;
+  package: IPackage;
   night: number;
+}
+export interface reviewData {
+  reviewer: string | undefined;
+  rating: number;
+  content: string;
+  packageId: string | null;
+  homestay: string | null;
 }
 
 const HistoryHomeStay = () => {
@@ -109,6 +140,8 @@ const HistoryHomeStay = () => {
   const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
+  const [rating, setRating] = useState(5); // เก็บค่าคะแนนจากการกดดาว
+  const [content, setContent] = useState(""); // เก็บข้อความรีวิว
   const [selectedBookingIndex, setSelectedBookingIndex] = useState<
     number | null
   >(null);
@@ -140,7 +173,8 @@ const HistoryHomeStay = () => {
     fetchData();
   }, [userInfo?._id]);
 
-  const location = myBooking[0]?.homestay.location[0];
+  console.log(myBooking);
+
   const monthNamesTH = [
     "มกราคม",
     "กุมภาพันธ์",
@@ -241,122 +275,189 @@ const HistoryHomeStay = () => {
     setIsReviewModalOpen(false);
     setSelectedBookingIndex(null);
   };
-  // console.log(myBooking[0]?.detail_offer);
+  const handleRatingChange = (value: number) => {
+    setRating(value);
+  };
+  // console.log(myBookingPackage[0]?.package._id);
+
+  const handleSubmit = (selectedBookingIndex: number) => {
+    const reviewer = userInfo?._id;
+    const reviewData = {
+      reviewer,
+      rating,
+      content,
+      packageId: myBooking[selectedBookingIndex]?.package
+        ? myBooking[selectedBookingIndex]?.package._id
+        : null,
+      homestay: myBooking[selectedBookingIndex]?.homestay
+        ? myBooking[selectedBookingIndex].homestay._id
+        : null,
+    };
+    console.log(reviewData);
+
+    submitReview(reviewData); // ฟังก์ชันสำหรับส่งข้อมูลรีวิว
+    closeReviewModal(); // ปิด modal หลังจากส่งข้อมูล
+  };
+  const submitReview = async (reviewData: reviewData) => {
+    try {
+      const revirew = await axiosPrivateUser.post(
+        "/review/createReview",
+        reviewData
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div>
       <div className="sticky top-0 z-50">
         {isMapModalOpen && selectedBookingIndex !== null && (
-          <dialog id="maps" open={isMapModalOpen} className="modal">
-            <div className="modal-box w-11/12 max-w-5xl">
-              <h3 className="font-bold text-lg">Maps</h3>
-              <div className="py-4">
-                {/* แสดงแผนที่ */}
-                <OpenStreetMapShowData
-                  lat={
-                    myBooking[selectedBookingIndex]?.homestay.location[0]
-                      .latitude_location
-                  }
-                  lng={
-                    myBooking[selectedBookingIndex]?.homestay.location[0]
-                      .longitude_location
-                  }
-                />
+          <>
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+            <dialog id="maps" open={isMapModalOpen} className="modal">
+              <div className="modal-box w-11/12 max-w-5xl">
+                <h3 className="font-bold text-lg">Maps</h3>
+                <div className="py-4">
+                  {/* แสดงแผนที่ */}
+                  <OpenStreetMapShowData
+                    lat={
+                      myBooking[selectedBookingIndex]?.homestay.location[0]
+                        .latitude_location
+                    }
+                    lng={
+                      myBooking[selectedBookingIndex]?.homestay.location[0]
+                        .longitude_location
+                    }
+                  />
+                </div>
+                <div className="modal-action">
+                  <button onClick={closeMapModal} className="btn">
+                    Close
+                  </button>
+                </div>
               </div>
-              <div className="modal-action">
-                <button onClick={closeMapModal} className="btn">
-                  Close
-                </button>
-              </div>
-            </div>
-          </dialog>
+            </dialog>
+          </>
         )}
         {isReviewModalOpen && selectedBookingIndex !== null && (
-          <dialog id="review" open={isReviewModalOpen} className="modal">
-            <div className="modal-box w-11/12 max-w-5xl">
-              <h3 className="font-bold text-lg">เขียนรีวิว</h3>
-              <p className="py-4">
-                <div className="flex flex-col gap-5 w-full b shadow-boxShadow rounded-lg p-10">
-                  <div className="flex flex-row justify-between w-full x">
-                    <div className=" xl:w-2/3 pr-2 flex flex-col gap-5">
-                      <div className="flex justify-between ">
-                        <span className="text-lg font-bold ">
-                          {
-                            myBooking[selectedBookingIndex]?.detail_offer[0]
-                              .name_type_room
-                          }
-                        </span>
-                        <div className="bg-green-400 px-3 rounded-full text-white xl:hidden">
-                          {myBooking[selectedBookingIndex].bookingStatus}
-                        </div>
-                      </div>
+          <>
+            {/* Backdrop พื้นหลังมืด */}
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
 
-                      <div
-                        className=" flex md:items-center  gap-2"
-                        // onClick={() => openMapModal(selectedBookingIndex)}
-                      >
-                        <FaMapLocationDot className="text-red-700 text-2xl" />
-                        <div className="flex flex-wrap text-sm gap-1">
-                          <div>{myBooking[selectedBookingIndex]?.homestay.location[0].house_no}</div>
-                          <div>ม.{myBooking[selectedBookingIndex]?.homestay.location[0].village_no}</div>
-                          <div>ต.{myBooking[selectedBookingIndex]?.homestay.location[0].subdistrict_location}</div>
-                          <div>อ.{myBooking[selectedBookingIndex]?.homestay.location[0].district_location}</div>
-                          <div>จ.{myBooking[selectedBookingIndex]?.homestay.location[0].province_location}</div>
-                          <div>{myBooking[selectedBookingIndex]?.homestay.location[0].zipcode_location}</div>
+            {/* Modal */}
+            <dialog id="review" open={isReviewModalOpen} className="modal z-50">
+              <div className="modal-box w-11/12 max-w-5xl">
+                <h3 className="font-bold text-lg">เขียนรีวิว</h3>
+                <p className="py-4">
+                  <div className="flex flex-col gap-5 w-full b shadow-boxShadow rounded-lg p-10">
+                    <div className="flex flex-row justify-between w-full">
+                      <div className=" xl:w-2/3 pr-2 flex flex-col gap-5">
+                        <div className="flex justify-between ">
+                          <span className="text-lg font-bold ">
+                            {
+                              myBooking[selectedBookingIndex]?.detail_offer[0]
+                                .name_type_room
+                            }
+                          </span>
+                          <div className="bg-green-400 px-3 rounded-full text-white xl:hidden">
+                            {myBooking[selectedBookingIndex].bookingStatus}
+                          </div>
+                        </div>
+
+                        <div className=" flex md:items-center gap-2">
+                          <FaMapLocationDot className="text-red-700 text-2xl" />
+                          <div className="flex flex-wrap text-sm gap-1">
+                            <div>
+                              {
+                                myBooking[selectedBookingIndex]?.homestay
+                                  .location[0].house_no
+                              }
+                            </div>
+                            <div>
+                              ม.
+                              {
+                                myBooking[selectedBookingIndex]?.homestay
+                                  .location[0].village_no
+                              }
+                            </div>
+                            <div>
+                              ต.
+                              {
+                                myBooking[selectedBookingIndex]?.homestay
+                                  .location[0].subdistrict_location
+                              }
+                            </div>
+                            <div>
+                              อ.
+                              {
+                                myBooking[selectedBookingIndex]?.homestay
+                                  .location[0].district_location
+                              }
+                            </div>
+                            <div>
+                              จ.
+                              {
+                                myBooking[selectedBookingIndex]?.homestay
+                                  .location[0].province_location
+                              }
+                            </div>
+                            <div>
+                              {
+                                myBooking[selectedBookingIndex]?.homestay
+                                  .location[0].zipcode_location
+                              }
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-sm">
+                          <span>
+                            {formatBookingDates(
+                              myBooking[selectedBookingIndex]?.bookingStart,
+                              myBooking[selectedBookingIndex]?.bookingEnd
+                            )}
+                          </span>
                         </div>
                       </div>
-                      <div className="text-sm">
-                        <span>
-                          {formatBookingDates(
-                            myBooking[selectedBookingIndex]?.bookingStart,
-                            myBooking[selectedBookingIndex]?.bookingEnd
-                          )}
-                        </span>
+                      <div className="rating">
+                        {[1, 2, 3, 4, 5].map((value) => (
+                          <input
+                            key={value}
+                            type="radio"
+                            name="rating-2"
+                            className="mask mask-star-2 bg-primaryUser"
+                            onClick={() => handleRatingChange(value)}
+                          />
+                        ))}
                       </div>
                     </div>
-                    <div className="rating">
-                      <input
-                        type="radio"
-                        name="rating-2"
-                        className="mask mask-star-2 bg-primaryUser"
-                      />
-                      <input
-                        type="radio"
-                        name="rating-2"
-                        className="mask mask-star-2 bg-primaryUser"
-                      />
-                      <input
-                        type="radio"
-                        name="rating-2"
-                        className="mask mask-star-2 bg-primaryUser"
-                      />
-                      <input
-                        type="radio"
-                        name="rating-2"
-                        className="mask mask-star-2 bg-primaryUser"
-                      />
-                      <input
-                        type="radio"
-                        name="rating-2"
-                        className="mask mask-star-2 bg-primaryUser"
-                      />
+                    <div className="w-full shadow-boxShadow rounded-lg">
+                      <textarea
+                        className="textarea w-full bg-white"
+                        placeholder="เขียนรีวิว"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                      ></textarea>
                     </div>
                   </div>
-                  <div className="w-full shadow-boxShadow rounded-lg">
-                    <textarea
-                      className="textarea w-full bg-white"
-                      placeholder="เขียนรีวิว"
-                    ></textarea>
-                  </div>
+                </p>
+                <div className="modal-action">
+                  <button
+                    onClick={() => handleSubmit(selectedBookingIndex)}
+                    className=" bg-green-500 text-white px-5 py-2 hover:bg-green-700 rounded-full w-[100px]"
+                  >
+                    รีวิว
+                  </button>
+                  <button
+                    onClick={closeReviewModal}
+                    className=" bg-red-500 text-white px-5 py-2 hover:bg-red-700 rounded-full w-[100px]"
+                  >
+                    ยกเลิก
+                  </button>
                 </div>
-              </p>
-              <div className="modal-action">
-                <button onClick={closeReviewModal} className="btn">
-                  Close
-                </button>
               </div>
-            </div>
-          </dialog>
+            </dialog>
+          </>
         )}
       </div>
       {images}
@@ -430,12 +531,39 @@ const HistoryHomeStay = () => {
                   >
                     <FaMapLocationDot className="text-red-700 text-2xl" />
                     <div className="flex flex-wrap text-sm gap-1">
-                      <div>{myBooking[index]?.homestay.location[0].house_no}</div>
-                      <div>ม.{myBooking[index]?.homestay.location[0].village_no}</div>
-                      <div>ต.{myBooking[index]?.homestay.location[0].subdistrict_location}</div>
-                      <div>อ.{myBooking[index]?.homestay.location[0].district_location}</div>
-                      <div>จ.{myBooking[index]?.homestay.location[0].province_location}</div>
-                      <div>{myBooking[index]?.homestay.location[0].zipcode_location}</div>
+                      <div>
+                        {myBooking[index]?.homestay.location[0].house_no}
+                      </div>
+                      <div>
+                        ม.{myBooking[index]?.homestay.location[0].village_no}
+                      </div>
+                      <div>
+                        ต.
+                        {
+                          myBooking[index]?.homestay.location[0]
+                            .subdistrict_location
+                        }
+                      </div>
+                      <div>
+                        อ.
+                        {
+                          myBooking[index]?.homestay.location[0]
+                            .district_location
+                        }
+                      </div>
+                      <div>
+                        จ.
+                        {
+                          myBooking[index]?.homestay.location[0]
+                            .province_location
+                        }
+                      </div>
+                      <div>
+                        {
+                          myBooking[index]?.homestay.location[0]
+                            .zipcode_location
+                        }
+                      </div>
                     </div>
                   </div>
                   <div className="text-sm">

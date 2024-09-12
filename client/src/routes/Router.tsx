@@ -25,6 +25,7 @@ import Contact from "../pages/orther/Contact";
 import ContactOnlyAdmin from "../pages/orther/Contact.OnlyAdmin";
 import Booking from "../pages/user/Booking";
 import HistoryBooking from "../pages/user/historyBooking";
+import HistoryReview from "../pages/user/historyReview";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard-user/HistiryBooking-user",
             element: <HistoryBooking />,
+          },
+          {
+            path: "/dashboard-user/HistiryReview-user",
+            element: <HistoryReview />,
           },
         ],
       },
