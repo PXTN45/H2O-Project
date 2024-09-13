@@ -366,7 +366,7 @@ const BookingHomeStay = () => {
                     <span className="text-lg font-bold ">
                       {booking?.detail_offer[0].name_type_room}
                     </span>
-                    <div id="status" className="bg-green-400 px-3 rounded-full text-white xl:hidden">
+                    <div id="status1" className="bg-green-400 px-3 rounded-full text-white xl:hidden">
                       {booking.bookingStatus}
                     </div>
                   </div>
@@ -437,7 +437,7 @@ const BookingHomeStay = () => {
                   </div>
                 </div>
                 <div className=" xl:w-1/3 flex flex-col justify-end items-end xl:border-l p-5">
-                  <div id="status" className="bg-green-400 px-3 rounded-full text-white hidden xl:block">
+                  <div id="status2" className="bg-green-400 px-3 rounded-full text-white hidden xl:block">
                     {booking.bookingStatus}
                   </div>
                   <div className="flex flex-col items-end text-xl my-5">
