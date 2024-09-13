@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import { BsCamera } from "react-icons/bs";
@@ -9,15 +9,22 @@ import { storage } from "../Firebase/firebase.config";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
 import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
 import axiosPrivateAdmin from "../hook/axiosPrivateAdmin";
+import { useNavigate } from "react-router-dom";
 
 const Drawer: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const authContext = useContext(AuthContext);
-  const [activeItem, setActiveItem] = useState<string>("");
-
+  const [activeItem, setActiveItem] = useState<string>("Profile");
+  const navigate = useNavigate()
   const handleClick = (item: string) => {
     setActiveItem(item);
   };
+
+
+
+  useEffect(() => {
+    navigate("/dashboard-user/Profile-User");
+  },[])
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
@@ -224,7 +231,7 @@ const Drawer: React.FC = () => {
               </div>
               <hr className="h-px bg-primaryUser border-0"></hr>
               {/* Sidebar content here */}
-              <div>
+              <div className="mt-5">
                 {userInfo?.role === "user" ? (
                   <div>
                     <Link to="/dashboard-user/Profile-User">
@@ -236,7 +243,7 @@ const Drawer: React.FC = () => {
                             : ""
                         }`}
                       >
-                        <a>โปรไฟล์(UC17)</a>
+                        <a>บัญชีของฉัน</a>
                       </li>
                     </Link>
                     <Link to="/dashboard-user/Booking-user">
@@ -263,7 +270,7 @@ const Drawer: React.FC = () => {
                         <a>ประวัติรีวิว</a>
                       </li>
                     </Link>
-                    <Link to="#">
+                    {/* <Link to="#">
                       <li
                         onClick={() => handleClick("Property messages")}
                         className={`cursor-pointer rounded-md ${
@@ -274,7 +281,7 @@ const Drawer: React.FC = () => {
                       >
                         <a>Property messages</a>
                       </li>
-                    </Link>
+                    </Link> */}
                   </div>
                 ) : userInfo?.role === "business" ? (
                   <div>

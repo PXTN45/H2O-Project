@@ -6,7 +6,7 @@ import PrivateRouterAdmin from "../PrivateRouter/PrivateRouterAdmin";
 import PrivateVerifyEmail from "../PrivateRouter/PrivateVerifyEmail";
 import Home from "../pages/home/homepage";
 import VerifyEmailSuccess from "../pages/orther/emailIsVerify";
-import ProfileUser from "../pages/user/profile";
+import ProfileUser from "../pages/user/myAccount";
 import ProfileBusiness from "../pages/business/profile";
 import SelectionCreate from "../pages/business/selectionCreate";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
