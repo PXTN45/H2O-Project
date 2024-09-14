@@ -281,7 +281,7 @@ const confirmBooking = async (req: Request, res: Response): Promise<void> => {
 };
 
 const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> => {
-  const { email, image, bookingId } = req.body;
+  const { bookingId , image } = req.body;
 
   try {
     const bookingData = await Booking.findOne({ '_id': bookingId }).populate([
@@ -299,7 +299,9 @@ const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    // await sendEmailPayment(email, image); // uncomment this line when ready
+    bookingData.bookingStatus = "Money transferred";
+
+    await sendEmailPayment(bookingData, image);
     res.status(200).json({
       message: bookingData,
     });
