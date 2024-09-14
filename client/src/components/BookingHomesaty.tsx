@@ -363,10 +363,18 @@ const BookingHomeStay = () => {
               <div className="pl-10 pt-5 md:pr-5 xl:p-2 flex flex-col xl:flex-row w-full xl:w-2/3">
                 <div className=" xl:w-2/3 pr-2 flex flex-col gap-5">
                   <div className="flex justify-between ">
-                    <span className="text-lg font-bold ">
-                      {booking?.detail_offer[0].name_type_room}
-                    </span>
-                    <div id="status1" className="bg-green-400 px-3 rounded-full text-white xl:hidden">
+                    <div className="flex flex-col">
+                      <span className="text-md font-bold ">
+                        {booking?.homestay.name_homeStay}
+                      </span>
+                      <span className="text-md ">
+                        {booking?.detail_offer[0].name_type_room}
+                      </span>
+                    </div>
+                    <div
+                      id="status1"
+                      className="bg-green-400 px-3 rounded-full text-white xl:hidden"
+                    >
                       {booking.bookingStatus}
                     </div>
                   </div>
@@ -437,7 +445,10 @@ const BookingHomeStay = () => {
                   </div>
                 </div>
                 <div className=" xl:w-1/3 flex flex-col justify-end items-end xl:border-l p-5">
-                  <div id="status2" className="bg-green-400 px-3 rounded-full text-white hidden xl:block">
+                  <div
+                    id="status2"
+                    className="bg-green-400 px-3 rounded-full text-white hidden xl:block"
+                  >
                     {booking.bookingStatus}
                   </div>
                   <div className="flex flex-col items-end text-xl my-5">

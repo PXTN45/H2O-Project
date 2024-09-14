@@ -4,8 +4,8 @@ import { AuthContext } from "../../AuthContext/auth.provider";
 import { TbPointFilled } from "react-icons/tb";
 
 const myAccount = () => {
-  const [openUpdateFrom, setOpenUpdateFrom] = useState<boolean>(false);
-  const [openUpdateEmail, setOpenUpdateEmail] = useState<boolean>(false);
+  // const [openUpdateFrom, setOpenUpdateFrom] = useState<boolean>(false);
+  const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
   const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
   const [openUpdateAddress, setOpenUpdateAddress] = useState<boolean>(false);
   const authContext = useContext(AuthContext);
@@ -25,26 +25,75 @@ const myAccount = () => {
       {userInfo ? (
         <div>
           <div className="shadow-boxShadow pb-10  rounded-lg">
-            <div className="flex justify-between items-center hover:bg-gray-300 p-5">
-              <div className="flex gap-5 items-center p-5 ">
-                <div>
-                  <img
-                    src={userInfo?.image}
-                    className="rounded-full w-14 h-14"
-                    alt="รูปโปรไฟล์"
-                  />
+            {openUpdateUser === false ? (
+              <div className="flex justify-between items-center hover:bg-gray-300 p-5">
+                <div className="flex gap-5 items-center p-5 ">
+                  <div>
+                    <img
+                      src={userInfo?.image}
+                      className="rounded-full w-14 h-14"
+                      alt="รูปโปรไฟล์"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm">ชื่อผู้ใช้</span>
+                    <span className="text-lg">
+                      {userInfo?.name} {userInfo?.lastName}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-sm">ชื่อผู้ใช้</span>
-                  <span className="text-lg">
-                    {userInfo?.name} {userInfo?.lastName}
-                  </span>
+                <div onClick={() => setOpenUpdateUser(true)}>
+                  <span>แก้ไข</span>
                 </div>
               </div>
-              <div className="">
-                <span>แก้ไข</span>
+            ) : (
+              <div className="flex justify-between items-center hover:bg-gray-300 p-5">
+                <div className="flex gap-5 items-center p-5 ">
+                  <div>
+                    <img
+                      src={userInfo?.image}
+                      className="rounded-full w-14 h-14"
+                      alt="รูปโปรไฟล์"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm">ชื่อผู้ใช้</span>
+                    <span className="text-lg flex gap-5 mt-2" >
+                      <div>
+                        {" "}
+                        <input
+                          type="text"
+                          placeholder="ชื่อ"
+                          value={userInfo?.name}
+                          className="input input-bordered w-full"
+                        />
+                      </div>
+                      <div>
+                        {" "}
+                        <input
+                          type="text"
+                          placeholder="นามสกุล"
+                          value={userInfo?.lastName}
+                          className="input input-bordered w-full"
+                        />
+                      </div>
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                    <button
+                      onClick={() => setOpenUpdateUser(false)}
+                      className="bg-red-500 mx-2 px-4 py-2 rounded-full text-white hover:bg-red-700"
+                    >
+                      ยกเลิก
+                    </button>
+                    <button className="bg-green-400 mx-2 px-4 py-2 rounded-full text-white hover:bg-green-600">
+                      บันทึก
+                    </button>
+                  </div>
               </div>
-            </div>
+            )}
+
             <div className=" hover:bg-gray-300 p-5">
               <div className="flex gap-5 items-center  ">
                 <div className="flex flex-col">
@@ -149,37 +198,41 @@ const myAccount = () => {
                 <div className="shadow-boxShadow p-5 rounded-lg">
                   <div>
                     <span>ที่อยู่</span>
-                    <div className="flex gap-2 my-5">
-                      <input
-                        type="text"
-                        placeholder="บ้านเลขที่"
-                        className="input input-bordered w-full"
-                      />
-                      <input
-                        type="text"
-                        placeholder="ถนน / ซอย"
-                        className="input input-bordered w-full"
-                      />
-                      <input
-                        type="text"
-                        placeholder="ตำบล"
-                        className="input input-bordered w-full"
-                      />
-                      <input
-                        type="text"
-                        placeholder="อำเภอ"
-                        className="input input-bordered w-full"
-                      />
-                      <input
-                        type="text"
-                        placeholder="จังหวัด"
-                        className="input input-bordered w-full"
-                      />
-                      <input
-                        type="text"
-                        placeholder="รหัสไปรษณีย์"
-                        className="input input-bordered w-full"
-                      />
+                    <div className="flex flex-col gap-2 my-5">
+                      <div className="flex gap-5">
+                        <input
+                          type="text"
+                          placeholder="บ้านเลขที่"
+                          className="input input-bordered w-full"
+                        />
+                        <input
+                          type="text"
+                          placeholder="ถนน / ซอย"
+                          className="input input-bordered w-full"
+                        />
+                        <input
+                          type="text"
+                          placeholder="ตำบล"
+                          className="input input-bordered w-full"
+                        />
+                      </div>
+                      <div className="flex gap-5">
+                        <input
+                          type="text"
+                          placeholder="อำเภอ"
+                          className="input input-bordered w-full"
+                        />
+                        <input
+                          type="text"
+                          placeholder="จังหวัด"
+                          className="input input-bordered w-full"
+                        />
+                        <input
+                          type="text"
+                          placeholder="รหัสไปรษณีย์"
+                          className="input input-bordered w-full"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="flex justify-end">
