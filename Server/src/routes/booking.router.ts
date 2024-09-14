@@ -12,6 +12,7 @@ import {
   getBookingPackageByUser,
   getBookingByConfirm,
   getBookingByPending,
+  sendMoneyToBusiness
 } from "../controller/booking.controller";
 import { verifyToken } from "../middlewares/verifyToken";
 import verifyUser from "../middlewares/verifyUser";
@@ -50,5 +51,7 @@ router.put(
 router.put("/confirmBooking/:id", confirmBooking, verifyBusiness, verifyToken);
 router.put("/cancelBooking/:id", cancelBooking, verifyToken, verifyUser);
 router.delete("/deleteBooking/:id", deleteBooking, verifyToken, verifyAdmin);
+
+router.post("/sendMoney", sendMoneyToBusiness);
 
 export default router;

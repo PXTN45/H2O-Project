@@ -85,7 +85,7 @@ const PackageSchema: Schema = new Schema({
   homestay: { type: Schema.Types.ObjectId, ref: "Homestay" },
   business_user: {
     type: Schema.Types.ObjectId,
-    ref: "Business_User",
+    ref: "Business",
     required: true,
   },
   review_rating_package: { type: Number, required: true },
