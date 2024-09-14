@@ -7,14 +7,13 @@ import AdminModel from "../model/admin.model ";
 // ฟังก์ชันสำหรับการเรียกดูรีวิวทั้งหมด
 const getAllReview = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { page = 1, limit = 10 } = req.query;
+        // ดึงค่าของ page และ limit จาก query parameters และกำหนดค่าเริ่มต้น
+        const page = parseInt(req.query.page as string, 10) || 1;
+        const limit = parseInt(req.query.limit as string, 10) || 10;
 
-        // ตรวจสอบให้แน่ใจว่า page และ limit เป็นตัวเลข
-        const pageNumber = parseInt(page as string, 10);
-        const limitNumber = parseInt(limit as string, 10);
-
-        if (isNaN(pageNumber) || isNaN(limitNumber)) {
-            res.status(400).json({ message: "Invalid page or limit parameter" });
+        // ตรวจสอบว่า page และ limit เป็นตัวเลขที่ถูกต้อง
+        if (page < 1 || limit < 1) {
+            res.status(400).json({ message: "Page and limit must be greater than 0" });
             return;
         }
 
@@ -22,45 +21,73 @@ const getAllReview = async (req: Request, res: Response): Promise<void> => {
         const reviews = await reviewModel.find()
             .populate("reviewer", "name") // ดึงเฉพาะฟิลด์ 'name' ของ User
             .sort({ createdAt: -1 }) // เรียงตามวันที่สร้างจากใหม่ไปเก่า
-            .skip((pageNumber - 1) * limitNumber)
-            .limit(limitNumber);
+            .skip((page - 1) * limit) // ใช้ page และ limit สำหรับการแบ่งหน้า
+            .limit(limit); // จำกัดจำนวนรีวิวที่ดึงออกมา
 
-        if (!reviews || reviews.length === 0) {
-            res.status(404).json({ message: "ไม่พบรีวิว" });
+        // ตรวจสอบว่ามีรีวิวที่ดึงมาได้หรือไม่
+        if (reviews.length === 0) {
+            res.status(404).json({ message: "No reviews found" });
             return;
         }
 
-        res.status(200).json(reviews); // ส่งข้อมูลรีวิวกลับในรูปแบบ JSON
+        // ส่งข้อมูลรีวิวกลับในรูปแบบ JSON
+        res.status(200).json(reviews);
+
     } catch (error: any) {
+        // บันทึกข้อผิดพลาดและส่งกลับข้อผิดพลาดในระบบ
         console.error("Error fetching reviews:", error.message);
-        res.status(500).json({ message: "เกิดข้อผิดพลาดในระบบ" });
+        res.status(500).json({ message: "An error occurred while fetching reviews" });
     }
 };
 
 // ฟังก์ชันสำหรับการสร้างรีวิว
 const createReview = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { reviewer, content, rating, homestay, packageId } = req.body;
+        const { reviewer, content, rating, homestayId, packageId }: { reviewer: string, content: string, rating: number, homestayId?: string, packageId?: string } = req.body;
 
-        // ตรวจสอบข้อมูลที่ได้รับ: ต้องมี reviewer, content, และ rating และต้องมี homestay หรือ package อย่างน้อยหนึ่งอย่าง
-        if (!reviewer || !content || !rating || (!homestay && !packageId)) {
-            res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+        // ตรวจสอบข้อมูลที่ได้รับ
+        if (!reviewer || !content || rating == null || (!homestayId && !packageId)) {
+            res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน และต้องระบุ homestayId หรือ packageId อย่างน้อยหนึ่งอย่าง' });
             return;
         }
 
-        // ตรวจสอบว่าคะแนนอยู่ในช่วงที่ถูกต้อง
+        // ตรวจสอบคะแนน
         if (rating < 1 || rating > 5) {
             res.status(400).json({ message: 'คะแนนต้องอยู่ระหว่าง 1 ถึง 5' });
             return;
         }
 
-        // ตรวจสอบการจองที่เกี่ยวข้องกับ homestay หรือ package
-        const booking = await BookingModel.findOne({ 
-            booker: reviewer, 
+        // ตรวจสอบว่า homestayId หรือ packageId เป็น ObjectId ที่ถูกต้องหรือไม่
+        const isValidHomestayId = homestayId && mongoose.Types.ObjectId.isValid(homestayId);
+        const isValidPackageId = packageId && mongoose.Types.ObjectId.isValid(packageId);
+
+        if (!isValidHomestayId && !isValidPackageId) {
+            res.status(400).json({ message: 'homestayId หรือ packageId ไม่ถูกต้อง' });
+            return;
+        }
+
+        // ตรวจสอบว่าลูกค้าคนเดิมได้รีวิวโฮมสเตย์หรือแพ็กเกจนี้ไปแล้วหรือไม่
+        const existingReview = await reviewModel.findOne({
+            reviewer: new mongoose.Types.ObjectId(reviewer),
             $or: [
-                { homestay },
-                { package: packageId }
+                { homestay: homestayId || null },
+                { package: packageId || null }
             ]
+        });
+
+        if (existingReview) {
+            res.status(400).json({ message: 'ลูกค้าคนเดิมไม่สามารถรีวิวซ้ำได้' });
+            return;
+        }
+
+        // ตรวจสอบการจองที่เกี่ยวข้อง
+        const booking = await BookingModel.findOne({
+            booker: new mongoose.Types.ObjectId(reviewer), // ใช้ booker แทน reviewer
+            $or: [
+                { homestay: homestayId || null },
+                { package: packageId || null }
+            ],
+            bookingStatus: 'Confirmed'
         });
 
         if (!booking) {
@@ -68,18 +95,13 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        if (booking.bookingStatus !== 'Confirmed') {
-            res.status(403).json({ message: 'ลูกค้าที่มีสถานะ Confirmed เท่านั้นที่สามารถเขียนรีวิวได้' });
-            return;
-        }
-
-        // สร้างรีวิวใหม่โดยพิจารณาจากเงื่อนไขของ homestay และ package
+        // สร้างรีวิวใหม่
         const newReview = new reviewModel({
-            reviewer,
+            reviewer: new mongoose.Types.ObjectId(reviewer),
             content,
             rating,
-            homestay: homestay || null, // ตั้งค่า homestay เป็น null ถ้าไม่ได้รับค่า
-            package: packageId || null   // ตั้งค่า package เป็น null ถ้าไม่ได้รับค่า
+            homestay: homestayId || null,
+            package: packageId || null
         });
 
         // บันทึกรีวิวลงในฐานข้อมูล
@@ -90,6 +112,8 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
     }
 };
+
+
 
 // ฟังก์ชันสำหรับการอัพเดตรีวิว
 const updateReview = async (req: Request, res: Response): Promise<void> => {
