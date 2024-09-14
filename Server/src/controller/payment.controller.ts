@@ -13,10 +13,41 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-06-20",
 });
 
+const checkBooking = async (req: Request, res: Response) => {
+  const { homestay, bookingStart, bookingEnd, booker, packageId } = req.body;
+  console.log(req.body);
+  
+  const bookingStartDate = new Date(bookingStart);
+  const bookingEndDate = new Date(bookingEnd);
+  try {
+    const data = {
+      booker,
+      homestay,
+      package: packageId,
+      bookingStart: bookingStartDate,
+      bookingEnd: bookingEndDate,
+    };
+    const isAvailable = await BookingModel.findOne(data);
+    if (!isAvailable) {
+      return res.status(200).json({
+        isAvailable,
+        message: "ยังไม่เคยจอง",
+      });
+    } else {
+      return res.status(200).json({
+        isAvailable,
+        message: "คุณต้องการทำการจองซ้ำอีกครั้งหรือไม่?",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
 const payment = async (req: Request, res: Response) => {
   const { totalPrice, name, email } = req.body;
-
   console.log(req.body);
+  const price = parseInt((totalPrice * 100).toFixed(0));
 
   try {
     // สร้าง session ของ Stripe
@@ -28,7 +59,7 @@ const payment = async (req: Request, res: Response) => {
             product_data: {
               name: name,
             },
-            unit_amount: totalPrice * 100, // ราคาเป็นจำนวนเต็มในหน่วยย่อย (เช่น สตางค์)
+            unit_amount: price, // ราคาเป็นจำนวนเต็มในหน่วยย่อย (เช่น สตางค์)
           },
           quantity: 1,
         },
@@ -38,21 +69,27 @@ const payment = async (req: Request, res: Response) => {
       cancel_url: `${YOUR_DOMAIN}/paymentFailure`,
       customer_email: email,
     });
+
     res.status(201).json({
       sessionUrl: session.url,
     });
   } catch (error) {
-    console.error("Error creating checkout session or booking:", error);
     res.status(500).json({ message: "Internal Server Error", error });
   }
 };
 
 const booking = async (req: Request, res: Response) => {
-  const { bookingStart, bookingEnd, booker, homestayId = "", offer = [], packageId } =
-    req.body.bookingData;
-  
+  const {
+    bookingStart,
+    bookingEnd,
+    booker,
+    homestayId = "",
+    offer = [],
+    packageId,
+  } = req.body.bookingData;
+
   console.log(req.body);
-  
+
   try {
     // ตรวจสอบความถูกต้องของวันที่
     if (!isDateValid(bookingStart, bookingEnd)) {
@@ -77,8 +114,8 @@ const booking = async (req: Request, res: Response) => {
     // สร้างข้อมูลการจอง
     const booking = await BookingModel.create({
       booker,
-      homestay: homestayId, 
-      detail_offer: offer, 
+      homestay: homestayId,
+      detail_offer: offer,
       package: packageId || null, // กำหนดให้ packageId เป็น null หากไม่มีค่า
       bookingStart,
       bookingEnd,
@@ -92,5 +129,4 @@ const booking = async (req: Request, res: Response) => {
   }
 };
 
-
-export { payment, booking };
+export { payment, booking, checkBooking };
