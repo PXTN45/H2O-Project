@@ -164,6 +164,7 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
   // console.log(`จำนวนคืน: ${numberOfNights}`); 
   
   
+  console.log(paymentData?.time_checkOut_homeStay);
   
 
   return (
@@ -183,7 +184,7 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
           <div className="shadow-boxShadow w-2/5 p-3 rounded-xl flex flex-col items-center text-sm">
             <div>เช็คอิน</div>
             <div>{dataNav?.dateRange.startDate}</div>
-            <div>ตั้งแต่ : 14.00 </div>
+            <div>ตั้งแต่ : {paymentData?.time_checkIn_homeStay} น.</div>
           </div>
           <div className="w-1/5 flex justify-center border-b">
             <div className="text-sm"> {dataNav?.dateRange.numberOfNights} คืน</div>
@@ -191,7 +192,7 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
           <div className="shadow-boxShadow w-2/5 p-3 rounded-xl flex flex-col items-center text-sm">
             <div>เช็คเอ้า</div>
             <div>{dataNav?.dateRange.endDate}</div>
-            <div>ก่อน : 12.0</div>
+            <div>ก่อน : {paymentData?.time_checkOut_homeStay} น.</div>
           </div>
         </div>
         <div>

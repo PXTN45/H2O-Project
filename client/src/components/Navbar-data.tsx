@@ -158,7 +158,7 @@ const Navbar = () => {
               <span>เด็ก</span>
               <span className="mx-1 sm:mx-2">{numChildren}</span>
               <span className="mr-2 sm:mr-3">/</span>
-              <span>ห้อง</span>
+              <span>หลัง</span>
               <span className="mx-1 sm:mx-2">{numRoom}</span>
             </span>
           </button>

@@ -411,7 +411,7 @@ const PackageDetail = () => {
               </div>
             )}
 
-            <div className="w-2/6 flex flex-col justify-end border-r p-2">
+            <div className="w-2/6 flex flex-col justify-end p-2">
               {offer.discount <= 0 ? (
                 <p className="flex justify-end font-bold text-alert text-3xl">
                   {totalPrice} บาท
@@ -434,14 +434,6 @@ const PackageDetail = () => {
               <p className="flex justify-end text-xs">
                 (ก่อนรวมภาษีและค่าธรรมเนียม)
               </p>
-            </div>
-            <div className="w-1/6 flex flex-col items-center pl-3">
-              <button
-                className=" bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110
-                transition-transform duration-300 text-white"
-              >
-                จอง
-              </button>
             </div>
           </div>
         </div>
@@ -697,16 +689,16 @@ const PackageDetail = () => {
                 <a
                   href="facilities"
                   className="text-decoration"
-                  onClick={handleScrollToElement("facilities")}
+                  onClick={handleScrollToElement("program")}
                 >
-                  สิ่งอำนวยความสะดวก
+                  รายละเอียดโปรแกรม
                 </a>
                 <a
                   href="detailRoom"
                   className="text-decoration"
-                  onClick={handleScrollToElement("detailRoom")}
+                  onClick={handleScrollToElement("package")}
                 >
-                  ห้องพัก
+                  แพ็คเกจ
                 </a>
                 <a
                   href="review"
@@ -745,7 +737,7 @@ const PackageDetail = () => {
                     <div className="mt-2">{item.detail_package}</div>
                   </div>
                 </div>
-                <div className="shadow-boxShadow p-10 rounded-lg">
+                <div id="program" className="shadow-boxShadow p-10 rounded-lg">
                   <span className="font-bold text-xl">รายละเอียดโปรแกรม</span>
                   <div className="flex flex-col my-5">{activities}</div>
                 </div>
@@ -761,8 +753,8 @@ const PackageDetail = () => {
               </div>
             </div>
             {/* package offer */}
-            <h1 className="text-2xl my-5 font-bold ">
-              แพ็กเกจสำหรับ - {item.name_package}
+            <h1 id="package" className="text-2xl my-5 font-bold ">
+              แพ็คเกจสำหรับ - {item.name_package}
             </h1>
             <div className="shadow-boxShadow rounded-lg p-5">
               <span className="text-2xl font-bold">{item.name_package}</span>
@@ -919,7 +911,7 @@ const PackageDetail = () => {
             </div>
             {/* homeStay */}
             <h1 className="text-2xl mt-10 font-bold ">
-              ที่พักสำหรับแพ็กเกจ - {item.name_package}
+              ที่พักสำหรับแพ็คเกจ - {item.name_package}
             </h1>
             <div>{carousel}</div>
             {/* review */}
