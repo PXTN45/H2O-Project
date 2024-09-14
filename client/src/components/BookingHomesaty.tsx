@@ -368,7 +368,7 @@ const BookingHomeStay = () => {
                         {booking?.homestay.name_homeStay}
                       </span>
                       <span className="text-md ">
-                        {booking?.detail_offer[0].name_type_room}
+                        ({booking?.detail_offer[0].name_type_room})
                       </span>
                     </div>
                     <div

@@ -525,7 +525,7 @@ const HistoryHomeStay = () => {
                         {booking?.homestay.name_homeStay}
                       </span>
                       <span className="text-md ">
-                        {booking?.detail_offer[0].name_type_room}
+                        ({booking?.detail_offer[0].name_type_room})
                       </span>
                     </div>
                     <div className="bg-green-400 px-3 rounded-full text-white xl:hidden">
