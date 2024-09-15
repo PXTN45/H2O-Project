@@ -47,10 +47,6 @@ const Drawer: React.FC = () => {
       setRangeValue(value);
     }
   };
-
-  const handleFocus = (setter: React.Dispatch<React.SetStateAction<number>>, currentValue: number) => {
-    setter(0);
-  };
   
   const handleRangeMouseUp = () => {
     handleSearch();
