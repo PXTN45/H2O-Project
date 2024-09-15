@@ -7,6 +7,7 @@ import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
+import Swal from "sweetalert2";
 
 export interface Image_room {
   _id: string;
@@ -43,6 +44,7 @@ const BookingDetail: React.FC = () => {
   const { paymentData, dataNav } = usePaymentContext();
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [feeAndTax, setFeeAndTax] = useState<number>(0);
+  const [checkBooking, setCheckBooking] = useState<boolean>(false);
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
@@ -58,13 +60,14 @@ const BookingDetail: React.FC = () => {
         paymentData.totalPrice *
         dataNav?.numRoom *
         dataNav.dateRange.numberOfNights;
-      const taxRate = 0.07;
-      const feeRate = 0.1;
+      const taxRate = 0.03;
+      const feeRate = 0.05;
 
       const fee = price * feeRate;
       const tax = (price + fee) * taxRate;
       const feeAndTax = fee + tax;
       const total = price + feeAndTax;
+
       setFeeAndTax(feeAndTax);
       setTotalPrice(total);
     }
@@ -99,7 +102,6 @@ const BookingDetail: React.FC = () => {
     bookingEnd = "default-end-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
   console.log(paymentData);
-  
 
   const offer = {
     discount: paymentData?.offer.discount,
@@ -108,23 +110,60 @@ const BookingDetail: React.FC = () => {
     room: dataNav?.numRoom,
     name_type_room: paymentData?.roomType.name_type_room,
     image_room: paymentData?.roomType.image_room,
-    totalPrice: totalPrice
+    totalPrice: totalPrice,
   };
   console.log(paymentData);
-  
+
   const booker = paymentData?.bookingUser._id;
   // const paymentDetail = "promptpay";
   const homestayId = paymentData?.homeStayId;
 
-  const makePayment = async () => {
+  const checkBookingAvailable = async () => {
+    try {
+      const isAvailable = await axiosPrivateUser.post("/checkBooking", {
+        homestay: homestayId,
+        bookingStart,
+        bookingEnd,
+        booker,
+        packageId: null,
+      });
+      console.log(isAvailable.data.message);
+
+      if (isAvailable.data.message === "คุณต้องการทำการจองซ้ำอีกครั้งหรือไม่?") {
+        Swal.fire({
+          title: "คุณต้องการทำการจองซ้ำอีกครั้งหรือไม่?",
+          text: "ข้อมูลการจองนี้ยังคงมีอยู่ในระบบ หากคุณต้องการทำการจองใหม่ โปรดยืนยันเพื่อดำเนินการต่อ",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "ใช่, ทำการจองใหม่",
+          cancelButtonText: "ยกเลิก"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // เรียกใช้ฟังก์ชันการจองใหม่ที่นี่
+            makePayment();
+          }
+        });
+      }else if (isAvailable.data.message === "ยังไม่เคยจอง") {
+        makePayment()
+      }
+    } catch (error) {
+      console.error("Error checking booking:", error);
+    }
+  };
+
+  console.log(checkBooking);
+
+  var makePayment = async () => {
     try {
       const response = await axiosPrivateUser.post("/create-checkout-session", {
         name: homeStayName,
-        totalPrice: totalPrice,
+        totalPrice,
         email: email,
       });
 
       if (response.data) {
+        console.log(response.data);
         const { sessionUrl } = response.data;
 
         // เก็บข้อมูลการจองใน localStorage
@@ -133,7 +172,7 @@ const BookingDetail: React.FC = () => {
           bookingEnd,
           booker,
           homestayId,
-          offer
+          offer,
         };
         localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
 
@@ -142,8 +181,12 @@ const BookingDetail: React.FC = () => {
       } else {
         throw new Error("Invalid response format");
       }
-    } catch (error) {
-      console.error("Error making payment:", error);
+    } catch (error: any) {
+      Swal.fire({
+        title: "คุณเคยจองห้องนี้แล้ว!",
+        text: `${error.response.data.message}`,
+      });
+      console.error("Error making payment:", error.response.data.message);
     }
   };
   return (
@@ -245,11 +288,12 @@ const BookingDetail: React.FC = () => {
                       บาท
                     </div>
                   </div>
+
                   <div>
                     <button
                       className="border w-full my-5 p-3 rounded-lg bg-primaryUser text-white font-bold text-xl hover:scale-105
                       transition-transform duration-300"
-                      onClick={makePayment}
+                      onClick={checkBookingAvailable}
                     >
                       ชำระเงิน
                     </button>

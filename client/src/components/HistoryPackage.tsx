@@ -115,7 +115,7 @@ const HistoryPackage = () => {
   const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
-  const [rating, setRating] = useState(5); // เก็บค่าคะแนนจากการกดดาว
+  const [rating, setRating] = useState(4); // เก็บค่าคะแนนจากการกดดาว
   const [content, setContent] = useState(""); // เก็บข้อความรีวิว
   const [selectedBookingIndex, setSelectedBookingIndex] = useState<
     number | null

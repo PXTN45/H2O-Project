@@ -6,6 +6,9 @@ import OpenStreetMapShowData from "../components/OpenStreetMapShowData";
 import { TbMapQuestion } from "react-icons/tb";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
 import Swal from "sweetalert2";
+import { GoHome } from "react-icons/go";
+import { LiaChildSolid } from "react-icons/lia";
+import { IoPeopleSharp } from "react-icons/io5";
 
 export interface Booker {
   _id: string;
@@ -18,6 +21,7 @@ export interface DetailOffer {
   name_type_room: string;
   adult: number;
   child: number;
+  room: number;
   discount: number;
   totalPrice: number;
   image_room: {
@@ -110,6 +114,7 @@ const BookingHomeStay = () => {
   const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
   const [status, setStatus] = useState<boolean>(false);
+
   const [selectedBookingIndex, setSelectedBookingIndex] = useState<
     number | null
   >(null);
@@ -139,9 +144,12 @@ const BookingHomeStay = () => {
     };
 
     fetchData();
-  }, [userInfo?._id, myBooking]);
+  }, [userInfo?._id, status]);
 
-  const location = myBooking[0]?.homestay.location[0];
+  console.log(myBooking[0]?.detail_offer[0].adult);
+  console.log(myBooking[0]?.detail_offer[0].child);
+  console.log(myBooking[0]?.detail_offer[0].room);
+
   const monthNamesTH = [
     "มกราคม",
     "กุมภาพันธ์",
@@ -224,7 +232,7 @@ const BookingHomeStay = () => {
       modal.showModal();
     }
   };
-  
+
   const cancelBooking = (id: string) => {
     console.log(id);
 
@@ -355,10 +363,18 @@ const BookingHomeStay = () => {
               <div className="pl-10 pt-5 md:pr-5 xl:p-2 flex flex-col xl:flex-row w-full xl:w-2/3">
                 <div className=" xl:w-2/3 pr-2 flex flex-col gap-5">
                   <div className="flex justify-between ">
-                    <span className="text-lg font-bold ">
-                      {booking?.detail_offer[0].name_type_room}
-                    </span>
-                    <div className="bg-green-400 px-3 rounded-full text-white xl:hidden">
+                    <div className="flex flex-col">
+                      <span className="text-md font-bold ">
+                        {booking?.homestay.name_homeStay}
+                      </span>
+                      <span className="text-md ">
+                        ({booking?.detail_offer[0].name_type_room})
+                      </span>
+                    </div>
+                    <div
+                      id="status1"
+                      className="bg-green-400 px-3 rounded-full text-white xl:hidden"
+                    >
                       {booking.bookingStatus}
                     </div>
                   </div>
@@ -369,12 +385,39 @@ const BookingHomeStay = () => {
                   >
                     <FaMapLocationDot className="text-red-700 text-2xl" />
                     <div className="flex flex-wrap text-sm gap-1">
-                      <div>{location.house_no}</div>
-                      <div>ม.{location.village_no}</div>
-                      <div>ต.{location.subdistrict_location}</div>
-                      <div>อ.{location.district_location}</div>
-                      <div>จ.{location.province_location}</div>
-                      <div>{location.zipcode_location}</div>
+                      <div>
+                        {myBooking[index]?.homestay.location[0].house_no}
+                      </div>
+                      <div>
+                        ม.{myBooking[index]?.homestay.location[0].village_no}
+                      </div>
+                      <div>
+                        ต.
+                        {
+                          myBooking[index]?.homestay.location[0]
+                            .subdistrict_location
+                        }
+                      </div>
+                      <div>
+                        อ.
+                        {
+                          myBooking[index]?.homestay.location[0]
+                            .district_location
+                        }
+                      </div>
+                      <div>
+                        จ.
+                        {
+                          myBooking[index]?.homestay.location[0]
+                            .province_location
+                        }
+                      </div>
+                      <div>
+                        {
+                          myBooking[index]?.homestay.location[0]
+                            .zipcode_location
+                        }
+                      </div>
                     </div>
                   </div>
                   <div className="text-sm">
@@ -385,9 +428,27 @@ const BookingHomeStay = () => {
                       )}
                     </span>
                   </div>
+                  <div className="text-md">
+                    <span className="flex items-center gap-2">
+                      <div className="flex items-center">
+                        <IoPeopleSharp /> {myBooking[0]?.detail_offer[0].adult}
+                      </div>
+                      <div className="flex items-center">
+                        <LiaChildSolid />
+                        {myBooking[index]?.detail_offer[0].child}
+                      </div>
+                      <div className="flex items-center">
+                        <GoHome />
+                        {myBooking[index]?.detail_offer[0].room}
+                      </div>
+                    </span>
+                  </div>
                 </div>
                 <div className=" xl:w-1/3 flex flex-col justify-end items-end xl:border-l p-5">
-                  <div className="bg-green-400 px-3 rounded-full text-white hidden xl:block">
+                  <div
+                    id="status2"
+                    className="bg-green-400 px-3 rounded-full text-white hidden xl:block"
+                  >
                     {booking.bookingStatus}
                   </div>
                   <div className="flex flex-col items-end text-xl my-5">

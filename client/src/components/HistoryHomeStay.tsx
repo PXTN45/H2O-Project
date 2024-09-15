@@ -5,6 +5,9 @@ import { FaMapLocationDot } from "react-icons/fa6";
 import OpenStreetMapShowData from "../components/OpenStreetMapShowData";
 import { TbMapQuestion } from "react-icons/tb";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
+import { GoHome } from "react-icons/go";
+import { LiaChildSolid } from "react-icons/lia";
+import { IoPeopleSharp } from "react-icons/io5";
 
 export interface Booker {
   _id: string;
@@ -140,7 +143,7 @@ const HistoryHomeStay = () => {
   const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
-  const [rating, setRating] = useState(5); // เก็บค่าคะแนนจากการกดดาว
+  const [rating, setRating] = useState(4); // เก็บค่าคะแนนจากการกดดาว
   const [content, setContent] = useState(""); // เก็บข้อความรีวิว
   const [selectedBookingIndex, setSelectedBookingIndex] = useState<
     number | null
@@ -517,9 +520,14 @@ const HistoryHomeStay = () => {
               <div className="pl-10 pt-5 md:pr-5 xl:p-2 flex flex-col xl:flex-row w-full xl:w-2/3">
                 <div className=" xl:w-2/3 pr-2 flex flex-col gap-5">
                   <div className="flex justify-between ">
-                    <span className="text-lg font-bold ">
-                      {booking?.detail_offer[0].name_type_room}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-md font-bold ">
+                        {booking?.homestay.name_homeStay}
+                      </span>
+                      <span className="text-md ">
+                        ({booking?.detail_offer[0].name_type_room})
+                      </span>
+                    </div>
                     <div className="bg-green-400 px-3 rounded-full text-white xl:hidden">
                       {booking.bookingStatus}
                     </div>
@@ -572,6 +580,21 @@ const HistoryHomeStay = () => {
                         myBooking[index]?.bookingStart,
                         myBooking[index]?.bookingEnd
                       )}
+                    </span>
+                  </div>
+                  <div className="text-md">
+                    <span className="flex items-center gap-2">
+                      <div className="flex items-center">
+                        <IoPeopleSharp /> {myBooking[0]?.detail_offer[0].adult}
+                      </div>
+                      <div className="flex items-center">
+                        <LiaChildSolid />
+                        {myBooking[index]?.detail_offer[0].child}
+                      </div>
+                      <div className="flex items-center">
+                        <GoHome />
+                        {myBooking[index]?.detail_offer[0].room}
+                      </div>
                     </span>
                   </div>
                 </div>
