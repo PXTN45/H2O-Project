@@ -1,5 +1,18 @@
 @import url("https://fonts.googleapis.com/css2?family=K2D:wght@100&family=Kanit:ital@1&family=Noto+Sans+Cypro+Minoan&family=Open+Sans:ital,wght@0,300;0,400;1,400;1,500&display=swap");
 
+/* สำหรับเบราว์เซอร์ Chrome, Safari, Edge และ Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* สำหรับ Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
 body {
   font: "K2D";
   background-color: white;

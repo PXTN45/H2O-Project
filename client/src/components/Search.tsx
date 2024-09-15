@@ -14,7 +14,7 @@ const Search: React.FC = () => {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [dateRange, setDateRange] = useState<Date[]>([new Date(), new Date()]);
   const [showPeopleMenu, setShowPeopleMenu] = useState<boolean>(false);
-  const [numPeople, setNumPeople] = useState<number>(0);
+  const [numPeople, setNumPeople] = useState<number>(1);
   const [numChildren, setNumChildren] = useState<number>(0);
   const [searchText, setSearchText] = useState<string>("");
 
