@@ -1,28 +1,158 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import { TbPointFilled } from "react-icons/tb";
+import axiosPrivateUser from "../../hook/axiosPrivateUser";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+interface Address {
+  houseNumber: string;
+  street: string;
+  village: string;
+  subdistrict: string;
+  district: string;
+  city: string;
+  country: string;
+  postalCode: string;
+}
 
+interface User {
+  _id?: string;
+  name?: string;
+  lastName?: string;
+  businessName?: string;
+  email: string;
+  password: string;
+  phone: string | undefined;
+  image: string;
+  address: Address[];
+  birthday: Date;
+  role: string;
+}
 const myAccount = () => {
-  // const [openUpdateFrom, setOpenUpdateFrom] = useState<boolean>(false);
-  const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
-  const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
-  const [openUpdateAddress, setOpenUpdateAddress] = useState<boolean>(false);
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
   const { userInfo } = authContext;
-  // console.log(userInfo?.addresses[0].city);
-  console.log(userInfo);
+  // const [openUpdateFrom, setOpenUpdateFrom] = useState<boolean>(false);
+  const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
+  const [userData, setUserData] = useState<User>();
+  const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
+  const [openUpdateAddress, setOpenUpdateAddress] = useState<boolean>(false);
+  const [address, setAddress] = useState<Address>({
+    houseNumber: userData?.address[0]?.houseNumber || "",
+    street: userData?.address[0]?.street || "",
+    village: userData?.address[0]?.village || "",
+    subdistrict: userData?.address[0]?.subdistrict || "",
+    district: userData?.address[0]?.district || "",
+    city: userData?.address[0]?.city || "",
+    country: userData?.address[0]?.country || "",
+    postalCode: userData?.address[0]?.postalCode || "",
+  });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axiosPrivateUser.get(
+          `/user/userData/${userInfo?._id}`
+        );
+        setUserData(response.data);
+        setAddress(response.data.address[0]);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [userInfo?._id, openUpdateAddress]);
+
+  // ฟังก์ชันจัดการการเปลี่ยนแปลงฟิลด์ฟอร์ม
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const numericFields = ["houseNumber", "postalCode", "village"];
+    const numericValue = numericFields.includes(name)
+      ? value.replace(/[^0-9]/g, "")
+      : value;
+
+    setAddress((prevAddress) => ({
+      ...prevAddress,
+      [name]: numericValue,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    Swal.fire({
+      title: "คุณแน่ใจหรือไม่?",
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ใช่, อัปเดตเลย!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosPrivateUser.put(`/user/updateAddress/${userInfo?._id}`, {
+            houseNumber: address.houseNumber,
+            village: address.village,
+            street: address.street,
+            district: address.district,
+            subdistrict: address.subdistrict,
+            city: address.city,
+            country: address.country,
+            postalCode: address.postalCode,
+          });
+          setOpenUpdateAddress(false);
+
+          // แจ้งเตือนว่าการอัปเดตสำเร็จ
+          Swal.fire({
+            title: "อัปเดตแล้ว!",
+            text: "ที่อยู่ของคุณได้รับการอัปเดตแล้ว.",
+            icon: "success",
+          });
+        } catch (error) {
+          // แจ้งเตือนหากเกิดข้อผิดพลาด
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "เกิดปัญหาในการอัปเดตที่อยู่ของคุณ.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  const handleDeleteUser = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success",
+        });
+        navigate("/");
+      }
+    });
+  };
 
   return (
     <div className="my-5 w-full ">
       <div className="mb-5">
         <span className="text-2xl">ข้อมูลผู้ใช้</span>
       </div>
-      {userInfo ? (
+      {userInfo && userData ? (
         <div>
           <div className="shadow-boxShadow pb-10  rounded-lg">
             {openUpdateUser === false ? (
@@ -48,7 +178,7 @@ const myAccount = () => {
               </div>
             ) : (
               <div className="flex justify-between items-center hover:bg-gray-300 p-5">
-                <div className="flex gap-5 items-center p-5 ">
+                <div className="w-3/4 flex gap-5 items-end p-5 ">
                   <div>
                     <img
                       src={userInfo?.image}
@@ -58,7 +188,7 @@ const myAccount = () => {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm">ชื่อผู้ใช้</span>
-                    <span className="text-lg flex gap-5 mt-2" >
+                    <span className="text-lg flex gap-5 mt-2">
                       <div>
                         {" "}
                         <input
@@ -80,17 +210,17 @@ const myAccount = () => {
                     </span>
                   </div>
                 </div>
-                <div className="flex justify-end">
-                    <button
-                      onClick={() => setOpenUpdateUser(false)}
-                      className="bg-red-500 mx-2 px-4 py-2 rounded-full text-white hover:bg-red-700"
-                    >
-                      ยกเลิก
-                    </button>
-                    <button className="bg-green-400 mx-2 px-4 py-2 rounded-full text-white hover:bg-green-600">
-                      บันทึก
-                    </button>
-                  </div>
+                <div className="w-1/4 flex justify-end items-end">
+                  <button
+                    onClick={() => setOpenUpdateUser(false)}
+                    className="bg-red-500 mx-2 px-4 py-2 rounded-full text-white hover:bg-red-700"
+                  >
+                    ยกเลิก
+                  </button>
+                  <button className="bg-green-400 mx-2 px-4 py-2 rounded-full text-white hover:bg-green-600">
+                    บันทึก
+                  </button>
+                </div>
               </div>
             )}
 
@@ -111,6 +241,7 @@ const myAccount = () => {
                 </div>
               </div>
             </div>
+
             {openUpdatePassword === false ? (
               <div className="flex justify-between items-center hover:bg-gray-300 p-5 transition-all duration-700 ease-in-out">
                 <div className="flex gap-5 items-center">
@@ -132,6 +263,9 @@ const myAccount = () => {
             ) : (
               <div className="p-5 transition-all duration-700 ease-in-out">
                 <div className="shadow-boxShadow p-5 rounded-lg">
+                  <div className="text-lg mb-5 font-bold">
+                    <span>แก้ไขรหัสผ่าน</span>
+                  </div>
                   <div>
                     <span>รหัสผ่านปัจจุบัน</span>
                     <div className="flex gap-2 my-5">
@@ -184,7 +318,13 @@ const myAccount = () => {
                     <span className="text-sm">ที่อยู่</span>
                     <div className="mt-3">
                       <span>
-                        144 ม.5 ต.หัวเขา อ.เดิมบางนางบวช จ.สุพรรณบุรี 72120
+                        {userData?.address[0].houseNumber} ถนน.
+                        {userData?.address[0].street} ม.
+                        {userData?.address[0].village} ต.
+                        {userData?.address[0].subdistrict} อ.
+                        {userData?.address[0].district} จ.
+                        {userData?.address[0].city}{" "}
+                        {userData?.address[0].postalCode}
                       </span>
                     </div>
                   </div>
@@ -197,54 +337,147 @@ const myAccount = () => {
               <div className="p-5 transition-all duration-700 ease-in-out">
                 <div className="shadow-boxShadow p-5 rounded-lg">
                   <div>
-                    <span>ที่อยู่</span>
-                    <div className="flex flex-col gap-2 my-5">
-                      <div className="flex gap-5">
-                        <input
-                          type="text"
-                          placeholder="บ้านเลขที่"
-                          className="input input-bordered w-full"
-                        />
-                        <input
-                          type="text"
-                          placeholder="ถนน / ซอย"
-                          className="input input-bordered w-full"
-                        />
-                        <input
-                          type="text"
-                          placeholder="ตำบล"
-                          className="input input-bordered w-full"
-                        />
-                      </div>
-                      <div className="flex gap-5">
-                        <input
-                          type="text"
-                          placeholder="อำเภอ"
-                          className="input input-bordered w-full"
-                        />
-                        <input
-                          type="text"
-                          placeholder="จังหวัด"
-                          className="input input-bordered w-full"
-                        />
-                        <input
-                          type="text"
-                          placeholder="รหัสไปรษณีย์"
-                          className="input input-bordered w-full"
-                        />
-                      </div>
+                    <div className="text-lg mb-5 font-bold">
+                      <span>ที่อยู่</span>
                     </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => setOpenUpdateAddress(false)}
-                      className="bg-red-500 mx-2 px-5 py-2 rounded-full text-white hover:bg-red-700"
-                    >
-                      ยกเลิก
-                    </button>
-                    <button className="bg-green-400 mx-2 px-5 py-2 rounded-full text-white hover:bg-green-600">
-                      บันทึก
-                    </button>
+                    <form onSubmit={handleSubmit}>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                              <span className="label-text">บ้านเลขที่</span>
+                            </div>
+                            <input
+                              type="text"
+                              name="houseNumber"
+                              value={address.houseNumber}
+                              onChange={handleChange}
+                              placeholder="บ้านเลขที่"
+                              className="input input-bordered w-full"
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                              <span className="label-text">ถนน / ซอย</span>
+                            </div>
+                            <input
+                              type="text"
+                              name="street"
+                              value={address.street}
+                              onChange={handleChange}
+                              placeholder="ถนน / ซอย"
+                              className="input input-bordered w-full"
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                              <span className="label-text">หมู่</span>
+                            </div>
+                            <input
+                              type="text"
+                              name="village"
+                              value={address.village}
+                              onChange={handleChange}
+                              placeholder="หมู่"
+                              className="input input-bordered w-full"
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                              <span className="label-text">ตำบล</span>
+                            </div>
+                            <input
+                              type="text"
+                              name="subdistrict"
+                              value={address.subdistrict}
+                              onChange={handleChange}
+                              placeholder="ตำบล"
+                              className="input input-bordered w-full"
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                              <span className="label-text">อำเภอ</span>
+                            </div>
+                            <input
+                              type="text"
+                              name="district"
+                              value={address.district}
+                              onChange={handleChange}
+                              placeholder="อำเภอ"
+                              className="input input-bordered w-full"
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                              <span className="label-text">จังหวัด</span>
+                            </div>
+                            <input
+                              type="text"
+                              name="city"
+                              value={address.city}
+                              onChange={handleChange}
+                              placeholder="จังหวัด"
+                              className="input input-bordered w-full"
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                              <span className="label-text">ประเทศ</span>
+                            </div>
+                            <input
+                              type="text"
+                              name="ประเทศ"
+                              value={address.country}
+                              onChange={handleChange}
+                              placeholder="ประเทศ"
+                              className="input input-bordered w-full"
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                              <span className="label-text">รหัสไปรษณีย์</span>
+                            </div>
+                            <input
+                              type="text"
+                              name="postalCode"
+                              value={address.postalCode}
+                              onChange={handleChange}
+                              placeholder="รหัสไปรษณีย์"
+                              className="input input-bordered w-full"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => setOpenUpdateAddress(false)}
+                          className="bg-red-500 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-red-700"
+                        >
+                          ยกเลิก
+                        </button>
+                        <button
+                          type="submit"
+                          className="bg-green-400 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-green-600"
+                        >
+                          แก้ไข
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -252,7 +485,10 @@ const myAccount = () => {
           </div>
 
           <div className="flex justify-end">
-            <button className="p-3 bg-red-500 hover:bg-red-700 rounded-lg my-3 text-xs text-white">
+            <button
+              onClick={handleDeleteUser}
+              className="p-3 bg-red-500 hover:bg-red-700 rounded-lg my-3 text-xs text-white"
+            >
               ลบบัญชีผู้ใช้
             </button>
           </div>

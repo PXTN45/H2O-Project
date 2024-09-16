@@ -297,6 +297,8 @@ const PackageDetail = () => {
     (activity: any, index: number) => {
       const activityDay = item?.activity_package[index].activity_days.map(
         (day, i: number) => {
+          console.log(day);
+          
           return (
             <div key={i}>
               <li>
@@ -924,12 +926,14 @@ const PackageDetail = () => {
                 <div>
                   <div className="flex  flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap gap-10 justify-around items-center p-10">
                     <div
-                      className="radial-progress  text-primaryUser text-5xl font-bold "
-                      style={{
-                        "--value": `${progress}`,
-                        "--size": "12rem",
-                        "--thickness": "2rem",
-                      }}
+                      className="radial-progress text-primaryUser text-5xl font-bold"
+                      style={
+                        {
+                          "--value": `${progress}`,
+                          "--size": "12rem",
+                          "--thickness": "2rem",
+                        } as React.CSSProperties
+                      }
                       role="progressbar"
                     >
                       {averageRating}
