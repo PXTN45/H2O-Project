@@ -74,8 +74,8 @@ const myAccount = () => {
     const { name, value } = e.target;
     const numericFields = ["houseNumber", "postalCode", "village"];
     const numericValue = numericFields.includes(name)
-      ? value.replace(/[^0-9]/g, "")
-      : value;
+      ? value.replace(/[^0-9/-]/g, "")
+      : value.replace(/[^a-zA-Zก-๙]/g, "")
 
     setAddress((prevAddress) => ({
       ...prevAddress,
