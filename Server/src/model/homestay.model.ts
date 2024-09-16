@@ -160,7 +160,7 @@ const HomeStaySchema = new Schema<HomeStay>({
   business_user: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Business_User",
+      ref: "Business",
       required: true,
     },
   ],
