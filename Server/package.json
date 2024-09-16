@@ -34,10 +34,7 @@
     "nodemon": "^3.1.0",
     "promptpay-qr": "^0.5.0",
     "qrcode": "^1.5.3",
-<<<<<<< HEAD
-=======
     "socket.io": "^4.7.5",
->>>>>>> 46b6ac1ad9c069f654c9d5b2ee5f093bf578e1f7
     "stripe": "^16.9.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
