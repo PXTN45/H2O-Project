@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import Booking from "../model/booking.model";
+import Homestay from "../model/homestay.model";
 import User from "../model/user.model";
 import { getBookingNights, isDateValid } from "../utils";
 import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
+import { sendEmailPayment } from "../utils/sendEmail";
+
 
 const getAllBooking = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -276,6 +279,48 @@ const confirmBooking = async (req: Request, res: Response): Promise<void> => {
     res.status(500).send(error);
   }
 };
+
+const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> => {
+  const { bookingId , image } = req.body;
+
+  try {
+    const bookingData = await Booking.findOne({ '_id': bookingId }).populate([
+      { 
+        path: "homestay",
+        select: "business_user",
+        populate: {
+          path: "business_user"
+        }
+      },
+    ]);
+
+    if (!bookingData) {
+      res.status(404).json("Can't send money. because I don't have bookingData!");
+      return;
+    }
+
+    bookingData.bookingStatus = "Money transferred";
+
+    await sendEmailPayment(bookingData, image);
+    res.status(200).json({
+      message: bookingData,
+    });
+
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: 'An error occurred while processing the request',
+        error: error.message, 
+      });
+    } else {
+      res.status(500).json({
+        message: 'An unknown error occurred',
+        error: error,
+      });
+    }
+  }
+};
+
 export {
   bookHomeStay,
   confirmBooking,
@@ -289,4 +334,5 @@ export {
   getBookingPackageByUser,
   getBookingByPending,
   getBookingByConfirm,
+  sendMoneyToBusiness
 };
