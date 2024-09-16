@@ -32,19 +32,45 @@ const Drawer: React.FC = () => {
 
   const { mapData, setDrawerData } = authContext;
 
-  const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value, 10);
-
-    setMinValue(value);
-    if (rangeValue < value + 1000) {
-      setRangeValue(value + 1000);
+  const handleMinBlur = () => {
+    if (isNaN(minValue)) {
+      setMinValue(0);
+    }
+  };
+  
+  const handleRangeBlur = () => {
+    if (isNaN(rangeValue)) {
+      setRangeValue(minValue);
+    }else if(rangeValue < minValue){
+      setRangeValue(minValue);
     }
   };
 
+  
+  const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    if (value === '') {
+      setMinValue(NaN);
+    } else {
+      setMinValue(parseInt(value, 10));
+      
+
+      if (rangeValue < parseInt(value, 10)) {
+        setRangeValue(parseInt(value, 10));
+      }
+    }
+  };
+  
   const handleRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value, 10);
-    if (value >= minValue + 1000) {
-      setRangeValue(value);
+    const value = event.target.value;
+
+    if (value === '') {
+      setRangeValue(NaN);
+    } else if (parseInt(value, 10) >= minValue) {
+      setRangeValue(parseInt(value, 10));
+    }else{
+      setRangeValue(NaN);
     }
   };
   
@@ -155,7 +181,7 @@ const Drawer: React.FC = () => {
                     <div className="w-[100%] flex flex-col items-center justify-center my-5">
                       <div className="w-[80%] mb-3 flex items-center">
                         <span className="flex justify-start">
-                          เริ่มต้น: {minValue}
+                          เริ่มต้น: {isNaN(minValue) ? 0 : minValue}
                         </span>
                       </div>
                       <input
@@ -171,7 +197,7 @@ const Drawer: React.FC = () => {
                       />
                       <div className="w-[80%] my-3 flex items-center">
                         <span className="flex justify-end">
-                          สูงสุด: {rangeValue}
+                          สูงสุด: {isNaN(rangeValue) ? 0 : rangeValue}
                         </span>
                       </div>
                       <input
@@ -195,6 +221,7 @@ const Drawer: React.FC = () => {
                             max="25000"
                             value={minValue}
                             onChange={handleMinChange}
+                            onBlur={handleMinBlur}
                             className="w-full h-8 px-3 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-400 text-gray-700 text-sm transition-colors peer no-arrows"
                           />
                           <label
@@ -215,6 +242,7 @@ const Drawer: React.FC = () => {
                             max="25000"
                             value={rangeValue}
                             onChange={handleRangeChange}
+                            onBlur={handleRangeBlur}
                             className="w-full h-8 px-3 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-400 text-gray-700 text-sm transition-colors peer no-arrows"
                           />
                           <label
