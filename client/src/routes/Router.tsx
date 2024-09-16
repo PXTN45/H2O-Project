@@ -35,10 +35,6 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/pay",
-        element: <QR />,
-      },
-      {
         path: "/detailPayment",
         element: (
           <PaymentProvider>
