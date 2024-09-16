@@ -27,7 +27,7 @@ const getBookingByPending = async (
   try {
     const bookingData = await Booking.find({
       booker: userId,
-      bookingStatus: "Pending",
+      bookingStatus: "Confirmed",
     }).populate([
       { path: "booker", select: "email name lastName" },
       { path: "homestay" },
@@ -181,7 +181,6 @@ const bookPackage = async (req: Request, res: Response) => {
       bookingStart,
       bookingEnd,
       night,
-      bookingStatus: "Pending",
     });
 
     await newBookingPackage.save();
