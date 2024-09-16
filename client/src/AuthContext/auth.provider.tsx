@@ -39,6 +39,17 @@ type SignUpFormData = SignUpForm1Data | SignUpForm2Data;
 
 type SignInWithPopupFunction = () => Promise<UserCredential>;
 
+interface Address {
+  houseNumber: string;
+  village: string;
+  street: string;
+  subdistrict: string;
+  district: string;
+  city: string;
+  postalCode: string;
+  country: string;
+}
+[];
 interface User {
   _id?: string;
   name?: string;
@@ -48,7 +59,8 @@ interface User {
   password: string;
   phone: string | undefined;
   image: string;
-  address: string;
+  isVerified: boolean;
+  address: Address[];
   birthday: Date;
   role: string;
 }
@@ -478,7 +490,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error("Error:", (error as Error).message);     
+      console.error("Error:", (error as Error).message);
     }
   };
 

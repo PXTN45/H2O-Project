@@ -154,7 +154,7 @@ const BookingDetail: React.FC = () => {
 
   console.log(checkBooking);
 
-  var makePayment = async () => {
+  const makePayment = async () => {
     try {
       const response = await axiosPrivateUser.post("/create-checkout-session", {
         name: homeStayName,
@@ -182,10 +182,6 @@ const BookingDetail: React.FC = () => {
         throw new Error("Invalid response format");
       }
     } catch (error: any) {
-      Swal.fire({
-        title: "คุณเคยจองห้องนี้แล้ว!",
-        text: `${error.response.data.message}`,
-      });
       console.error("Error making payment:", error.response.data.message);
     }
   };

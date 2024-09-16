@@ -3,8 +3,6 @@ import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
-import HistoryPackage from "../../components/HistoryPackage";
-import HistoryHomeStay from "../../components/HistoryHomeStay";
 import BookingHomeStay from "../../components/BookingHomesaty";
 import BookingPackage from "../../components/BookingPackage";
 

@@ -18,7 +18,6 @@ import HomeStayDetail from "../pages/homeStay/homeStayDetail";
 import PackageDetail from "../pages/package/packageDetail";
 import { PaymentProvider } from "../AuthContext/paymentContext";
 import CreateHomeStay from "../pages/business/createHomeStay";
-import QR from "../testPromptPay";
 import PaymentSuccess from "../pages/homeStay/paymentSuccess";
 import PaymentFailure from "../pages/homeStay/paymentFailure";
 import Contact from "../pages/orther/Contact";
@@ -34,10 +33,6 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
-      },
-      {
-        path: "/pay",
-        element: <QR />,
       },
       {
         path: "/detailPayment",
