@@ -162,6 +162,27 @@ const adminRegister = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const updateUserAddress = async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const addressData = req.body;
+  try {
+    const updateResult = await UserModel.findByIdAndUpdate(
+      userId,
+      { $set: { address: addressData } },
+      { new: true, runValidators: true } 
+    );
+
+    if (!updateResult) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(updateResult);
+  } catch (error) {
+    console.error("Error updating address:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 const updateUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
   const updateData = req.body;
@@ -353,4 +374,5 @@ export {
   getAllAdmin,
   updateUser,
   checkEmailExists,
+  updateUserAddress,
 };

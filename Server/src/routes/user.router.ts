@@ -205,6 +205,7 @@ import {
   updateUser,
   checkEmailExists,
   getUserById,
+  updateUserAddress,
 } from "../controller/user.controller";
 import verifyEmailToken from "../middlewares/verifyEmailToken";
 import { verifyToken } from "../middlewares/verifyToken";
@@ -445,6 +446,7 @@ router.post("/checkEmailExists", checkEmailExists);
  */
 router.put("/updateUser/:id", updateUser);
 
+router.put("/updateAddress/:id", updateUserAddress);
 
 /**
  * @swagger
