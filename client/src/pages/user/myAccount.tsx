@@ -439,7 +439,7 @@ const myAccount = () => {
                             </div>
                             <input
                               type="text"
-                              name="ประเทศ"
+                              name="country"
                               value={address.country}
                               onChange={handleChange}
                               placeholder="ประเทศ"
