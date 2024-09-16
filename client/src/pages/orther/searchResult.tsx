@@ -142,6 +142,7 @@ const SearchResult: React.FC = () => {
   const [homeStayCount, setHomeStayCount] = useState<number>(0);
   const [packageCount, setPackageCount] = useState<number>(0);
   const [sortOption, setSortOption] = useState<string | null>(null);
+  const [sortText, setSortText] = useState<string | null>("กรองข้อมูล");
 
   const today = new Date();
   const tomorrow = new Date(today);
@@ -425,7 +426,7 @@ const SearchResult: React.FC = () => {
     const sortedData = [...data];
 
     switch (sortOption) {
-      case "เรียงตามราคาสูงไปน้อย":
+      case "ราคามากไปน้อย":
         return sortedData.sort((a, b) => {
           const offersA = a.room_type?.[0]?.offer || [];
           const offersB = b.room_type?.[0]?.offer || [];
@@ -443,7 +444,7 @@ const SearchResult: React.FC = () => {
 
           return minPriceB - minPriceA || packagePriceB - packagePriceA;
         });
-      case "เรียงตามราคาน้อยไปสูง":
+      case "ราคาน้อยไปมาก":
         return sortedData.sort((a, b) => {
           const offersA = a.room_type?.[0]?.offer || [];
           const offersB = b.room_type?.[0]?.offer || [];
@@ -462,13 +463,13 @@ const SearchResult: React.FC = () => {
           return minPriceA - minPriceB || packagePriceA - packagePriceB;
         });
 
-      case "เรียงตามดาวสูงไปน้อย":
+      case "คะแนนมากไปน้อย":
         return sortedData.sort(
           (a, b) =>
             (b.review_rating_homeStay ?? b.review_rating_package ?? 0) -
             (a.review_rating_homeStay ?? a.review_rating_package ?? 0)
         );
-      case "เรียงตามดาวน้อยไปสูง":
+      case "คะแนนน้อยไปมาก":
         return sortedData.sort(
           (a, b) =>
             (a.review_rating_homeStay ?? a.review_rating_package ?? 0) -
@@ -481,6 +482,7 @@ const SearchResult: React.FC = () => {
 
   const handleFilterClick = (filter: string) => {
     setSortOption(filter);
+    setSortText(filter)
     setShowFilterMenu(false);
   };
 
@@ -627,7 +629,7 @@ const SearchResult: React.FC = () => {
               >
                 <span className="flex items-center justify-center font-bold">
                   <MdFilterList className="w-4 h-4 mr-2 sm:mr-3" />
-                  <span>Sort</span>
+                  <span>{sortText}</span>
                 </span>
               </button>
               {showFilterMenu && (
@@ -638,37 +640,37 @@ const SearchResult: React.FC = () => {
                         id="PriceHightToLow"
                         className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
                         onClick={() =>
-                          handleFilterClick("เรียงตามราคาสูงไปน้อย")
+                          handleFilterClick("ราคามากไปน้อย")
                         }
                       >
-                        เรียงตามราคาสูงไปน้อย
+                        ราคามากไปน้อย
                       </button>
                       <button
                         id="PriceLowToHight"
                         className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
                         onClick={() =>
-                          handleFilterClick("เรียงตามราคาน้อยไปสูง")
+                          handleFilterClick("ราคาน้อยไปมาก")
                         }
                       >
-                        เรียงตามราคาน้อยไปสูง
+                        ราคาน้อยไปมาก
                       </button>
                       <button
                         id="StarHightToLow"
                         className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
                         onClick={() =>
-                          handleFilterClick("เรียงตามดาวสูงไปน้อย")
+                          handleFilterClick("คะแนนมากไปน้อย")
                         }
                       >
-                        เรียงตามดาวสูงไปน้อย
+                        คะแนนมากไปน้อย
                       </button>
                       <button
                         id="StarLowToHight"
                         className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
                         onClick={() =>
-                          handleFilterClick("เรียงตามดาวน้อยไปสูง")
+                          handleFilterClick("คะแนนน้อยไปมาก")
                         }
                       >
-                        เรียงตามดาวน้อยไปสูง
+                        คะแนนน้อยไปมาก 
                       </button>
                     </div>
                   </div>
