@@ -130,7 +130,7 @@ const HistoryPackage = () => {
     const fetchData = async () => {
       try {
         const response = await axiosPrivateUser(
-          `/booking-confirm/${userInfo?._id}`
+          `/booking-check-in/${userInfo?._id}`
         );
 
         if (response.data) {
