@@ -18,6 +18,7 @@ const getUserById = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: error.message });
   }
 };
+
 const getAllUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData = await UserModel.find();
@@ -169,7 +170,7 @@ const updateUserAddress = async (req: Request, res: Response) => {
     const updateResult = await UserModel.findByIdAndUpdate(
       userId,
       { $set: { address: addressData } },
-      { new: true, runValidators: true } 
+      { new: true, runValidators: true }
     );
 
     if (!updateResult) {
@@ -362,6 +363,52 @@ const Logout = (req: Request, res: Response): void => {
   res.status(200).json({ message: "Successfully logged out" });
 };
 
+const ChangePassword = async (req: Request, res: Response) => {
+  const { email, password, newPass, confirmPass } = req.body;
+  if (email === "" || password === "" || newPass === "" || confirmPass === "") {
+    return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบทุกช่อง" });
+  }
+  
+  try {
+    const userData = await UserModel.findOne({ email });
+    if (!userData) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const isPasswordMatch = bcrypt.compareSync(password, userData.password);
+    console.log(isPasswordMatch);
+    
+    if (!isPasswordMatch) {
+      return res.status(401).json({ message: "รหัสผ่านปัจจุบันไม่ถูกต้อง" });
+    }
+    if (password === newPass || password === confirmPass) {
+      return res
+        .status(400)
+        .json({
+          message:
+            "กรุณากรอกรหัสผ่านใหม่ที่ไม่ตรงกับรหัสผ่านปัจจุบัน",
+        });
+    }
+    if (newPass !== confirmPass) {
+      return res.status(400).json({
+        message: "รหัสผ่านใหม่และรหัสผ่านยืนยันไม่ตรงกัน กรุณาตรวจสอบและกรอกให้ตรงกัน",
+      });
+    }
+    const salt = bcrypt.genSaltSync(10);
+    const hashedNewPassword = bcrypt.hashSync(newPass, salt);
+
+    // อัปเดตข้อมูลในฐานข้อมูล
+    userData.password = hashedNewPassword;
+    await userData.save();
+
+    res
+      .status(200)
+      .json({ message: "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว", userData });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "ข้อผิดพลาดเซิร์ฟเวอร์ภายใน",error });
+  }
+};
+
 export {
   userRegister,
   businessRegister,
@@ -375,4 +422,5 @@ export {
   updateUser,
   checkEmailExists,
   updateUserAddress,
+  ChangePassword,
 };

@@ -105,8 +105,6 @@ const getBookingPackageByUser = async (
   } catch (error) {}
 };
 
-
-
 const createBook = async (req: Request, res: Response) => {
   // เข้าถึง bookingData จาก req.body
   const { bookingData } = req.body;
