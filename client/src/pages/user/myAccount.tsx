@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
-import { TbPointFilled } from "react-icons/tb";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
-import Swal from "sweetalert2";
+import { TbPointFilled } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { LuEye, LuEyeOff } from "react-icons/lu";
+import axios from "axios";
+
+interface Password {
+  email: string;
+  password: string;
+  newPass: string;
+  confirmPass: string;
+}
 interface Address {
   houseNumber: string;
   street: string;
@@ -41,6 +49,17 @@ const myAccount = () => {
   const [userData, setUserData] = useState<User>();
   const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
   const [openUpdateAddress, setOpenUpdateAddress] = useState<boolean>(false);
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+  const [passwords, setPasswords] = useState<Password>({
+    email: "",
+    password: "",
+    newPass: "",
+    confirmPass: "",
+  });
   const [address, setAddress] = useState<Address>({
     houseNumber: userData?.address[0]?.houseNumber || "",
     street: userData?.address[0]?.street || "",
@@ -52,6 +71,7 @@ const myAccount = () => {
     postalCode: userData?.address[0]?.postalCode || "",
   });
   const navigate = useNavigate();
+  console.log(passwords);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -61,6 +81,12 @@ const myAccount = () => {
         );
         setUserData(response.data);
         setAddress(response.data.address[0]);
+        setPasswords({
+          email: response.data.email,
+          password: "",
+          newPass: "",
+          confirmPass: "",
+        });
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -75,11 +101,19 @@ const myAccount = () => {
     const numericFields = ["houseNumber", "postalCode", "village"];
     const numericValue = numericFields.includes(name)
       ? value.replace(/[^0-9/-]/g, "")
-      : value.replace(/[^a-zA-Zก-๙]/g, "")
+      : value.replace(/[^a-zA-Zก-๙]/g, "");
 
     setAddress((prevAddress) => ({
       ...prevAddress,
       [name]: numericValue,
+    }));
+  };
+  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setPasswords((prevPassword) => ({
+      ...prevPassword,
+      [name]: value, // ตั้งค่า value โดยตรง
     }));
   };
 
@@ -146,9 +180,62 @@ const myAccount = () => {
       }
     });
   };
+  console.log(passwords);
+
+  const togglePasswordVisibility = (field: "current" | "new" | "confirm") => {
+    setShowPasswords((prevState) => ({
+      ...prevState,
+      [field]: !prevState[field],
+    }));
+  };
+
+  const changePassword = async () => {
+    if (
+      passwords.password === "" ||
+      passwords.newPass === "" ||
+      passwords.confirmPass === ""
+    ) {
+      Swal.fire({
+        title: "กรุณากรอกข้อมูลให้ครบ",
+        text: "โปรดตรวจสอบและกรอกข้อมูลทุกช่องให้ครบก่อนดำเนินการ",
+        icon: "warning",
+      });
+      return;
+    }
+
+    try {
+      const change = await axiosPrivateUser.put(
+        "/user/update-password",
+        passwords
+      );
+      if (change.status === 200) {
+        Swal.fire({
+          title: "สำเร็จ!",
+          text: "รหัสผ่านของคุณได้ถูกเปลี่ยนเรียบร้อยแล้ว.",
+          icon: "success",
+        });
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        Swal.fire({
+          title: "ข้อผิดพลาด!",
+          text: error.response.data.message,
+          icon: "error",
+        });
+        console.log(error.response.data.message);
+      } else {
+        Swal.fire({
+          title: "ข้อผิดพลาด!",
+          text: "เกิดข้อผิดพลาดบางอย่าง!",
+          icon: "error",
+        });
+        console.log("Unknown error:", error);
+      }
+    }
+  };
 
   return (
-    <div className="my-5 w-full ">
+    <div className="my-5 w-full">
       <div className="mb-5">
         <span className="text-2xl">ข้อมูลผู้ใช้</span>
       </div>
@@ -267,33 +354,67 @@ const myAccount = () => {
                     <span>แก้ไขรหัสผ่าน</span>
                   </div>
                   <div>
-                    <span>รหัสผ่านปัจจุบัน</span>
-                    <div className="flex gap-2 my-5">
-                      <input
-                        type="password"
-                        placeholder="รหัสผ่านปัจจุบัน"
-                        className="input input-bordered w-full"
-                      />
+                    {/* รหัสผ่านปัจจุบัน */}
+                    <div>
+                      <span>รหัสผ่านปัจจุบัน</span>
+                      <div className="flex gap-2 my-5">
+                        <input
+                          name="password"
+                          value={passwords.password}
+                          onChange={handleChangePassword}
+                          type={showPasswords.current ? "text" : "password"}
+                          placeholder="รหัสผ่านปัจจุบัน"
+                          className="input input-bordered w-full"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility("current")}
+                        >
+                          {showPasswords.current ? <LuEye /> : <LuEyeOff />}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <span>รหัสผ่านใหม่</span>
-                    <div className="flex gap-2 my-5">
-                      <input
-                        type="password"
-                        placeholder="รหัสผ่านใหม่"
-                        className="input input-bordered w-full"
-                      />
+
+                    {/* รหัสผ่านใหม่ */}
+                    <div>
+                      <span>รหัสผ่านใหม่</span>
+                      <div className="flex gap-2 my-5">
+                        <input
+                          name="newPass"
+                          value={passwords.newPass}
+                          onChange={handleChangePassword}
+                          type={showPasswords.new ? "text" : "password"}
+                          placeholder="รหัสผ่านใหม่"
+                          className="input input-bordered w-full"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility("new")}
+                        >
+                          {showPasswords.new ? <LuEye /> : <LuEyeOff />}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <span>ยืนยันรหัสผ่านใหม่</span>
-                    <div className="flex gap-2 my-5">
-                      <input
-                        type="password"
-                        placeholder="ยืนยันรหัสผ่านใหม่"
-                        className="input input-bordered w-full"
-                      />
+
+                    {/* ยืนยันรหัสผ่านใหม่ */}
+                    <div>
+                      <span>ยืนยันรหัสผ่านใหม่</span>
+                      <div className="flex gap-2 my-5">
+                        <input
+                          name="confirmPass"
+                          value={passwords.confirmPass}
+                          onChange={handleChangePassword}
+                          type={showPasswords.confirm ? "text" : "password"}
+                          placeholder="ยืนยันรหัสผ่านใหม่"
+                          className="input input-bordered w-full"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility("confirm")}
+                        >
+                          {showPasswords.confirm ? <LuEye /> : <LuEyeOff />}
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <div className="flex justify-end">
@@ -303,7 +424,10 @@ const myAccount = () => {
                     >
                       ยกเลิก
                     </button>
-                    <button className="bg-green-400 mx-2 px-5 py-2 rounded-full text-white hover:bg-green-600">
+                    <button
+                      onClick={changePassword}
+                      className="bg-green-400 mx-2 px-5 py-2 rounded-full text-white hover:bg-green-600"
+                    >
                       บันทึก
                     </button>
                   </div>
@@ -483,7 +607,6 @@ const myAccount = () => {
               </div>
             )}
           </div>
-
           <div className="flex justify-end">
             <button
               onClick={handleDeleteUser}
