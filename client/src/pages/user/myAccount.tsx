@@ -71,7 +71,6 @@ const myAccount = () => {
     postalCode: userData?.address[0]?.postalCode || "",
   });
   const navigate = useNavigate();
-  console.log(passwords);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -94,6 +93,7 @@ const myAccount = () => {
 
     fetchUserData();
   }, [userInfo?._id, openUpdateAddress]);
+  console.log(userData);
 
   // ฟังก์ชันจัดการการเปลี่ยนแปลงฟิลด์ฟอร์ม
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,7 +180,6 @@ const myAccount = () => {
       }
     });
   };
-  console.log(passwords);
 
   const togglePasswordVisibility = (field: "current" | "new" | "confirm") => {
     setShowPasswords((prevState) => ({
@@ -315,111 +314,120 @@ const myAccount = () => {
                 </div>
               </div>
             </div>
-
-            {openUpdatePassword === false ? (
-              <div className="flex justify-between items-center hover:bg-gray-300 p-5 transition-all duration-700 ease-in-out">
-                <div className="flex gap-5 items-center">
-                  <div className="flex flex-col">
-                    <span className="text-sm">รหัสผ่าน</span>
-                    <div className="flex space-x-1 mt-3">
-                      {Array.from({ length: 10 }).map((_, index) => (
-                        <span key={index} className="text-sm">
-                          <TbPointFilled />
-                        </span>
-                      ))}
+            {userData.password ? (
+              <div>
+                {openUpdatePassword === false ? (
+                  <div className="flex justify-between items-center hover:bg-gray-300 p-5 transition-all duration-700 ease-in-out">
+                    <div className="flex gap-5 items-center">
+                      <div className="flex flex-col">
+                        <span className="text-sm">รหัสผ่าน</span>
+                        <div className="flex space-x-1 mt-3">
+                          {Array.from({ length: 10 }).map((_, index) => (
+                            <span key={index} className="text-sm">
+                              <TbPointFilled />
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div onClick={() => setOpenUpdatePassword(true)}>
+                      <button>แก้ไข</button>
                     </div>
                   </div>
-                </div>
-                <div onClick={() => setOpenUpdatePassword(true)}>
-                  <button>แก้ไข</button>
-                </div>
+                ) : (
+                  <div className="p-5 transition-all duration-700 ease-in-out">
+                    <div className="shadow-boxShadow p-5 rounded-lg">
+                      <div className="text-lg mb-5 font-bold">
+                        <span>แก้ไขรหัสผ่าน</span>
+                      </div>
+                      <div>
+                        {/* รหัสผ่านปัจจุบัน */}
+                        <div>
+                          <span>รหัสผ่านปัจจุบัน</span>
+                          <div className="flex gap-2 my-5">
+                            <input
+                              name="password"
+                              value={passwords.password}
+                              onChange={handleChangePassword}
+                              type={showPasswords.current ? "text" : "password"}
+                              placeholder="รหัสผ่านปัจจุบัน"
+                              className="input input-bordered w-full"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                togglePasswordVisibility("current")
+                              }
+                            >
+                              {showPasswords.current ? <LuEye /> : <LuEyeOff />}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* รหัสผ่านใหม่ */}
+                        <div>
+                          <span>รหัสผ่านใหม่</span>
+                          <div className="flex gap-2 my-5">
+                            <input
+                              name="newPass"
+                              value={passwords.newPass}
+                              onChange={handleChangePassword}
+                              type={showPasswords.new ? "text" : "password"}
+                              placeholder="รหัสผ่านใหม่"
+                              className="input input-bordered w-full"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => togglePasswordVisibility("new")}
+                            >
+                              {showPasswords.new ? <LuEye /> : <LuEyeOff />}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* ยืนยันรหัสผ่านใหม่ */}
+                        <div>
+                          <span>ยืนยันรหัสผ่านใหม่</span>
+                          <div className="flex gap-2 my-5">
+                            <input
+                              name="confirmPass"
+                              value={passwords.confirmPass}
+                              onChange={handleChangePassword}
+                              type={showPasswords.confirm ? "text" : "password"}
+                              placeholder="ยืนยันรหัสผ่านใหม่"
+                              className="input input-bordered w-full"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                togglePasswordVisibility("confirm")
+                              }
+                            >
+                              {showPasswords.confirm ? <LuEye /> : <LuEyeOff />}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => setOpenUpdatePassword(false)}
+                          className="bg-red-500 mx-2 px-5 py-2 rounded-full text-white hover:bg-red-700"
+                        >
+                          ยกเลิก
+                        </button>
+                        <button
+                          onClick={changePassword}
+                          className="bg-green-400 mx-2 px-5 py-2 rounded-full text-white hover:bg-green-600"
+                        >
+                          บันทึก
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="p-5 transition-all duration-700 ease-in-out">
-                <div className="shadow-boxShadow p-5 rounded-lg">
-                  <div className="text-lg mb-5 font-bold">
-                    <span>แก้ไขรหัสผ่าน</span>
-                  </div>
-                  <div>
-                    {/* รหัสผ่านปัจจุบัน */}
-                    <div>
-                      <span>รหัสผ่านปัจจุบัน</span>
-                      <div className="flex gap-2 my-5">
-                        <input
-                          name="password"
-                          value={passwords.password}
-                          onChange={handleChangePassword}
-                          type={showPasswords.current ? "text" : "password"}
-                          placeholder="รหัสผ่านปัจจุบัน"
-                          className="input input-bordered w-full"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => togglePasswordVisibility("current")}
-                        >
-                          {showPasswords.current ? <LuEye /> : <LuEyeOff />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* รหัสผ่านใหม่ */}
-                    <div>
-                      <span>รหัสผ่านใหม่</span>
-                      <div className="flex gap-2 my-5">
-                        <input
-                          name="newPass"
-                          value={passwords.newPass}
-                          onChange={handleChangePassword}
-                          type={showPasswords.new ? "text" : "password"}
-                          placeholder="รหัสผ่านใหม่"
-                          className="input input-bordered w-full"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => togglePasswordVisibility("new")}
-                        >
-                          {showPasswords.new ? <LuEye /> : <LuEyeOff />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* ยืนยันรหัสผ่านใหม่ */}
-                    <div>
-                      <span>ยืนยันรหัสผ่านใหม่</span>
-                      <div className="flex gap-2 my-5">
-                        <input
-                          name="confirmPass"
-                          value={passwords.confirmPass}
-                          onChange={handleChangePassword}
-                          type={showPasswords.confirm ? "text" : "password"}
-                          placeholder="ยืนยันรหัสผ่านใหม่"
-                          className="input input-bordered w-full"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => togglePasswordVisibility("confirm")}
-                        >
-                          {showPasswords.confirm ? <LuEye /> : <LuEyeOff />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => setOpenUpdatePassword(false)}
-                      className="bg-red-500 mx-2 px-5 py-2 rounded-full text-white hover:bg-red-700"
-                    >
-                      ยกเลิก
-                    </button>
-                    <button
-                      onClick={changePassword}
-                      className="bg-green-400 mx-2 px-5 py-2 rounded-full text-white hover:bg-green-600"
-                    >
-                      บันทึก
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <div></div>
             )}
 
             {openUpdateAddress === false ? (
