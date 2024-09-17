@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { MdFamilyRestroom } from "react-icons/md";
 import { IoPeopleSharp, IoRemoveOutline } from "react-icons/io5";
 import { LiaChildSolid } from "react-icons/lia";
@@ -11,7 +11,7 @@ import { usePaymentContext } from "../AuthContext/paymentContext";
 const Navbar = () => {
   const location = useLocation();
   const sendSearchToDetail = location.state?.sendSearchToDetail;
-  const { dataNav, setDataNav } = usePaymentContext();
+  const { setDataNav } = usePaymentContext();
 
   const [showPeopleMenu, setShowPeopleMenu] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);

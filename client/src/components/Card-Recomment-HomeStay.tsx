@@ -72,7 +72,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
       <div onClick={handleCardClick}>
         <img
           id="imageCard-Home"
-          src={item.image[0].image_upload}
+          src={item?.image[0].image_upload}
           alt="images to cards"
           className="w-full h-[15rem] object-cover"
         />
@@ -82,7 +82,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
             {truncateText(item.name_homeStay || "", 15)}
           </div>
           <p id="Province-HomeStay" className="text-base">
-            {truncateText(item.location[0].province_location || "", 30)}
+            {truncateText(item?.location[0].province_location || "", 30)}
           </p>
         </div>
         <div className="flex items-center justify-center mt-5">
@@ -91,7 +91,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
             className="absolute left-0 font-bold px-6 py-4 text-primaryUser"
           >
             <div className="flex">
-              {renderStars(item.review_rating_homeStay || 0)}
+              {renderStars(item?.review_rating_homeStay || 0)}
             </div>
           </div>
           <div
@@ -99,7 +99,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
             className="absolute right-0 font-bold px-6 py-4"
           >
             <span className="mx-1">฿</span>
-            {item.room_type[0].offer[0].price_homeStay}
+            {item?.room_type[0].offer[0].price_homeStay}
           </div>
         </div>
       </div>
