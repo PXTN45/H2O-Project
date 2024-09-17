@@ -36,6 +36,7 @@ const Drawer: React.FC = () => {
     if (isNaN(minValue)) {
       setMinValue(0);
     }
+    handleSearch();
   };
   
   const handleRangeBlur = () => {
@@ -44,6 +45,7 @@ const Drawer: React.FC = () => {
     }else if(rangeValue < minValue){
       setRangeValue(minValue);
     }
+    handleSearch();
   };
 
   
@@ -67,10 +69,8 @@ const Drawer: React.FC = () => {
 
     if (value === '') {
       setRangeValue(NaN);
-    } else if (parseInt(value, 10) >= minValue) {
-      setRangeValue(parseInt(value, 10));
     }else{
-      setRangeValue(NaN);
+      setRangeValue(parseInt(value, 10));
     }
   };
   
