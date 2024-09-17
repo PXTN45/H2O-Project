@@ -190,19 +190,6 @@ const myAccount = () => {
   };
 
   const changePassword = async () => {
-    if (
-      passwords.password === "" ||
-      passwords.newPass === "" ||
-      passwords.confirmPass === ""
-    ) {
-      Swal.fire({
-        title: "กรุณากรอกข้อมูลให้ครบ",
-        text: "โปรดตรวจสอบและกรอกข้อมูลทุกช่องให้ครบก่อนดำเนินการ",
-        icon: "warning",
-      });
-      return;
-    }
-
     try {
       const change = await axiosPrivateUser.put(
         "/user/update-password",
