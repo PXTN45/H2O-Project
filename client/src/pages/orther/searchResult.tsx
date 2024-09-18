@@ -147,7 +147,6 @@ const SearchResult: React.FC = () => {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-  console.log(dataPackageForPriceFilter);
 
   //Filter Price
   useEffect(() => {
@@ -157,9 +156,11 @@ const SearchResult: React.FC = () => {
         const minPrice = Math.min(
           ...offers.map((offer) => offer.price_homeStay)
         );
+        
         return offers.find((offer) => offer.price_homeStay === minPrice);
       });
 
+      
       const filteredDataHomestays = minPrices.filter((offer) => {
         if (offer === undefined || offer.price_homeStay === undefined) {
           return false;
@@ -189,6 +190,7 @@ const SearchResult: React.FC = () => {
       const validDataHomestays = filteredDataHomestays.filter(
         (item) => item !== undefined
       );
+
       const validDataPackage = filteredDataPackage.filter(
         (item) => item !== undefined
       );
@@ -208,27 +210,42 @@ const SearchResult: React.FC = () => {
       });
 
       const formattedData = dataHomeStays
-        .map((location) => {
-          const offers = location.room_type.flatMap(
-            (roomType) => roomType.offer
+      .map((location) => {
+        // รวมทุก offers จาก room_type ของแต่ละ location
+        const allOffers = location.room_type.flatMap(
+          (roomType) => roomType.offer
+        );
+    
+        // กรองเฉพาะ offers ที่อยู่ในช่วงราคาที่กำหนด
+        const filteredOffers = allOffers.filter((offer) => {
+          if (!offer || offer.price_homeStay === undefined) return false;
+    
+          const startPrice = drawerData?.drawerPrice?.startPrice ?? 0;
+          const endPrice = drawerData?.drawerPrice?.endPrice ?? Number.MAX_VALUE;
+    
+          // เงื่อนไขการกรองราคาของ offer ให้อยู่ในช่วง startPrice และ endPrice
+          return (
+            offer.price_homeStay >= startPrice && offer.price_homeStay <= endPrice
           );
-          const filteredOffers = offers.filter((offer) =>
-            sortedDataHomestays.includes(offer)
-          );
-          if (filteredOffers.length > 0) {
-            return {
-              ...location,
-              room_type: location.room_type.map((roomType) => ({
-                ...roomType,
-                offer: roomType.offer.filter((offer) =>
-                  filteredOffers.includes(offer)
-                ),
-              })),
-            };
-          }
-          return null;
-        })
-        .filter((location) => location !== null);
+        });
+    
+        // ถ้ามี offers ที่ตรงตามเงื่อนไข ให้สร้างข้อมูลใหม่
+        if (filteredOffers.length > 0) {
+          return {
+            ...location,
+            room_type: location.room_type.map((roomType) => ({
+              ...roomType,
+              offer: roomType.offer.filter((offer) =>
+                filteredOffers.includes(offer)
+              ),
+            })),
+          };
+        }
+    
+        // ถ้าไม่มี offers ที่ตรงตามเงื่อนไข ให้ส่งกลับเป็น null
+        return null;
+      })
+      .filter((location) => location !== null); // กรองออกเฉพาะ location ที่ไม่ใช่ null
 
       setDataHomeStaysdataHomeStaysForPriceFilter(formattedData);
       setDataPackagedataHomeStaysForPriceFilter(sortedDataPackage);
@@ -729,7 +746,7 @@ const SearchResult: React.FC = () => {
                 <>
                   {(drawerData?.drawerPrice?.endPrice ?? 0) > 0 ? (
                     <>
-                      {sortData(dataHomeStaysForPriceFilter).map(
+                      {dataHomeStaysForPriceFilter.map(
                         (item, index) => (
                           <div key={index} className="w-full">
                             <CardHomeStay
