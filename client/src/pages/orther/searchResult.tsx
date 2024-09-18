@@ -170,16 +170,6 @@ const SearchResult: React.FC = () => {
         (item) => item !== undefined
       );
 
-<<<<<<< HEAD
-      const sortedDataHomestays = validDataHomestays.sort((a, b) => {
-        const priceA = a?.price_homeStay ?? Infinity;
-        const priceB = b?.price_homeStay ?? Infinity;
-
-        return priceA - priceB;
-      });
-
-=======
->>>>>>> cb41976e20e6e72b0bc323104baee90275d08c66
       const sortedDataPackage = validDataPackage.sort((a, b) => {
         const priceA = a.price_package ?? Infinity;
         const priceB = b.price_package ?? Infinity;
