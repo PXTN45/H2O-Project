@@ -447,7 +447,7 @@ router.post("/checkEmailExists", checkEmailExists);
  */
 router.put("/updateUser/:id", updateUser);
 
-router.put("/updateUser/:id", updateUserAddress);
+router.put("/updateAddress/:id", updateUserAddress);
 
 router.put("/update-password", ChangePassword);
 
