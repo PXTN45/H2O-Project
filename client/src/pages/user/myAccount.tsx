@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import { TbPointFilled } from "react-icons/tb";
@@ -6,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import axios from "axios";
+import { BsCamera } from "react-icons/bs";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../Firebase/firebase.config";
 
 interface Password {
   email: string;
@@ -43,8 +46,9 @@ const myAccount = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
 
-  const { userInfo } = authContext;
+  const { userInfo, setUserInfo } = authContext;
   // const [openUpdateFrom, setOpenUpdateFrom] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
   const [userData, setUserData] = useState<User>();
   const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
@@ -70,6 +74,7 @@ const myAccount = () => {
     country: userData?.address[0]?.country || "",
     postalCode: userData?.address[0]?.postalCode || "",
   });
+  const [updatedUserInfo, setUpdatedUserInfo] = useState<User>({} as User);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,14 +91,15 @@ const myAccount = () => {
           newPass: "",
           confirmPass: "",
         });
+        setUpdatedUserInfo(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
 
     fetchUserData();
-  }, [userInfo?._id, openUpdateAddress]);
-  console.log(userData);
+  }, [userInfo?._id, openUpdateAddress, openUpdateUser]);
+  console.log(updatedUserInfo);
 
   // ฟังก์ชันจัดการการเปลี่ยนแปลงฟิลด์ฟอร์ม
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,6 +114,7 @@ const myAccount = () => {
       [name]: numericValue,
     }));
   };
+
   const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -220,6 +227,164 @@ const myAccount = () => {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUpdatedUserInfo((prev) => {
+      const prevUserInfo = prev || {
+        email: "",
+        password: "",
+        phone: undefined,
+        image: "",
+        address: [],
+        role: userInfo?.role,
+      };
+
+      return {
+        ...prevUserInfo,
+        [name]: value,
+      };
+    });
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await axiosPrivateUser.put(
+        `/user/updateUser/${userInfo?._id}`,
+        updatedUserInfo
+      );
+      // setUserInfo(updatedUserInfo)
+      Swal.fire({
+        title: "สำเร็จ!",
+        text: "ข้อมูลของคุณได้รับการอัปเดตเรียบร้อยแล้ว.",
+        icon: "success",
+      });
+
+      setOpenUpdateUser(false);
+    } catch (error) {
+      Swal.fire({
+        title: "ข้อผิดพลาด!",
+        text: "ไม่สามารถอัปเดตข้อมูลได้ โปรดลองอีกครั้ง.",
+        icon: "error",
+      });
+      console.error("Error updating user:", error);
+    }
+  };
+
+  const handleChangeImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      const resizedFile = await resizeImage(selectedFile, 500, 500);
+      const pathImage = `imagesAvatar/${userInfo?._id}`;
+
+      Swal.fire({
+        title: "Are you sure you want to change the image?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, change it!",
+        cancelButtonText: "Cancel",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            // setLoadPage(false);
+            await handleUpload(resizedFile, pathImage);
+            const storageRef = ref(storage, pathImage);
+            const imageURL = await getDownloadURL(storageRef);
+            await apiUpdateImage(imageURL);
+            // setLoadPage(true);
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "There was an error updating.",
+              text: `${error}`,
+            });
+          }
+        } else if (result.isDismissed) {
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+          console.log("User canceled the image change");
+        }
+      });
+    }
+  };
+
+  const resizeImage = (
+    file: File,
+    maxWidth: number,
+    maxHeight: number
+  ): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        Math.min(maxWidth / img.width, maxHeight / img.height);
+
+        canvas.width = maxWidth;
+        canvas.height = maxHeight;
+        ctx?.drawImage(img, 0, 0, maxWidth, maxHeight);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const resizedFile = new File([blob], file.name, {
+              type: file.type,
+            });
+            resolve(resizedFile);
+          } else {
+            reject(new Error("Canvas is empty"));
+          }
+        }, file.type);
+      };
+      img.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleUpload = async (file: File, pathImage: string) => {
+    const storageRef = ref(storage, pathImage);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise<void>((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        () => {},
+        (error) => {
+          reject(error);
+        },
+        () => {
+          resolve();
+        }
+      );
+    });
+  };
+
+  const apiUpdateImage = async (imageURL: string) => {
+    if (userInfo) {
+      const updateImage = {
+        image: imageURL,
+        role: userInfo.role,
+      };
+      const response = await axiosPrivateUser.put(
+        `/user/updateUser/${userInfo._id}`,
+        updateImage
+      );
+
+      if (!response) {
+        throw new Error(`Error: ${response}`);
+      } else {
+        setUserInfo(response.data);
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Avatar image change successful!",
+        });
+      }
+    }
+  };
+
   return (
     <div className="my-5 w-full">
       <div className="mb-5">
@@ -230,67 +395,93 @@ const myAccount = () => {
           <div className="shadow-boxShadow pb-10  rounded-lg">
             {openUpdateUser === false ? (
               <div className="flex justify-between items-center hover:bg-gray-300 p-5">
-                <div className="flex gap-5 items-center p-5 ">
+                <div className="flex gap-5 items-center p-5">
                   <div>
                     <img
-                      src={userInfo?.image}
-                      className="rounded-full w-14 h-14"
+                      src={userData?.image}
+                      className="rounded-full w-14 h-14 bg-black"
                       alt="รูปโปรไฟล์"
                     />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm">ชื่อผู้ใช้</span>
                     <span className="text-lg">
-                      {userInfo?.name} {userInfo?.lastName}
+                      {userData?.name} {userData?.lastName}
                     </span>
                   </div>
                 </div>
                 <div onClick={() => setOpenUpdateUser(true)}>
-                  <span>แก้ไข</span>
+                  <button>แก้ไข</button>
                 </div>
               </div>
             ) : (
-              <div className="flex justify-between items-center hover:bg-gray-300 p-5">
-                <div className="w-3/4 flex gap-5 items-end p-5 ">
-                  <div>
-                    <img
-                      src={userInfo?.image}
-                      className="rounded-full w-14 h-14"
-                      alt="รูปโปรไฟล์"
-                    />
+              <div className="flex flex-wrap justify-between items-center hover:bg-gray-300 p-5">
+                <div className="w-full xl:w-3/4 flex gap-5 items-end p-5">
+                  <div className="relative group ">
+                    <div className="rounded-full h-14 w-14 object-cover bg-dark">
+                      <img
+                        src={userInfo?.image}
+                        alt="Profile"
+                        className="object-cover w-full h-full transition-opacity duration-300 group-hover:opacity-30 rounded-full"
+                      />
+                    </div>
+                    <label
+                      className="absolute inset-0 bg-opacity-50 text-white text-lg cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ textAlign: "center" }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center text-xs">
+                        <div className="flex flex-col items-center justify-center">
+                          <p>
+                            <BsCamera />
+                          </p>
+                          <p>เปลี่ยนรูป</p>
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleChangeImage}
+                      />
+                    </label>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm">ชื่อผู้ใช้</span>
                     <span className="text-lg flex gap-5 mt-2">
                       <div>
-                        {" "}
                         <input
                           type="text"
+                          name="name"
                           placeholder="ชื่อ"
-                          value={userInfo?.name}
+                          value={updatedUserInfo.name}
+                          onChange={handleInputChange}
                           className="input input-bordered w-full"
                         />
                       </div>
                       <div>
-                        {" "}
                         <input
                           type="text"
+                          name="lastName"
                           placeholder="นามสกุล"
-                          value={userInfo?.lastName}
+                          value={updatedUserInfo.lastName}
+                          onChange={handleInputChange}
                           className="input input-bordered w-full"
                         />
                       </div>
                     </span>
                   </div>
                 </div>
-                <div className="w-1/4 flex justify-end items-end">
+                <div className="w-full xl:w-1/4 flex justify-end items-end">
                   <button
                     onClick={() => setOpenUpdateUser(false)}
-                    className="bg-red-500 mx-2 px-4 py-2 rounded-full text-white hover:bg-red-700"
+                    className="bg-red-500 mx-2 px-2 py-1 rounded-full text-white hover:bg-red-700"
                   >
                     ยกเลิก
                   </button>
-                  <button className="bg-green-400 mx-2 px-4 py-2 rounded-full text-white hover:bg-green-600">
+                  <button
+                    onClick={handleSave}
+                    className="bg-green-400 mx-2 px-2 py-1 rounded-full text-white hover:bg-green-600"
+                  >
                     บันทึก
                   </button>
                 </div>

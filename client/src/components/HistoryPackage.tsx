@@ -253,7 +253,7 @@ const HistoryPackage = () => {
   const handleRatingChange = (value: number) => {
     setRating(value);
   };
-  console.log(myBookingPackage[0]?.package._id);
+  console.log(myBookingPackage[0].bookingStatus);
 
   const handleSubmit = (selectedBookingIndex: number) => {
     const reviewer = userInfo?._id;
@@ -334,8 +334,7 @@ const HistoryPackage = () => {
                           </span>
                           <div className="bg-green-400 px-3 rounded-full text-white xl:hidden">
                             {
-                              myBookingPackage[selectedBookingIndex]
-                                .bookingStatus
+                              myBookingPackage[selectedBookingIndex].bookingStatus
                             }
                           </div>
                         </div>
@@ -502,7 +501,7 @@ const HistoryPackage = () => {
                     <span className="text-lg font-bold ">
                       {booking?.package.name_package}
                     </span>
-                    <div className="bg-green-400 px-3 rounded-full text-white hidden xl:hidden">
+                    <div className="bg-green-400 px-3 rounded-full text-white block xl:hidden">
                       {booking.bookingStatus}
                     </div>
                   </div>

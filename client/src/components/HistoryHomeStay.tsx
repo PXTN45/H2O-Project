@@ -528,7 +528,7 @@ const HistoryHomeStay = () => {
                         ({booking?.detail_offer[0].name_type_room})
                       </span>
                     </div>
-                    <div className="bg-green-400 px-3 rounded-full text-white xl:hidden">
+                    <div className="bg-green-400 px-3 rounded-full flex items-center text-white xl:hidden">
                       {booking.bookingStatus}
                     </div>
                   </div>
