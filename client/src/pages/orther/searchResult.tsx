@@ -151,28 +151,6 @@ const SearchResult: React.FC = () => {
   //Filter Price
   useEffect(() => {
     if (drawerData?.drawerPrice.endPrice !== 0) {
-      const minPrices = dataHomeStays.map((location) => {
-        const offers = location.room_type.flatMap((roomType) => roomType.offer);
-        const minPrice = Math.min(
-          ...offers.map((offer) => offer.price_homeStay)
-        );
-        
-        return offers.find((offer) => offer.price_homeStay === minPrice);
-      });
-
-      
-      const filteredDataHomestays = minPrices.filter((offer) => {
-        if (offer === undefined || offer.price_homeStay === undefined) {
-          return false;
-        }
-
-        const startPrice = drawerData?.drawerPrice?.startPrice ?? 0;
-        const endPrice = drawerData?.drawerPrice?.endPrice ?? Number.MAX_VALUE;
-
-        return (
-          offer.price_homeStay > startPrice && offer.price_homeStay <= endPrice
-        );
-      });
 
       const filteredDataPackage = dataPackage.filter((offer) => {
         if (offer === undefined || offer.price_package === undefined) {
@@ -187,14 +165,12 @@ const SearchResult: React.FC = () => {
         );
       });
 
-      const validDataHomestays = filteredDataHomestays.filter(
-        (item) => item !== undefined
-      );
 
       const validDataPackage = filteredDataPackage.filter(
         (item) => item !== undefined
       );
 
+<<<<<<< HEAD
       const sortedDataHomestays = validDataHomestays.sort((a, b) => {
         const priceA = a?.price_homeStay ?? Infinity;
         const priceB = b?.price_homeStay ?? Infinity;
@@ -202,6 +178,8 @@ const SearchResult: React.FC = () => {
         return priceA - priceB;
       });
 
+=======
+>>>>>>> cb41976e20e6e72b0bc323104baee90275d08c66
       const sortedDataPackage = validDataPackage.sort((a, b) => {
         const priceA = a.price_package ?? Infinity;
         const priceB = b.price_package ?? Infinity;
@@ -503,6 +481,9 @@ const SearchResult: React.FC = () => {
     setShowFilterMenu(false);
   };
 
+  let nonNullCardCount = 0;
+  console.log(nonNullCardCount);
+  
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-10">
       <div id="main-search" className="w-full my-5">
@@ -516,7 +497,11 @@ const SearchResult: React.FC = () => {
             }
             onClick={clickToHome}
           >
-            ที่พัก ({homeStayCount})
+              ที่พัก (
+              {(drawerData?.drawerPrice?.endPrice ?? 0) > 0
+                ? dataHomeStaysForPriceFilter.length
+                : homeStayCount}
+              )
           </button>
           <button
             id="button-homestaySearch-noSelect"
@@ -527,7 +512,11 @@ const SearchResult: React.FC = () => {
             }
             onClick={clickToPackage}
           >
-            แพ็คเกจ ({packageCount})
+              แพ็คเกจ (
+              {(drawerData?.drawerPrice?.endPrice ?? 0) > 0
+                ? dataPackageForPriceFilter.length
+                : packageCount}
+              )
           </button>
         </div>
         <div id="header">
@@ -746,7 +735,7 @@ const SearchResult: React.FC = () => {
                 <>
                   {(drawerData?.drawerPrice?.endPrice ?? 0) > 0 ? (
                     <>
-                      {dataHomeStaysForPriceFilter.map(
+                      {sortData(dataHomeStaysForPriceFilter).map(
                         (item, index) => (
                           <div key={index} className="w-full">
                             <CardHomeStay
