@@ -31,7 +31,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ lat, lng }) => {
     }).addTo(map);
 
     L.marker([lat, lng]).addTo(map)
-      .bindPopup(`ตำแหน่งคุณคือ: [${lat}, ${lng}]`)
+      .bindPopup(`ตำแหน่งสถานที่คือ: [${lat}, ${lng}]`)
       .openPopup();
 
     L.circle([lat, lng], {
