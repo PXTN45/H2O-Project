@@ -112,9 +112,9 @@ const SearchResult: React.FC = () => {
   const { mapData, drawerData, setDrawerData, setMapData } = authContext;
 
   const [isPackage, setIsPackage] = useState<boolean>(
-    dataSearch.searchType === "Homestay"
+    dataSearch?.searchType === "Homestay"
       ? false
-      : dataSearch.searchType === "Package"
+      : dataSearch?.searchType === "Package"
       ? true
       : false
   );
@@ -165,7 +165,6 @@ const SearchResult: React.FC = () => {
         );
       });
 
-
       const validDataPackage = filteredDataPackage.filter(
         (item) => item !== undefined
       );
@@ -179,25 +178,21 @@ const SearchResult: React.FC = () => {
 
       const formattedData = dataHomeStays
       .map((location) => {
-        // รวมทุก offers จาก room_type ของแต่ละ location
         const allOffers = location.room_type.flatMap(
           (roomType) => roomType.offer
         );
     
-        // กรองเฉพาะ offers ที่อยู่ในช่วงราคาที่กำหนด
         const filteredOffers = allOffers.filter((offer) => {
           if (!offer || offer.price_homeStay === undefined) return false;
     
           const startPrice = drawerData?.drawerPrice?.startPrice ?? 0;
           const endPrice = drawerData?.drawerPrice?.endPrice ?? Number.MAX_VALUE;
     
-          // เงื่อนไขการกรองราคาของ offer ให้อยู่ในช่วง startPrice และ endPrice
           return (
             offer.price_homeStay >= startPrice && offer.price_homeStay <= endPrice
           );
         });
     
-        // ถ้ามี offers ที่ตรงตามเงื่อนไข ให้สร้างข้อมูลใหม่
         if (filteredOffers.length > 0) {
           return {
             ...location,
@@ -210,12 +205,19 @@ const SearchResult: React.FC = () => {
           };
         }
     
-        // ถ้าไม่มี offers ที่ตรงตามเงื่อนไข ให้ส่งกลับเป็น null
         return null;
       })
-      .filter((location) => location !== null); // กรองออกเฉพาะ location ที่ไม่ใช่ null
+      .filter((location) => location !== null);
 
-      setDataHomeStaysdataHomeStaysForPriceFilter(formattedData);
+    const nonNullFormattedData = formattedData.filter(
+      (item): item is Item => item !== null
+    );
+
+    if (Array.isArray(nonNullFormattedData)) {
+      setDataHomeStaysdataHomeStaysForPriceFilter(nonNullFormattedData);
+    } else {
+      console.error('Formatted data contains null values or is not an array');
+    }
       setDataPackagedataHomeStaysForPriceFilter(sortedDataPackage);
     } else {
       setDataHomeStaysdataHomeStaysForPriceFilter([]);
@@ -470,9 +472,6 @@ const SearchResult: React.FC = () => {
     setSortText(filter)
     setShowFilterMenu(false);
   };
-
-  let nonNullCardCount = 0;
-  console.log(nonNullCardCount);
   
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-10">
