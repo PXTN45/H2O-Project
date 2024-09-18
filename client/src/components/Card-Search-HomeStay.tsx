@@ -196,9 +196,9 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren , dateRange })
 
   const lowestPrice = findLowestPrice(allOffers);
 
-  let fullRoom:string = ""
+  let fullRoom: string = "" 
   if (remainingAdults > 0 || remainingChildren > 0) {
-    fullRoom = "ไม่พอ"
+    fullRoom = "SoldOut"
   }
 
   return (
@@ -322,7 +322,7 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren , dateRange })
         <div className="flex flex-col ">
           <div className="card-semiBox w-[75%] rounded-br-[10px]">
             <span className="mx-1">
-              <div className="w-full mx-5">ใช้ห้องทั้งหมด: {fullRoom === "" ? totalRooms : fullRoom}</div>
+              <div className="w-full mx-5">{fullRoom === "" ? `ใช้บ้านทั้งหมด: ${totalRooms} หลัง` : "ไม่มีบ้านว่างให้จอง"}</div>
             </span>
           </div>
           <div id="Price-Homestay" className="mt-16 px-6 py-4">
