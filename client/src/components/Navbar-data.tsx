@@ -22,9 +22,11 @@ const Navbar = () => {
     sendSearchToDetail?.numChildren ?? 0
   );
   const [numRoom, setNumRoom] = useState<number>(
-    sendSearchToDetail?.numRoom ?? 1
+    sendSearchToDetail?.resultRoom ?? 1
   );
 
+  console.log(sendSearchToDetail);
+  
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 

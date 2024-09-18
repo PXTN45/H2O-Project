@@ -222,6 +222,11 @@ const Drawer: React.FC = () => {
                             value={minValue}
                             onChange={handleMinChange}
                             onBlur={handleMinBlur}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleSearch(); // Call your submit function here
+                              }
+                            }}
                             className="w-full h-8 px-3 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-400 text-gray-700 text-sm transition-colors peer no-arrows"
                           />
                           <label
@@ -243,6 +248,11 @@ const Drawer: React.FC = () => {
                             value={rangeValue}
                             onChange={handleRangeChange}
                             onBlur={handleRangeBlur}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleSearch(); // Call your submit function here
+                              }
+                            }}
                             className="w-full h-8 px-3 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-400 text-gray-700 text-sm transition-colors peer no-arrows"
                           />
                           <label

@@ -181,7 +181,8 @@ const Card: React.FC<CardProps> = ({
     !isWithinDateRange ||
     (!item.isChildren && numChildren > 0)
   ) {
-    return null;
+    console.log("a");
+    
   }
 
   return (

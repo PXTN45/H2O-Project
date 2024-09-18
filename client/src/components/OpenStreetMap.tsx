@@ -83,18 +83,50 @@ const OpenStreetMap: React.FC = () => {
 
       setTimeout(() => {
         if (mapRef.current && !map) {
-          const initMap = L.map(mapRef.current, {
-            center: [13.7563, 100.5018],
-            zoom: 15,
-          });
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
 
-          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "© OpenStreetMap contributors",
-          }).addTo(initMap);
+              if (mapRef.current) {
+                // Type guard to ensure mapRef.current is not null
+                const initMap = L.map(mapRef.current, {
+                  center: [latitude, longitude],
+                  zoom: 15,
+                });
 
-          setMap(initMap);
+                L.tileLayer(
+                  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  {
+                    attribution: "© OpenStreetMap contributors",
+                  }
+                ).addTo(initMap);
+
+                setMap(initMap);
+              }
+            },
+            (error) => {
+              console.error("Error fetching location", error);
+
+              if (mapRef.current) {
+                // Type guard to ensure mapRef.current is not null
+                const initMap = L.map(mapRef.current, {
+                  center: [13.7563, 100.5018], // Default to Bangkok
+                  zoom: 15,
+                });
+
+                L.tileLayer(
+                  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  {
+                    attribution: "© OpenStreetMap contributors",
+                  }
+                ).addTo(initMap);
+
+                setMap(initMap);
+              }
+            }
+          );
         }
-      }, 100); // 100ms delay for modal to render completely
+      }, 100);
     } else {
       // Clean up map when modal is closed
       if (map) {

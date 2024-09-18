@@ -109,23 +109,6 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren , dateRange })
   };
   
   const navigate = useNavigate();
-  const handleCardClick = () => {
-    const startDate = dateRange[0] ? formatDate(dateRange[0]) : "Not selected";
-    const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
-    const startDate_Time = dateRange[0];
-    const endDate_Time = dateRange[1];
-    const sendSearchToDetail = {
-      numPeople,
-      numChildren,
-      dateRange: {
-        startDate,
-        endDate,
-        startDate_Time,
-        endDate_Time,
-      },
-    };
-    navigate(`/homeStayDetail/${item._id}`, { state: { sendSearchToDetail } });
-  };
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
@@ -197,6 +180,34 @@ const Card: React.FC<CardProps> = ({ item, numPeople, numChildren , dateRange })
   const lowestPrice = findLowestPrice(allOffers);
 
   let fullRoom: string = "" 
+
+  const handleCardClick = () => {
+    const startDate = dateRange[0] ? formatDate(dateRange[0]) : "Not selected";
+    const endDate = dateRange[1] ? formatDate(dateRange[1]) : "Not selected";
+    const startDate_Time = dateRange[0];
+    const endDate_Time = dateRange[1];
+    let resultRoom:number
+
+    if(fullRoom === ""){
+      resultRoom = totalRooms
+    }else{
+      resultRoom = 1
+    }
+
+    const sendSearchToDetail = {
+      numPeople,
+      numChildren,
+      dateRange: {
+        startDate,
+        endDate,
+        startDate_Time,
+        endDate_Time,
+      },
+      resultRoom
+    };
+    navigate(`/homeStayDetail/${item._id}`, { state: { sendSearchToDetail } });
+  };
+
   if (remainingAdults > 0 || remainingChildren > 0) {
     fullRoom = "SoldOut"
   }
