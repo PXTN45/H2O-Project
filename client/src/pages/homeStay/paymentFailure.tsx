@@ -1,4 +1,4 @@
-import React from "react";
+
 
 const paymentFailure = () => {
     const errorMessage = 'ไม่สามารถดำเนินการชำระเงินได้ในขณะนี้ กรุณาลองใหม่อีกครั้งภายหลัง';

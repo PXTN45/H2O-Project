@@ -29,6 +29,7 @@ export interface Facilities_Room {
 }
 
 export interface Offer {
+  _id: string;
   price_homeStay: number;
   max_people: {
     adult: number;
@@ -38,7 +39,6 @@ export interface Offer {
   facilitiesRoom: Facilities_Room[];
   roomCount: number;
   quantityRoom: number;
-  _id: string;
 }
 export interface RoomType {
   name_type_room: string;

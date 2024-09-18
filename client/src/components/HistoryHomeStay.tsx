@@ -20,6 +20,7 @@ export interface DetailOffer {
   name_type_room: string;
   adult: number;
   child: number;
+  room: number;
   discount: number;
   totalPrice: number;
   image_room: {
@@ -77,6 +78,9 @@ interface Location {
   radius_location: number;
 }
 
+export interface ActivityDays {
+  activity_name: string;
+}
 export interface ActivityPackage {
   activity_days: ActivityDays[];
 }
@@ -303,7 +307,7 @@ const HistoryHomeStay = () => {
   };
   const submitReview = async (reviewData: reviewData) => {
     try {
-      const revirew = await axiosPrivateUser.post(
+      await axiosPrivateUser.post(
         "/review/createReview",
         reviewData
       );
@@ -585,7 +589,7 @@ const HistoryHomeStay = () => {
                   <div className="text-md">
                     <span className="flex items-center gap-2">
                       <div className="flex items-center">
-                        <IoPeopleSharp /> {myBooking[0]?.detail_offer[0].adult}
+                        <IoPeopleSharp /> {myBooking[index]?.detail_offer[0].adult}
                       </div>
                       <div className="flex items-center">
                         <LiaChildSolid />

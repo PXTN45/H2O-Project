@@ -1,6 +1,5 @@
 // DetailPayment.tsx
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import axiosPublic from "../../hook/axiosPublic";
 import DetailBooking from "../../components/detailBooking";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
@@ -36,36 +35,9 @@ export interface RoomType {
   image_room: Image_room[];
 }
 
-interface User {
-  _id?: string;
-  name?: string;
-  lastName?: string;
-  businessName?: string;
-  email: string;
-  password: string;
-  phone: string | undefined;
-  image: string;
-  address: string;
-  birthday: Date;
-  role: string;
-}
-
-interface PaymentData {
-  homeStayId: string;
-  homeStayName: string;
-  totalPrice: number;
-  roomType: RoomType;
-  offer: Offer;
-  bookingUser: User;
-  rating: number;
-}
-
 const DetailPayment: React.FC = () => {
-  const location = useLocation();
-  // const { amount } = location.state || { amount: 0 };
   const [isLoading, setLoadPage] = useState<boolean>(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | undefined>(undefined);
-  const [totalPrice, setTotalPrice] = useState<number>(0);
   const { paymentData } = usePaymentContext();
 
   if (!paymentData) {

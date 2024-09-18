@@ -248,7 +248,7 @@ const myAccount = () => {
 
   const handleSave = async () => {
     try {
-      const response = await axiosPrivateUser.put(
+      await axiosPrivateUser.put(
         `/user/updateUser/${userInfo?._id}`,
         updatedUserInfo
       );

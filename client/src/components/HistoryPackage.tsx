@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
 import { useContext } from "react";
-import Swal from "sweetalert2";
 import { AuthContext } from "../AuthContext/auth.provider";
 import OpenStreetMapShowData from "../components/OpenStreetMapShowData";
 import { FaMapLocationDot } from "react-icons/fa6";
@@ -275,7 +274,7 @@ const HistoryPackage = () => {
   };
   const submitReview = async (reviewData: reviewData) => {
     try {
-      const revirew = await axiosPrivateUser.post(
+     await axiosPrivateUser.post(
         "/review/createReview",
         reviewData
       );

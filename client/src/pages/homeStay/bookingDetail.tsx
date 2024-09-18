@@ -44,7 +44,6 @@ const BookingDetail: React.FC = () => {
   const { paymentData, dataNav } = usePaymentContext();
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [feeAndTax, setFeeAndTax] = useState<number>(0);
-  const [checkBooking, setCheckBooking] = useState<boolean>(false);
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
@@ -151,8 +150,6 @@ const BookingDetail: React.FC = () => {
       console.error("Error checking booking:", error);
     }
   };
-
-  console.log(checkBooking);
 
   const makePayment = async () => {
     try {

@@ -1,7 +1,6 @@
 import React from "react";
 import { useState, useEffect, useContext, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import OpenStreetMap from "../../components/OpenStreetMap";
+import { useNavigate } from "react-router-dom";
 import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar-data";
@@ -27,6 +26,7 @@ export interface Facilities_Room {
 }
 
 export interface Offer {
+  _id: string;
   price_homeStay: number;
   max_people: {
     adult: number;
@@ -50,7 +50,16 @@ export interface Facility {
   _id: string;
   facilities_name: string;
 }
-
+interface Address {
+  houseNumber: string;
+  street: string;
+  village: string;
+  subdistrict: string;
+  district: string;
+  city: string;
+  country: string;
+  postalCode: string;
+}
 interface User {
   _id?: string;
   name?: string;
@@ -60,7 +69,7 @@ interface User {
   password: string;
   phone: string | undefined;
   image: string;
-  address: string;
+  address: Address[];
   birthday: Date;
   role: string;
 }
@@ -95,7 +104,7 @@ interface PaymentData {
 }
 export interface Image {
   _id: string;
-  image: string;
+  image_upload: string;
 }
 
 export interface HomeStay {
@@ -108,7 +117,7 @@ export interface HomeStay {
   policy_cancel_homeStay: string;
   location: Location[];
   image: Image[];
-  business_user: string[]; // Assuming you use ObjectId as string
+  business_user: string[];
   review_rating_homeStay: number;
   facilities: Facility[];
   status_sell_homeStay: boolean;
@@ -134,13 +143,12 @@ interface Review {
 const homeStayDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [item, setItem] = useState<HomeStay | undefined>();
+  const [item, setItem] = useState<HomeStay>();
   const [review, setReview] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [isLoading, setLoadPage] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState(false);
-  const alertRef = useRef(null);
+  const alertRef = useRef<HTMLDivElement | null>(null);
   const { setPaymentData, dataNav } = usePaymentContext();
   const authContext = useContext(AuthContext);
 
@@ -150,7 +158,6 @@ const homeStayDetail = () => {
   const { userInfo } = authContext;
   useEffect(() => {
     const fetchData = async () => {
-      setLoadPage(true);
       try {
         const res = await axiosPrivateUser.get(`/homestay/${id}`);
         if (res.data) {
@@ -158,8 +165,6 @@ const homeStayDetail = () => {
         }
       } catch (error) {
         console.error("เกิดข้อผิดพลาดในการดึงรายละเอียด homestay:", error);
-      } finally {
-        setLoadPage(false);
       }
     };
 
@@ -168,7 +173,6 @@ const homeStayDetail = () => {
 
   useEffect(() => {
     const fetchReview = async () => {
-      setLoadPage(true);
       try {
         const reviewsResponse = await axios.get<Review[]>("/review.json");
         if (reviewsResponse.data) {
@@ -309,7 +313,7 @@ const homeStayDetail = () => {
   const calculatePercentages = (review: Review[]) => {
     console.log(review);
     console.log(review.length);
-    
+
     const totalReviews = review.length;
     const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
 
@@ -423,9 +427,9 @@ const homeStayDetail = () => {
                 time_checkOut_homeStay: item.time_checkOut_homeStay,
                 policy_cancel_homeStay: item.policy_cancel_homeStay,
               };
-
+      
               localStorage.setItem("paymentData", JSON.stringify(paymentData));
-
+      
               setPaymentData(paymentData);
               navigate("/bookingDetail");
             }
@@ -653,7 +657,7 @@ const homeStayDetail = () => {
               <div>
                 <img
                   className="w-[400px] md:w-[600px] h-[220px] md:h-[300px]  object-cover rounded-lg"
-                  src={item.image[0].image_upload}
+                  src={item?.image[0].image_upload}
                   alt=""
                 />
               </div>
@@ -802,12 +806,14 @@ const homeStayDetail = () => {
                 <div>
                   <div className="flex  flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap gap-10 justify-around items-center p-10">
                     <div
-                      className="radial-progress  text-primaryUser text-5xl font-bold "
-                      style={{
-                        "--value": `${progress}`,
-                        "--size": "12rem",
-                        "--thickness": "2rem",
-                      }}
+                      className="radial-progress text-primaryUser text-5xl font-bold"
+                      style={
+                        {
+                          "--value": `${progress}`,
+                          "--size": "12rem",
+                          "--thickness": "2rem",
+                        } as React.CSSProperties
+                      }
                       role="progressbar"
                     >
                       {averageRating}

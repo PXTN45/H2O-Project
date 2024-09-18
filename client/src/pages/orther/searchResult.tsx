@@ -194,8 +194,8 @@ const SearchResult: React.FC = () => {
       );
 
       const sortedDataHomestays = validDataHomestays.sort((a, b) => {
-        const priceA = a.price_homeStay ?? Infinity;
-        const priceB = b.price_homeStay ?? Infinity;
+        const priceA = a?.price_homeStay ?? Infinity;
+        const priceB = b?.price_homeStay ?? Infinity;
 
         return priceA - priceB;
       });

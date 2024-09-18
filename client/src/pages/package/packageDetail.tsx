@@ -49,20 +49,6 @@ export interface Facility {
   _id: string;
   facilities_name: string;
 }
-
-interface User {
-  _id?: string;
-  name?: string;
-  lastName?: string;
-  businessName?: string;
-  email: string;
-  password: string;
-  phone: string | undefined;
-  image: string;
-  address: string;
-  birthday: Date;
-  role: string;
-}
 export interface Image {
   _id: string;
   image: string;
@@ -121,7 +107,6 @@ const PackageDetail = () => {
   const [review, setReview] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [isLoading, setLoadPage] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const roomTypes = item?.homestay.room_type || [];
   const [currentIndices, setCurrentIndices] = useState<number[]>(
@@ -153,7 +138,6 @@ const PackageDetail = () => {
 
   useEffect(() => {
     const fetchReview = async () => {
-      setLoadPage(true);
       try {
         const reviewsResponse = await axios.get<Review[]>(
           "/reviewPackage.json"
@@ -296,9 +280,10 @@ const PackageDetail = () => {
   const activities = item?.activity_package.map(
     (activity: any, index: number) => {
       const activityDay = item?.activity_package[index].activity_days.map(
-        (day, i: number) => {
+        (day: any, i: number) => {
           console.log(day);
-          
+          console.log(activity);
+
           return (
             <div key={i}>
               <li>
