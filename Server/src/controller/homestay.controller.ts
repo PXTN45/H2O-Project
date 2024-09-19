@@ -64,19 +64,7 @@ const getByPriceHomeStay = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ message: error.message });
   }
 };
-// const getByRoomTypeHomeStay = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const room_type = req.params.room_type;
-//     const homeStayPrice = await HomeStayModel.findOne({ _id : room_type });
-//     if (!homeStayPrice) {
-//       res.status(404).json({ message: "Not found homeStay price" });
-//     } else {
-//       res.json(homeStayPrice);
-//     }
-//   } catch (error: any) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+
 
 const updateHomeStay = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;

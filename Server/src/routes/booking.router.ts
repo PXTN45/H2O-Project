@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import {
-  bookHomeStay,
-  bookPackage,
+  createBook,
   confirmBooking,
   getAllBooking,
   editPackageBooking,
@@ -11,7 +10,7 @@ import {
   getBookingHomeStayByUser,
   getBookingPackageByUser,
   getBookingByConfirm,
-  getBookingByPending,
+  getBookingByCheckIn,
   sendMoneyToBusiness
 } from "../controller/booking.controller";
 import { verifyToken } from "../middlewares/verifyToken";
@@ -20,7 +19,7 @@ import verifyBusiness from "../middlewares/verifyBusiness";
 import verifyAdmin from "../middlewares/verifyAdmin";
 const router = express.Router();
 router.get("/booking", getAllBooking, verifyAdmin, verifyToken);
-router.get("/booking-pending/:id", getBookingByPending);
+router.get("/booking-check-in/:id", getBookingByCheckIn);
 router.get("/booking-confirm/:id", getBookingByConfirm);
 router.get(
   "/homestay-booking/:userId",
@@ -34,8 +33,7 @@ router.get(
   verifyUser,
   verifyToken
 );
-router.post("/bookingHomeStay/:userId", bookHomeStay, verifyUser, verifyToken);
-router.post("/bookingPackage", bookPackage, verifyUser, verifyToken);
+router.post("/bookingPackage", createBook, verifyUser, verifyToken);
 router.put(
   "/editPackageBooking/:userId",
   editPackageBooking,

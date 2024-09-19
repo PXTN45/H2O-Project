@@ -19,7 +19,7 @@ const getAllBooking = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const getBookingByPending = async (
+const getBookingByCheckIn = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -27,7 +27,7 @@ const getBookingByPending = async (
   try {
     const bookingData = await Booking.find({
       booker: userId,
-      bookingStatus: "Pending",
+      bookingStatus: "Check-in",
     }).populate([
       { path: "booker", select: "email name lastName" },
       { path: "homestay" },
@@ -105,55 +105,7 @@ const getBookingPackageByUser = async (
   } catch (error) {}
 };
 
-const bookHomeStay = async (req: Request, res: Response): Promise<void> => {
-  const { homestay, bookingStart, bookingEnd, paymentDetail } = req.body;
-  const userId = req.params.userId;
-  // console.log(userId);
-
-  try {
-    // Validate dates
-    if (!isDateValid(bookingStart, bookingEnd)) {
-      throw new BadRequestError(
-        "Please provide valid dates starting from today!"
-      );
-    }
-
-    // Calculate the number of nights
-    const differenceInDays = getBookingNights(bookingStart, bookingEnd);
-    if (differenceInDays < 1) {
-      throw new BadRequestError("Return date must be after the start date!");
-    }
-
-    // Check if the homestay is available (assuming you have an isBookingAvailable function)
-    const isAvailable = await isBookingAvailable(
-      homestay,
-      bookingStart,
-      bookingEnd
-    );
-    if (!isAvailable) {
-      throw new BadRequestError("The homestay is already booked!");
-    }
-
-    // Create the booking
-    const booking = await Booking.create({
-      booker: userId, // userId is directly assigned since booker is a single ObjectId
-      homestay,
-      bookingStart,
-      bookingEnd,
-      night: differenceInDays,
-      bookingStatus: "Pending", // This will use the default, but explicitly setting it
-      paymentDetail,
-    });
-
-    // Respond with the created booking
-    res.status(201).json({ booking });
-  } catch (error) {
-    console.error("Error while booking homestay:", error);
-    res.status(500).json({ message: "Server Error", error });
-  }
-};
-
-const bookPackage = async (req: Request, res: Response) => {
+const createBook = async (req: Request, res: Response) => {
   // เข้าถึง bookingData จาก req.body
   const { bookingData } = req.body;
 
@@ -181,7 +133,6 @@ const bookPackage = async (req: Request, res: Response) => {
       bookingStart,
       bookingEnd,
       night,
-      bookingStatus: "Pending",
     });
 
     await newBookingPackage.save();
@@ -322,9 +273,8 @@ const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> =
 };
 
 export {
-  bookHomeStay,
   confirmBooking,
-  bookPackage,
+  createBook,
   getAllBooking,
   editPackageBooking,
   editHomeStayBooking,
@@ -332,7 +282,7 @@ export {
   deleteBooking,
   getBookingHomeStayByUser,
   getBookingPackageByUser,
-  getBookingByPending,
+  getBookingByCheckIn,
   getBookingByConfirm,
   sendMoneyToBusiness
 };
