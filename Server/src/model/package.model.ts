@@ -91,6 +91,8 @@ const PackageSchema: Schema = new Schema({
     required: true,
   },
   review_rating_package: { type: Number, required: true },
+  isChildren: { type: Boolean, required: true },
+  isFood: { type: Boolean, required: true },
 });
 
 // สร้างโมเดลจาก Schema
