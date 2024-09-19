@@ -116,7 +116,7 @@ const Booking = () => {
     const fetchData = async () => {
       try {
         const response = await axiosPrivateUser(
-          `/booking-pending/${userInfo?._id}`
+          `/booking-confirm/${userInfo?._id}`
         );
         setMyBooking(response.data);
       } catch (error) {
