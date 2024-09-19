@@ -2,18 +2,14 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import axios from "axios";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
-import { FaRegCalendarCheck, FaPeopleGroup } from "react-icons/fa6";
-import { IoPricetagsOutline } from "react-icons/io5";
-import { BiSolidDiscount } from "react-icons/bi";
 import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { AuthContext } from "../../AuthContext/auth.provider";
+import { FaRegCalendarCheck, FaPeopleGroup } from "react-icons/fa6";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { IoPricetagsOutline } from "react-icons/io5";
+import { BiSolidDiscount } from "react-icons/bi";
 import { GrSync } from "react-icons/gr";
-import { FaChildReaching } from "react-icons/fa6";
-import { MdOutlineBathroom } from "react-icons/md";
-import { FaMale } from "react-icons/fa";
-import { TbRuler3 } from "react-icons/tb";
-import { LuBedSingle, LuBedDouble } from "react-icons/lu";
+import PackageHomeStay from "../../components/PackageHomeStay";
 export interface Image {
   image_upload: string;
 }
@@ -106,34 +102,36 @@ const PackageDetail = () => {
   const { id } = useParams(); // Destructure id from useParams
   const [review, setReview] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState(0);
+  const [totalPricePackage, setTotalPricePackage] = useState<number>(0);
   const [progress, setProgress] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const roomTypes = item?.homestay.room_type || [];
-  const [currentIndices, setCurrentIndices] = useState<number[]>(
-    roomTypes.map(() => 0)
-  );
-  // console.log(currentIndices);
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { userInfo } = authContext;
-  // console.log(id);
 
   useEffect(() => {
+    if (!id) {
+      console.error("ID is undefined or null");
+      return; // หยุดการทำงานหาก id เป็น undefined หรือ null
+    }
+
     const fetchData = async () => {
       try {
         const res = await axiosPrivateUser.get(`/package/${id}`);
-        setItem(res.data);
+        if (res.data) {
+          setItem(res.data);
+        } else {
+          console.error("No data found for the package");
+        }
       } catch (error) {
         console.error("Error fetching package detail:", error);
       }
     };
 
-    if (id) {
-      fetchData();
-    }
+    fetchData();
   }, [id]); // Add id to dependency array
 
   useEffect(() => {
@@ -156,10 +154,19 @@ const PackageDetail = () => {
 
     fetchReview();
   }, [id]);
-  // ใช้ useEffect เพื่อตั้งค่า currentIndices เมื่อ roomTypes เปลี่ยนแปลง
+
   useEffect(() => {
-    setCurrentIndices(roomTypes.map(() => 0));
-  }, [roomTypes]);
+    const priceDiscount = () => {
+      if (item) { // ตรวจสอบว่ามี `item` ก่อน
+        const price = item.price_package;
+        const discount = item.discount;
+        const totalPrice = discount > 0 ? price * ((100 - discount) / 100) : price;
+        setTotalPricePackage(totalPrice);
+      }
+    };
+    
+    priceDiscount();
+  }, [item]);
 
   // ฟังก์ชันคำนวณค่าเฉลี่ยของ rating
   const calculateAverageRating = (reviews: Review[]): number => {
@@ -185,6 +192,8 @@ const PackageDetail = () => {
       setProgress(progress);
     }
   }, [review]);
+
+
 
   const reviews = review?.map((reviewHomeStay: Review, reviewIndex: number) => {
     // console.log(reviewHomeStay);
@@ -245,7 +254,7 @@ const PackageDetail = () => {
 
     return percentages;
   };
-  // console.log(numRoom);
+
   const percentages = calculatePercentages(review);
   if (!item) {
     return <p>No item data available</p>;
@@ -279,20 +288,13 @@ const PackageDetail = () => {
 
   const activities = item?.activity_package.map(
     (activity: any, index: number) => {
-      const activityDay = item?.activity_package[index].activity_days.map(
-        (day: any, i: number) => {
-          console.log(day);
-          console.log(activity);
-
-          return (
-            <div key={i}>
-              <li>
-                {item?.activity_package[index].activity_days[i].activity_name}
-              </li>
-            </div>
-          );
-        }
-      );
+      const activityDay = activity.activity_days.map((day: any, i: number) => {
+        return (
+          <div key={i}>
+            <li>{day.activity_name}</li>
+          </div>
+        );
+      });
 
       return (
         <div key={index} className="flex flex-col">
@@ -318,226 +320,6 @@ const PackageDetail = () => {
       );
     }
   );
-
-  const handlePrev = (index: number) => {
-    setCurrentIndices((prevIndices) =>
-      prevIndices.map((currentIndex, i) => {
-        const imageRoomLength = roomTypes[i]?.image_room.length ?? 0;
-
-        return i === index
-          ? currentIndex === 0
-            ? imageRoomLength - 1
-            : currentIndex - 1
-          : currentIndex;
-      })
-    );
-  };
-
-  const handleNext = (index: number) => {
-    setCurrentIndices((prevIndices) =>
-      prevIndices.map((currentIndex, i) => {
-        const imageRoomLength = roomTypes[i]?.image_room.length ?? 0;
-
-        return i === index
-          ? currentIndex === imageRoomLength - 1
-            ? 0
-            : currentIndex + 1
-          : currentIndex;
-      })
-    );
-  };
-
-  const carousel = roomTypes.map((roomType: any, index: number) => {
-    const offer = roomType.offer.map((offer: Offer, i: number) => {
-      const price = offer.price_homeStay;
-      const discount = offer.discount;
-      const totalPrice =
-        discount > 0 ? price * ((100 - discount) / 100) : price;
-      const facilitiesRoom = offer?.facilitiesRoom.map(
-        (facility: Facilities_Room, index: number) => {
-          return (
-            <div key={index} className="flex items-center gap-4">
-              <div>✓</div>
-              {facility.facilitiesName}
-            </div>
-          );
-        }
-      );
-
-      return (
-        <div key={i}>
-          <div className="shadow-boxShadow flex rounded-lg px-5 py-10">
-            <div className="w-2/6 border-r text-sm">{facilitiesRoom}</div>
-            {roomType.offer[i].max_people.child > 0 &&
-            roomType.offer[i].max_people.adult > 0 &&
-            roomType.offer[i].max_people.adult < 2 ? (
-              <div className="w-1/6 border-r">
-                <div className="flex justify-center items-end">
-                  <FaMale className="text-xl" />
-                  <FaChildReaching className="text-md" />
-                </div>
-              </div>
-            ) : roomType.offer[i].max_people.child > 0 &&
-              roomType.offer[i].max_people.adult > 1 ? (
-              <div className="w-1/6 border-r">
-                <div className="flex justify-center items-end">
-                  <FaMale className="text-xl" /> <FaMale className="text-xl" />{" "}
-                  <FaChildReaching className="text-md" />
-                </div>
-              </div>
-            ) : roomType.offer[i].max_people.child <= 0 &&
-              roomType.offer[i].max_people.adult > 1 ? (
-              <div className="w-1/6 border-r">
-                <div className="flex justify-center items-end">
-                  <FaMale className="text-xl" /> <FaMale className="text-xl" />
-                </div>
-              </div>
-            ) : (
-              <div className="w-1/6 flex justify-center border-r">
-                <FaMale className="text-xl" />
-              </div>
-            )}
-
-            <div className="w-2/6 flex flex-col justify-end p-2">
-              {offer.discount <= 0 ? (
-                <p className="flex justify-end font-bold text-alert text-3xl">
-                  {totalPrice} บาท
-                </p>
-              ) : (
-                <div>
-                  <div className=" text-white w-full md:w-[100px] rounded-xl flex justify-center item-center bg-alert text-sm">
-                    SALE! ลด {offer.discount} %
-                  </div>
-                  <p className="flex justify-end text-sm ">
-                    <del>{offer.price_homeStay}</del> บาท
-                  </p>
-                  <p className="flex justify-end font-bold text-alert text-3xl">
-                    {totalPrice} บาท
-                  </p>
-                </div>
-              )}
-
-              <p className="flex justify-end text-xs">ราคาต่อคืน</p>
-              <p className="flex justify-end text-xs">
-                (ก่อนรวมภาษีและค่าธรรมเนียม)
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    });
-
-    return (
-      <div
-        key={index}
-        className="my-5 relative  shadow-boxShadow p-5 rounded-lg"
-      >
-        <h2 className="text-xl font-bold mb-4">{roomType.name_type_room}</h2>
-        <div className="flex flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap gap-2 ">
-          <div className="w-full md:full lg:w-1/3">
-            <div
-              id={`carousel-${index}`}
-              className="relative w-full shadow-boxShadow rounded-xl"
-              data-carousel="slide"
-            >
-              <div className="relative h-60 rounded-lg">
-                {roomType.image_room.map(
-                  (image: Image_room, imageIndex: number) => (
-                    <div
-                      key={imageIndex}
-                      className={`duration-700 ease-in-out ${
-                        currentIndices[index] === imageIndex
-                          ? "block"
-                          : "hidden"
-                      }`}
-                      data-carousel-item
-                    >
-                      <img
-                        src={image.image}
-                        className="absolute block w-full h-full object-cover rounded-xl"
-                        alt={`Slide ${imageIndex + 1}`}
-                      />
-                    </div>
-                  )
-                )}
-                <button
-                  type="button"
-                  className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-                  onClick={() => handlePrev(index)}
-                  data-carousel-prev
-                >
-                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                    <svg
-                      className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 6 10"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 1 1 5l4 4"
-                      />
-                    </svg>
-                    <span className="sr-only">Previous</span>
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-                  onClick={() => handleNext(index)}
-                  data-carousel-next
-                >
-                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                    <svg
-                      className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 6 10"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="m1 9 4-4-4-4"
-                      />
-                    </svg>
-                    <span className="sr-only">Next</span>
-                  </span>
-                </button>
-              </div>
-            </div>
-            <div className="my-5">
-              <div className="flex items-center gap-2">
-                <MdOutlineBathroom className="text-xl" />
-                {roomTypes[index].bathroom_homeStay} ห้อง
-              </div>
-              <div className="flex items-center gap-2">
-                {roomTypes[index].bedroom_homeStay < 2 ? (
-                  <LuBedSingle className="text-xl" />
-                ) : (
-                  <LuBedDouble className="text-xl" />
-                )}
-                {roomTypes[index].bedroom_homeStay} เตียง
-              </div>
-              <div className="flex items-center gap-2">
-                <TbRuler3 className="text-xl" />
-                {roomTypes[index].sizeBedroom_homeStay}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2 w-full md:full lg:w-2/3">
-            {offer}
-          </div>
-        </div>
-      </div>
-    );
-  });
 
   const handleScrollToElement =
     (id: string) =>
@@ -587,9 +369,7 @@ const PackageDetail = () => {
     console.log("Start date is not defined");
     bookingStart = "default-start-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
-  // console.log(bookingStart);
 
-  // การจัดการวันที่สิ้นสุด (end date)
   const endStr = endDate;
   let bookingEnd: string;
 
@@ -601,15 +381,13 @@ const PackageDetail = () => {
     bookingEnd = "default-end-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
 
-  // console.log(bookingEnd);
-
   const packageName = item?.name_package;
   const booker = userInfo?._id;
   const email = userInfo?.email;
   const packageId = id;
   const homestayId = " ";
   const offer: Offer[] = [];
-  const totalPrice = item.price_package;
+  const totalPrice = totalPricePackage;
 
   const makePayment = async () => {
     try {
@@ -643,13 +421,13 @@ const PackageDetail = () => {
     }
   };
 
-  // if (!item) {
-  //   return <p>No item data available</p>;
-  // }
-  const discount: number = 20;
+  
+  console.log(totalPricePackage);
+
+  const discount = item.discount;
   return (
     <div>
-      {item ? (
+      {item && id ? (
         <div>
           <div className="my-10 container-xl mx-6 md:mx-8 lg:mx-24 xl:mx-40">
             <div className="flex gap-4 justify-center items-center">
@@ -660,7 +438,7 @@ const PackageDetail = () => {
                   alt=""
                 />
               </div>
-              <div className="">
+              <div>
                 <div className="grid grid-cols-3 gap-4">{image}</div>
               </div>
             </div>
@@ -698,9 +476,9 @@ const PackageDetail = () => {
             </div>
 
             {/* package Detail */}
-            <div className="flex flex-row flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap mb-10 gap-4">
+            <div className="flex flex-row flex-wrap md:flex-wrap  xl:flex-nowrap mb-10 gap-4">
               {/* Left Column */}
-              <div className="flex flex-col w-full md:w-full lg:w-3/4 xl:w-3/4">
+              <div className="flex flex-col w-full md:w-full lg:w-full xl:w-3/4">
                 <div className="rounded-lg shadow-boxShadow p-10 mb-5">
                   <div className="flex items-center">
                     <div className="flex items-center flex-wrap gap-4">
@@ -730,7 +508,7 @@ const PackageDetail = () => {
                 </div>
               </div>
               {/* Maps */}
-              <div className="flex flex-col w-full md:w-full lg:w-1/4 xl:w-1/4">
+              <div className="flex flex-col w-full md:w-full lg:w-full xl:w-1/4">
                 <div className="shadow-boxShadow rounded-lg">
                   <OpenStreetMapShoData
                     lat={item?.location[0].latitude_location}
@@ -745,8 +523,8 @@ const PackageDetail = () => {
             </h1>
             <div className="shadow-boxShadow rounded-lg p-5">
               <span className="text-2xl font-bold">{item.name_package}</span>
-              <div className=" flex gap-4 p-5">
-                <div className="w-full md:full lg:w-1/2">
+              <div className=" flex flex-wrap xl:flex-nowrap gap-4 p-5">
+                <div className="w-full xl:w-1/2">
                   <div
                     id="controls-carousel"
                     className="relative w-full"
@@ -825,7 +603,7 @@ const PackageDetail = () => {
                     </button>
                   </div>
                 </div>
-                <div className="w-1/2 grid grid-cols-2 p-5">
+                <div className="w-full xl:w-1/2 grid grid-cols-2 p-5">
                   {/* กำหนดการเดินทาง */}
                   <div className="p-5">
                     <div className="flex gap-2">
@@ -838,7 +616,7 @@ const PackageDetail = () => {
                   </div>
                   {/* ขนาดทัวร์ */}
                   <div className="p-5">
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center md:justify-end lg:justify-end gap-2">
                       <FaPeopleGroup className="text-2xl" /> ขนาดทัวร์
                       <div>{item.max_people} คน</div>
                     </span>
@@ -858,7 +636,7 @@ const PackageDetail = () => {
                       <IoPricetagsOutline className="text-2xl" />
                       ราคาเริ่มต้น{" "}
                       {discount > 0 ? (
-                        <span className="flex items-center px-2 border rounded-xl bg-red-600 text-white ml-2">
+                        <span className=" flex items-center px-2 h-8 rounded-xl bg-red-600 text-white ml-2">
                           {" "}
                           <BiSolidDiscount />
                           {discount}%
@@ -870,7 +648,7 @@ const PackageDetail = () => {
                     <div className="flex justify-end">
                       {discount > 0 ? (
                         <span className="text-sm">
-                          <del>6250 </del>บาท
+                          <del>{item?.price_package} </del>บาท
                         </span>
                       ) : (
                         <div></div>
@@ -878,7 +656,7 @@ const PackageDetail = () => {
                     </div>
                     <div className="flex justify-end items-end gap-2">
                       <span className="text-2xl font-bold text-red-500">
-                        {item.price_package}
+                        {totalPricePackage}
                       </span>{" "}
                       บาท/ท่าน
                     </div>
@@ -896,11 +674,17 @@ const PackageDetail = () => {
                 </div>
               </div>
             </div>
-            {/* homeStay */}
-            <h1 className="text-2xl mt-10 font-bold ">
-              ที่พักสำหรับแพ็คเกจ - {item.name_package}
-            </h1>
-            <div>{carousel}</div>
+            {item?.homestay ? (
+              <div>
+                {/* homeStay */}
+                <h1 className="text-2xl mt-10 font-bold ">
+                  ที่พักสำหรับแพ็คเกจ - {item.name_package}
+                </h1>
+                <PackageHomeStay id={packageId || ""} />
+              </div>
+            ) : (
+              <div></div>
+            )}
             {/* review */}
             <div>
               <div id="review" className="text-2xl font-bold mb-5">

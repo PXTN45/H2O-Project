@@ -379,8 +379,7 @@ const homeStayDetail = () => {
     const offer = roomType.offer.map((offer: Offer, i: number) => {
       const price = offer.price_homeStay;
       const discount = offer.discount;
-      const totalPrice =
-        discount > 0 ? price * ((100 - discount) / 100) : price;
+      const totalPrice = discount > 0 ? price * ((100 - discount) / 100) : price;
       const facilitiesRoom = offer?.facilitiesRoom.map(
         (facility: Facilities_Room, index: number) => {
           return (
