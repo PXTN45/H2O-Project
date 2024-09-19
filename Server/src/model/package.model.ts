@@ -26,6 +26,7 @@ export interface IPackage extends Document {
   }[];
   image: { image_upload: string }[];
   price_package: number;
+  discount: number;
   homestay?: mongoose.Types.ObjectId;
   business_user: mongoose.Types.ObjectId;
   review_rating_package: number;
@@ -82,6 +83,7 @@ const PackageSchema: Schema = new Schema({
     required: true,
   },
   price_package: { type: Number, required: true },
+  discount: { type: Number, required: true },
   homestay: { type: Schema.Types.ObjectId, ref: "Homestay" },
   business_user: {
     type: Schema.Types.ObjectId,
