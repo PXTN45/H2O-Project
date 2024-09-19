@@ -116,7 +116,7 @@ const historyBooking = () => {
     const fetchData = async () => {
       try {
         const response = await axiosPrivateUser(
-          `/booking-pending/${userInfo?._id}`
+          `/booking-check-in/${userInfo?._id}`
         );
         setMyBooking(response.data);
       } catch (error) {
