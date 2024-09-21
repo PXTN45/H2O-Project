@@ -14,33 +14,16 @@ export interface Review extends Document {
 
 // Interface สำหรับ Response
 export interface Response {
-  responder: Schema.Types.ObjectId; // ผู้ตอบกลับ (admin)
+  responder: Schema.Types.ObjectId; // ผู้ตอบกลับ (เจ้าของธุรกิจ)
   content: string; // เนื้อหาของการตอบกลับ
   createdAt: Date; // วันที่ตอบกลับ
 }
 
-// สร้าง schema สำหรับ response (การตอบกลับ)
-const responseSchema = new Schema<Response>({
-  responder: {
-    type: Schema.Types.ObjectId,
-    ref: "User", // เชื่อมโยงกับ User collection
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now, // ตั้งวันที่ตอบกลับเป็นวันปัจจุบัน
-  }
-}, { _id: false }); // ปิดการสร้าง _id สำหรับ response เนื่องจากเป็น subdocument
-
-// สร้าง schema สำหรับ review (รีวิว)
+// สร้าง schema สำหรับ review (รีวิว) โดยรวม response ไว้ในที่เดียว
 const reviewSchema = new Schema<Review>({
   reviewer: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "User", // เชื่อมโยงกับ User collection สำหรับผู้รีวิว
     required: true,
     index: true,
   },
@@ -50,13 +33,7 @@ const reviewSchema = new Schema<Review>({
   },
   rating: {
     type: Number,
-    required: true,
-    validate: {
-      validator: function (value: number) {
-        return value >= 1 && value <= 5;
-      },
-      message: 'คะแนนต้องอยู่ระหว่าง 1 ถึง 5',
-    },
+    required: true, // ต้องการค่า แต่ไม่ต้องตรวจสอบใน model แล้ว
   },
   package: {
     type: Schema.Types.ObjectId,
@@ -70,7 +47,26 @@ const reviewSchema = new Schema<Review>({
     default: null,
     index: true,
   },
-  responses: [responseSchema], // ใช้ schema สำหรับ responses ใน array
+  // ฟิลด์สำหรับการตอบกลับที่ฝังอยู่ภายใน reviewSchema
+  responses: [{
+    responder: {
+      type: Schema.Types.ObjectId,
+      ref: "Business", // เชื่อมโยงกับ businesses collection
+      required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
 }, { timestamps: true });
 
 // สร้างโมเดล review และส่งออก (export)

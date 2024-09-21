@@ -3,6 +3,7 @@ import reviewModel from "../model/review.model";
 import BookingModel from "../model/booking.model";
 import mongoose from "mongoose";
 import AdminModel from "../model/admin.model ";
+import BusinessModel from "../model/business.model";
 
 // ฟังก์ชันสำหรับการเรียกดูรีวิวทั้งหมด
 const getAllReview = async (req: Request, res: Response): Promise<void> => {
@@ -56,7 +57,7 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
             res.status(400).json({ message: 'คะแนนต้องอยู่ระหว่าง 1 ถึง 5' });
             return;
         }
-
+        
         // ตรวจสอบว่า homestayId หรือ packageId เป็น ObjectId ที่ถูกต้องหรือไม่
         const isValidHomestayId = homestayId && mongoose.Types.ObjectId.isValid(homestayId);
         const isValidPackageId = packageId && mongoose.Types.ObjectId.isValid(packageId);
@@ -112,8 +113,6 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
     }
 };
-
-
 
 // ฟังก์ชันสำหรับการอัพเดตรีวิว
 const updateReview = async (req: Request, res: Response): Promise<void> => {
@@ -264,21 +263,36 @@ const getReviewByPackageId = async (req: Request, res: Response): Promise<void> 
     }
 };;
 
-// ฟังก์ชันสำหรับการตอบกลับรีวิว
+// ฟังก์ชันสำหรับตอบกลับรีวิว
 // ฟังก์ชันสำหรับตอบกลับรีวิว
 const respondToReview = async (req: Request, res: Response): Promise<Response> => {
     const { id } = req.params; // รหัสรีวิวที่ต้องการเพิ่มการตอบกลับ
     const { responder, content } = req.body; // ข้อมูลการตอบกลับ
 
-    if (!id || !responder || !content) {
+    // ตรวจสอบว่า id เป็น ObjectId ที่ถูกต้องหรือไม่
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'ID ไม่ถูกต้อง' });
+    }
+
+    // ตรวจสอบว่ามีการส่งข้อมูลครบถ้วนหรือไม่
+    if (!responder || !content) {
         return res.status(400).json({ message: 'กรุณาระบุข้อมูลที่ครบถ้วน' });
     }
 
     try {
-        // ตรวจสอบว่าผู้ตอบกลับเป็นแอดมินหรือไม่
-        const admin = await AdminModel.findById(responder);
-        if (!admin || admin.role !== 'admin') {
-            return res.status(403).json({ message: 'เฉพาะแอดมินเท่านั้นที่สามารถตอบกลับรีวิวได้' });
+        // ตรวจสอบว่าผู้ตอบกลับเป็นเจ้าของธุรกิจหรือไม่
+        if (!mongoose.Types.ObjectId.isValid(responder)) {
+            return res.status(400).json({ message: 'Responser ID ไม่ถูกต้อง' });
+        }
+
+        const business = await BusinessModel.findById(responder);
+        if (!business) {
+            return res.status(404).json({ message: 'ไม่พบบัญชีธุรกิจที่ระบุ' });
+        }
+
+        // ตรวจสอบ role ของผู้ตอบกลับ
+        if (business.role !== 'business') { 
+            return res.status(403).json({ message: 'เฉพาะเจ้าของธุรกิจเท่านั้นที่สามารถตอบกลับรีวิวได้' });
         }
 
         // ตรวจสอบว่ามีรีวิวที่ตรงกับ id หรือไม่
@@ -291,7 +305,7 @@ const respondToReview = async (req: Request, res: Response): Promise<Response> =
         review.responses.push({ responder, content, createdAt: new Date() });
         await review.save();
 
-        // Populate the review data
+        // Populate the review data (ดึงข้อมูลที่เกี่ยวข้องกับ reviewer และ responder)
         const updatedReview = await reviewModel.findById(id)
             .populate('reviewer', 'name')
             .populate('responses.responder', 'name')
@@ -299,10 +313,11 @@ const respondToReview = async (req: Request, res: Response): Promise<Response> =
 
         return res.status(200).json(updatedReview);
     } catch (error: any) {
-        console.error('ข้อผิดพลาดในการตอบกลับรีวิว:', error.message);
-        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
+        console.error('ข้อผิดพลาดในการตอบกลับรีวิว:', error);
+        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ', error: error.message });
     }
 };
+
 
 export {
     getAllReview,
