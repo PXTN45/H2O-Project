@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import BookingPackage from "../../components/BookingPackage";
 import BusinessHomeStay from "../../components/BusinessHomeStay";
+import BusinessPackage from "../../components/BusinessPackage";
 
 export interface Booker {
   _id: string;
@@ -188,7 +189,7 @@ const myBusiness = () => {
             </div>
           ) : activeButton == "package" ? (
             <div>
-              <BookingPackage />
+              <BusinessPackage />
             </div>
           ) : (
             <div>

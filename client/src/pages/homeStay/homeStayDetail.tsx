@@ -5,6 +5,7 @@ import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar-data";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
+import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
@@ -159,9 +160,16 @@ const homeStayDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axiosPrivateUser.get(`/homestay/${id}`);
-        if (res.data) {
-          setItem(res.data);
+        if (userInfo?.role == "user") {
+          const res = await axiosPrivateUser.get(`/homestay/${id}`);
+          if (res.data) {
+            setItem(res.data);
+          }
+        } else if (userInfo?.role == "business") {
+          const res = await axiosPrivateBusiness.get(`/homestay/${id}`);
+          if (res.data) {
+            setItem(res.data);
+          }
         }
       } catch (error) {
         console.error("เกิดข้อผิดพลาดในการดึงรายละเอียด homestay:", error);

@@ -5,11 +5,16 @@ import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
 import Loader from "../assets/loadingAPI/loaddingTravel";
 import { FaLocationDot, FaStar } from "react-icons/fa6";
 import { GoProjectSymlink, GoShieldCheck } from "react-icons/go";
-import { IoHomeOutline, IoTrashBinOutline } from "react-icons/io5";
+import { IoTrashBinOutline } from "react-icons/io5";
 import { MdAddHomeWork } from "react-icons/md";
-import { FaRegEdit, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
+import {
+  FaRegCalendarCheck,
+  FaRegEdit,
+  FaRegStar,
+  FaStarHalfAlt,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { FcPrevious } from "react-icons/fc";
+import { LuActivity } from "react-icons/lu";
 import Swal from "sweetalert2";
 import { GrNext, GrPrevious } from "react-icons/gr";
 
@@ -88,23 +93,58 @@ export interface HomeStay {
   updatedAt: Date;
 }
 
-const BusinessHomeStay = () => {
+export interface Activity {
+  activity_days: {
+    activity_name: string;
+  }[];
+}
+[];
+
+export interface IPackage {
+  _id: string;
+  name_package: string;
+  type_package: string;
+  max_people: number;
+  detail_package: string;
+  activity_package: Activity[];
+  time_start_package: Date;
+  time_end_package: Date;
+  policy_cancel_package: string;
+  location: {
+    name_location: string;
+    province_location: string;
+    district_location: string;
+    subdistrict_location: string;
+    zipcode_location: number;
+    latitude_location: string;
+    longitude_location: string;
+    radius_location: number;
+  }[];
+  image: { image_upload: string }[];
+  price_package: number;
+  discount: number;
+  item?: HomeStay;
+  business_user: string;
+  review_rating_package: number;
+}
+
+const BusinessPackage = () => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { userInfo } = authContext;
-  const [myHomestay, setMyHomestay] = useState<HomeStay[]>([]);
+  const [myPackage, setMyPackage] = useState<IPackage[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 2;
 
   const fetchData = async () => {
     try {
       const response = await axiosPrivateBusiness.get(
-        `/business-homestay/${userInfo?._id}`
+        `/business-package/${userInfo?._id}`
       );
       if (response.data) {
-        setMyHomestay(response.data);
+        setMyPackage(response.data);
       }
     } catch (error) {
       console.log(error);
@@ -115,18 +155,18 @@ const BusinessHomeStay = () => {
   }, []);
 
   const [currentIndices, setCurrentIndices] = useState<number[]>(
-    myHomestay.map(() => 0)
+    myPackage.map(() => 0)
   );
 
-  // ใช้ useEffect เพื่อตั้งค่า currentIndices เมื่อ myHomestay เปลี่ยนแปลง
+  // ใช้ useEffect เพื่อตั้งค่า currentIndices เมื่อ myPackage เปลี่ยนแปลง
   useEffect(() => {
-    setCurrentIndices(myHomestay.map(() => 0));
-  }, [myHomestay]);
+    setCurrentIndices(myPackage.map(() => 0));
+  }, [myPackage]);
 
   const handlePrev = (index: number) => {
     setCurrentIndices((prevIndices) =>
       prevIndices.map((currentIndex, i) => {
-        const imageRoomLength = myHomestay[i]?.image.length ?? 0;
+        const imageRoomLength = myPackage[i]?.image.length ?? 0;
 
         return i === index
           ? currentIndex === 0
@@ -140,7 +180,7 @@ const BusinessHomeStay = () => {
   const handleNext = (index: number) => {
     setCurrentIndices((prevIndices) =>
       prevIndices.map((currentIndex, i) => {
-        const imageRoomLength = myHomestay[i]?.image.length ?? 0;
+        const imageRoomLength = myPackage[i]?.image.length ?? 0;
 
         return i === index
           ? currentIndex === imageRoomLength - 1
@@ -173,7 +213,7 @@ const BusinessHomeStay = () => {
     });
   };
 
-  const deleteHomeStay = async (index: number) => {
+  const deletePackage = async (index: number) => {
     Swal.fire({
       title: "ยืนยันการลบแพ็กเกจ?",
       text: "คุณไม่สามารถย้อนกลับได้หลังจากลบ",
@@ -187,7 +227,7 @@ const BusinessHomeStay = () => {
         try {
           // ทำการลบแพ็กเกจ
           const delData = await axiosPrivateBusiness.delete(
-            `/homestay/${myHomestay[index]?._id}`
+            `/package/${myPackage[index]?._id}`
           );
 
           // เช็คสถานะการลบ
@@ -214,15 +254,14 @@ const BusinessHomeStay = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = myHomestay.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = myPackage.slice(indexOfFirstItem, indexOfLastItem);
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
 
   return (
     <div>
-      {myHomestay?.length > 0 ? (
+      {myPackage?.length > 0 ? (
         <div>
-          {currentItems?.map((homestay: any, index) => (
+          {currentItems?.map((item: any, index) => (
             <div key={index} className="px-0 xl:px-10">
               <div className="w-full my-5 shadow-boxShadow rounded-xl flex gap-2 flex-wrap xl:flex-nowrap">
                 <div className="w-full lg:h-full xl:w-1/3 rounded-l-lg ">
@@ -232,7 +271,7 @@ const BusinessHomeStay = () => {
                     data-carousel="slide"
                   >
                     <div className="relative h-60 rounded-lg">
-                      {homestay.image.map((image: any, imageIndex: number) => (
+                      {item.image.map((image: any, imageIndex: number) => (
                         <div
                           key={imageIndex}
                           className={`duration-700 ease-in-out ${
@@ -304,57 +343,90 @@ const BusinessHomeStay = () => {
                 </div>
                 <div className="pl-10 pt-5 md:pr-5 xl:p-2 flex flex-col xl:flex-row w-full xl:w-2/3">
                   <div className=" xl:w-4/6 pr-2 flex flex-col gap-5">
-                    <div className="flex justify-between ">
+                    <div className="flex h-full ">
                       <div className="flex flex-col w-full gap-2">
                         <span className="text-md font-bold flex items-start justify-between w-full gap-3">
-                          {homestay?.name_homeStay}
+                          {item?.name_package}
                           <div className="flex items-center text-yellow-300">
-                            {renderStars(homestay?.review_rating_homeStay)}
-                            {homestay?.review_rating_homeStay}
+                            {renderStars(item?.review_rating_package)}
+                            {item?.review_rating_package}
                           </div>
                         </span>
                         <div className="flex flex-col">
-                          <span className="flex items-center gap-2">
-                            <IoHomeOutline />
-                            ประเภทที่พัก
+                          <span className="text-sm flex items-center gap-2">
+                            <FaRegCalendarCheck className="text-lg" />
+                            {formatThaiDate(item?.time_start_package)} ถึง{" "}
+                            {formatThaiDate(item?.time_end_package)}
                           </span>
-                          <div className="flex flex-col pl-6">
-                            {homestay?.room_type.map(
-                              (roomType: any, i: number) => (
-                                <span key={i}>- {roomType.name_type_room}</span>
-                              )
+                        </div>
+                        <div className="flex gap-3 items-start">
+                          <div className="pt-1">
+                            <LuActivity />
+                          </div>
+                          <div>
+                            {item?.activity_package.map(
+                              (day: Activity, i: number) => {
+                                const activityIndex =
+                                  item?.activity_package[i].activity_days
+                                    .length;
+                                const activity = day.activity_days.map(
+                                  (activity: any, index: number) => {
+                                    return (
+                                      <div key={index} className="flex gap-2">
+                                        <span>{activity.activity_name}</span>
+                                        {activityIndex == index + 1 ? (
+                                          <div></div>
+                                        ) : (
+                                          <span>,</span>
+                                        )}
+                                      </div>
+                                    );
+                                  }
+                                );
+
+                                return (
+                                  <div key={i}>
+                                    <div className="flex gap-2">
+                                      <span>วันที่ {i + 1})</span>
+                                      {activity}
+                                    </div>
+                                  </div>
+                                );
+                              }
                             )}
                           </div>
                         </div>
+
                         <div
                           id="location"
                           className=" flex md:items-center  gap-2"
                         >
                           <FaLocationDot className="text-red-600" />
                           <div className="flex flex-wrap text-sm gap-1">
-                            <div>{homestay.location[0].house_no}</div>
-                            <div>ม.{homestay.location[0].village_no}</div>
+                            <div>{item.location[0].house_no}</div>
+                            <div>ม.{item.location[0].village_no}</div>
                             <div>
                               ต.
-                              {homestay.location[0].subdistrict_location}
+                              {item.location[0].subdistrict_location}
                             </div>
                             <div>
                               อ.
-                              {homestay.location[0].district_location}
+                              {item.location[0].district_location}
                             </div>
                             <div>
                               จ.
-                              {homestay.location[0].province_location}
+                              {item.location[0].province_location}
                             </div>
-                            <div>{homestay.location[0].zipcode_location}</div>
+                            <div>{item.location[0].zipcode_location}</div>
                           </div>
                         </div>
-                        <div id="policy">
-                          <span className="text-sm flex gap-2">
-                            <div className="pt-2">
+
+                        <div>
+                          <span className="text-sm flex items-center gap-3">
+                            <div>
                               <GoShieldCheck className="text-lg" />
                             </div>
-                            {homestay?.policy_cancel_homeStay}
+                            {item?.policy_cancel_package}
                           </span>
                         </div>
                       </div>
@@ -363,28 +435,31 @@ const BusinessHomeStay = () => {
                   <div className="xl:w-2/6 flex flex-col w-full xl:border-l p-1">
                     <div className="flex flex-col justify-between h-full w-full gap-2">
                       <div className="w-full flex flex-col items-end justify-end">
-                        {homestay?.status_sell_homeStay === "Ready" ? (
+                        {new Date() < new Date(item?.time_start_package) ? (
+                          <div className="text-sm bg-green-400 px-2 rounded-xl text-white">
+                            ยังไม่พร้อมให้จอง
+                          </div>
+                        ) : new Date() > new Date(item?.time_end_package) ? (
+                          <div className="text-sm bg-red-600 px-2 rounded-xl text-white">
+                            แพ็กเกจหมดเขตแล้ว
+                          </div>
+                        ) : (
                           <div className="text-sm bg-green-400 px-2 rounded-xl text-white">
                             พร้อมให้จอง
                           </div>
-                        ) : (
-                          homestay?.status_sell_homeStay === "NotReady" && (
-                            <div className="text-sm bg-red-400 px-2 rounded-xl text-white">
-                              ยังไม่พร้อมให้จอง
-                            </div>
-                          )
                         )}
+
                         <div>
                           <button className="p-2">
                             <FaRegEdit className="text-xl hover:text-yellow-400" />
                           </button>
                           <button className="p-2">
-                            <Link to={`/homeStayDetail/${homestay?._id}`}>
+                            <Link to={`/packageDetail/${item?._id}`}>
                               <GoProjectSymlink className="text-xl  hover:text-blue-500" />
                             </Link>
                           </button>
                           <button
-                            onClick={() => deleteHomeStay(index)}
+                            onClick={() => deletePackage(index)}
                             className="p-2"
                           >
                             <IoTrashBinOutline className="text-xl  hover:text-red-600" />
@@ -392,13 +467,13 @@ const BusinessHomeStay = () => {
                         </div>
                       </div>
                       <div className="w-full text-xs flex justify-end opacity-50">
-                        {homestay?.updatedAt ? (
+                        {item?.updatedAt ? (
                           <span>
-                            อัปเดตเมื่อ {formatThaiDate(homestay?.updatedAt)}
+                            อัปเดตเมื่อ {formatThaiDate(item?.updatedAt)}
                           </span>
-                        ) : homestay?.createdAt ? (
+                        ) : item?.createdAt ? (
                           <span>
-                            สร้างเมื่อ {formatThaiDate(homestay?.createdAt)}
+                            สร้างเมื่อ {formatThaiDate(item?.createdAt)}
                           </span>
                         ) : (
                           <div></div>
@@ -408,10 +483,9 @@ const BusinessHomeStay = () => {
                   </div>
                 </div>
               </div>
-              {/* Pagination Buttons */}
             </div>
           ))}
-          <div className="w-full flex items-center justify-center">
+                    <div className="w-full flex items-center justify-center">
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
@@ -424,7 +498,7 @@ const BusinessHomeStay = () => {
             {/* Pagination Buttons */}
             <div className="flex justify-center">
               {Array.from(
-                { length: Math.ceil(myHomestay.length / itemsPerPage) },
+                { length: Math.ceil(myPackage.length / itemsPerPage) },
                 (_, i) => (
                   <button
                     className={`transition-transform duration-300 ease-in-out transform hover:scale-110 px-3 py-2 m-0.5 rounded-md ${
@@ -444,10 +518,10 @@ const BusinessHomeStay = () => {
             <button
               onClick={() => paginate(currentPage + 1)}
               disabled={
-                currentPage === Math.ceil(myHomestay.length / itemsPerPage)
+                currentPage === Math.ceil(myPackage.length / itemsPerPage)
               }
               className={` px-3 py-3 rounded-xl ml-2 text-white ${
-                currentPage === Math.ceil(myHomestay.length / itemsPerPage)
+                currentPage === Math.ceil(myPackage.length / itemsPerPage)
                   ? "bg-gray-300 "
                   : "bg-primaryBusiness"
               }`}
@@ -471,4 +545,4 @@ const BusinessHomeStay = () => {
   );
 };
 
-export default BusinessHomeStay;
+export default BusinessPackage;

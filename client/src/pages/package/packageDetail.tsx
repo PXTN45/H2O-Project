@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import axios from "axios";
+import Loader from "../../assets/loadingAPI/loaddingTravel";
 import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import { FaRegCalendarCheck, FaPeopleGroup } from "react-icons/fa6";
@@ -9,6 +10,7 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { IoPricetagsOutline } from "react-icons/io5";
 import { BiSolidDiscount } from "react-icons/bi";
 import { GrSync } from "react-icons/gr";
+import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import PackageHomeStay from "../../components/PackageHomeStay";
 export interface Image {
   image_upload: string;
@@ -97,6 +99,37 @@ interface Review {
   createdAt: string;
 }
 
+export interface IPackage {
+  name_package: string;
+  type_package: string;
+  max_people: number;
+  detail_package: string;
+  activity_package: {
+    activity_days: {
+      activity_name: string;
+    }[];
+  }[];
+  time_start_package: Date;
+  time_end_package: Date;
+  policy_cancel_package: string;
+  location: {
+    name_location: string;
+    province_location: string;
+    district_location: string;
+    subdistrict_location: string;
+    zipcode_location: number;
+    latitude_location: string;
+    longitude_location: string;
+    radius_location: number;
+  }[];
+  image: { image_upload: string }[];
+  price_package: number;
+  discount: number;
+  homestay?: HomeStay;
+  business_user: string;
+  review_rating_package: number;
+}
+
 const PackageDetail = () => {
   const [item, setItem] = useState<any>();
   const { id } = useParams(); // Destructure id from useParams
@@ -117,10 +150,16 @@ const PackageDetail = () => {
       console.error("ID is undefined or null");
       return; // หยุดการทำงานหาก id เป็น undefined หรือ null
     }
+    let axiosPrivate: any;
+    if (userInfo?.role == "user") {
+      axiosPrivate = axiosPrivateUser;
+    } else if (userInfo?.role == "business") {
+      axiosPrivate = axiosPrivateBusiness;
+    }
 
     const fetchData = async () => {
       try {
-        const res = await axiosPrivateUser.get(`/package/${id}`);
+        const res = await axiosPrivate.get(`/package/${id}`);
         if (res.data) {
           setItem(res.data);
         } else {
@@ -157,14 +196,16 @@ const PackageDetail = () => {
 
   useEffect(() => {
     const priceDiscount = () => {
-      if (item) { // ตรวจสอบว่ามี `item` ก่อน
+      if (item) {
+        // ตรวจสอบว่ามี `item` ก่อน
         const price = item.price_package;
         const discount = item.discount;
-        const totalPrice = discount > 0 ? price * ((100 - discount) / 100) : price;
+        const totalPrice =
+          discount > 0 ? price * ((100 - discount) / 100) : price;
         setTotalPricePackage(totalPrice);
       }
     };
-    
+
     priceDiscount();
   }, [item]);
 
@@ -192,8 +233,6 @@ const PackageDetail = () => {
       setProgress(progress);
     }
   }, [review]);
-
-
 
   const reviews = review?.map((reviewHomeStay: Review, reviewIndex: number) => {
     // console.log(reviewHomeStay);
@@ -257,7 +296,7 @@ const PackageDetail = () => {
 
   const percentages = calculatePercentages(review);
   if (!item) {
-    return <p>No item data available</p>;
+    return <Loader />;
   }
 
   const handleNextPackage = () => {
@@ -367,7 +406,7 @@ const PackageDetail = () => {
     bookingStart = localDate.toISOString().split("T")[0];
   } else {
     console.log("Start date is not defined");
-    bookingStart = "default-start-date"; 
+    bookingStart = "default-start-date";
   }
 
   const endStr = endDate;
@@ -659,15 +698,18 @@ const PackageDetail = () => {
                     </div>
                   </div>
                   <div className="flex items-center p-5"></div>
-                  <div className="flex items-end justify-end p-5">
-                    <button
-                      className="bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
+                  {userInfo?.role == "user" && (
+                    <div className="flex items-end justify-end p-5">
+                      <button
+                      id="btn-makePayment"
+                        className="bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
                         transition-transform duration-300 text-white"
-                      onClick={makePayment}
-                    >
-                      จองทันที
-                    </button>
-                  </div>
+                        onClick={makePayment}
+                      >
+                        จองทันที
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -727,7 +769,7 @@ const PackageDetail = () => {
           </div>
         </div>
       ) : (
-        <div>no data</div>
+        <Loader />
       )}
     </div>
   );
