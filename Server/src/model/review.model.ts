@@ -23,7 +23,7 @@ export interface Response {
 const reviewSchema = new Schema<Review>({
   reviewer: {
     type: Schema.Types.ObjectId,
-    ref: "User", // เชื่อมโยงกับ User collection สำหรับผู้รีวิว
+    ref: "User",
     required: true,
     index: true,
   },
@@ -33,25 +33,24 @@ const reviewSchema = new Schema<Review>({
   },
   rating: {
     type: Number,
-    required: true, // ต้องการค่า แต่ไม่ต้องตรวจสอบใน model แล้ว
+    required: true,
   },
   package: {
     type: Schema.Types.ObjectId,
     ref: "Package",
-    default: null,
     index: true,
+    // ไม่กำหนดค่าเริ่มต้น
   },
   homestay: {
     type: Schema.Types.ObjectId,
     ref: "HomeStay",
-    default: null,
     index: true,
+    // ไม่กำหนดค่าเริ่มต้น
   },
-  // ฟิลด์สำหรับการตอบกลับที่ฝังอยู่ภายใน reviewSchema
   responses: [{
     responder: {
       type: Schema.Types.ObjectId,
-      ref: "Business", // เชื่อมโยงกับ businesses collection
+      ref: "Business",
       required: true,
     },
     content: {
@@ -68,6 +67,7 @@ const reviewSchema = new Schema<Review>({
     }
   }],
 }, { timestamps: true });
+
 
 // สร้างโมเดล review และส่งออก (export)
 const reviewModel = model<Review>("Review", reviewSchema);

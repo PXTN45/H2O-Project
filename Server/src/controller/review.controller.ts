@@ -71,8 +71,8 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
         const existingReview = await reviewModel.findOne({
             reviewer: new mongoose.Types.ObjectId(reviewer),
             $or: [
-                { homestay: homestayId || null },
-                { package: packageId || null }
+                { homestay: homestayId ? new mongoose.Types.ObjectId(homestayId) : null },
+                { package: packageId ? new mongoose.Types.ObjectId(packageId) : null }
             ]
         });
 
@@ -83,10 +83,10 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
 
         // ตรวจสอบการจองที่เกี่ยวข้อง
         const booking = await BookingModel.findOne({
-            booker: new mongoose.Types.ObjectId(reviewer), // ใช้ booker แทน reviewer
+            booker: new mongoose.Types.ObjectId(reviewer),
             $or: [
-                { homestay: homestayId || null },
-                { package: packageId || null }
+                { homestay: homestayId ? new mongoose.Types.ObjectId(homestayId) : null },
+                { package: packageId ? new mongoose.Types.ObjectId(packageId) : null }
             ],
             bookingStatus: 'Confirmed'
         });
@@ -96,14 +96,16 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        // สร้างรีวิวใหม่
-        const newReview = new reviewModel({
+        // สร้างรีวิวใหม่ โดยไม่ใส่ค่าที่เป็น null
+        const newReviewData = {
             reviewer: new mongoose.Types.ObjectId(reviewer),
             content,
             rating,
-            homestay: homestayId || null,
-            package: packageId || null
-        });
+            ...(homestayId && { homestay: new mongoose.Types.ObjectId(homestayId) }), // ใส่ homestay ถ้ามี
+            ...(packageId && { package: new mongoose.Types.ObjectId(packageId) }), // ใส่ package ถ้ามี
+        };
+
+        const newReview = new reviewModel(newReviewData);
 
         // บันทึกรีวิวลงในฐานข้อมูล
         const savedReview = await newReview.save();
@@ -113,6 +115,7 @@ const createReview = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
     }
 };
+
 
 // ฟังก์ชันสำหรับการอัพเดตรีวิว
 const updateReview = async (req: Request, res: Response): Promise<void> => {
@@ -269,9 +272,9 @@ const respondToReview = async (req: Request, res: Response): Promise<Response> =
     const { id } = req.params; // รหัสรีวิวที่ต้องการเพิ่มการตอบกลับ
     const { responder, content } = req.body; // ข้อมูลการตอบกลับ
 
-    // ตรวจสอบว่า id เป็น ObjectId ที่ถูกต้องหรือไม่
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'ID ไม่ถูกต้อง' });
+    // ตรวจสอบว่า id และ responder เป็น ObjectId ที่ถูกต้องหรือไม่
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(responder)) {
+        return res.status(400).json({ message: 'ID หรือ Responder ID ไม่ถูกต้อง' });
     }
 
     // ตรวจสอบว่ามีการส่งข้อมูลครบถ้วนหรือไม่
@@ -281,17 +284,13 @@ const respondToReview = async (req: Request, res: Response): Promise<Response> =
 
     try {
         // ตรวจสอบว่าผู้ตอบกลับเป็นเจ้าของธุรกิจหรือไม่
-        if (!mongoose.Types.ObjectId.isValid(responder)) {
-            return res.status(400).json({ message: 'Responser ID ไม่ถูกต้อง' });
-        }
-
         const business = await BusinessModel.findById(responder);
         if (!business) {
             return res.status(404).json({ message: 'ไม่พบบัญชีธุรกิจที่ระบุ' });
         }
 
         // ตรวจสอบ role ของผู้ตอบกลับ
-        if (business.role !== 'business') { 
+        if (business.role !== 'business') {
             return res.status(403).json({ message: 'เฉพาะเจ้าของธุรกิจเท่านั้นที่สามารถตอบกลับรีวิวได้' });
         }
 
@@ -302,21 +301,39 @@ const respondToReview = async (req: Request, res: Response): Promise<Response> =
         }
 
         // เพิ่มการตอบกลับในรีวิว
-        review.responses.push({ responder, content, createdAt: new Date() });
+        const currentDate = new Date();
+        review.responses.push({ responder, content, createdAt: currentDate });
+        
+        // อัปเดต createdAt และ updatedAt ของรีวิว
+        review.createdAt = currentDate; 
+        review.updatedAt = currentDate; 
+        
         await review.save();
 
         // Populate the review data (ดึงข้อมูลที่เกี่ยวข้องกับ reviewer และ responder)
         const updatedReview = await reviewModel.findById(id)
             .populate('reviewer', 'name')
             .populate('responses.responder', 'name')
+            .lean() // ใช้ lean เพื่อแปลงเป็น plain JavaScript object
             .exec();
 
-        return res.status(200).json(updatedReview);
+        // ตรวจสอบว่า updatedReview ไม่เป็น null
+        if (!updatedReview) {
+            return res.status(404).json({ message: 'ไม่พบรีวิวที่อัปเดต' });
+        }
+
+        // ลบฟิลด์ที่มีค่า null ออกจาก response
+        const cleanedReview = Object.fromEntries(
+            Object.entries(updatedReview).filter(([_, value]) => value !== null)
+        );
+
+        return res.status(200).json(cleanedReview);
     } catch (error: any) {
         console.error('ข้อผิดพลาดในการตอบกลับรีวิว:', error);
         return res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ', error: error.message });
     }
 };
+
 
 
 export {
