@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
-import { useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../AuthContext/auth.provider";
-import { FaMapLocationDot } from "react-icons/fa6";
 import OpenStreetMapShowData from "../components/OpenStreetMapShowData";
-import { TbMapQuestion } from "react-icons/tb";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
 import Swal from "sweetalert2";
+import { FaMapLocationDot } from "react-icons/fa6";
+import { TbMapQuestion } from "react-icons/tb";
 import { GoHome } from "react-icons/go";
 import { LiaChildSolid } from "react-icons/lia";
 import { IoPeopleSharp } from "react-icons/io5";
@@ -145,10 +144,6 @@ const BookingHomeStay = () => {
 
     fetchData();
   }, [userInfo?._id, status]);
-
-  console.log(myBooking[0]?.detail_offer[0].adult);
-  console.log(myBooking[0]?.detail_offer[0].child);
-  console.log(myBooking[0]?.detail_offer[0].room);
 
   const monthNamesTH = [
     "มกราคม",

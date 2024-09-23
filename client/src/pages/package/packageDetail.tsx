@@ -367,7 +367,7 @@ const PackageDetail = () => {
     bookingStart = localDate.toISOString().split("T")[0];
   } else {
     console.log("Start date is not defined");
-    bookingStart = "default-start-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
+    bookingStart = "default-start-date"; 
   }
 
   const endStr = endDate;
@@ -420,11 +420,8 @@ const PackageDetail = () => {
       console.error("Error making payment:", error);
     }
   };
-
-  
-  console.log(totalPricePackage);
-
   const discount = item.discount;
+
   return (
     <div>
       {item && id ? (

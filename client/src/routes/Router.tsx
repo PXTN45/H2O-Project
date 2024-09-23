@@ -25,6 +25,8 @@ import ContactOnlyAdmin from "../pages/orther/Contact.OnlyAdmin";
 import Booking from "../pages/user/Booking";
 import HistoryBooking from "../pages/user/historyBooking";
 import HistoryReview from "../pages/user/historyReview";
+import MyAccountBusiness from "../pages/business/myAccountBusiness";
+import MyBusiness from "../pages/business/myBusiness";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -45,11 +47,9 @@ const router = createBrowserRouter([
       {
         path: "/homeStayDetail/:id",
         element: (
-          <PrivateRouterUser>
-            <PaymentProvider>
-              <HomeStayDetail />
-            </PaymentProvider>
-          </PrivateRouterUser>
+          <PaymentProvider>
+            <HomeStayDetail />
+          </PaymentProvider>
         ),
       },
       {
@@ -112,11 +112,15 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard-business/Profile-business",
-            element: <ProfileBusiness />,
+            element: <MyAccountBusiness />,
+          },
+          {
+            path: "/dashboard-business/MyBusiness-business",
+            element: <MyBusiness />,
           },
         ],
       },
-      
+
       {
         path: "/dashboard-admin",
         element: (
@@ -141,15 +145,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/help",
-        element: (
-            <Contact />
-        ),
+        element: <Contact />,
       },
       {
         path: "/helpOnlyAdmin",
-        element: (
-            <ContactOnlyAdmin />
-        ),
+        element: <ContactOnlyAdmin />,
       },
     ],
   },
