@@ -271,22 +271,10 @@ const Drawer: React.FC = () => {
                         <a>ประวัติรีวิว</a>
                       </li>
                     </Link>
-                    {/* <Link to="#">
-                      <li
-                        onClick={() => handleClick("Property messages")}
-                        className={`cursor-pointer rounded-md ${
-                          activeItem === "Property messages"
-                            ? "bg-primaryUser text-white"
-                            : ""
-                        }`}
-                      >
-                        <a>Property messages</a>
-                      </li>
-                    </Link> */}
                   </div>
                 ) : userInfo?.role === "business" ? (
                   <div>
-                    <Link to={"/dashboard-business/ProfileBusiness"}>
+                    <Link to={"/dashboard-business/Profile-business"}>
                       <li
                         onClick={() => handleClick("Profile")}
                         className={`cursor-pointer rounded-md ${
@@ -298,9 +286,16 @@ const Drawer: React.FC = () => {
                         <a>บัญชีของฉัน</a>
                       </li>
                     </Link>
-                    <Link to={"#"}>
-                      <li>
-                        <a>My Business (UC10 และ UC9)</a>
+                    <Link to={"/dashboard-business/MyBusiness-business"}>
+                      <li
+                        onClick={() => handleClick("MyBusiness")}
+                        className={`cursor-pointer rounded-md ${
+                          activeItem === "MyBusiness"
+                            ? "bg-primaryUser text-white"
+                            : ""
+                        }`}
+                      >
+                        <a>ที่พัก / แพ็คเกจ</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
@@ -310,12 +305,7 @@ const Drawer: React.FC = () => {
                     </Link>
                     <Link to={"#"}>
                       <li>
-                        <a>Review</a>
-                      </li>
-                    </Link>
-                    <Link to={"#"}>
-                      <li>
-                        <a>Property messages</a>
+                        <a>รีวิว</a>
                       </li>
                     </Link>
                   </div>
@@ -323,7 +313,7 @@ const Drawer: React.FC = () => {
                   <div>
                     <Link to={"/dashboard-business/ProfileAdmin"}>
                       <li>
-                        <a>Profile</a>
+                        <a>บัญชีของฉัน</a>
                       </li>
                     </Link>
                   </div>
@@ -348,12 +338,12 @@ const Drawer: React.FC = () => {
                   <div>
                     <Link to={"#"}>
                       <li>
-                        <a>History Booking(UC8)</a>
+                        <a>ประวัติการจอง (UC8)</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
                       <li>
-                        <a>How to get money(UC17)</a>
+                        <a>วิธีรับเงิน (UC17)</a>
                       </li>
                     </Link>
                   </div>

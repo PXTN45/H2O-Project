@@ -5,6 +5,7 @@ import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar-data";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
+import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
@@ -159,9 +160,16 @@ const homeStayDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axiosPrivateUser.get(`/homestay/${id}`);
-        if (res.data) {
-          setItem(res.data);
+        if (userInfo?.role == "user") {
+          const res = await axiosPrivateUser.get(`/homestay/${id}`);
+          if (res.data) {
+            setItem(res.data);
+          }
+        } else if (userInfo?.role == "business") {
+          const res = await axiosPrivateBusiness.get(`/homestay/${id}`);
+          if (res.data) {
+            setItem(res.data);
+          }
         }
       } catch (error) {
         console.error("เกิดข้อผิดพลาดในการดึงรายละเอียด homestay:", error);
@@ -311,9 +319,6 @@ const homeStayDetail = () => {
   });
 
   const calculatePercentages = (review: Review[]) => {
-    console.log(review);
-    console.log(review.length);
-
     const totalReviews = review.length;
     const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
 
@@ -371,10 +376,6 @@ const homeStayDetail = () => {
     );
   };
 
-  // Debugging: ตรวจสอบค่า currentIndices และ roomTypes
-  // console.log("Current Indices:", currentIndices);
-  // console.log("Room Types:", roomTypes);
-
   const carousel = roomTypes.map((roomType, index) => {
     const offer = roomType.offer.map((offer: Offer, i: number) => {
       const price = offer.price_homeStay;
@@ -427,9 +428,9 @@ const homeStayDetail = () => {
                 time_checkOut_homeStay: item.time_checkOut_homeStay,
                 policy_cancel_homeStay: item.policy_cancel_homeStay,
               };
-      
+
               localStorage.setItem("paymentData", JSON.stringify(paymentData));
-      
+
               setPaymentData(paymentData);
               navigate("/bookingDetail");
             }
@@ -501,15 +502,17 @@ const homeStayDetail = () => {
                 (ก่อนรวมภาษีและค่าธรรมเนียม)
               </p>
             </div>
-            <div className="w-1/6 flex flex-col items-center pl-3">
-              <button
-                className=" bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
+            {userInfo?.role == "user" && (
+              <div className="w-1/6 flex flex-col items-center pl-3">
+                <button
+                  className=" bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
                 transition-transform duration-300 text-white"
-                onClick={() => handleSelectAndProceed()}
-              >
-                จอง
-              </button>
-            </div>
+                  onClick={() => handleSelectAndProceed()}
+                >
+                  จอง
+                </button>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -619,6 +622,7 @@ const homeStayDetail = () => {
       </div>
     );
   });
+  console.log(userInfo?.role);
 
   return (
     <div>
@@ -630,7 +634,7 @@ const homeStayDetail = () => {
             className="container-xl mx-6 md:mx-8 lg:mx-24 xl:mx-40"
           >
             <div className="mt-5 ">
-              <Navbar />
+              {userInfo?.role == "user" && <Navbar />}
               <div className="mt-2  flex  justify-end">
                 {showAlert && (
                   <div className="alert alert-error text-white w-1/3">
