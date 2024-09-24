@@ -17,7 +17,7 @@ interface Element {
   };
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ lat, lng }) => {
+const OpenStreetMapShowData: React.FC<MapComponentProps> = ({ lat, lng }) => {
   const [places, setPlaces] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -126,4 +126,4 @@ const MapComponent: React.FC<MapComponentProps> = ({ lat, lng }) => {
   );
 };
 
-export default MapComponent;
+export default OpenStreetMapShowData;
