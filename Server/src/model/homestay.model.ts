@@ -52,34 +52,23 @@ interface HomeStay extends Document {
   updatedAt: Date;
 }
 
-const HomeStaySchema = new Schema<HomeStay>({
-  name_homeStay: {
-    type: String,
-    required: true,
-  },
-  room_type: {
-    type: [
-      {
-        name_type_room: { type: String, required: true },
-        bathroom_homeStay: { type: Number, required: true },
-        bedroom_homeStay: { type: Number, required: true },
-        sizeBedroom_homeStay: { type: String, required: true },
-        image_room: {
-          type: [
-            {
-              image: { type: String },
-            },
-          ],
-        },
-        offer: {
-          type: [
-            {
-              price_homeStay: { type: Number, required: true },
-              max_people: {
-                type: {
-                  adult: Number,
-                  child: Number,
-                },
+const HomeStaySchema = new Schema<HomeStay>(
+  {
+    name_homeStay: {
+      type: String,
+      required: true,
+    },
+    room_type: {
+      type: [
+        {
+          name_type_room: { type: String, required: true },
+          bathroom_homeStay: { type: Number, required: true },
+          bedroom_homeStay: { type: Number, required: true },
+          sizeBedroom_homeStay: { type: String, required: true },
+          image_room: {
+            type: [
+              {
+                image: { type: String },
               },
             ],
           },
@@ -191,7 +180,7 @@ const HomeStaySchema = new Schema<HomeStay>({
     },
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 
