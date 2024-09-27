@@ -18,6 +18,15 @@ const getUserById = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: error.message });
   }
 };
+const getBusinessById = async (req: Request, res: Response): Promise<void> => {
+  const id = req.params.id;
+  try {
+    const userData = await BusinessModel.findById(id); 
+    res.status(200).json(userData);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 const getAllUser = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -165,19 +174,37 @@ const adminRegister = async (req: Request, res: Response): Promise<void> => {
 
 const updateUserAddress = async (req: Request, res: Response) => {
   const userId = req.params.id;
-  const addressData = req.body;
+  const {address, role} = req.body;
+  
   try {
-    const updateResult = await UserModel.findByIdAndUpdate(
-      userId,
-      { $set: { address: addressData } },
-      { new: true, runValidators: true }
-    );
 
-    if (!updateResult) {
+    let updateData
+
+    switch(role) {
+      case "user":
+        updateData = await UserModel.findByIdAndUpdate(
+          userId,
+          { $set: { address: address } },
+          { new: true, runValidators: true }
+        );
+        break;
+      case "business":
+        updateData = await BusinessModel.findByIdAndUpdate(
+          userId,
+          { $set: { address: address } },
+          { new: true, runValidators: true }
+        );
+        break;
+      default:
+        return res.status(404).json({ message: "Role not found" });
+    }
+
+
+    if (!updateData) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(updateResult);
+    res.status(200).json(updateData);
   } catch (error) {
     console.error("Error updating address:", error);
     res.status(500).json({ message: "Server error" });
@@ -188,6 +215,8 @@ const updateUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
   const updateData = req.body;
   const salt = bcrypt.genSaltSync(10);
+  console.log(updateData);
+  
 
   if (updateData.password) {
     updateData.password = bcrypt.hashSync(updateData.password, salt);
@@ -197,16 +226,20 @@ const updateUser = async (req: Request, res: Response) => {
     let updateResult;
     switch (updateData.role) {
       case "user":
+        console.log(updateData.role);
         updateResult = await UserModel.findByIdAndUpdate(userId, updateData, {
           new: true,
         });
+        console.log(updateResult?.name);
         break;
       case "business":
-        updateResult = await BusinessModel.findByIdAndUpdate(
-          userId,
-          updateData,
-          { new: true }
-        );
+        console.log(updateData.role);
+        updateResult = await BusinessModel.findByIdAndUpdate(userId, updateData, {
+          new: true,
+        });
+        console.log(updateResult?.name);
+
+        
         break;
       case "admin":
         updateResult = await AdminModel.findByIdAndUpdate(userId, updateData, {
@@ -368,7 +401,7 @@ const ChangePassword = async (req: Request, res: Response) => {
   if (email === "" || password === "" || newPass === "" || confirmPass === "") {
     return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบทุกช่อง" });
   }
-  
+
   try {
     const userData = await UserModel.findOne({ email });
     if (!userData) {
@@ -376,21 +409,19 @@ const ChangePassword = async (req: Request, res: Response) => {
     }
     const isPasswordMatch = bcrypt.compareSync(password, userData.password);
     console.log(isPasswordMatch);
-    
+
     if (!isPasswordMatch) {
       return res.status(401).json({ message: "รหัสผ่านปัจจุบันไม่ถูกต้อง" });
     }
     if (password === newPass || password === confirmPass) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "กรุณากรอกรหัสผ่านใหม่ที่ไม่ตรงกับรหัสผ่านปัจจุบัน",
-        });
+      return res.status(400).json({
+        message: "กรุณากรอกรหัสผ่านใหม่ที่ไม่ตรงกับรหัสผ่านปัจจุบัน",
+      });
     }
     if (newPass !== confirmPass) {
       return res.status(400).json({
-        message: "รหัสผ่านใหม่และรหัสผ่านยืนยันไม่ตรงกัน กรุณาตรวจสอบและกรอกให้ตรงกัน",
+        message:
+          "รหัสผ่านใหม่และรหัสผ่านยืนยันไม่ตรงกัน กรุณาตรวจสอบและกรอกให้ตรงกัน",
       });
     }
     const salt = bcrypt.genSaltSync(10);
@@ -400,27 +431,26 @@ const ChangePassword = async (req: Request, res: Response) => {
     userData.password = hashedNewPassword;
     await userData.save();
 
-    res
-      .status(200)
-      .json({ message: "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว", userData });
+    res.status(200).json({ message: "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว", userData });
   } catch (error) {
     console.error("Error changing password:", error);
-    res.status(500).json({ message: "ข้อผิดพลาดเซิร์ฟเวอร์ภายใน",error });
+    res.status(500).json({ message: "ข้อผิดพลาดเซิร์ฟเวอร์ภายใน", error });
   }
 };
 
 export {
-  userRegister,
-  businessRegister,
-  adminRegister,
-  Login,
-  Logout,
-  getUserById,
-  getAllUser,
-  getAllBusiness,
-  getAllAdmin,
-  updateUser,
-  checkEmailExists,
   updateUserAddress,
+  businessRegister,
+  checkEmailExists,
+  getBusinessById,
+  getAllBusiness,
   ChangePassword,
+  adminRegister,
+  userRegister,
+  getAllAdmin,
+  getUserById,
+  updateUser,
+  getAllUser,
+  Logout,
+  Login,
 };
