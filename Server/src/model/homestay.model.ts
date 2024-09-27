@@ -2,9 +2,6 @@ import { Schema, model, Document } from "mongoose";
 
 interface HomeStay extends Document {
   name_homeStay: string;
-  nearbyPlaces: {
-    places: string;
-  }[];
   room_type: {
     image_room: {
       image: string;
@@ -59,15 +56,6 @@ const HomeStaySchema = new Schema<HomeStay>({
   name_homeStay: {
     type: String,
     required: true,
-  },
-  nearbyPlaces: {
-    type: [
-      {
-        places: {
-          type: String,
-        },
-      },
-    ],
   },
   room_type: {
     type: [
