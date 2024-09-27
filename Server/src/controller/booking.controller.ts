@@ -239,7 +239,7 @@ const confirmBooking = async (req: Request, res: Response): Promise<void> => {
 };
 
 const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> => {
-  const { bookingId , image } = req.body;
+  const { bookingId , imageUrl } = req.body;
 
   try {
     const bookingData = await Booking.findOne({ '_id': bookingId }).populate([
@@ -250,18 +250,26 @@ const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> =
           path: "business_user"
         }
       },
-    ]);
+      { 
+        path: "package",
+        select: "business_user",
+        populate: {
+          path: "business_user"
+        }
+      }
+    ]);    
 
     if (!bookingData) {
       res.status(404).json("Can't send money. because I don't have bookingData!");
       return;
     }
 
-    bookingData.bookingStatus = "Money transferred";
+    bookingData.bookingStatus = "Money-transferred";
 
-    await sendEmailPayment(bookingData, image);
+    await sendEmailPayment(bookingData , imageUrl);
+
     res.status(200).json({
-      message: bookingData,
+      message: 'Success send money to business'
     });
 
   } catch (error) {

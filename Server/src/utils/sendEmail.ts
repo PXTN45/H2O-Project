@@ -27,8 +27,14 @@ const sendEmail = async (email: string , token: string): Promise<void> => {
 	}
 };
 
-const sendEmailPayment = async (bookingData: any , image: string): Promise<void> => {
+const sendEmailPayment = async (bookingData: any , imageUrl: string): Promise<void> => {
 	try {
+		const businessData = {
+			email: (bookingData.homestay?.business_user?.[0]?.email) || (bookingData.package?.business_user?.email),
+			name: (bookingData.homestay?.business_user?.[0]?.name) || (bookingData.package?.business_user?.name),
+			lastName: (bookingData.homestay?.business_user?.[0]?.lastName) || (bookingData.package?.business_user?.lastName),
+		  };
+		
 		const transporter = nodemailer.createTransport({
 			host: process.env.HOST,
 			service: process.env.SERVICE,
@@ -42,9 +48,9 @@ const sendEmailPayment = async (bookingData: any , image: string): Promise<void>
 
 		await transporter.sendMail({
 			from: process.env.USER,
-			to: bookingData.homestay.business_user[0].email,
+			to: businessData.email,
 			subject: 'Payment Successfully Transferred',
-			text: `Dear ${bookingData.homestay.business_user[0].name} ${bookingData.homestay.business_user[0].lastName},
+			text: `Dear ${businessData.name} ${businessData.lastName},
 		  
 		  We are pleased to inform you that the payment has been successfully transferred to your account. 
 		  
@@ -57,7 +63,7 @@ const sendEmailPayment = async (bookingData: any , image: string): Promise<void>
 			attachments: [
 			  {
 				filename: 'payment-slip.png',
-				path: '/path/to/payment-slip.png'
+				path: imageUrl
 			  }
 			]
 		  });
@@ -69,5 +75,6 @@ const sendEmailPayment = async (bookingData: any , image: string): Promise<void>
 		throw error; // Rethrow the error to ensure the caller knows that the email was not sent
 	}
 };
+
 
 export { sendEmail , sendEmailPayment}

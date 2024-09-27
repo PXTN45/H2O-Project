@@ -2,9 +2,6 @@ import { Schema, model, Document } from "mongoose";
 
 interface HomeStay extends Document {
   name_homeStay: string;
-  nearbyPlaces: {
-    places: string;
-  }[];
   room_type: {
     image_room: {
       image: string;
@@ -55,32 +52,34 @@ interface HomeStay extends Document {
   updatedAt: Date;
 }
 
-const HomeStaySchema = new Schema<HomeStay>(
-  {
-    name_homeStay: {
-      type: String,
-      required: true,
-    },
-    nearbyPlaces: {
-      type: [
-        {
-          places: {
-            type: String,
-          },
+const HomeStaySchema = new Schema<HomeStay>({
+  name_homeStay: {
+    type: String,
+    required: true,
+  },
+  room_type: {
+    type: [
+      {
+        name_type_room: { type: String, required: true },
+        bathroom_homeStay: { type: Number, required: true },
+        bedroom_homeStay: { type: Number, required: true },
+        sizeBedroom_homeStay: { type: String, required: true },
+        image_room: {
+          type: [
+            {
+              image: { type: String },
+            },
+          ],
         },
-      ],
-    },
-    room_type: {
-      type: [
-        {
-          name_type_room: { type: String, required: true },
-          bathroom_homeStay: { type: Number, required: true },
-          bedroom_homeStay: { type: Number, required: true },
-          sizeBedroom_homeStay: { type: String, required: true },
-          image_room: {
-            type: [
-              {
-                image: { type: String },
+        offer: {
+          type: [
+            {
+              price_homeStay: { type: Number, required: true },
+              max_people: {
+                type: {
+                  adult: Number,
+                  child: Number,
+                },
               },
             ],
           },
