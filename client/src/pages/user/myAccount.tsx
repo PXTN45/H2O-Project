@@ -10,37 +10,8 @@ import { BsCamera } from "react-icons/bs";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../../Firebase/firebase.config";
 import { FaEdit } from "react-icons/fa";
+import { Address, Password, User } from "../../type";
 
-interface Password {
-  email: string;
-  password: string;
-  newPass: string;
-  confirmPass: string;
-}
-interface Address {
-  houseNumber: string;
-  street: string;
-  village: string;
-  subdistrict: string;
-  district: string;
-  city: string;
-  country: string;
-  postalCode: string;
-}
-
-interface User {
-  _id?: string;
-  name?: string;
-  lastName?: string;
-  businessName?: string;
-  email: string;
-  password: string;
-  phone: string | undefined;
-  image: string;
-  address: Address[];
-  birthday: Date;
-  role: string;
-}
 const myAccount = () => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
