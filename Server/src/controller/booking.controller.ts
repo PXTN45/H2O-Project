@@ -12,6 +12,8 @@ const getAllBooking = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await Booking.find().populate([
       { path: "booker", select: "email name lastName" },
+      { path: "homestay" },
+      { path: "package" },
     ]);
     res.status(201).json(data);
   } catch (error: any) {
@@ -37,7 +39,7 @@ const getBookingByCheckIn = async (
     // ตรวจสอบว่าพบข้อมูลหรือไม่
     if (bookingData.length === 0) {
       res.status(404).json({
-        message: "No bookings found for this user with pending status.",
+        message: "No bookings found for this user with CheckIn status.",
       });
     } else {
       res.status(200).json(bookingData);
@@ -62,7 +64,7 @@ const getBookingByConfirm = async (
     // ตรวจสอบว่าพบข้อมูลหรือไม่
     if (bookingData.length === 0) {
       res.status(404).json({
-        message: "No bookings found for this user with pending status.",
+        message: "No bookings found for this user with Confirm status.",
       });
     } else {
       res.status(200).json(bookingData);
@@ -86,7 +88,9 @@ const getBookingHomeStayByUser = async (
     }
     const bookings = await Booking.find({ user: userId }).populate("homestay");
     res.status(200).json(bookings);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
 };
 
 const getBookingPackageByUser = async (
@@ -102,8 +106,11 @@ const getBookingPackageByUser = async (
     }
     const bookings = await Booking.find({ user: userId }).populate("package");
     res.status(200).json(bookings);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
 };
+
 
 const createBook = async (req: Request, res: Response) => {
   // เข้าถึง bookingData จาก req.body

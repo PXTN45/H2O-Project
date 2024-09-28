@@ -39,10 +39,23 @@ const getByIdHomeStay = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const getByIdBusiness = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const homeStayId = req.params.id;
+    const data = await HomeStayModel.find({business_user: homeStayId});
+    if (!data) {
+      res.status(404).json({ message: "HomeStay not found" });
+    } else {
+      res.json(data);
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const createHomeStay = async (req: Request, res: Response): Promise<void> => {
   const homeStayData = req.body;
   const newHomeStay = new HomeStayModel(homeStayData);
-  console.log(homeStayData);
   try {
     const savedHomeStay = await newHomeStay.save();
     res.status(201).json(savedHomeStay);
@@ -123,4 +136,5 @@ export {
   updateHomeStay,
   deleteHomeStay,
   searchHomeStay,
+  getByIdBusiness,
 };

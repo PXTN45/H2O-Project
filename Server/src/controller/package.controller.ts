@@ -48,6 +48,20 @@ const getByIdPackage = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const getByIdBusiness = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const homeStayId = req.params.id;
+    const data = await PackageModel.find({business_user: homeStayId});
+    if (!data) {
+      res.status(404).json({ message: "HomeStay not found" });
+    } else {
+      res.json(data);
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const createPackage = async (req: Request, res: Response): Promise<void> => {
   const packageData = req.body;
   const newPackage = new PackageModel(packageData);
@@ -135,4 +149,5 @@ export {
   updatePackage,
   deletePackage,
   searchPackage,
+  getByIdBusiness
 };

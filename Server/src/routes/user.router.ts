@@ -206,7 +206,8 @@ import {
   checkEmailExists,
   getUserById,
   updateUserAddress,
-  ChangePassword
+  ChangePassword,
+  getBusinessById
 } from "../controller/user.controller";
 import verifyEmailToken from "../middlewares/verifyEmailToken";
 import { verifyToken } from "../middlewares/verifyToken";
@@ -241,6 +242,8 @@ const router = Router();
 router.get("/userData", getAllUser);
 
 router.get("/userData/:id", getUserById);
+
+router.get("/businessData/:id", getBusinessById);
 
 /**
  * @swagger
