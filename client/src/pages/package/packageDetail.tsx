@@ -12,123 +12,7 @@ import { BiSolidDiscount } from "react-icons/bi";
 import { GrSync } from "react-icons/gr";
 import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import PackageHomeStay from "../../components/PackageHomeStay";
-export interface Image {
-  image_upload: string;
-}
-export interface Image_room {
-  _id: string;
-  image: string;
-}
-export interface Facilities_Room {
-  facilitiesName: string;
-}
-
-export interface Offer {
-  price_homeStay: number;
-  max_people: {
-    adult: number;
-    child: number;
-  };
-  discount: number;
-  facilitiesRoom: Facilities_Room[];
-  roomCount: number;
-  quantityRoom: number;
-}
-export interface RoomType {
-  name_type_room: string;
-  bathroom_homeStay: number;
-  bedroom_homeStay: number;
-  sizeBedroom_homeStay: string;
-  offer: Offer[];
-  image_room: Image_room[];
-}
-
-export interface Facility {
-  _id: string;
-  facilities_name: string;
-}
-export interface Image {
-  _id: string;
-  image: string;
-}
-interface Location {
-  name_location: string;
-  province_location: string;
-  house_no: string;
-  village?: string; // Optional property
-  village_no: string;
-  alley?: string; // Optional property
-  street?: string; // Optional property
-  district_location: string;
-  subdistrict_location: string;
-  zipcode_location: number;
-  latitude_location: number;
-  longitude_location: number;
-  radius_location: number;
-}
-export interface HomeStay {
-  name_homeStay: string;
-  room_type: RoomType[];
-  max_people: number;
-  detail_homeStay: string;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
-  location: Location[];
-  image: Image[];
-  business_user: string[]; // Assuming you use ObjectId as string
-  review_rating_homeStay: number;
-  facilities: Facility[];
-  status_sell_homeStay: boolean;
-  discount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-interface Reviewer {
-  image: string;
-  name: string;
-  email: string;
-}
-interface Review {
-  _id: string;
-  reviewer: Reviewer;
-  content: string;
-  rating: number;
-  package: string;
-  homestay: string;
-  createdAt: string;
-}
-
-export interface IPackage {
-  name_package: string;
-  type_package: string;
-  max_people: number;
-  detail_package: string;
-  activity_package: {
-    activity_days: {
-      activity_name: string;
-    }[];
-  }[];
-  time_start_package: Date;
-  time_end_package: Date;
-  policy_cancel_package: string;
-  location: {
-    name_location: string;
-    province_location: string;
-    district_location: string;
-    subdistrict_location: string;
-    zipcode_location: number;
-    latitude_location: string;
-    longitude_location: string;
-    radius_location: number;
-  }[];
-  image: { image_upload: string }[];
-  price_package: number;
-  discount: number;
-  homestay?: HomeStay;
-  business_user: string;
-  review_rating_package: number;
-}
+import { Image_upload, Offer, Review } from "../../type";
 
 const PackageDetail = () => {
   const [item, setItem] = useState<any>();
@@ -311,19 +195,21 @@ const PackageDetail = () => {
     );
   };
 
-  const image = item?.image.slice(1, 7).map((img: Image, index: number) => {
-    return (
-      <div key={index} className="w-full h-full">
-        <div>
-          <img
-            className="w-[250px] md:w-60 h-[100px] md:h-[140px] object-cover rounded-md"
-            src={img?.image_upload}
-            alt=""
-          />
+  const image = item?.image
+    .slice(1, 7)
+    .map((img: Image_upload, index: number) => {
+      return (
+        <div key={index} className="w-full h-full">
+          <div>
+            <img
+              className="w-[250px] md:w-60 h-[100px] md:h-[140px] object-cover rounded-md"
+              src={img?.image_upload}
+              alt=""
+            />
+          </div>
         </div>
-      </div>
-    );
-  });
+      );
+    });
 
   const activities = item?.activity_package.map(
     (activity: any, index: number) => {
@@ -574,7 +460,7 @@ const PackageDetail = () => {
                           transform: `translateX(-${currentIndex * 100}%)`,
                         }}
                       >
-                        {item.image.map((img: Image, index: number) => (
+                        {item.image.map((img: Image_upload, index: number) => (
                           <div
                             key={index}
                             className="flex-shrink-0 w-full h-full"
@@ -701,7 +587,7 @@ const PackageDetail = () => {
                   {userInfo?.role == "user" && (
                     <div className="flex items-end justify-end p-5">
                       <button
-                      id="btn-makePayment"
+                        id="btn-makePayment"
                         className="bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
                         transition-transform duration-300 text-white"
                         onClick={makePayment}

@@ -10,37 +10,7 @@ import { BsCamera } from "react-icons/bs";
 import { FaEdit } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
-
-interface Password {
-  email: string;
-  password: string;
-  newPass: string;
-  confirmPass: string;
-}
-interface Address {
-  houseNumber: string;
-  street: string;
-  village: string;
-  subdistrict: string;
-  district: string;
-  city: string;
-  country: string;
-  postalCode: string;
-}
-
-interface Business {
-  _id?: string;
-  name: string;
-  lastName: string;
-  businessName?: string;
-  email: string;
-  password: string;
-  phone: string | undefined;
-  image: string;
-  address: Address[];
-  birthday: Date;
-  role: string;
-}
+import { Address, Business, Password } from "../../type";
 
 const myAccountBusiness = () => {
   const authContext = useContext(AuthContext);

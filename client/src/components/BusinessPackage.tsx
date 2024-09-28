@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useContext } from "react";
 import { AuthContext } from "../AuthContext/auth.provider";
 import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
-import Loader from "../assets/loadingAPI/loaddingTravel";
+// import Loader from "../assets/loadingAPI/loaddingTravel";
 import { FaLocationDot, FaStar } from "react-icons/fa6";
 import { GoProjectSymlink, GoShieldCheck } from "react-icons/go";
 import { IoTrashBinOutline } from "react-icons/io5";
@@ -17,116 +17,7 @@ import { Link } from "react-router-dom";
 import { LuActivity } from "react-icons/lu";
 import Swal from "sweetalert2";
 import { GrNext, GrPrevious } from "react-icons/gr";
-
-export interface Image_room {
-  _id: string;
-  image: string;
-}
-export interface Facilities_Room {
-  facilitiesName: string;
-}
-
-export interface Offer {
-  _id: string;
-  price_homeStay: number;
-  max_people: {
-    adult: number;
-    child: number;
-  };
-  discount: number;
-  facilitiesRoom: Facilities_Room[];
-  roomCount: number;
-  quantityRoom: number;
-}
-export interface RoomType {
-  name_type_room: string;
-  bathroom_homeStay: number;
-  bedroom_homeStay: number;
-  sizeBedroom_homeStay: string;
-  offer: Offer[];
-  image_room: Image_room[];
-}
-
-export interface Facility {
-  _id: string;
-  facilities_name: string;
-}
-
-interface Location {
-  name_location: string;
-  province_location: string;
-  house_no: string;
-  village?: string; // Optional property
-  village_no: string;
-  alley?: string; // Optional property
-  street?: string; // Optional property
-  district_location: string;
-  subdistrict_location: string;
-  zipcode_location: number;
-  latitude_location: number;
-  longitude_location: number;
-  radius_location: number;
-}
-
-export interface Image {
-  _id: string;
-  image_upload: string;
-}
-
-export interface HomeStay {
-  _id: string;
-  name_homeStay: string;
-  room_type: RoomType[];
-  max_people: number;
-  detail_homeStay: string;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
-  location: Location[];
-  image: Image[];
-  business_user: string[];
-  review_rating_homeStay: number;
-  facilities: Facility[];
-  status_sell_homeStay: boolean;
-  discount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Activity {
-  activity_days: {
-    activity_name: string;
-  }[];
-}
-[];
-
-export interface IPackage {
-  _id: string;
-  name_package: string;
-  type_package: string;
-  max_people: number;
-  detail_package: string;
-  activity_package: Activity[];
-  time_start_package: Date;
-  time_end_package: Date;
-  policy_cancel_package: string;
-  location: {
-    name_location: string;
-    province_location: string;
-    district_location: string;
-    subdistrict_location: string;
-    zipcode_location: number;
-    latitude_location: string;
-    longitude_location: string;
-    radius_location: number;
-  }[];
-  image: { image_upload: string }[];
-  price_package: number;
-  discount: number;
-  item?: HomeStay;
-  business_user: string;
-  review_rating_package: number;
-}
+import { Activity, IPackage } from "../type";
 
 const BusinessPackage = () => {
   const authContext = useContext(AuthContext);
@@ -485,7 +376,7 @@ const BusinessPackage = () => {
               </div>
             </div>
           ))}
-                    <div className="w-full flex items-center justify-center">
+          <div className="w-full flex items-center justify-center">
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
