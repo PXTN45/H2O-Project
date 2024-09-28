@@ -280,6 +280,30 @@ const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> =
   }
 };
 
+const getAllBookingForAdmin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const data = await Booking.find().populate([
+      { 
+        path: "homestay",
+        select: "business_user",
+        populate: {
+          path: "business_user"
+        }
+      },
+      { 
+        path: "package",
+        select: "business_user",
+        populate: {
+          path: "business_user"
+        }
+      }
+    ]);
+    res.status(201).json(data);
+  } catch (error: any) {
+    res.status(404).json({ message: "Error cannot get this booking:", error });
+  }
+};
+
 export {
   confirmBooking,
   createBook,
@@ -292,5 +316,6 @@ export {
   getBookingPackageByUser,
   getBookingByCheckIn,
   getBookingByConfirm,
-  sendMoneyToBusiness
+  sendMoneyToBusiness,
+  getAllBookingForAdmin
 };
