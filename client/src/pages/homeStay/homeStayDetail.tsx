@@ -5,6 +5,7 @@ import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar-data";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
+import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { usePaymentContext } from "../../AuthContext/paymentContext";
@@ -16,129 +17,8 @@ import { IoMdTime } from "react-icons/io";
 import { MdOutlinePolicy } from "react-icons/md";
 import { TbRuler3 } from "react-icons/tb";
 import { LuBedSingle, LuBedDouble } from "react-icons/lu";
+import { Facilities_Room, HomeStay, Offer, PaymentData, Review } from "../../type";
 
-export interface Image_room {
-  _id: string;
-  image: string;
-}
-export interface Facilities_Room {
-  facilitiesName: string;
-}
-
-export interface Offer {
-  _id: string;
-  price_homeStay: number;
-  max_people: {
-    adult: number;
-    child: number;
-  };
-  discount: number;
-  facilitiesRoom: Facilities_Room[];
-  roomCount: number;
-  quantityRoom: number;
-}
-export interface RoomType {
-  name_type_room: string;
-  bathroom_homeStay: number;
-  bedroom_homeStay: number;
-  sizeBedroom_homeStay: string;
-  offer: Offer[];
-  image_room: Image_room[];
-}
-
-export interface Facility {
-  _id: string;
-  facilities_name: string;
-}
-interface Address {
-  houseNumber: string;
-  street: string;
-  village: string;
-  subdistrict: string;
-  district: string;
-  city: string;
-  country: string;
-  postalCode: string;
-}
-interface User {
-  _id?: string;
-  name?: string;
-  lastName?: string;
-  businessName?: string;
-  email: string;
-  password: string;
-  phone: string | undefined;
-  image: string;
-  address: Address[];
-  birthday: Date;
-  role: string;
-}
-interface Location {
-  name_location: string;
-  province_location: string;
-  house_no: string;
-  village?: string; // Optional property
-  village_no: string;
-  alley?: string; // Optional property
-  street?: string; // Optional property
-  district_location: string;
-  subdistrict_location: string;
-  zipcode_location: number;
-  latitude_location: number;
-  longitude_location: number;
-  radius_location: number;
-}
-interface PaymentData {
-  homeStayId: string;
-  homeStayName: string;
-  totalPrice: number;
-  pricePerRoom: number;
-  location: Location[];
-  roomType: RoomType;
-  offer: Offer;
-  bookingUser: User;
-  rating: number;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
-}
-export interface Image {
-  _id: string;
-  image_upload: string;
-}
-
-export interface HomeStay {
-  name_homeStay: string;
-  room_type: RoomType[];
-  max_people: number;
-  detail_homeStay: string;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
-  location: Location[];
-  image: Image[];
-  business_user: string[];
-  review_rating_homeStay: number;
-  facilities: Facility[];
-  status_sell_homeStay: boolean;
-  discount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-interface Reviewer {
-  image: string;
-  name: string;
-  email: string;
-}
-interface Review {
-  _id: string;
-  reviewer: Reviewer;
-  content: string;
-  rating: number;
-  package: string;
-  homestay: string;
-  createdAt: string;
-}
 
 const homeStayDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -159,9 +39,16 @@ const homeStayDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axiosPrivateUser.get(`/homestay/${id}`);
-        if (res.data) {
-          setItem(res.data);
+        if (userInfo?.role == "user") {
+          const res = await axiosPrivateUser.get(`/homestay/${id}`);
+          if (res.data) {
+            setItem(res.data);
+          }
+        } else if (userInfo?.role == "business") {
+          const res = await axiosPrivateBusiness.get(`/homestay/${id}`);
+          if (res.data) {
+            setItem(res.data);
+          }
         }
       } catch (error) {
         console.error("เกิดข้อผิดพลาดในการดึงรายละเอียด homestay:", error);
@@ -311,9 +198,6 @@ const homeStayDetail = () => {
   });
 
   const calculatePercentages = (review: Review[]) => {
-    console.log(review);
-    console.log(review.length);
-
     const totalReviews = review.length;
     const ratingCounts = [0, 0, 0, 0, 0]; // Index 0 = 1 ดาว, Index 1 = 2 ดาว, etc.
 
@@ -371,10 +255,6 @@ const homeStayDetail = () => {
     );
   };
 
-  // Debugging: ตรวจสอบค่า currentIndices และ roomTypes
-  // console.log("Current Indices:", currentIndices);
-  // console.log("Room Types:", roomTypes);
-
   const carousel = roomTypes.map((roomType, index) => {
     const offer = roomType.offer.map((offer: Offer, i: number) => {
       const price = offer.price_homeStay;
@@ -427,9 +307,9 @@ const homeStayDetail = () => {
                 time_checkOut_homeStay: item.time_checkOut_homeStay,
                 policy_cancel_homeStay: item.policy_cancel_homeStay,
               };
-      
+
               localStorage.setItem("paymentData", JSON.stringify(paymentData));
-      
+
               setPaymentData(paymentData);
               navigate("/bookingDetail");
             }
@@ -501,15 +381,17 @@ const homeStayDetail = () => {
                 (ก่อนรวมภาษีและค่าธรรมเนียม)
               </p>
             </div>
-            <div className="w-1/6 flex flex-col items-center pl-3">
-              <button
-                className=" bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
+            {userInfo?.role == "user" && (
+              <div className="w-1/6 flex flex-col items-center pl-3">
+                <button
+                  className=" bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
                 transition-transform duration-300 text-white"
-                onClick={() => handleSelectAndProceed()}
-              >
-                จอง
-              </button>
-            </div>
+                  onClick={() => handleSelectAndProceed()}
+                >
+                  จอง
+                </button>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -619,6 +501,7 @@ const homeStayDetail = () => {
       </div>
     );
   });
+  console.log(userInfo?.role);
 
   return (
     <div>
@@ -630,7 +513,7 @@ const homeStayDetail = () => {
             className="container-xl mx-6 md:mx-8 lg:mx-24 xl:mx-40"
           >
             <div className="mt-5 ">
-              <Navbar />
+              {userInfo?.role == "user" && <Navbar />}
               <div className="mt-2  flex  justify-end">
                 {showAlert && (
                   <div className="alert alert-error text-white w-1/3">

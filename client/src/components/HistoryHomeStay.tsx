@@ -300,8 +300,6 @@ const HistoryHomeStay = () => {
         ? myBooking[selectedBookingIndex].homestay._id
         : null,
     };
-    console.log(reviewData);
-
     submitReview(reviewData); // ฟังก์ชันสำหรับส่งข้อมูลรีวิว
     closeReviewModal(); // ปิด modal หลังจากส่งข้อมูล
   };

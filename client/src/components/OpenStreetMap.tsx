@@ -6,6 +6,7 @@ import axiosPublic from "../hook/axiosPublic";
 import { AuthContext } from "../AuthContext/auth.provider";
 import { MdClose } from "react-icons/md";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import Animetions from "../assets/loadingAPI/loaddingTravel";
 
 Modal.setAppElement("#root");
 
@@ -60,6 +61,9 @@ const OpenStreetMap: React.FC = () => {
   const [loadingMessage, setLoadingMessage] = useState<string>(
     `แผนที่จะแสดงข้อมูลในรัศมี 1 กิโลเมตร หลังคลิกโปรดรอ ${countdown} วินาที`
   );
+  const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
+  console.log(isMapLoading);
+
   const mapRef = useRef<HTMLDivElement | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -75,7 +79,7 @@ const OpenStreetMap: React.FC = () => {
     if (modalIsOpen) {
       // Reset countdown when modal is opened
       setCountdown(3);
-
+      setIsMapLoading(true); // Set map loading to true when modal is opened
       // Clear previous countdown interval if it exists
       if (countdownIntervalRef.current) {
         clearInterval(countdownIntervalRef.current);
@@ -102,6 +106,7 @@ const OpenStreetMap: React.FC = () => {
                 ).addTo(initMap);
 
                 setMap(initMap);
+                setIsMapLoading(false); // Set map loading to false even if default location is used
               }
             },
             (error) => {
@@ -122,6 +127,7 @@ const OpenStreetMap: React.FC = () => {
                 ).addTo(initMap);
 
                 setMap(initMap);
+                setIsMapLoading(false); // Set map loading to false when map is ready
               }
             }
           );
@@ -142,9 +148,8 @@ const OpenStreetMap: React.FC = () => {
       const handleMapClick = async (e: L.LeafletMouseEvent) => {
         if (!map) return;
 
-        if (marker) {
-          marker.remove();
-        }
+        if (marker) return;
+
         if (circle) {
           circle.remove();
         }
@@ -299,7 +304,13 @@ const OpenStreetMap: React.FC = () => {
             </button>
           )}
         </div>
-        <div id="map" ref={mapRef} className="w-full h-full" />
+        {isMapLoading ? (
+          <div ref={mapRef} className="flex items-center justify-center h-full">
+            <Animetions />
+          </div>
+        ) : (
+          <div id="map" ref={mapRef} className="w-full h-full" />
+        )}
         <footer className="flex items-center justify-center p-2">
           <p className="text-center">{loadingMessage}</p>
         </footer>

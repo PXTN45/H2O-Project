@@ -1,18 +1,18 @@
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import React, { useState, useEffect, useContext, useRef } from "react";
+import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import { AuthContext } from "../../AuthContext/auth.provider";
-import axiosPrivateUser from "../../hook/axiosPrivateUser";
+import { storage } from "../../Firebase/firebase.config";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 import { TbPointFilled } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import { LuEye, LuEyeOff } from "react-icons/lu";
-import axios from "axios";
 import { BsCamera } from "react-icons/bs";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../../Firebase/firebase.config";
 import { FaEdit } from "react-icons/fa";
-import { Address, Password, User } from "../../type";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { Address, Business, Password } from "../../type";
 
-const myAccount = () => {
+const myAccountBusiness = () => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
@@ -22,7 +22,7 @@ const myAccount = () => {
   // const [openUpdateFrom, setOpenUpdateFrom] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
-  const [userData, setUserData] = useState<User>();
+  const [userData, setUserData] = useState<Business>();
   const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
   const [openUpdateAddress, setOpenUpdateAddress] = useState<boolean>(false);
   const [showPasswords, setShowPasswords] = useState({
@@ -46,14 +46,18 @@ const myAccount = () => {
     country: userData?.address[0]?.country || "",
     postalCode: userData?.address[0]?.postalCode || "",
   });
-  const [updatedUserInfo, setUpdatedUserInfo] = useState<User>({} as User);
+  const [updatedUserInfo, setUpdatedUserInfo] = useState<Business>(
+    {} as Business
+  );
   const navigate = useNavigate();
+
+  // console.log(userData);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axiosPrivateUser.get(
-          `/user/userData/${userInfo?._id}`
+        const response = await axiosPrivateBusiness.get(
+          `/user/businessData/${userInfo?._id}`
         );
         setUserData(response.data);
         setAddress(response.data.address[0]);
@@ -68,18 +72,17 @@ const myAccount = () => {
         console.error("Error fetching user data:", error);
       }
     };
+    // console.log(userInfo?.role);
 
     fetchUserData();
   }, [userInfo?._id, openUpdateAddress, openUpdateUser]);
-  console.log(updatedUserInfo);
 
-  // ฟังก์ชันจัดการการเปลี่ยนแปลงฟิลด์ฟอร์ม
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const numericFields = ["houseNumber", "postalCode", "village"];
     const numericValue = numericFields.includes(name)
       ? value.replace(/[^0-9/-]/g, "")
-      : value.replace(/[^a-zA-Zก-๙]/g, "");
+      : value.replace(/[^a-zA-Zก-๙/-]/g, "");
 
     setAddress((prevAddress) => ({
       ...prevAddress,
@@ -109,19 +112,22 @@ const myAccount = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axiosPrivateUser.put(`/user/updateAddress/${userInfo?._id}`, {
-            role: userInfo?.role,
-            address: {
-              houseNumber: address.houseNumber,
-              village: address.village,
-              street: address.street,
-              district: address.district,
-              subdistrict: address.subdistrict,
-              city: address.city,
-              country: address.country,
-              postalCode: address.postalCode,
-            },
-          });
+          await axiosPrivateBusiness.put(
+            `/user/updateAddress/${userInfo?._id}`,
+            {
+              role: userInfo?.role,
+              address: {
+                houseNumber: address.houseNumber,
+                village: address.village,
+                street: address.street,
+                district: address.district,
+                subdistrict: address.subdistrict,
+                city: address.city,
+                country: address.country,
+                postalCode: address.postalCode,
+              },
+            }
+          );
           setOpenUpdateAddress(false);
 
           // แจ้งเตือนว่าการอัปเดตสำเร็จ
@@ -172,7 +178,7 @@ const myAccount = () => {
 
   const changePassword = async () => {
     try {
-      const change = await axiosPrivateUser.put(
+      const change = await axiosPrivateBusiness.put(
         "/user/update-password",
         passwords
       );
@@ -223,16 +229,20 @@ const myAccount = () => {
 
   const handleSave = async () => {
     try {
-      await axiosPrivateUser.put(
+      const updateData = await axiosPrivateBusiness.put(
         `/user/updateUser/${userInfo?._id}`,
         updatedUserInfo
       );
-      // setUserInfo(updatedUserInfo)
-      Swal.fire({
-        title: "สำเร็จ!",
-        text: "ข้อมูลของคุณได้รับการอัปเดตเรียบร้อยแล้ว.",
-        icon: "success",
-      });
+      // setUserInfo(userData)
+      if (updateData.status === 200) {
+        Swal.fire({
+          title: "สำเร็จ!",
+          text: "ข้อมูลของคุณได้รับการอัปเดตเรียบร้อยแล้ว.",
+          icon: "success",
+        });
+      }
+
+      console.log(updateData);
 
       setOpenUpdateUser(false);
     } catch (error) {
@@ -342,7 +352,7 @@ const myAccount = () => {
         image: imageURL,
         role: userInfo.role,
       };
-      const response = await axiosPrivateUser.put(
+      const response = await axiosPrivateBusiness.put(
         `/user/updateUser/${userInfo._id}`,
         updateImage
       );
@@ -367,9 +377,18 @@ const myAccount = () => {
       </div>
       {userInfo && userData ? (
         <div>
-          <div className="shadow-boxShadow pb-10  rounded-lg">
+          <div className="shadow-boxShadow p-10  rounded-lg">
+            {/* <div className="hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out">
+              <div>
+                <span className="text-sm">ชื่อธุรกิจ</span>
+              </div>
+              <div>
+                <span className="text-md">{userData?.businessName}</span>
+              </div>
+            </div> */}
+
             {openUpdateUser === false ? (
-              <div className="flex justify-between items-center hover:bg-gray-300 p-5">
+              <div className="flex justify-between items-center rounded-lg hover:bg-gray-300 pr-5 transition-all duration-700 ease-in-out">
                 <div className="flex gap-5 items-center p-5">
                   <div>
                     <img
@@ -465,7 +484,7 @@ const myAccount = () => {
               </div>
             )}
 
-            <div className=" hover:bg-gray-300 p-5">
+            <div className="hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out">
               <div className="flex gap-5 items-center  ">
                 <div className="flex flex-col">
                   <span className="text-sm">อีเมล</span>
@@ -482,10 +501,11 @@ const myAccount = () => {
                 </div>
               </div>
             </div>
+
             {userData.password ? (
               <div>
                 {openUpdatePassword === false ? (
-                  <div className="flex justify-between items-center hover:bg-gray-300 p-5 transition-all duration-700 ease-in-out">
+                  <div className="flex justify-between items-center hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out">
                     <div className="flex gap-5 items-center">
                       <div className="flex flex-col">
                         <span className="text-sm">รหัสผ่าน</span>
@@ -601,7 +621,7 @@ const myAccount = () => {
             )}
 
             {openUpdateAddress === false ? (
-              <div className="flex justify-between items-center hover:bg-gray-300 p-5 transition-all duration-700 ease-in-out">
+              <div className="flex justify-between items-center hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out">
                 <div className="flex gap-5 items-center">
                   <div className="flex flex-col">
                     <span className="text-sm">ที่อยู่</span>
@@ -774,6 +794,7 @@ const myAccount = () => {
               </div>
             )}
           </div>
+
           <div className="flex justify-end">
             <button
               onClick={handleDeleteUser}
@@ -793,4 +814,4 @@ const myAccount = () => {
   );
 };
 
-export default myAccount;
+export default myAccountBusiness;

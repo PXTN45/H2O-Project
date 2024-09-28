@@ -252,8 +252,6 @@ const HistoryPackage = () => {
   const handleRatingChange = (value: number) => {
     setRating(value);
   };
-  console.log(myBookingPackage[0].bookingStatus);
-
   const handleSubmit = (selectedBookingIndex: number) => {
     const reviewer = userInfo?._id;
     const reviewData = {

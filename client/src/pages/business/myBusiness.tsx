@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import axiosPrivateUser from "../../hook/axiosPrivateUser";
+import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import LoadingTravel from "../../assets/loadingAPI/loaddingTravel";
 import { useContext } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
-import HistoryPackage from "../../components/HistoryPackage";
-import HistoryHomeStay from "../../components/HistoryHomeStay";
+import BusinessHomeStay from "../../components/BusinessHomeStay";
+import BusinessPackage from "../../components/BusinessPackage";
 import { Booking } from "../../type";
 
-const historyBooking = () => {
-  const [myBooking, setMyBooking] = useState<Booking[]>([]);
+const myBusiness = () => {
+  const [myHomestayAndPackage, setMyHomestayAndPackage] = useState<Booking[]>(
+    []
+  );
   const [activeButton, setActiveButton] = useState<string>("homestay");
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -16,21 +18,24 @@ const historyBooking = () => {
   }
   const { userInfo } = authContext;
 
-  const fetchData = async () => {
-    try {
-      const response = await axiosPrivateUser(
-        `/booking-check-in/${userInfo?._id}`
-      );
-      setMyBooking(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosPrivateBusiness(
+          `/business-homestay/${userInfo?._id}`
+        );
+        console.log(response.data);
+
+        setMyHomestayAndPackage(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     fetchData();
   }, [userInfo?._id]);
 
-  if (!myBooking) {
+  if (!myHomestayAndPackage) {
     return <div>no my booking</div>;
   }
 
@@ -40,20 +45,30 @@ const historyBooking = () => {
 
   return (
     <div>
-      {myBooking ? (
+      {myHomestayAndPackage ? (
         <div className="container w-full px-6 my-5">
           <div>
-            <span className="text-2xl">ประวัติการจอง</span>
+            {activeButton === "homestay" ? (
+              <span className="text-2xl">
+                โฮมสเตย์ของ-{userInfo?.businessName}
+              </span>
+            ) : activeButton === "package" ? (
+              <span className="text-2xl">
+                แพ็คเกจของ-{userInfo?.businessName}
+              </span>
+            ) : (
+              <div></div>
+            )}
           </div>
 
-          <div className="flex w-[35rem] md:w-[37rem] lg:w-[35rem] xl:w-[49em]  2xl:w-[65rem] gap-5 my-5">
+          <div className="flex w-full gap-5 my-5">
             <div className="w-1/2">
               <button
                 onClick={() => handleButtonClick("homestay")}
-                className={`shadow-boxShadow rounded-md py-2 w-[100%]
+                className={`shadow-boxShadow rounded-md py-2 w-full
             ${
               activeButton === "homestay"
-                ? "bg-primaryUser text-white"
+                ? "bg-primaryBusiness text-white"
                 : "bg-primaryActive text-black"
             }`}
               >
@@ -63,10 +78,10 @@ const historyBooking = () => {
             <div className="w-1/2">
               <button
                 onClick={() => handleButtonClick("package")}
-                className={`shadow-boxShadow rounded-md py-2 w-[100%]
+                className={`shadow-boxShadow rounded-md py-2 w-full
             ${
               activeButton === "package"
-                ? "bg-primaryUser text-white"
+                ? "bg-primaryBusiness text-white"
                 : "bg-primaryActive text-black"
             }`}
               >
@@ -77,11 +92,11 @@ const historyBooking = () => {
 
           {activeButton == "homestay" ? (
             <div>
-              <HistoryHomeStay />
+              <BusinessHomeStay />
             </div>
           ) : activeButton == "package" ? (
             <div>
-              <HistoryPackage />
+              <BusinessPackage />
             </div>
           ) : (
             <div>
@@ -98,4 +113,4 @@ const historyBooking = () => {
   );
 };
 
-export default historyBooking;
+export default myBusiness;

@@ -1,14 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Link } from "react-router-dom";
-// import { BsCamera } from "react-icons/bs";
-// import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-// import Swal from "sweetalert2";
 import { AuthContext } from "../AuthContext/auth.provider";
-// import { storage } from "../Firebase/firebase.config";
-// import axiosPrivateUser from "../hook/axiosPrivateUser";
-// import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
-// import axiosPrivateAdmin from "../hook/axiosPrivateAdmin";
 import { useNavigate } from "react-router-dom";
 
 const Drawer: React.FC = () => {
@@ -33,134 +26,6 @@ const Drawer: React.FC = () => {
   useEffect(() => {
     navigate(`/dashboard-${userInfo?.role}/Profile-${userInfo?.role}`);
   }, []);
-  // const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const selectedFile = e.target.files?.[0];
-  //   if (selectedFile) {
-  //     const resizedFile = await resizeImage(selectedFile, 500, 500);
-  //     const pathImage = `imagesAvatar/${userInfo?._id}`;
-
-  //     Swal.fire({
-  //       title: "Are you sure you want to change the image?",
-  //       text: "This action cannot be undone!",
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#3085d6",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "Yes, change it!",
-  //       cancelButtonText: "Cancel",
-  //     }).then(async (result) => {
-  //       if (result.isConfirmed) {
-  //         try {
-  //           setLoadPage(false);
-  //           await handleUpload(resizedFile, pathImage);
-  //           const storageRef = ref(storage, pathImage);
-  //           const imageURL = await getDownloadURL(storageRef);
-  //           await apiUpdateImage(imageURL);
-  //           setLoadPage(true);
-  //         } catch (error) {
-  //           Swal.fire({
-  //             icon: "error",
-  //             title: "There was an error updating.",
-  //             text: `${error}`,
-  //           });
-  //         }
-  //       } else if (result.isDismissed) {
-  //         if (fileInputRef.current) {
-  //           fileInputRef.current.value = "";
-  //         }
-  //         console.log("User canceled the image change");
-  //       }
-  //     });
-  //   }
-  // };
-
-  // const resizeImage = (
-  //   file: File,
-  //   maxWidth: number,
-  //   maxHeight: number
-  // ): Promise<File> => {
-  //   return new Promise((resolve, reject) => {
-  //     const img = new Image();
-  //     img.src = URL.createObjectURL(file);
-  //     img.onload = () => {
-  //       const canvas = document.createElement("canvas");
-  //       const ctx = canvas.getContext("2d");
-  //       Math.min(maxWidth / img.width, maxHeight / img.height);
-
-  //       canvas.width = maxWidth;
-  //       canvas.height = maxHeight;
-  //       ctx?.drawImage(img, 0, 0, maxWidth, maxHeight);
-
-  //       canvas.toBlob((blob) => {
-  //         if (blob) {
-  //           const resizedFile = new File([blob], file.name, {
-  //             type: file.type,
-  //           });
-  //           resolve(resizedFile);
-  //         } else {
-  //           reject(new Error("Canvas is empty"));
-  //         }
-  //       }, file.type);
-  //     };
-  //     img.onerror = (err) => reject(err);
-  //   });
-  // };
-
-  // const handleUpload = async (file: File, pathImage: string) => {
-  //   const storageRef = ref(storage, pathImage);
-  //   const uploadTask = uploadBytesResumable(storageRef, file);
-
-  //   return new Promise<void>((resolve, reject) => {
-  //     uploadTask.on(
-  //       "state_changed",
-  //       () => {},
-  //       (error) => {
-  //         reject(error);
-  //       },
-  //       () => {
-  //         resolve();
-  //       }
-  //     );
-  //   });
-  // };
-
-  // const apiUpdateImage = async (imageURL: string) => {
-  //   if (userInfo) {
-  //     const updateImage = {
-  //       image: imageURL,
-  //       role: userInfo.role,
-  //     };
-
-  //     const whatAxios = (() => {
-  //       switch (userInfo.role) {
-  //         case "user":
-  //           return axiosPrivateUser;
-  //         case "business":
-  //           return axiosPrivateBusiness;
-  //         case "admin":
-  //           return axiosPrivateAdmin;
-  //         default:
-  //           throw new Error("Invalid user role");
-  //       }
-  //     })();
-
-  //     const response = await whatAxios.put(
-  //       `/user/updateUser/${userInfo._id}`,
-  //       updateImage
-  //     );
-
-  //     if (!response) {
-  //       throw new Error(`Error: ${response}`);
-  //     } else {
-  //       setUserInfo(response.data);
-  //       Swal.fire({
-  //         icon: "success",
-  //         title: "Success",
-  //         text: "Avatar image change successful!",
-  //       });
-  //     }
-  //   }
-  // };
 
   return (
     <div>
@@ -271,51 +136,48 @@ const Drawer: React.FC = () => {
                         <a>ประวัติรีวิว</a>
                       </li>
                     </Link>
-                    {/* <Link to="#">
-                      <li
-                        onClick={() => handleClick("Property messages")}
-                        className={`cursor-pointer rounded-md ${
-                          activeItem === "Property messages"
-                            ? "bg-primaryUser text-white"
-                            : ""
-                        }`}
-                      >
-                        <a>Property messages</a>
-                      </li>
-                    </Link> */}
                   </div>
                 ) : userInfo?.role === "business" ? (
                   <div>
-                    <Link to={"/dashboard-business/ProfileBusiness"}>
+                    <Link to={"/dashboard-business/Profile-business"}>
                       <li
                         onClick={() => handleClick("Profile")}
                         className={`cursor-pointer rounded-md ${
                           activeItem === "Profile"
-                            ? "bg-primaryUser text-white"
+                            ? "bg-primaryBusiness text-white"
                             : ""
                         }`}
                       >
                         <a>บัญชีของฉัน</a>
                       </li>
                     </Link>
-                    <Link to={"#"}>
-                      <li>
-                        <a>My Business (UC10 และ UC9)</a>
+                    <Link to={"/dashboard-business/MyBusiness-business"}>
+                      <li
+                        onClick={() => handleClick("MyBusiness")}
+                        className={`cursor-pointer rounded-md ${
+                          activeItem === "MyBusiness"
+                            ? "bg-primaryBusiness text-white"
+                            : ""
+                        }`}
+                      >
+                        <a>ที่พัก / แพ็คเกจ</a>
+                      </li>
+                    </Link>
+                    <Link to={"/dashboard-business/BookingList-business"}>
+                    <li
+                        onClick={() => handleClick("BookingList")}
+                        className={`cursor-pointer rounded-md ${
+                          activeItem === "BookingList"
+                            ? "bg-primaryBusiness text-white"
+                            : ""
+                        }`}
+                      >
+                        <a>รายการจอง</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
                       <li>
-                        <a>Booking List (UC14)</a>
-                      </li>
-                    </Link>
-                    <Link to={"#"}>
-                      <li>
-                        <a>Review</a>
-                      </li>
-                    </Link>
-                    <Link to={"#"}>
-                      <li>
-                        <a>Property messages</a>
+                        <a>รีวิว</a>
                       </li>
                     </Link>
                   </div>
@@ -323,7 +185,7 @@ const Drawer: React.FC = () => {
                   <div>
                     <Link to={"/dashboard-business/ProfileAdmin"}>
                       <li>
-                        <a>Profile</a>
+                        <a>บัญชีของฉัน</a>
                       </li>
                     </Link>
                   </div>
@@ -348,12 +210,12 @@ const Drawer: React.FC = () => {
                   <div>
                     <Link to={"#"}>
                       <li>
-                        <a>History Booking(UC8)</a>
+                        <a>ประวัติการจอง (UC8)</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
                       <li>
-                        <a>How to get money(UC17)</a>
+                        <a>วิธีรับเงิน (UC17)</a>
                       </li>
                     </Link>
                   </div>

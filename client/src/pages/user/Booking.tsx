@@ -116,7 +116,7 @@ const Booking = () => {
     const fetchData = async () => {
       try {
         const response = await axiosPrivateUser(
-          `/booking-pending/${userInfo?._id}`
+          `/booking-confirm/${userInfo?._id}`
         );
         setMyBooking(response.data);
       } catch (error) {
@@ -143,11 +143,11 @@ const Booking = () => {
             <span className="text-2xl">การจอง</span>
           </div>
 
-          <div className="flex w-[35rem] md:w-[37rem] lg:w-[35rem] xl:w-[49em]  2xl:w-[65rem] gap-5 my-5">
+          <div className="flex w-full gap-5 my-5 border">
             <div className="w-1/2">
               <button
                 onClick={() => handleButtonClick("homestay")}
-                className={`shadow-boxShadow rounded-md py-2 w-[100%]
+                className={`shadow-boxShadow rounded-md py-2 w-full
             ${
               activeButton === "homestay"
                 ? "bg-primaryUser text-white"
@@ -160,7 +160,7 @@ const Booking = () => {
             <div className="w-1/2">
               <button
                 onClick={() => handleButtonClick("package")}
-                className={`shadow-boxShadow rounded-md py-2 w-[100%]
+                className={`shadow-boxShadow rounded-md py-2 w-full
             ${
               activeButton === "package"
                 ? "bg-primaryUser text-white"

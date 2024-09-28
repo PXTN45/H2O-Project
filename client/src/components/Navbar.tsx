@@ -25,9 +25,6 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-  console.log(userInfo?.role);
-  
-
   const handleCreateAdmin = () => {
     (document.getElementById("Get-Started") as HTMLDialogElement)?.showModal();
   };
