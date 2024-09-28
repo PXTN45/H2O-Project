@@ -88,6 +88,7 @@ const SelectionCreate = () => {
           const [x, y] = dot;
           let [dx, dy] = directions[index];
 
+          // Random direction changes
           if (Math.random() < 0.05) {
             const newDx = Math.random() < 0.5 ? 1 : -1;
             const newDy = Math.random() < 0.5 ? 1 : -1;
@@ -98,9 +99,11 @@ const SelectionCreate = () => {
             directions[index] = [dx, dy];
           }
 
+          // Move dot
           let newX = x + dx * 2;
           let newY = y + dy * 2;
 
+          // Keep within bounds
           if (newX < 0) {
             newX = offsetWidth;
           } else if (newX > offsetWidth) {
@@ -223,6 +226,28 @@ const SelectionCreate = () => {
                 strokeWidth="1"
               />
             ))}
+          {dots.map(([x1, y1], index1) => {
+            const closestDots = dots
+              .map(([x2, y2], index2) => {
+                const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                return { distance, coordinates: [x2, y2], index2 };
+              })
+              .filter((dot) => dot.index2 !== index1)
+              .sort((a, b) => a.distance - b.distance)
+              .slice(0, 3);
+
+            return closestDots.map((dot, idx) => (
+              <line
+                key={`${index1}-${idx}`}
+                x1={x1}
+                y1={y1}
+                x2={dot.coordinates[0]}
+                y2={dot.coordinates[1]}
+                stroke="#7AA6E5"
+                strokeWidth="1"
+              />
+            ));
+          })}
         </svg>
       </div>
     </div>
