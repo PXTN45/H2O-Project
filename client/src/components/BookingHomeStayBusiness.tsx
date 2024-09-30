@@ -7,7 +7,15 @@ import { Booking, BookingHomeStayBusinessProps } from "../type";
 import { FiUsers } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { MdOutlineEmail } from "react-icons/md";
-import { FaRegCalendarCheck, FaRegUser } from "react-icons/fa";
+import {
+  FaRegCalendarCheck,
+  FaRegCheckCircle,
+  FaRegUser,
+} from "react-icons/fa";
+import { IoPricetagsOutline } from "react-icons/io5";
+import { ImCancelCircle } from "react-icons/im";
+import { GiConfirmed } from "react-icons/gi";
+import { FaRegTrashCan } from "react-icons/fa6";
 
 const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({
   bookingData,
@@ -35,7 +43,6 @@ const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({
   useEffect(() => {
     fetchData();
   }, [userInfo?._id, bookingData]);
-
 
   const monthNamesTH = [
     "มกราคม",
@@ -105,7 +112,7 @@ const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({
     <div>
       {myBooking.length > 0 ? (
         myBooking?.map((booking, index) => (
-          <div key={index} className="px-0 xl:px-10">
+          <div key={index} className="px-0 xl:px-10 hover:scale-101 transition-transform duration-200">
             <div className="w-full my-5 shadow-boxShadow rounded-lg flex gap-2 flex-wrap xl:flex-nowrap">
               <div className="p-5 flex flex-col  xl:flex-row w-full xl:w-full">
                 <div className=" xl:w-2/3 flex flex-col gap-2">
@@ -139,37 +146,14 @@ const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({
                     <span className="flex items-center gap-2">
                       <FaRegCalendarCheck />
                       {formatBookingDates(
-                        myBooking[index]?.bookingStart,
-                        myBooking[index]?.bookingEnd
+                        booking?.bookingStart,
+                        booking?.bookingEnd
                       )}
                     </span>
                   </div>
-                  <div className="text-md">
-                    <span className="flex items-center gap-2">
-                      <div className="flex items-center">
-                        <FiUsers /> {myBooking[0]?.detail_offer[0].adult}
-                      </div>
-                      <div className="flex items-center">
-                        <TbMoodKid />
-                        {myBooking[index]?.detail_offer[0].child}
-                      </div>
-                      <div className="flex items-center">
-                        <GoHome />
-                        {myBooking[index]?.detail_offer[0].room}
-                      </div>
-                    </span>
-                  </div>
-                </div>
-                <div className=" xl:w-1/3 flex flex-col justify-end items-end xl:border-l">
-                  <div
-                    id="status2"
-                    className="bg-green-400 px-3 rounded-full text-white hidden xl:block"
-                  >
-                    {booking.bookingStatus}
-                  </div>
-                  <div className="flex flex-col items-end text-xl my-5">
-                    <span>ราคา</span>
-                    <span className="font-bold text-red-500 ">
+                  <div className="flex items-center gap-2">
+                    <IoPricetagsOutline />
+                    <span>
                       ฿{" "}
                       {booking?.detail_offer[0].totalPrice.toLocaleString(
                         "th-TH",
@@ -180,18 +164,43 @@ const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({
                       )}{" "}
                     </span>
                   </div>
-                  <div className=" flex gap-2">
-                    <button
-                      className=" py-2 px-5 rounded-lg text-black border hover:bg-red-500 hover:text-white"
-                      onClick={() => cancelBooking(myBooking[index]?._id)}
+                  <div className="text-md">
+                    <span className="flex items-center gap-2">
+                      <div className="flex items-center">
+                        <FiUsers /> {myBooking[0]?.detail_offer[0].adult}
+                      </div>
+                      <div className="flex items-center">
+                        <TbMoodKid />
+                        {booking?.detail_offer[0].child}
+                      </div>
+                      <div className="flex items-center">
+                        <GoHome />
+                        {booking?.detail_offer[0].room}
+                      </div>
+                    </span>
+                  </div>
+                </div>
+                <div className=" xl:w-1/3 flex flex-col justify-start gap-5 items-end xl:border-l">
+                  {booking.bookingStatus === "Confirmed" && (
+                    <div
+                      id="status2"
+                      className="bg-green-400 px-3 rounded-full text-white hidden xl:block"
                     >
-                      ยกเลิก
+                      ชำระเงินแล้ว
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => cancelBooking(booking?._id)}
+                      className="hover:scale-110 transition-transform duration-200 hover:text-red-500"
+                    >
+                      <FaRegTrashCan className="w-5 h-5" />
                     </button>
                     <button
-                      className="bg-primaryBusiness py-2 px-5 rounded-lg text-white hover:bg-blue-500"
                       // onClick={() => cancelBooking(myBooking[index]?._id)}
+                      className="hover:scale-110 transition-transform duration-200 hover:text-blue-500"
                     >
-                      ยืนยัน
+                      <FaRegCheckCircle className="w-5 h-5" />
                     </button>
                   </div>
                 </div>

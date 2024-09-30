@@ -279,6 +279,7 @@ const myAccountBusiness = () => {
             const imageURL = await getDownloadURL(storageRef);
             await apiUpdateImage(imageURL);
             // setLoadPage(true);
+            setOpenUpdateUser(false);
           } catch (error) {
             Swal.fire({
               icon: "error",
@@ -416,7 +417,7 @@ const myAccountBusiness = () => {
                   <div className="relative group ">
                     <div className="rounded-full h-14 w-14 object-cover bg-dark">
                       <img
-                        src={userInfo?.image}
+                        src={userData?.image}
                         alt="Profile"
                         className="object-cover w-full h-full transition-opacity duration-300 group-hover:opacity-30 rounded-full"
                       />
