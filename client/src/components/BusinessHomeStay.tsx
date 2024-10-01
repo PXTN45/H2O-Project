@@ -22,6 +22,9 @@ const BusinessHomeStay = () => {
   const [myHomestay, setMyHomestay] = useState<HomeStay[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 2;
+  const [toggleStates, setToggleStates] = useState<{ [key: number]: boolean }>(
+    {}
+  );
 
   const fetchData = async () => {
     try {
@@ -37,7 +40,7 @@ const BusinessHomeStay = () => {
   };
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [toggleStates]);
 
   const [currentIndices, setCurrentIndices] = useState<number[]>(
     myHomestay.map(() => 0)
@@ -142,6 +145,31 @@ const BusinessHomeStay = () => {
   const currentItems = myHomestay.slice(indexOfFirstItem, indexOfLastItem);
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  const toggle = async (index: number, id: string) => {
+    // สลับสถานะก่อน
+    const newState = !toggleStates[index];  
+    console.log(newState);
+      
+    try {
+      if (newState) {
+        // ส่ง request สำหรับเปิดการจอง
+        await axiosPrivateBusiness.post(`/changeStatus/${id}`, {
+          status_sell_homeStay: "Ready", 
+        });
+      } else {
+        await axiosPrivateBusiness.post(`/changeStatus/${id}`, {
+          status_sell_homeStay: "NotReady", 
+        });
+      }
+      // อัปเดตสถานะของ toggle
+      setToggleStates((prevState) => ({
+        ...prevState,
+        [index]: newState,
+      }));
+    } catch (error) {
+      console.error("Error updating booking status:", error);
+    }
+  };
 
   return (
     <div>
@@ -288,17 +316,25 @@ const BusinessHomeStay = () => {
                   <div className="xl:w-2/6 flex flex-col w-full xl:border-l p-1">
                     <div className="flex flex-col justify-between h-full w-full gap-2">
                       <div className="w-full flex flex-col items-end justify-end">
-                        {homestay?.status_sell_homeStay === "Ready" ? (
-                          <div className="text-sm bg-green-400 px-2 rounded-xl text-white">
-                            พร้อมให้จอง
-                          </div>
-                        ) : (
-                          homestay?.status_sell_homeStay === "NotReady" && (
-                            <div className="text-sm bg-red-400 px-2 rounded-xl text-white">
-                              ยังไม่พร้อมให้จอง
-                            </div>
-                          )
-                        )}
+                        <button
+                          key={homestay?._id}
+                          onClick={() => toggle(index, homestay?._id)}
+                          className={`w-[115px] text-xs font-bold text-white px-4 py-2 rounded-full flex items-center gap-2 transition-colors duration-300 ease-in-out ${
+                            toggleStates[index]
+                              ? "bg-blue-500 flex-row-reverse"
+                              : "bg-red-400 flex-row"
+                          }`}
+                        >
+                          <div
+                            className={`p-2 bg-whiteSmoke shadow-boxShadow rounded-full transition-transform duration-300 ease-in-out ${
+                              toggleStates[index]
+                                ? "translate-x-1"
+                                : "translate-x-0"
+                            }`}
+                          ></div>
+                          {toggleStates[index] ? "เปิดให้จอง" : "ปิดให้จอง"}
+                        </button>
+
                         <div>
                           <button className="p-2">
                             <FaRegEdit className="text-xl hover:text-yellow-400" />

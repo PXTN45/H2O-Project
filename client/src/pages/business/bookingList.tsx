@@ -146,7 +146,7 @@ const bookingList = () => {
           ) : (
             activeButton == "package" && (
               <div>
-                <BookingPackageBusiness />
+                <BookingPackageBusiness bookingData={filteredGuests}/>
               </div>
             )
           )}

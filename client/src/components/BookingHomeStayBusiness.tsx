@@ -13,13 +13,9 @@ import {
   FaRegUser,
 } from "react-icons/fa";
 import { IoPricetagsOutline } from "react-icons/io5";
-import { ImCancelCircle } from "react-icons/im";
-import { GiConfirmed } from "react-icons/gi";
 import { FaRegTrashCan } from "react-icons/fa6";
 
-const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({
-  bookingData,
-}) => {
+const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({ bookingData,}) => {
   const [myBooking, setMyBooking] = useState<Booking[]>([]);
 
   const authContext = useContext(AuthContext);
