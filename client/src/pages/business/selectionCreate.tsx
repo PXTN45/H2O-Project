@@ -88,7 +88,6 @@ const SelectionCreate = () => {
           const [x, y] = dot;
           let [dx, dy] = directions[index];
 
-          // Random direction changes
           if (Math.random() < 0.05) {
             const newDx = Math.random() < 0.5 ? 1 : -1;
             const newDy = Math.random() < 0.5 ? 1 : -1;
@@ -99,11 +98,9 @@ const SelectionCreate = () => {
             directions[index] = [dx, dy];
           }
 
-          // Move dot
           let newX = x + dx * 2;
           let newY = y + dy * 2;
 
-          // Keep within bounds
           if (newX < 0) {
             newX = offsetWidth;
           } else if (newX > offsetWidth) {
@@ -172,8 +169,6 @@ const SelectionCreate = () => {
           <span className="md:inline">
             หากคุณมองหาโอกาสในการร่วมธุรกิจที่เติบโตไปด้วยกัน
             เราขอเชิญคุณมาร่วมเป็นส่วนหนึ่งกับเรา!
-            เรามีแนวทางที่ชัดเจนในการสร้างสรรค์และพัฒนาโอกาสใหม่ๆ
-            ที่จะนำไปสู่ความสำเร็จร่วมกัน มาร่วมมือกันสร้างอนาคตที่ดีกว่า!
           </span>
         </div>
         <LeftSide />

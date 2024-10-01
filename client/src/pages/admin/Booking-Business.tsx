@@ -97,7 +97,10 @@ const BookingBusiness = () => {
     const fetchBusinesses = async () => {
       try {
         const response = await axiosPublic.get("/getBookingForAdmin");
-        setBusinesses(response.data);
+        const confirmedBookings = response.data.filter(
+          (booking) => booking.bookingStatus === "Check-in"
+        );
+        setBusinesses(confirmedBookings);
       } catch (err) {
         setError("Failed to load businesses");
       } finally {
@@ -116,8 +119,42 @@ const BookingBusiness = () => {
     return <p>{error}</p>;
   }
 
+  if (businesses.length === 0) {
+    return (
+      <div>
+        <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
+          <button
+            id="button-homestaySearch-Select"
+            className={
+              !isPackage
+                ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
+                : "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+            }
+            onClick={clickToHome}
+          >
+            ผู้ใช้ ( จำนวนสุทธิ )
+          </button>
+          <button
+            id="button-homestaySearch-noSelect"
+            className={
+              !isPackage
+                ? "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+                : "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+            }
+            onClick={clickToPackage}
+          >
+            ผู้ขาย (จำนวนสุทธิ)
+          </button>
+        </div>
+        <div className="min-h-screen flex items-center justify-center">
+          <p>ไม่พบข้อมูล</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div className="min-h-screen">
       <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
         <button
           id="button-homestaySearch-Select"
@@ -128,7 +165,7 @@ const BookingBusiness = () => {
           }
           onClick={clickToHome}
         >
-          ที่พัก ( จำนวนสุทธิ )
+          ผู้ใช้ ( จำนวนสุทธิ )
         </button>
         <button
           id="button-homestaySearch-noSelect"
@@ -139,7 +176,7 @@ const BookingBusiness = () => {
           }
           onClick={clickToPackage}
         >
-          แพ็คเกจ (จำนวนสุทธิ)
+          ผู้ขาย (จำนวนสุทธิ)
         </button>
       </div>
       <div className="grid grid-cols-1 gap-6 p-4">
