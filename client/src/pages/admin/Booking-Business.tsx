@@ -98,7 +98,7 @@ const BookingBusiness = () => {
       try {
         const response = await axiosPublic.get("/getBookingForAdmin");
         const confirmedBookings = response.data.filter(
-          (booking) => booking.bookingStatus === "Check-in"
+          (booking:Booking) => booking.bookingStatus === "Check-in"
         );
         setBusinesses(confirmedBookings);
       } catch (err) {
