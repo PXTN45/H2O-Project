@@ -54,7 +54,6 @@ export interface FormData {
   time_checkOut_homeStay: string;
   policy_cancel_homeStay: string;
   business_user: string;
-  review_rating_homeStay: number;
   status_sell_homeStay: string;
 }
 
@@ -64,9 +63,8 @@ const createHomeStay: React.FC = () => {
     detail_homeStay: "",
     time_checkIn_homeStay: "",
     time_checkOut_homeStay: "",
-    policy_cancel_homeStay: "",
+    policy_cancel_homeStay: "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก",
     business_user: "",
-    review_rating_homeStay: 0,
     status_sell_homeStay: "",
   });
   const [location, setLocation] = useState<Location>({
@@ -107,7 +105,7 @@ const createHomeStay: React.FC = () => {
   const [isPolicyAccepted, setIsPolicyAccepted] = useState<boolean>(false);
   const [checkInTime, setCheckInTime] = useState("15:00");
   const [checkOutTime, setCheckOutTime] = useState("12:00");
-  const [cancellationPolicy, setCancellationPolicy] = useState("");
+  const [cancellationPolicy, setCancellationPolicy] = useState("คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก");
   const [selected, setSelected] = useState<string | null>("homestay");
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [amenities, setAmenities] = useState<string[]>([]);
@@ -140,21 +138,23 @@ const createHomeStay: React.FC = () => {
     const { name, value, type } = e.target;
 
     // ตรวจสอบว่า e.target เป็น HTMLInputElement
-    if (type === "radio" || type === "checkbox") {
-      const target = e.target as HTMLInputElement; 
-      let displayText = "";
+    if (type === "radio" || type === "checkbox") {      
+      let displayText = "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก";
       switch (value) {
         case "option1":
           displayText = "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก";
+          setCancellationPolicy(displayText)
           break;
         case "option2":
           displayText = "คืนเงิน 50% หากทำการยกเลิกภายใน 3 วันก่อนการเข้าพัก";
+          setCancellationPolicy(displayText)
           break;
         case "option3":
           displayText = "คืนเงิน 50% หากทำการยกเลิกภายใน 7 วันหลังการเข้าพัก";
+          setCancellationPolicy(displayText)
           break;
         
-      }  console.log('Selected Display Text:', displayText)
+      } 
       setFormData((prevState) => ({
         ...prevState,
         [name]: displayText,
@@ -164,9 +164,13 @@ const createHomeStay: React.FC = () => {
         ...prevState,
         [name]: value,
       }));
-    } console.log(formData);
+    } 
     
   };
+
+  console.log(cancellationPolicy);
+  console.log(formData);
+  
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -182,13 +186,13 @@ const createHomeStay: React.FC = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setRoomType((prevRoomType) => ({
-      ...prevRoomType,
-      [name]: value,
-    }));
-  };
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setRoomType((prevRoomType) => ({
+  //     ...prevRoomType,
+  //     [name]: value,
+  //   }));
+  // };
   const handleChangeLocation = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -199,16 +203,16 @@ const createHomeStay: React.FC = () => {
     }));
     console.log(location);
   };
-  const handleChangeRoomType = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setRoomType((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-    console.log(roomType);
-  };
+  // const handleChangeRoomType = (
+  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  // ) => {
+  //   const { name, value } = e.target;
+  //   setRoomType((prevState) => ({
+  //     ...prevState,
+  //     [name]: value,
+  //   }));
+  //   console.log(roomType);
+  // };
 
   const handlePolicyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsPolicyAccepted(e.target.checked);
@@ -351,7 +355,7 @@ const createHomeStay: React.FC = () => {
                       id="option1"
                       name="policy_cancel_homeStay"
                       value="option1"
-                      checked={formData.policy_cancel_homeStay === "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก"}
+                      checked={cancellationPolicy === "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก"}
                       onChange={handleChange}
                       className="mr-2"
                     />
@@ -365,7 +369,7 @@ const createHomeStay: React.FC = () => {
                       id="option2"
                       name="policy_cancel_homeStay"
                       value="option2"
-                      checked={formData.policy_cancel_homeStay === "คืนเงิน 50% หากทำการยกเลิกภายใน 3 วันก่อนการเข้าพัก"}
+                      checked={cancellationPolicy === "คืนเงิน 50% หากทำการยกเลิกภายใน 3 วันก่อนการเข้าพัก"}
                       onChange={handleChange}
                       className="mr-2"
                     />
@@ -379,7 +383,7 @@ const createHomeStay: React.FC = () => {
                       id="option3"
                       name="policy_cancel_homeStay"
                       value="option3"
-                      checked={formData.policy_cancel_homeStay === "คืนเงิน 50% หากทำการยกเลิกภายใน 7 วันหลังการเข้าพัก"}
+                      checked={cancellationPolicy === "คืนเงิน 50% หากทำการยกเลิกภายใน 7 วันหลังการเข้าพัก"}
                       onChange={handleChange}
                       className="mr-2"
                     />

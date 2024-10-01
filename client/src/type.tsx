@@ -92,16 +92,7 @@ export interface HomeStay {
   updatedAt: Date;
 }
 
-export interface Booking {
-  _id: string;
-  booker: Booker;
-  bookingStart: string;
-  bookingEnd: string;
-  bookingStatus: string;
-  detail_offer: DetailOffer[];
-  homestay: HomeStay;
-  night: number;
-}
+
 
 export interface BookingHomeStayBusinessProps {
   bookingData: Booking[];
@@ -245,3 +236,15 @@ export interface Activity {
     activity_name: string;
   }[];
 }[];
+
+export interface Booking {
+  _id: string;
+  booker: Booker;
+  bookingStart: string;
+  bookingEnd: string;
+  bookingStatus: string;
+  detail_offer: DetailOffer[];
+  homestay: HomeStay;
+  package: IPackage;
+  night: number;
+}
