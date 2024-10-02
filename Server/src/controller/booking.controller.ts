@@ -111,15 +111,12 @@ const getBookingPackageByUser = async (
   }
 };
 
-
 const createBook = async (req: Request, res: Response) => {
-  // เข้าถึง bookingData จาก req.body
   const { bookingData } = req.body;
 
   console.log("Received booking package data:", bookingData);
 
   try {
-    // ตรวจสอบการมีอยู่ของฟิลด์ใน bookingData
     const { bookingStart, bookingEnd, booker, homestayId, offer, packageId } =
       bookingData;
 
