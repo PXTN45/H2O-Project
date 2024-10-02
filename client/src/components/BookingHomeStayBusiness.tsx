@@ -163,7 +163,7 @@ const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({ booki
                   <div className="text-md">
                     <span className="flex items-center gap-2">
                       <div className="flex items-center">
-                        <FiUsers /> {myBooking[0]?.detail_offer[0].adult}
+                        <FiUsers /> {booking?.detail_offer[0].adult}
                       </div>
                       <div className="flex items-center">
                         <TbMoodKid />

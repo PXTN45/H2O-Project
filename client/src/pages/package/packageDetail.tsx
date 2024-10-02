@@ -6,13 +6,15 @@ import Loader from "../../assets/loadingAPI/loaddingTravel";
 import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { AuthContext } from "../../AuthContext/auth.provider";
 import { FaRegCalendarCheck, FaPeopleGroup } from "react-icons/fa6";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { FaStar, FaStarHalfAlt, FaRegStar, FaChild } from "react-icons/fa";
 import { IoPricetagsOutline } from "react-icons/io5";
 import { BiSolidDiscount } from "react-icons/bi";
 import { GrSync } from "react-icons/gr";
 import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import PackageHomeStay from "../../components/PackageHomeStay";
 import { Image_upload, Offer, Review } from "../../type";
+import { MdPeopleAlt } from "react-icons/md";
+import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 
 const PackageDetail = () => {
   const [item, setItem] = useState<any>();
@@ -22,6 +24,8 @@ const PackageDetail = () => {
   const [totalPricePackage, setTotalPricePackage] = useState<number>(0);
   const [progress, setProgress] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [adult, setAdult] = useState(1);
+  const [child, setChild] = useState(0);
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
@@ -86,12 +90,12 @@ const PackageDetail = () => {
         const discount = item.discount;
         const totalPrice =
           discount > 0 ? price * ((100 - discount) / 100) : price;
-        setTotalPricePackage(totalPrice);
+        setTotalPricePackage(totalPrice * adult);
       }
     };
 
     priceDiscount();
-  }, [item]);
+  }, [item, adult]);
 
   // ฟังก์ชันคำนวณค่าเฉลี่ยของ rating
   const calculateAverageRating = (reviews: Review[]): number => {
@@ -311,7 +315,15 @@ const PackageDetail = () => {
   const email = userInfo?.email;
   const packageId = id;
   const homestayId = " ";
-  const offer: Offer[] = [];
+  const offer = {
+    discount: item?.discount,
+    adult: adult,
+    child: child,
+    name_type_room: "",
+    image_room: [],
+    room: 0,
+    totalPrice: totalPricePackage,
+  };
   const totalPrice = totalPricePackage;
 
   const makePayment = async () => {
@@ -346,6 +358,15 @@ const PackageDetail = () => {
     }
   };
   const discount = item.discount;
+  console.log(item.isChildren);
+
+  const handleAdultChange = (value: number) => {
+    setAdult((prev) => Math.max(1, prev + value)); // ค่า adult จะไม่ต่ำกว่า 1
+  };
+
+  const handleChildChange = (value: number) => {
+    setChild((prev) => Math.max(0, prev + value));
+  };
 
   return (
     <div>
@@ -537,11 +558,85 @@ const PackageDetail = () => {
                     </div>
                   </div>
                   {/* ขนาดทัวร์ */}
-                  <div className="p-5">
-                    <span className="flex items-center md:justify-end lg:justify-end gap-2">
-                      <FaPeopleGroup className="text-2xl" /> ขนาดทัวร์
-                      <div>{item.max_people} คน</div>
-                    </span>
+                  <div className="p-5 flex justify-center">
+                    {userInfo?.role === "business" ? (
+                      <span className="flex items-center md:justify-end lg:justify-end gap-2">
+                        <FaPeopleGroup className="text-2xl" /> ขนาดทัวร์
+                        <div>{item.max_people} คน</div>
+                      </span>
+                    ) : (
+                      userInfo?.role === "user" && (
+                        <div>
+                          <div className="flex flex-col gap-2">
+                            <div className="dropdown dropdown-top">
+                              <div
+                                tabIndex={0}
+                                role="button"
+                                className="m-1 flex gap-2"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <MdPeopleAlt /> {adult} คน
+                                </div>
+                                {item.isChildren === true && (
+                                  <div className="flex items-center gap-2">
+                                    <FaChild /> {child} คน
+                                  </div>
+                                )}
+                              </div>
+                              <ul
+                                tabIndex={0}
+                                className="dropdown-content shadow-boxShadow bg-white menu rounded-box z-[1] w-46 p-3"
+                              >
+                                <div className="flex items-center justify-center gap-2 mb-2">
+                                  <MdPeopleAlt className="text-xl" />
+                                  <button
+                                    className="bg-white text-2xl p-2"
+                                    onClick={() => handleAdultChange(-1)}
+                                  >
+                                    <CiCircleMinus />
+                                  </button>
+                                  <input
+                                    type="number"
+                                    value={adult}
+                                    className="input shadow-boxShadow w-[30%] max-w-xs text-center"
+                                    readOnly
+                                  />
+                                  <button
+                                    className="bg-white text-2xl p-2"
+                                    onClick={() => handleAdultChange(1)}
+                                  >
+                                    <CiCirclePlus />
+                                  </button>
+                                </div>
+                                {item.isChildren === true && (
+                                  <div className="flex items-center justify-center gap-2">
+                                    <FaChild className="text-xl" />
+                                    <button
+                                      className="bg-white text-2xl p-2"
+                                      onClick={() => handleChildChange(-1)}
+                                    >
+                                      <CiCircleMinus />
+                                    </button>
+                                    <input
+                                      type="number"
+                                      value={child}
+                                      className="input shadow-boxShadow w-[30%] max-w-xs text-center"
+                                      readOnly
+                                    />
+                                    <button
+                                      className="bg-white text-2xl p-2"
+                                      onClick={() => handleChildChange(1)}
+                                    >
+                                      <CiCirclePlus />
+                                    </button>
+                                  </div>
+                                )}
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    )}
                   </div>
                   {/* policy_cancel_package */}
                   <div className="flex  p-5">
@@ -568,19 +663,17 @@ const PackageDetail = () => {
                       )}
                     </div>
                     <div className="flex justify-end">
-                      {discount > 0 ? (
+                      {discount > 0 && (
                         <span className="text-sm">
-                          <del>{item?.price_package} </del>บาท
+                          <del>{item?.price_package?.toLocaleString()} </del>บาท
                         </span>
-                      ) : (
-                        <div></div>
                       )}
                     </div>
                     <div className="flex justify-end items-end gap-2">
                       <span className="text-2xl font-bold text-red-500">
-                        {totalPricePackage}
+                        {totalPricePackage?.toLocaleString()}
                       </span>{" "}
-                      บาท/ท่าน
+                      บาท
                     </div>
                   </div>
                   <div className="flex items-center p-5"></div>
@@ -612,7 +705,7 @@ const PackageDetail = () => {
             )}
             {/* review */}
             <div>
-              <div id="review" className="text-2xl font-bold mb-5">
+              <div id="review" className="text-2xl font-bold my-5">
                 รีวิวจากผู้เข้าพักจริง - {item.name_package}
               </div>
               <div id="review" className="shadow-boxShadow rounded-lg p-10">

@@ -1,83 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { LuBedSingle, LuBedDouble } from "react-icons/lu";
 import { MdOutlineBathroom } from "react-icons/md";
 import { FaChildReaching } from "react-icons/fa6";
 import { TbRuler3 } from "react-icons/tb";
 import { FaMale } from "react-icons/fa";
 import axiosPrivateUser from "../hook/axiosPrivateUser";
+import { Facilities_Room, Image_room, Offer } from "../type";
+import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
+import { AuthContext } from "../AuthContext/auth.provider";
 
-export interface Image {
-  image_upload: string;
-}
-export interface Image_room {
-  _id: string;
-  image: string;
-}
-export interface Facilities_Room {
-  facilitiesName: string;
-}
-
-export interface Offer {
-  price_homeStay: number;
-  max_people: {
-    adult: number;
-    child: number;
-  };
-  discount: number;
-  facilitiesRoom: Facilities_Room[];
-  roomCount: number;
-  quantityRoom: number;
-}
-export interface RoomType {
-  name_type_room: string;
-  bathroom_homeStay: number;
-  bedroom_homeStay: number;
-  sizeBedroom_homeStay: string;
-  offer: Offer[];
-  image_room: Image_room[];
-}
-
-export interface Facility {
-  _id: string;
-  facilities_name: string;
-}
-export interface Image {
-  _id: string;
-  image: string;
-}
-interface Location {
-  name_location: string;
-  province_location: string;
-  house_no: string;
-  village?: string; // Optional property
-  village_no: string;
-  alley?: string; // Optional property
-  street?: string; // Optional property
-  district_location: string;
-  subdistrict_location: string;
-  zipcode_location: number;
-  latitude_location: number;
-  longitude_location: number;
-  radius_location: number;
-}
-export interface HomeStay {
-  name_homeStay: string;
-  room_type: RoomType[];
-  max_people: number;
-  detail_homeStay: string;
-  time_checkIn_homeStay: string;
-  time_checkOut_homeStay: string;
-  policy_cancel_homeStay: string;
-  location: Location[];
-  image: Image[];
-  business_user: string[];
-  review_rating_homeStay: number;
-  facilities: Facility[];
-  status_sell_homeStay: boolean;
-  discount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 interface PackageHomeStayProps {
   id: string;
@@ -89,12 +20,24 @@ const PackageHomeStay: React.FC<PackageHomeStayProps> = ({ id }) => {
   const [currentIndices, setCurrentIndices] = useState<number[]>(
     roomTypes.map(() => 0)
   );
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
+  }
+  const { userInfo } = authContext;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axiosPrivateUser.get(`/package/${id}`);
-        setItem(res.data);
+        let response
+        if (userInfo?.role === "user") {
+          response = await axiosPrivateUser.get(`/package/${id}`);
+          setItem(response.data);
+        }else if (userInfo?.role === "business") {
+          response = await axiosPrivateBusiness.get(`/package/${id}`);
+          setItem(response.data);
+        }
       } catch (error) {
         console.error("Error fetching package detail:", error);
       }
@@ -103,7 +46,7 @@ const PackageHomeStay: React.FC<PackageHomeStayProps> = ({ id }) => {
     if (id) {
       fetchData();
     }
-  }, [id]); // เพิ่ม id เป็น dependency
+  }, [id]);
 
   useEffect(() => {
     setCurrentIndices(roomTypes.map(() => 0));
@@ -328,6 +271,8 @@ const PackageHomeStay: React.FC<PackageHomeStayProps> = ({ id }) => {
       </div>
     );
   });
+
+  
 
 
   return (
