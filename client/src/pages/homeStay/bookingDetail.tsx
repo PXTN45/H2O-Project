@@ -111,10 +111,8 @@ const BookingDetail: React.FC = () => {
     image_room: paymentData?.roomType.image_room,
     totalPrice: totalPrice,
   };
-  console.log(paymentData);
 
   const booker = paymentData?.bookingUser._id;
-  // const paymentDetail = "promptpay";
   const homestayId = paymentData?.homeStayId;
 
   const checkBookingAvailable = async () => {
@@ -126,7 +124,7 @@ const BookingDetail: React.FC = () => {
         booker,
         packageId: null,
       });
-      console.log(isAvailable.data.message);
+
 
       if (isAvailable.data.message === "คุณต้องการทำการจองซ้ำอีกครั้งหรือไม่?") {
         Swal.fire({
@@ -160,7 +158,6 @@ const BookingDetail: React.FC = () => {
       });
 
       if (response.data) {
-        console.log(response.data);
         const { sessionUrl } = response.data;
 
         // เก็บข้อมูลการจองใน localStorage

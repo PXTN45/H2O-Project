@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import axiosPrivateBusiness from "../hook/axiosPrivateBusiness";
 import { AuthContext } from "../AuthContext/auth.provider";
 import { TbMapQuestion, TbMoodKid } from "react-icons/tb";
-import { GoHome } from "react-icons/go";
 import { Booking, BookingHomeStayBusinessProps } from "../type";
 import Swal from "sweetalert2";
 import { MdFamilyRestroom, MdOutlineEmail } from "react-icons/md";
@@ -13,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { IoPricetagsOutline } from "react-icons/io5";
 import { FaRegTrashCan } from "react-icons/fa6";
+import { FiUsers } from "react-icons/fi";
 
 const BookingPackageBusiness: React.FC<BookingHomeStayBusinessProps> = ({
   bookingData,
@@ -105,15 +105,15 @@ const BookingPackageBusiness: React.FC<BookingHomeStayBusinessProps> = ({
     }
   };
 
-  console.log(myBooking[0]?.package);
+  console.log(myBooking[0]?.detail_offer[0].totalPrice);
 
   const discountPrice = (i: number) => {
     const discount: number = myBooking[i]?.package.discount;
-    const price: number = myBooking[i]?.package.price_package;
+    const price: number = myBooking[i]?.detail_offer[0].totalPrice;
     if (discount > 0) {
       const totalPrice = ((100 - discount) / 100) * price;
       return totalPrice;
-    }
+    } 
     return price;
   };
 
@@ -187,9 +187,16 @@ const BookingPackageBusiness: React.FC<BookingHomeStayBusinessProps> = ({
                       )}{" "}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <MdFamilyRestroom />
-                    {booking?.package.max_people} คน
+                  <div className="text-md">
+                    <span className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <FiUsers /> {booking?.detail_offer[0].adult}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <TbMoodKid />
+                        {booking?.detail_offer[0].child}
+                      </div>
+                    </span>
                   </div>
                 </div>
                 <div className=" xl:w-1/3 flex flex-col justify-start gap-5 items-end xl:border-l">
