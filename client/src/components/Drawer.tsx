@@ -183,7 +183,7 @@ const Drawer: React.FC = () => {
                   </div>
                 ) : userInfo?.role === "admin" ? (
                   <div>
-                    <Link to={"/dashboard-business/ProfileAdmin"}>
+                    <Link to={"/dashboard-admin/Profile-admin"}>
                       <li>
                         <a>บัญชีของฉัน</a>
                       </li>

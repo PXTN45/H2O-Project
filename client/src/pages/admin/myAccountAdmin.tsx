@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../AuthContext/auth.provider";
-import axiosPrivateUser from "../../hook/axiosPrivateUser";
+import axiosPrivateUser from "../../hook/axiosPrivateAdmin";
 import { TbPointFilled } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -10,7 +10,7 @@ import { BsCamera } from "react-icons/bs";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../../Firebase/firebase.config";
 import { FaEdit } from "react-icons/fa";
-import { Address, Password, User } from "../../type";
+import { Password, User } from "../../type";
 
 const myAccount = () => {
   const authContext = useContext(AuthContext);
@@ -24,7 +24,6 @@ const myAccount = () => {
   const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
   const [userData, setUserData] = useState<User>();
   const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
-  const [openUpdateAddress, setOpenUpdateAddress] = useState<boolean>(false);
   const [openUpdateBirthday, setOpenUpdateBirthday] = useState<boolean>(false);
   const [openUpdatePhone, setOpenUpdatePhone] = useState<boolean>(false);
   const [showPasswords, setShowPasswords] = useState({
@@ -38,16 +37,7 @@ const myAccount = () => {
     newPass: "",
     confirmPass: "",
   });
-  const [address, setAddress] = useState<Address>({
-    houseNumber: userData?.address[0]?.houseNumber || "",
-    street: userData?.address[0]?.street || "",
-    village: userData?.address[0]?.village || "",
-    subdistrict: userData?.address[0]?.subdistrict || "",
-    district: userData?.address[0]?.district || "",
-    city: userData?.address[0]?.city || "",
-    country: userData?.address[0]?.country || "",
-    postalCode: userData?.address[0]?.postalCode || "",
-  });
+
   const [updatedUserInfo, setUpdatedUserInfo] = useState<User>({} as User);
   const formatDate = (date: Date | string | undefined): string => {
     if (!date) return ""; // Return empty string if date is undefined or falsy
@@ -68,18 +58,18 @@ const myAccount = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axiosPrivateUser.get(
-          `/user/userData/${userInfo?._id}`
-        );
-        setUserData(response.data);
-        setAddress(response.data.address[0]);
+        const response = await axiosPrivateUser.get(`/user/adminData`);
+        const filteredData = response.data.filter(user => user._id === userInfo?._id);
+        console.log(filteredData[0]);
+        setUserData(filteredData[0]);
         setPasswords({
-          email: response.data.email,
+          email: filteredData[0].email,
           password: "",
           newPass: "",
           confirmPass: "",
         });
-        setUpdatedUserInfo(response.data);
+        setUpdatedUserInfo(filteredData[0].data);
+
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -88,25 +78,10 @@ const myAccount = () => {
     fetchUserData();
   }, [
     userInfo?._id,
-    openUpdateAddress,
     openUpdateUser,
     openUpdateBirthday,
     openUpdatePhone,
   ]);
-
-  // ฟังก์ชันจัดการการเปลี่ยนแปลงฟิลด์ฟอร์ม
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const numericFields = ["houseNumber", "postalCode", "village"];
-    const numericValue = numericFields.includes(name)
-      ? value.replace(/[^0-9/-]/g, "")
-      : value.replace(/[^a-zA-Zก-๙]/g, "");
-
-    setAddress((prevAddress) => ({
-      ...prevAddress,
-      [name]: numericValue,
-    }));
-  };
 
   const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -115,52 +90,6 @@ const myAccount = () => {
       ...prevPassword,
       [name]: value, // ตั้งค่า value โดยตรง
     }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    Swal.fire({
-      title: "คุณแน่ใจหรือไม่?",
-      text: "คุณจะไม่สามารถย้อนกลับได้!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "ใช่, อัปเดตเลย!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await axiosPrivateUser.put(`/user/updateAddress/${userInfo?._id}`, {
-            role: userInfo?.role,
-            address: {
-              houseNumber: address.houseNumber,
-              village: address.village,
-              street: address.street,
-              district: address.district,
-              subdistrict: address.subdistrict,
-              city: address.city,
-              country: address.country,
-              postalCode: address.postalCode,
-            },
-          });
-          setOpenUpdateAddress(false);
-
-          // แจ้งเตือนว่าการอัปเดตสำเร็จ
-          Swal.fire({
-            title: "อัปเดตแล้ว!",
-            text: "ที่อยู่ของคุณได้รับการอัปเดตแล้ว.",
-            icon: "success",
-          });
-        } catch (error) {
-          // แจ้งเตือนหากเกิดข้อผิดพลาด
-          Swal.fire({
-            title: "ข้อผิดพลาด!",
-            text: "เกิดปัญหาในการอัปเดตที่อยู่ของคุณ.",
-            icon: "error",
-          });
-        }
-      }
-    });
   };
 
   const handleSubmitBirthday = (e: React.FormEvent) => {
@@ -213,14 +142,14 @@ const myAccount = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          let formattedPhone = phone;
+            let formattedPhone = phone;
 
-          // ถ้า phone เริ่มต้นด้วย '0' ให้ตัดออก
-          if(formattedPhone){
-            if (formattedPhone.startsWith('0')) {
-              formattedPhone = formattedPhone.slice(1);
-            }  
-          }
+            // ถ้า phone เริ่มต้นด้วย '0' ให้ตัดออก
+            if(formattedPhone){
+              if (formattedPhone.startsWith('0')) {
+                formattedPhone = formattedPhone.slice(1);
+              }  
+            }
 
           await axiosPrivateUser.put(`/user/updateUser/${userInfo?._id}`, {
             role: userInfo?.role,
@@ -314,7 +243,6 @@ const myAccount = () => {
         password: "",
         phone: undefined,
         image: "",
-        address: [],
         role: userInfo?.role,
       };
 
@@ -813,179 +741,6 @@ const myAccount = () => {
               </div>
             ) : null}
 
-            {openUpdateAddress === false ? (
-              <div className="flex justify-between items-center hover:bg-gray-300 p-5 transition-all duration-700 ease-in-out">
-                <div className="flex gap-5 items-center">
-                  <div className="flex flex-col">
-                    <span className="text-sm">ที่อยู่</span>
-                    <div className="mt-3">
-                      <span>
-                        {userData?.address[0].houseNumber} ถนน.
-                        {userData?.address[0].street} ม.
-                        {userData?.address[0].village} ต.
-                        {userData?.address[0].subdistrict} อ.
-                        {userData?.address[0].district} จ.
-                        {userData?.address[0].city}{" "}
-                        {userData?.address[0].postalCode}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div onClick={() => setOpenUpdateAddress(true)}>
-                  <button>
-                    <FaEdit size={24} />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="p-5 transition-all duration-700 ease-in-out">
-                <div className="shadow-boxShadow p-5 rounded-lg">
-                  <div>
-                    <div className="text-lg mb-5 font-bold">
-                      <span>ที่อยู่</span>
-                    </div>
-                    <form onSubmit={handleSubmit}>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <label className="form-control w-full max-w-xs">
-                            <div className="label">
-                              <span className="label-text">บ้านเลขที่</span>
-                            </div>
-                            <input
-                              type="text"
-                              name="houseNumber"
-                              value={address.houseNumber}
-                              onChange={handleChange}
-                              placeholder="บ้านเลขที่"
-                              className="input input-bordered w-full"
-                            />
-                          </label>
-                        </div>
-                        <div>
-                          <label className="form-control w-full max-w-xs">
-                            <div className="label">
-                              <span className="label-text">ถนน / ซอย</span>
-                            </div>
-                            <input
-                              type="text"
-                              name="street"
-                              value={address.street}
-                              onChange={handleChange}
-                              placeholder="ถนน / ซอย"
-                              className="input input-bordered w-full"
-                            />
-                          </label>
-                        </div>
-                        <div>
-                          <label className="form-control w-full max-w-xs">
-                            <div className="label">
-                              <span className="label-text">หมู่</span>
-                            </div>
-                            <input
-                              type="text"
-                              name="village"
-                              value={address.village}
-                              onChange={handleChange}
-                              placeholder="หมู่"
-                              className="input input-bordered w-full"
-                            />
-                          </label>
-                        </div>
-                        <div>
-                          <label className="form-control w-full max-w-xs">
-                            <div className="label">
-                              <span className="label-text">ตำบล</span>
-                            </div>
-                            <input
-                              type="text"
-                              name="subdistrict"
-                              value={address.subdistrict}
-                              onChange={handleChange}
-                              placeholder="ตำบล"
-                              className="input input-bordered w-full"
-                            />
-                          </label>
-                        </div>
-                        <div>
-                          <label className="form-control w-full max-w-xs">
-                            <div className="label">
-                              <span className="label-text">อำเภอ</span>
-                            </div>
-                            <input
-                              type="text"
-                              name="district"
-                              value={address.district}
-                              onChange={handleChange}
-                              placeholder="อำเภอ"
-                              className="input input-bordered w-full"
-                            />
-                          </label>
-                        </div>
-                        <div>
-                          <label className="form-control w-full max-w-xs">
-                            <div className="label">
-                              <span className="label-text">จังหวัด</span>
-                            </div>
-                            <input
-                              type="text"
-                              name="city"
-                              value={address.city}
-                              onChange={handleChange}
-                              placeholder="จังหวัด"
-                              className="input input-bordered w-full"
-                            />
-                          </label>
-                        </div>
-                        <div>
-                          <label className="form-control w-full max-w-xs">
-                            <div className="label">
-                              <span className="label-text">ประเทศ</span>
-                            </div>
-                            <input
-                              type="text"
-                              name="country"
-                              value={address.country}
-                              onChange={handleChange}
-                              placeholder="ประเทศ"
-                              className="input input-bordered w-full"
-                            />
-                          </label>
-                        </div>
-                        <div>
-                          <label className="form-control w-full max-w-xs">
-                            <div className="label">
-                              <span className="label-text">รหัสไปรษณีย์</span>
-                            </div>
-                            <input
-                              type="text"
-                              name="postalCode"
-                              value={address.postalCode}
-                              onChange={handleChange}
-                              placeholder="รหัสไปรษณีย์"
-                              className="input input-bordered w-full"
-                            />
-                          </label>
-                        </div>
-                      </div>
-                      <div className="flex justify-end">
-                        <button
-                          onClick={() => setOpenUpdateAddress(false)}
-                          className="bg-red-500 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-red-700"
-                        >
-                          ยกเลิก
-                        </button>
-                        <button
-                          type="submit"
-                          className="bg-green-400 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-green-600"
-                        >
-                          แก้ไข
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
           <div className="flex justify-end">
             <button

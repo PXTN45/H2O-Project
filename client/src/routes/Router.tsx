@@ -8,6 +8,7 @@ import Home from "../pages/home/homepage";
 import VerifyEmailSuccess from "../pages/orther/emailIsVerify";
 import ProfileUser from "../pages/user/myAccount";
 import ProfileBusiness from "../pages/business/profile";
+import MyAccountAdmin from "../pages/admin/myAccountAdmin";
 import SelectionCreate from "../pages/business/selectionCreate";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
@@ -137,7 +138,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard-admin/Profile-admin",
-            element: <ProfileBusiness />,
+            element: <MyAccountAdmin />,
           },
         ],
       },

@@ -12,6 +12,24 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+/* CSS to target the date input's calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: white url('https://icon-library.com/images/date-icon-png/date-icon-png-5.jpg') no-repeat right 10px center; /* Add your icon */
+  background-size: 30px 30px; /* Size of the icon */
+  padding-right: 30px; /* Adjust padding to fit the icon */
+  color: black; /* Text color */
+}
+
+input[type="date"] {
+  color: black; /* Change text color to black */
+}
+
+/* For Firefox */
+input[type="date"]::-moz-inner-spin-button,
+input[type="date"]::-moz-calendar-picker-indicator {
+  background: black;
+}
+
 
 body {
   font: "K2D";
