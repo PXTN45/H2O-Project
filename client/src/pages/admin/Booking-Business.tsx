@@ -109,7 +109,7 @@ const BookingBusiness = () => {
     };
 
     fetchBusinesses();
-  }, []);
+  }, [businesses]);
 
   if (loading) {
     return <p>Loading...</p>;

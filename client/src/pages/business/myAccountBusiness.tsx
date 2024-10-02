@@ -12,6 +12,17 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { Address, Business, Password } from "../../type";
 
+const banks = [
+  "ธนาคารกรุงเทพ",
+  "ธนาคารกสิกรไทย",
+  "ธนาคารกรุงไทย",
+  "ธนาคารไทยพาณิชย์",
+  "ธนาคารทหารไทยธนชาต",
+  "ธนาคารออมสิน",
+  "ธนาคารธนชาต",
+  // เพิ่มธนาคารอื่น ๆ ตามต้องการ
+];
+
 const myAccountBusiness = () => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -49,6 +60,64 @@ const myAccountBusiness = () => {
   const [updatedUserInfo, setUpdatedUserInfo] = useState<Business>(
     {} as Business
   );
+  const [openUpdateBanking, setOpenUpdateBanking] = useState(false);
+
+  const [updatedBankingInfo, setUpdatedBankingInfo] = useState({
+    BankingName: "",
+    BankingUsername: "",
+    BankingUserlastname: "",
+    BankingCode: "",
+    role: userInfo?.role,
+  });
+
+  const handleBankingChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedBankingInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmitBanking = (e: React.FormEvent) => {
+    e.preventDefault();
+    Swal.fire({
+      title: "คุณแน่ใจหรือไม่?",
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ใช่, อัปเดตเลย!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, {
+            role: userInfo?.role,
+            BankingName: updatedBankingInfo.BankingName,
+            BankingUsername: updatedBankingInfo.BankingUsername,
+            BankingUserlastname: updatedBankingInfo.BankingUserlastname,
+            BankingCode: updatedBankingInfo.BankingCode,
+          });
+          setOpenUpdateBanking(false);
+
+          // แจ้งเตือนว่าการอัปเดตสำเร็จ
+          Swal.fire({
+            title: "อัปเดตแล้ว!",
+            text: "ที่อยู่ของคุณได้รับการอัปเดตแล้ว.",
+            icon: "success",
+          });
+        } catch (error) {
+          // แจ้งเตือนหากเกิดข้อผิดพลาด
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "เกิดปัญหาในการอัปเดตที่อยู่ของคุณ.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
   const navigate = useNavigate();
 
   // console.log(userData);
@@ -75,7 +144,7 @@ const myAccountBusiness = () => {
     // console.log(userInfo?.role);
 
     fetchUserData();
-  }, [userInfo?._id, openUpdateAddress, openUpdateUser]);
+  }, [userInfo?._id, openUpdateAddress, openUpdateUser, openUpdateBanking]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -791,6 +860,121 @@ const myAccountBusiness = () => {
                       </div>
                     </form>
                   </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="shadow-boxShadow p-10 rounded-lg my-5">
+            {openUpdateBanking === false ? (
+              <div className="flex justify-between items-center hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out">
+                <div className="flex flex-col">
+                  <span className="text-sm">ชื่อธนาคาร</span>
+                  <span className="text-lg mb-5">
+                    {userData?.BankingName || "ไม่มีข้อมูล"}
+                  </span>
+                  <span className="text-sm">ชื่อบัญชี</span>
+                  <span className="text-lg mb-5">
+                    {userData?.BankingUsername} {userData?.BankingUserlastname}
+                  </span>
+                  <span className="text-sm">เลขบัญชี</span>
+                  <span className="text-lg">
+                    {userData?.BankingCode || "ไม่มีข้อมูล"}
+                  </span>
+                </div>
+                <div onClick={() => setOpenUpdateBanking(true)}>
+                  <button>
+                    <FaEdit size={24} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-5 transition-all duration-700 ease-in-out">
+                <div className="shadow-boxShadow p-5 rounded-lg">
+                  <div className="text-lg mb-5 font-bold">
+                    <span>แก้ไขข้อมูลธนาคาร</span>
+                  </div>
+                  <form onSubmit={handleSubmitBanking}>
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <label className="label">
+                          <span className="label-text w-20">ชื่อธนาคาร</span>
+                          <select
+                            name="BankingName"
+                            value={updatedBankingInfo.BankingName}
+                            onChange={handleBankingChange}
+                            className="input input-bordered w-full"
+                            required
+                          >
+                            <option value="">เลือกธนาคาร</option>
+                            {banks.map((bank, index) => (
+                              <option key={index} value={bank}>
+                                {bank}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                      <div className="flex flex-col gap-2 sm:flex-col md:flex-col lg:flex-row">
+                        <div className="flex-1">
+                          <label className="label">
+                            <span className="label-text w-20">ชื่อ</span>
+                            <input
+                              type="text"
+                              name="BankingUsername"
+                              value={updatedBankingInfo.BankingUsername}
+                              onChange={handleBankingChange}
+                              placeholder="ชื่อผู้ใช้"
+                              className="input input-bordered w-full"
+                              required
+                            />
+                          </label>
+                        </div>
+                        <div className="flex-1">
+                          <label className="label">
+                            <span className="label-text w-20">นามสกุล</span>
+                            <input
+                              type="text"
+                              name="BankingUserlastname"
+                              value={updatedBankingInfo.BankingUserlastname}
+                              onChange={handleBankingChange}
+                              placeholder="นามสกุลผู้ใช้"
+                              className="input input-bordered w-full"
+                              required
+                            />
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="label">
+                          <span className="label-text w-20">เลขบัญชี</span>
+                          <input
+                            type="text"
+                            name="BankingCode"
+                            value={updatedBankingInfo.BankingCode}
+                            onChange={handleBankingChange}
+                            placeholder="รหัสธนาคาร"
+                            className="input input-bordered w-full"
+                            required
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <div className="flex justify-end mt-5">
+                      <button
+                        onClick={() => setOpenUpdateBanking(false)}
+                        className="bg-red-500 mx-2 px-3 py-1 rounded-full text-white hover:bg-red-700"
+                      >
+                        ยกเลิก
+                      </button>
+                      <button
+                        type="submit"
+                        className="bg-green-400 mx-2 px-3 py-1 rounded-full text-white hover:bg-green-600"
+                      >
+                        แก้ไข
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}

@@ -80,31 +80,6 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
               </span>
             </Link>
 
-            <div className="hidden lg:flex flex-grow items-center justify-center text-lg">
-              <ul className="font-medium flex space-x-8 rtl:space-x-reverse">
-                <li>
-                  <Link to="/home" className="link-style ml-[50px]">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/about" className="link-style ml-[50px]">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/service" className="link-style ml-[50px]">
-                    Service
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/contact" className="link-style ml-[50px]">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
             <button
               className="text-lg font-bold py-2 px-4 rounded"
               onClick={
@@ -136,7 +111,14 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
                 <div id="GetStarted">Get Started</div>
               ) : (
                 <>
-                  <div className="relative">
+                  <div className="relative flex">
+                    <div className="mx-5 hidden lg:flex flex-grow text-lg ">
+                      {userInfo.role === "user" || userInfo.role === "admin"
+                        ? `${userInfo.name} ${userInfo.lastName}`
+                        : userInfo.role === "business"
+                        ? `${userInfo.businessName}`
+                        : null}
+                    </div>
                     <div className="flex items-center">
                       <img
                         id="avatarButton"
@@ -149,10 +131,10 @@ const Navbar: React.FC<NavbarProps> = ({ image }) => {
                     {isOpen && (
                       <div
                         id="userDropdown"
-                        className="z-50 absolute right-7 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44 card-box"
+                        className="z-50 absolute right-9 top-9 divide  divide-y  rounded-[1.25rem] rounded-tr-[0rem] shadow w-44 card-box"
                       >
                         <div className="px-4 py-3 text-sm">
-                          <div className="truncate">
+                          <div className="truncate flex items-center justify-center lg:hidden">
                             {userInfo.role === "user" ||
                             userInfo.role === "admin"
                               ? `${userInfo.name} ${userInfo.lastName}`

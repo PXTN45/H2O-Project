@@ -217,6 +217,10 @@ export interface Business {
   image: string;
   address: Address[];
   birthday: Date;
+  BankingName: string;
+  BankingUsername: string;
+  BankingUserlastname: string;
+  BankingCode: string;
   role: string;
 }
 
