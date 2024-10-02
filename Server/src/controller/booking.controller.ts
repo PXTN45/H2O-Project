@@ -135,7 +135,7 @@ const createBook = async (req: Request, res: Response) => {
     const newBookingPackage = new Booking({
       booker,
       homestay: homestayId.trim() || undefined,  // ใช้ trim() เพื่อลบช่องว่างที่ไม่ต้องการ
-      detail_offer: offer || [],
+      detail_offer: offer,
       package: packageId || undefined,
       bookingStart,
       bookingEnd,
