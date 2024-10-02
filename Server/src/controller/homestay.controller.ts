@@ -11,7 +11,10 @@ const getAllHomeStay = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const searchByTypeHomeStay = async (req: Request, res: Response): Promise<void> => {
+const searchByTypeHomeStay = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const type_homeStay = req.params.type_homeStay;
   try {
     const homeStayType = await HomeStayModel.findOne({ type_homeStay });
@@ -39,10 +42,23 @@ const getByIdHomeStay = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const getByIdBusiness = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const homeStayId = req.params.id;
+    const data = await HomeStayModel.find({ business_user: homeStayId });
+    if (!data) {
+      res.status(404).json({ message: "HomeStay not found" });
+    } else {
+      res.json(data);
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const createHomeStay = async (req: Request, res: Response): Promise<void> => {
   const homeStayData = req.body;
   const newHomeStay = new HomeStayModel(homeStayData);
-  console.log(homeStayData);
   try {
     const savedHomeStay = await newHomeStay.save();
     res.status(201).json(savedHomeStay);
@@ -51,10 +67,15 @@ const createHomeStay = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const getByPriceHomeStay = async (req: Request, res: Response): Promise<void> => {
+const getByPriceHomeStay = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const price = req.params.price;
-    const homeStayPrice = await HomeStayModel.findOne({ price_homeStay: price });
+    const homeStayPrice = await HomeStayModel.findOne({
+      price_homeStay: price,
+    });
     if (!homeStayPrice) {
       res.status(404).json({ message: "Not found homeStay price" });
     } else {
@@ -64,25 +85,14 @@ const getByPriceHomeStay = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ message: error.message });
   }
 };
-// const getByRoomTypeHomeStay = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const room_type = req.params.room_type;
-//     const homeStayPrice = await HomeStayModel.findOne({ _id : room_type });
-//     if (!homeStayPrice) {
-//       res.status(404).json({ message: "Not found homeStay price" });
-//     } else {
-//       res.json(homeStayPrice);
-//     }
-//   } catch (error: any) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 const updateHomeStay = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
   const data = req.body;
   try {
-    const updatedHomeStay = await HomeStayModel.findByIdAndUpdate(id, data, { new: true });
+    const updatedHomeStay = await HomeStayModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
     if (!updatedHomeStay) {
       res.status(404).json({ message: "HomeStay Not Found" });
     } else {
@@ -126,6 +136,32 @@ const searchHomeStay = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const changeStatus = async (req: Request, res: Response): Promise<Response> => {
+  const id = req.params.id;
+  const { status_sell_homeStay } = req.body; // รับค่าใหม่จาก body
+
+  try {
+    if (!status_sell_homeStay) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    const data = await HomeStayModel.findByIdAndUpdate(
+      id,
+      { status_sell_homeStay },
+      { new: true, runValidators: true }
+    );
+    console.log(data?.status_sell_homeStay);
+
+    if (!data) {
+      return res.status(404).json({ message: "Package Not Found" });
+    }
+
+    return res.status(200).json(data.status_sell_homeStay);
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export {
   getAllHomeStay,
   searchByTypeHomeStay,
@@ -135,4 +171,6 @@ export {
   updateHomeStay,
   deleteHomeStay,
   searchHomeStay,
+  getByIdBusiness,
+  changeStatus,
 };

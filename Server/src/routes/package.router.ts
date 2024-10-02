@@ -89,6 +89,7 @@ import {
   updatePackage,
   deletePackage,
   searchPackage,
+  getByIdBusiness
 } from "../controller/package.controller";
 
 const router = express.Router();
@@ -170,6 +171,8 @@ router.get("/package/type/:type_package", searchByTypePackage);
  *          description: Some error happened!!
  */
 router.get("/package/:id", getByIdPackage);
+
+router.get("/business-package/:id", getByIdBusiness);
 
 /**
  * @swagger
