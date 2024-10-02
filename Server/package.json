@@ -1,6 +1,6 @@
 {
-  "name": "myproject",
-  "version": "1.0.0",
+  "name": "h2o_project",
+  "version": "4.0.0",
   "description": "",
   "main": "index.js",
   "homepage": "http://localhost:3000/checkout",
@@ -34,6 +34,8 @@
     "nodemon": "^3.1.0",
     "promptpay-qr": "^0.5.0",
     "qrcode": "^1.5.3",
+    "socket.io": "^4.7.5",
+    "stripe": "^16.9.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   },

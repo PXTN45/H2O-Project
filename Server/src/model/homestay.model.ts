@@ -2,9 +2,6 @@ import { Schema, model, Document } from "mongoose";
 
 interface HomeStay extends Document {
   name_homeStay: string;
-  nearbyPlaces: {
-    places: string;
-  }[];
   room_type: {
     image_room: {
       image: string;
@@ -55,142 +52,137 @@ interface HomeStay extends Document {
   updatedAt: Date;
 }
 
-const HomeStaySchema = new Schema<HomeStay>({
-  name_homeStay: {
-    type: String,
-    required: true,
-  },
-  nearbyPlaces: {
-    type: [
-      {
-        places: {
-          type: String,
-        },
-      },
-    ],
-  },
-  room_type: {
-    type: [
-      {
-        name_type_room: { type: String, required: true },
-        bathroom_homeStay: { type: Number, required: true },
-        bedroom_homeStay: { type: Number, required: true },
-        sizeBedroom_homeStay: { type: String, required: true },
-        image_room: {
-          type: [
-            {
-              image: { type: String },
-            },
-          ],
-        },
-        offer: {
-          type: [
-            {
-              price_homeStay: { type: Number, required: true },
-              max_people: {
-                type: {
-                  adult: Number,
-                  child: Number,
-                },
+const HomeStaySchema = new Schema<HomeStay>(
+  {
+    name_homeStay: {
+      type: String,
+      required: true,
+    },
+    room_type: {
+      type: [
+        {
+          name_type_room: { type: String, required: true },
+          bathroom_homeStay: { type: Number, required: true },
+          bedroom_homeStay: { type: Number, required: true },
+          sizeBedroom_homeStay: { type: String, required: true },
+          image_room: {
+            type: [
+              {
+                image: { type: String },
               },
-              discount: { type: Number, default: 0 },
-              facilitiesRoom: {
-                type: [
-                  {
-                    facilitiesName: {
-                      type: String,
-                      required: true,
-                    },
+            ],
+          },
+          offer: {
+            type: [
+              {
+                price_homeStay: { type: Number, required: true },
+                max_people: {
+                  type: {
+                    adult: Number,
+                    child: Number,
                   },
-                ],
+                },
+                discount: { type: Number, default: 0 },
+                facilitiesRoom: {
+                  type: [
+                    {
+                      facilitiesName: {
+                        type: String,
+                        required: true,
+                      },
+                    },
+                  ],
+                },
+                roomCount: { type: Number },
+                quantityRoom: { type: Number, default: 1 },
               },
-              roomCount: { type: Number },
-              quantityRoom: { type: Number, default: 1 },
-            },
-          ],
+            ],
+          },
         },
+      ],
+    },
+    detail_homeStay: {
+      type: String,
+      required: true,
+    },
+    time_checkIn_homeStay: {
+      type: String,
+      required: true,
+    },
+    time_checkOut_homeStay: {
+      type: String,
+      required: true,
+    },
+    policy_cancel_homeStay: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: [
+        {
+          name_location: { type: String, required: true },
+          province_location: { type: String, required: true },
+          house_no: { type: String, required: true },
+          village: { type: String, required: false },
+          village_no: { type: String, required: true },
+          alley: { type: String, required: false },
+          street: { type: String, required: false },
+          district_location: { type: String, required: true },
+          subdistrict_location: { type: String, required: true },
+          zipcode_location: { type: Number, required: true },
+          latitude_location: { type: String, required: true },
+          longitude_location: { type: String, required: true },
+          radius_location: { type: Number, required: true },
+        },
+      ],
+    },
+    image: {
+      type: [
+        {
+          image_upload: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
+    },
+    business_user: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Business",
+        required: true,
       },
     ],
-  },
-  detail_homeStay: {
-    type: String,
-    required: true,
-  },
-  time_checkIn_homeStay: {
-    type: String,
-    required: true,
-  },
-  time_checkOut_homeStay: {
-    type: String,
-    required: true,
-  },
-  policy_cancel_homeStay: {
-    type: String,
-    required: true,
-  },
-  location: {
-    type: [
+    review_rating_homeStay: {
+      type: Number,
+      required: true,
+    },
+    facilities: [
       {
-        name_location: { type: String, required: true },
-        province_location: { type: String, required: true },
-        house_no: { type: String, required: true },
-        village: { type: String, required: false },
-        village_no: { type: String, required: true },
-        alley: { type: String, required: false },
-        street: { type: String, required: false },
-        district_location: { type: String, required: true },
-        subdistrict_location: { type: String, required: true },
-        zipcode_location: { type: Number, required: true },
-        latitude_location: { type: String, required: true },
-        longitude_location: { type: String, required: true },
-        radius_location: { type: Number, required: true },
-      },
-    ],
-  },
-  image: {
-    type: [
-      {
-        image_upload: {
+        facilities_name: {
           type: String,
           required: true,
         },
       },
     ],
-  },
-  business_user: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Business_User",
+    status_sell_homeStay: {
+      type: String,
       required: true,
+      enum: ["Ready", "NotReady"],
+      default: "Ready",
     },
-  ],
-  review_rating_homeStay: {
-    type: Number,
-    required: true,
-  },
-  facilities: [
-    {
-      facilities_name: {
-        type: String,
-        required: true,
-      },
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
-  ],
-  status_sell_homeStay: {
-    type: String,
-    required: true,
-    enum: ["Ready", "NotReady"],
-    default: "Ready",
+    updatedAt: {
+      type: Date,
+    },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 const HomeStayModel = model<HomeStay>("HomeStay", HomeStaySchema);
 export default HomeStayModel;

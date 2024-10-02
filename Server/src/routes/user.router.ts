@@ -205,6 +205,9 @@ import {
   updateUser,
   checkEmailExists,
   getUserById,
+  updateUserAddress,
+  ChangePassword,
+  getBusinessById
 } from "../controller/user.controller";
 import verifyEmailToken from "../middlewares/verifyEmailToken";
 import { verifyToken } from "../middlewares/verifyToken";
@@ -239,6 +242,8 @@ const router = Router();
 router.get("/userData", getAllUser);
 
 router.get("/userData/:id", getUserById);
+
+router.get("/businessData/:id", getBusinessById);
 
 /**
  * @swagger
@@ -283,7 +288,6 @@ router.get("/businessData", getAllBusiness);
  *         description: Internal server error
  */
 router.get("/adminData", getAllAdmin);
-
 
 /**
  * @swagger
@@ -446,6 +450,9 @@ router.post("/checkEmailExists", checkEmailExists);
  */
 router.put("/updateUser/:id", updateUser);
 
+router.put("/updateAddress/:id", updateUserAddress);
+
+router.put("/update-password", ChangePassword);
 
 /**
  * @swagger

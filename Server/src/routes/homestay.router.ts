@@ -127,6 +127,8 @@ import {
   updateHomeStay,
   deleteHomeStay,
   searchHomeStay,
+  getByIdBusiness,
+  changeStatus,
 } from "../controller/homestay.controller";
 
 const router = express.Router();
@@ -179,6 +181,8 @@ router.get("/homestay", getAllHomeStay);
  *          description: Some error happened!!
  */
 router.get("/homestay/type/:type_homeStay", searchByTypeHomeStay);
+
+router.get("/business-homestay/:id", getByIdBusiness);
 
 /**
  * @swagger
@@ -259,6 +263,8 @@ router.get("/homestay/price/:price", getByPriceHomeStay);
  *              description: Some error happened
  */
 router.post("/homestay", createHomeStay);
+
+router.post("/changeStatus/:id", changeStatus);
 
 /**
  * @swagger

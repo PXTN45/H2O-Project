@@ -8,7 +8,7 @@ export interface User extends Document {
   birthday?: Date;
   phone: string;
   image?: string;
-  addresses: Address[];
+  address: Address[];
   isVerified: boolean;
   role: string;
 }
@@ -16,8 +16,9 @@ export interface User extends Document {
 export interface Address {
   houseNumber: string;
   village: string;
-  district: string;
   street: string;
+  district: string;
+  subdistrict: string;
   city: string;
   country: string;
   postalCode: string;
@@ -32,11 +33,15 @@ const AddressSchema = new Schema<Address>({
     type: String,
     default: "",
   },
+  street: {
+    type: String,
+    default: "",
+  },
   district: {
     type: String,
     default: "",
   },
-  street: {
+  subdistrict: {
     type: String,
     default: "",
   },
@@ -85,17 +90,18 @@ const UserSchema = new Schema<User>({
     default:
       "https://static.vecteezy.com/system/resources/previews/022/123/337/original/user-icon-profile-icon-account-icon-login-sign-line-vector.jpg",
   },
-  addresses: {
+  address: {
     type: [AddressSchema],
     default: [
       {
-        houseNumber: "",
-        village: "",
-        district: "",
-        street: "",
-        city: "",
-        country: "",
-        postalCode: "",
+        houseNumber: "-",
+        village: "-",
+        street: "-",
+        subdistrict: "-",
+        district: "-",
+        city: "-",
+        country: "-",
+        postalCode: "-",
       },
     ],
   },
