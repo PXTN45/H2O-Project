@@ -85,9 +85,7 @@ const DetailBooking: React.FC<{ totalPrice: number }> = ({ totalPrice }) => {
   
   // const numberOfNights = calculateNights(startDate_Time, endDate_Time);
   // console.log(`จำนวนคืน: ${numberOfNights}`); 
-  
-  
-  console.log(paymentData?.time_checkOut_homeStay);
+
   
 
   return (

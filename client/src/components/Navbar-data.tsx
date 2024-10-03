@@ -25,7 +25,6 @@ const Navbar = () => {
     sendSearchToDetail?.resultRoom ?? 1
   );
 
-  console.log(sendSearchToDetail);
   
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -42,6 +41,8 @@ const Navbar = () => {
     initialEndDate,
   ]);
 
+  console.log(dateRange);
+  
   const togglePeopleMenu = () => {
     setShowPeopleMenu(!showPeopleMenu);
     setShowCalendar(false);
@@ -86,10 +87,14 @@ const Navbar = () => {
   const startDate_Time = dateRange[0];
   const endDate_Time = dateRange[1];
 
+  
   const calculateNights = (
     startDateTime?: Date | null,
     endDateTime?: Date | null
   ): number => {
+    console.log(startDateTime);
+    console.log(endDateTime);
+    
     if (!startDateTime || !endDateTime) {
       console.error("Start date or end date is missing or invalid");
       return 0;
@@ -103,16 +108,25 @@ const Navbar = () => {
     const end =
       typeof endDateTime === "string" ? new Date(endDateTime) : endDateTime;
 
+      console.log(start);
+      console.log(end);
+      
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       console.error("Invalid start or end date");
       return 0;
     }
 
     const differenceInTime = end.getTime() - start.getTime();
-    const differenceInDays = differenceInTime / (1000 * 3600 * 24) - 1;
-
-    return Math.ceil(differenceInDays);
+  
+    
+    const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
+    console.log(differenceInDays);
+    
+    
+    return differenceInDays;
   };
+
+  
 
   const numberOfNights = calculateNights(startDate_Time, endDate_Time);
   // console.log(`จำนวนคืน: ${numberOfNights}`);
