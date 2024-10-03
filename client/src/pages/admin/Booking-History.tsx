@@ -91,7 +91,7 @@ const BookingHistory = () => {
       try {
         const response = await axiosPublic.get("/getBookingForAdmin");
         const confirmedBookingsUser = response.data.filter(
-          (booking: Booking) => booking.bookingStatus === "Money-transferred"
+          (booking: Booking) => booking.bookingStatus === "Money-transferredUser" || booking.bookingStatus === "Money-transferredBusiness" 
         );
         setUser(confirmedBookingsUser);
       } catch (err) {

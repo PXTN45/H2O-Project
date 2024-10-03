@@ -84,6 +84,17 @@ interface Booking {
 const Card: React.FC<{ item: Booking }> = ({ item }) => {
 
   const [images, setImages] = React.useState<string>("");
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedImage, setSelectedImage] = React.useState("");
+
+  const handleImageClick = () => {
+    setSelectedImage(images); // ตั้งค่าภาพที่ถูกคลิก
+    setIsModalOpen(true); // เปิด modal
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // ปิด modal
+  };
 
   React.useEffect(() => {
     const fetchImage = async () => {
@@ -102,7 +113,6 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
     }
   }, [item]);
 
-  console.log(images);
 
 
   return (
@@ -120,34 +130,40 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
 
         {/* รูปวงกลม */}
         <img
-          id="imageCard-Home"
-          src={
-            images
-          }
-          alt="images to cards"
-          className="w-[100px] h-[100px] rounded-full object-cover z-10 my-2"
-        />
+        id="imageCard-Home"
+        src={images}
+        alt="images to cards"
+        className="w-[100px] h-[100px] rounded-full object-cover z-10 my-2 cursor-pointer"
+        onClick={handleImageClick} // เรียกฟังก์ชันเมื่อคลิก
+      />
+
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-[100]" onClick={closeModal}>
+          <img
+            src={selectedImage}
+            alt="Large view"
+            className="max-w-full max-h-full"
+          />
+        </div>
+      )}
       </div>
       <div id="center-card-Package" className="w-full xl:w-[50%] mt-5">
         <div className="flex justify-between my-1 mx-5 text-xl">
           <div className="flex flex-row">
             <div className="mx-2">
-              {item.homestay?.business_user?.[0]?.name ||
-                item.package?.business_user?.name}
+              เลขรหัสการค้า : 
             </div>
             <div className="mx-2">
-              {item.homestay?.business_user?.[0]?.lastName ||
-                item.package?.business_user?.lastName}
+              {item?._id}
             </div>
           </div>
-          <div className="w-28 text-sm text-white rounded-full bg-primaryAdmin flex items-center justify-center">
-            <div>พร้อมรับเงิน</div>
+          <div className="w-36 text-sm text-white rounded-full bg-primaryAdmin flex items-center justify-center">
+            <div>ได้รับเงินรับเงินแล้ว</div>
           </div>
         </div>
         <div className="mb-2 mx-7 text-sm">
           (
-          {item.homestay?.business_user?.[0]?.businessName ||
-            item.package?.business_user?.businessName}
+          {item?.bookingStatus}
           )
         </div>
         <div className="flex flex-col mb-5 mx-7 text-md">
@@ -193,14 +209,14 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
           </div>
         </div>
       </div>
-      <button
+      <div
         id="right-card"
-        className="w-full xl:w-[25%] card-box hover:bg-whiteSmoke hover:text-blue-600"
+        className="w-full xl:w-[25%] card-box text-primaryAdmin"
       >
-        <div className="flex items-center justify-center h-full text-[35px] shadow-text">
-          ชำระเงิน
+        <div className="flex items-center justify-center h-full text-[30px] shadow-text">
+          ชำระเงินแล้ว
         </div>
-      </button>
+      </div>
     </div>
   );
 };

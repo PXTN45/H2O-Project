@@ -156,8 +156,6 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
   };
 
   const handlePaymentClick = async () => {
-    console.log(item);
-    
     const { value: file } = await Swal.fire({
       title: "ข้อมูลสำหรับโอนเงิน",
       html: `

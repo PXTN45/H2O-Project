@@ -229,7 +229,7 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
         const pathImage = `imagesPayment/${item?._id}`;
         setLoading(true)
         await handleUpload(resizedFile, pathImage);
-        const status = "Money-transferred"
+        const status = "Money-transferredUser"
         await apiSendImage(status);
       } catch (error) {
         Swal.fire({
