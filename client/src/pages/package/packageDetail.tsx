@@ -361,7 +361,7 @@ const PackageDetail = () => {
   console.log(item.isChildren);
 
   const handleAdultChange = (value: number) => {
-    setAdult((prev) => Math.max(1, prev + value)); // ค่า adult จะไม่ต่ำกว่า 1
+    setAdult((prev) => Math.min(item.max_people, Math.max(1, prev + value)));
   };
 
   const handleChildChange = (value: number) => {
