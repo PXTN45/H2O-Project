@@ -70,7 +70,7 @@ const myAccountBusiness = () => {
     role: userInfo?.role,
   });
 
-  const handleBankingChange = (e) => {
+  const handleBankingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUpdatedBankingInfo((prev) => ({
       ...prev,
@@ -902,7 +902,7 @@ const myAccountBusiness = () => {
                           <select
                             name="BankingName"
                             value={updatedBankingInfo.BankingName}
-                            onChange={handleBankingChange}
+                            onChange={() => handleBankingChange}
                             className="input input-bordered w-full"
                             required
                           >

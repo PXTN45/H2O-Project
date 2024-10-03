@@ -59,7 +59,7 @@ const myAccount = () => {
     const fetchUserData = async () => {
       try {
         const response = await axiosPrivateUser.get(`/user/adminData`);
-        const filteredData = response.data.filter(user => user._id === userInfo?._id);
+        const filteredData = response.data.filter((user : User) => user._id === userInfo?._id);
         console.log(filteredData[0]);
         setUserData(filteredData[0]);
         setPasswords({

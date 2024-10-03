@@ -7,7 +7,7 @@ const DashBoard = () => {
       <div>
         <Drawer />
       </div>
-      <div className="w-full sm:px-10 md:w-full lg:w-3/4 xl:w-3/4 flex flex-col">
+      <div className="w-full sm:px-10 md:w-full lg:w-3/4 xl:w-3/4 flex flex-col mt-5">
         <Outlet />
       </div>
     </div>

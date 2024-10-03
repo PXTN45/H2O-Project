@@ -7,7 +7,6 @@ import PrivateVerifyEmail from "../PrivateRouter/PrivateVerifyEmail";
 import Home from "../pages/home/homepage";
 import VerifyEmailSuccess from "../pages/orther/emailIsVerify";
 import ProfileUser from "../pages/user/myAccount";
-import ProfileBusiness from "../pages/business/profile";
 import MyAccountAdmin from "../pages/admin/myAccountAdmin";
 import SelectionCreate from "../pages/business/selectionCreate";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
@@ -29,6 +28,7 @@ import HistoryReview from "../pages/user/historyReview";
 import MyAccountBusiness from "../pages/business/myAccountBusiness";
 import MyBusiness from "../pages/business/myBusiness";
 import BookingList from "../pages/business/bookingList";
+import BookingBusiness from "../pages/admin/Booking-Business";
 
 const router = createBrowserRouter([
   {
@@ -139,6 +139,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard-admin/Profile-admin",
             element: <MyAccountAdmin />,
+          },
+          {
+            path: "/dashboard-admin/Payment",
+            element: <BookingBusiness />,
           },
         ],
       },

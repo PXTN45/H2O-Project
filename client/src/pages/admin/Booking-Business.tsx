@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosPublic from "../../hook/axiosPublic";
 import Card from "../../components/Card-Detail-Business";
 
@@ -155,12 +155,12 @@ const BookingBusiness = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
+      <div className="flex items-center justify-center w-full shadow-lg rounded-[10px] ">
         <button
           id="button-homestaySearch-Select"
           className={
             !isPackage
-              ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
+              ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
               : "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
           }
           onClick={clickToHome}
@@ -172,7 +172,7 @@ const BookingBusiness = () => {
           className={
             !isPackage
               ? "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-              : "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+              : "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
           }
           onClick={clickToPackage}
         >

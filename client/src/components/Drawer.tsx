@@ -188,6 +188,11 @@ const Drawer: React.FC = () => {
                         <a>บัญชีของฉัน</a>
                       </li>
                     </Link>
+                    <Link to={"/dashboard-admin/Payment"}>
+                      <li>
+                        <a>รายชื่อผู้รับเงิน</a>
+                      </li>
+                    </Link>
                   </div>
                 ) : null}
                 <hr className="h-px my-4 bg-primaryUser border-0"></hr>

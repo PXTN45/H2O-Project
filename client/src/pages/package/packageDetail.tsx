@@ -12,7 +12,7 @@ import { BiSolidDiscount } from "react-icons/bi";
 import { GrSync } from "react-icons/gr";
 import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import PackageHomeStay from "../../components/PackageHomeStay";
-import { Image_upload, Offer, Review } from "../../type";
+import { Image_upload , Review } from "../../type";
 import { MdPeopleAlt } from "react-icons/md";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 
