@@ -11,6 +11,22 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../../Firebase/firebase.config";
 import { FaEdit } from "react-icons/fa";
 import { Password, User } from "../../type";
+import bcrypt from "bcryptjs";
+
+const validatePassword = (password: string) => {
+  const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+  return regex.test(password);
+};
+
+const getCurrentDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // +1 เพราะเดือนเริ่มต้นที่ 0
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const currentDate = getCurrentDate();
 
 const myAccount = () => {
   const authContext = useContext(AuthContext);
@@ -59,8 +75,9 @@ const myAccount = () => {
     const fetchUserData = async () => {
       try {
         const response = await axiosPrivateUser.get(`/user/adminData`);
-        const filteredData = response.data.filter((user : User) => user._id === userInfo?._id);
-        console.log(filteredData[0]);
+        const filteredData = response.data.filter(
+          (user: User) => user._id === userInfo?._id
+        );
         setUserData(filteredData[0]);
         setPasswords({
           email: filteredData[0].email,
@@ -68,20 +85,14 @@ const myAccount = () => {
           newPass: "",
           confirmPass: "",
         });
-        setUpdatedUserInfo(filteredData[0].data);
-
+        setUpdatedUserInfo(filteredData[0]);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
 
     fetchUserData();
-  }, [
-    userInfo?._id,
-    openUpdateUser,
-    openUpdateBirthday,
-    openUpdatePhone,
-  ]);
+  }, [userInfo?._id, openUpdateUser, openUpdateBirthday, openUpdatePhone]);
 
   const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -142,14 +153,14 @@ const myAccount = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-            let formattedPhone = phone;
+          let formattedPhone = phone;
 
-            // ถ้า phone เริ่มต้นด้วย '0' ให้ตัดออก
-            if(formattedPhone){
-              if (formattedPhone.startsWith('0')) {
-                formattedPhone = formattedPhone.slice(1);
-              }  
+          // ถ้า phone เริ่มต้นด้วย '0' ให้ตัดออก
+          if (formattedPhone) {
+            if (formattedPhone.startsWith("0")) {
+              formattedPhone = formattedPhone.slice(1);
             }
+          }
 
           await axiosPrivateUser.put(`/user/updateUser/${userInfo?._id}`, {
             role: userInfo?.role,
@@ -205,15 +216,56 @@ const myAccount = () => {
 
   const changePassword = async () => {
     try {
-      const change = await axiosPrivateUser.put(
-        "/user/update-password",
-        passwords
-      );
-      if (change.status === 200) {
+      const userInputPassword = passwords.password;
+      const hashedPassword = updatedUserInfo?.password;
+      const isMatch = bcrypt.compareSync(userInputPassword, hashedPassword);
+      if (isMatch) {
+        if (!validatePassword(passwords.newPass)) {
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร, รวมทั้งตัวพิมพ์ใหญ่, ตัวพิมพ์เล็ก, ตัวเลข และอักขระพิเศษ",
+            icon: "error",
+          });
+          return;
+        }
+
+        if (!validatePassword(passwords.confirmPass)) {
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร, รวมทั้งตัวพิมพ์ใหญ่, ตัวพิมพ์เล็ก, ตัวเลข และอักขระพิเศษ",
+            icon: "error",
+          });
+          return;
+        }
+
+        if (passwords.newPass === passwords.confirmPass) {
+          const change = await axiosPrivateUser.put(
+            `/user/updateUser/${updatedUserInfo?._id}`,
+            {
+              password: passwords.newPass,
+              role: updatedUserInfo?.role,
+            }
+          );
+          if (change.status === 200) {
+            Swal.fire({
+              title: "สำเร็จ!",
+              text: "รหัสผ่านของคุณได้ถูกเปลี่ยนเรียบร้อยแล้ว.",
+              icon: "success",
+            });
+            setOpenUpdatePassword(false);
+          }
+        } else {
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "รหัสผ่านใหม่ไม่ตรงกัน",
+            icon: "error",
+          });
+        }
+      } else {
         Swal.fire({
-          title: "สำเร็จ!",
-          text: "รหัสผ่านของคุณได้ถูกเปลี่ยนเรียบร้อยแล้ว.",
-          icon: "success",
+          title: "ข้อผิดพลาด!",
+          text: "รหัสเก่าไม่ถูกต้อง",
+          icon: "error",
         });
       }
     } catch (error) {
@@ -300,6 +352,7 @@ const myAccount = () => {
             const storageRef = ref(storage, pathImage);
             const imageURL = await getDownloadURL(storageRef);
             await apiUpdateImage(imageURL);
+            setOpenUpdateUser(false);
             // setLoadPage(true);
           } catch (error) {
             Swal.fire({
@@ -429,7 +482,7 @@ const myAccount = () => {
                   <div className="relative group ">
                     <div className="rounded-full h-14 w-14 object-cover bg-dark">
                       <img
-                        src={userInfo?.image}
+                        src={updatedUserInfo?.image}
                         alt="Profile"
                         className="object-cover w-full h-full transition-opacity duration-300 group-hover:opacity-30 rounded-full"
                       />
@@ -682,8 +735,10 @@ const myAccount = () => {
                     </span>
                     <input
                       type="date"
+                      id="dob"
                       value={dob}
                       onChange={(e) => setDob(e.target.value)}
+                      max={currentDate} // กำหนดวันที่สูงสุด
                       className="input input-bordered w-full mt-2"
                     />
                   </div>
@@ -740,7 +795,6 @@ const myAccount = () => {
                 </div>
               </div>
             ) : null}
-
           </div>
           <div className="flex justify-end">
             <button

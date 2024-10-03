@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosPublic from "../../hook/axiosPublic";
-import Card from "../../components/Card-Detail-Business";
+import CardUser from "../../components/Card-Detail-User";
+import CardBusiness from "../../components/Card-Detail-Business";
 
 // ที่อยู่ของ business user
 interface Address {
@@ -80,27 +81,32 @@ interface Booking {
 }
 
 const BookingBusiness = () => {
+  const [user, serUser] = useState<Booking[]>([]);
   const [businesses, setBusinesses] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isPackage, setIsPackage] = useState<boolean>(false);
+  const [isBusiness, setIsBusiness] = useState<boolean>(false);
 
   const clickToPackage = () => {
-    setIsPackage(true);
+    setIsBusiness(true);
   };
 
   const clickToHome = () => {
-    setIsPackage(false);
+    setIsBusiness(false);
   };
 
   useEffect(() => {
     const fetchBusinesses = async () => {
       try {
         const response = await axiosPublic.get("/getBookingForAdmin");
-        const confirmedBookings = response.data.filter(
-          (booking:Booking) => booking.bookingStatus === "Check-in"
+        const confirmedBookingsBusiness = response.data.filter(
+          (booking: Booking) => booking.bookingStatus === "Check-in"
         );
-        setBusinesses(confirmedBookings);
+        const confirmedBookingsUser = response.data.filter(
+          (booking: Booking) => booking.bookingStatus === "Cancelled"
+        );
+        serUser(confirmedBookingsUser);
+        setBusinesses(confirmedBookingsBusiness);
       } catch (err) {
         setError("Failed to load businesses");
       } finally {
@@ -119,72 +125,56 @@ const BookingBusiness = () => {
     return <p>{error}</p>;
   }
 
-  if (businesses.length === 0) {
-    return (
-      <div>
-        <div className="flex items-center justify-center w-full shadow-lg rounded-[10px]">
-          <button
-            id="button-homestaySearch-Select"
-            className={
-              !isPackage
-                ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
-                : "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-            }
-            onClick={clickToHome}
-          >
-            ผู้ใช้ ( จำนวนสุทธิ )
-          </button>
-          <button
-            id="button-homestaySearch-noSelect"
-            className={
-              !isPackage
-                ? "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-                : "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-            }
-            onClick={clickToPackage}
-          >
-            ผู้ขาย (จำนวนสุทธิ)
-          </button>
-        </div>
-        <div className="min-h-screen flex items-center justify-center">
-          <p>ไม่พบข้อมูล</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen">
       <div className="flex items-center justify-center w-full shadow-lg rounded-[10px] ">
         <button
           id="button-homestaySearch-Select"
           className={
-            !isPackage
+            !isBusiness
               ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
               : "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
           }
           onClick={clickToHome}
         >
-          ผู้ใช้ ( จำนวนสุทธิ )
+          ผู้ใช้ ( {user.length} )
         </button>
         <button
           id="button-homestaySearch-noSelect"
           className={
-            !isPackage
+            !isBusiness
               ? "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
               : "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
           }
           onClick={clickToPackage}
         >
-          ผู้ขาย (จำนวนสุทธิ)
+          ผู้ขาย ( {businesses.length} )
         </button>
       </div>
-      <div className="grid grid-cols-1 gap-6 p-4">
-        {businesses.map((business) => (
-          <div key={business?._id} className="w-full">
-            <Card item={business} />
+      <div className="grid grid-cols-1 gap-6 p-4 mb-10">
+        {!isBusiness ? (
+          user.length === 0 ? (
+            <div className="min-h-screen flex items-center justify-center">
+              ไม่มีข้อมูล
+            </div>
+          ) : (
+            user.map((user) => (
+              <div key={user?._id} className="w-full">
+                <CardUser item={user} />
+              </div>
+            ))
+          )
+        ) : businesses.length === 0 ? (
+          <div className="min-h-screen flex items-center justify-center">
+            ไม่มีข้อมูล
           </div>
-        ))}
+        ) : (
+          businesses.map((business) => (
+            <div key={business?._id} className="w-full">
+              <CardBusiness item={business} />
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

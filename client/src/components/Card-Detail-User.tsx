@@ -1,7 +1,8 @@
 import React from "react";
 import Swal from "sweetalert2";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../Firebase/firebase.config";
+import { User } from "../type";
 import axiosPublic from "../hook/axiosPublic";
 import LoaddingTravel from "../assets/loadingAPI/loaddingTravel";
 
@@ -134,16 +135,34 @@ const handleUpload = async (file: File, pathImage: string) => {
 const Card: React.FC<{ item: Booking }> = ({ item }) => {
   
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [userData, setUserData] = React.useState<User>();
 
-  const apiSendImage = async (imageURL: string) => {
-    if (imageURL) {
-      const sendImage = {
-        bookingId: item?._id,
-        imageUrl: imageURL,
+ React.useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosPublic.get("/user/userData");
+        const user = response.data.filter(
+          (users:Booking) => users._id === item.booker
+        );
+        setUserData(user[0])
+      } catch (err) {
+        console.error(Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [item]);
+
+  const apiSendImage = async (status: string) => {
+    if (status) {
+      const changedStatus = {
+        bookingStatus: status
       };
-      const response = await axiosPublic.post(
-        `/sendMoney`,
-        sendImage
+      const response = await axiosPublic.put(
+        `/change-status/${item._id}`,
+        changedStatus
       );
   
       if (!response) {
@@ -164,10 +183,9 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
       <div style="text-align: left;">
         <p style="margin-bottom: 10px; font-weight: bold;">รายละเอียดบัญชี</p>
         <ul style="margin-bottom: 20px;">
-          <li><strong>ชื่อธนาคาร:</strong> ${item.homestay?.business_user?.[0]?.BankingName || item.package?.business_user?.BankingName}</li>
-          <li><strong>ชื่อ:</strong> ${item.homestay?.business_user?.[0]?.BankingUsername || item.package?.business_user?.BankingUsername}</li>
-          <li><strong>นามสกุล:</strong> ${item.homestay?.business_user?.[0]?.BankingUserlastname || item.package?.business_user?.BankingUserlastname}</li>
-          <li><strong>เลขบัญชี:</strong> ${item.homestay?.business_user?.[0]?.BankingCode || item.package?.business_user?.BankingCode}</li>
+          <li><strong>ชื่อ:</strong> ${userData?.name}</li>
+          <li><strong>นามสกุล:</strong> ${userData?.lastName}</li>
+          <li><strong>กรุณาติดต่อที่:</strong> ${userData?.phone}</li>
         </ul>
         <p style="margin-bottom: 10px; font-weight: bold;">กรุณาอัปโหลดหลักฐานการโอนเงิน</p>
         <div style="display: flex; justify-start: flex-end;">
@@ -208,12 +226,11 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
     if (file) {
       try {
         const resizedFile = await resizeImage(file, 500, 500);
-        const pathImage = `imagesPaymentBusiness/${item?._id}`;
+        const pathImage = `imagesPaymentUser/${item?._id}`;
         setLoading(true)
         await handleUpload(resizedFile, pathImage);
-        const storageRef = ref(storage, pathImage);
-        const imageURL = await getDownloadURL(storageRef);
-        await apiSendImage(imageURL);
+        const status = "Money-transferred"
+        await apiSendImage(status);
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -251,9 +268,8 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
         <img
           id="imageCard-Home"
           src={
-            item.homestay?.business_user?.[0]?.image ||
-            item.package?.business_user?.image ||
-            "https://www.thebetter.co.th/upload/news/thumb/2803.png?t=1727486225"
+            userData?.image ||
+            "https://th.bing.com/th/id/OIP.srNFFzORAaERcWvhwgPzVAHaHa?rs=1&pid=ImgDetMain"
           }
           alt="images to cards"
           className="w-[100px] h-[100px] rounded-full object-cover z-10 my-2"
@@ -263,12 +279,10 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
         <div className="flex justify-between my-1 mx-5 text-xl">
           <div className="flex flex-row">
             <div className="mx-2">
-              {item.homestay?.business_user?.[0]?.name ||
-                item.package?.business_user?.name}
+              {userData?.name}
             </div>
             <div className="mx-2">
-              {item.homestay?.business_user?.[0]?.lastName ||
-                item.package?.business_user?.lastName}
+              {userData?.lastName}
             </div>
           </div>
           <div className="w-28 text-sm text-white rounded-full bg-primaryAdmin flex items-center justify-center">
@@ -277,8 +291,7 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
         </div>
         <div className="mb-2 mx-7 text-sm">
           (
-          {item.homestay?.business_user?.[0]?.businessName ||
-            item.package?.business_user?.businessName}
+          {userData?.email}
           )
         </div>
         <div className="flex flex-col mb-5 mx-7 text-md">
