@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosPublic from "../../hook/axiosPublic";
-import CardUser from "../../components/Card-Detail-User";
-import CardBusiness from "../../components/Card-Detail-Business";
+import CardHistory from "../../components/Card-Detail-History";
 
 // ที่อยู่ของ business user
 interface Address {
@@ -80,33 +79,21 @@ interface Booking {
   __v: number;
 }
 
-const BookingBusiness = () => {
-  const [user, serUser] = useState<Booking[]>([]);
-  const [businesses, setBusinesses] = useState<Booking[]>([]);
+
+const BookingHistory = () => {
+  const [user, setUser] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isBusiness, setIsBusiness] = useState<boolean>(false);
-
-  const clickToPackage = () => {
-    setIsBusiness(true);
-  };
-
-  const clickToHome = () => {
-    setIsBusiness(false);
-  };
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     const fetchBusinesses = async () => {
       try {
         const response = await axiosPublic.get("/getBookingForAdmin");
-        const confirmedBookingsBusiness = response.data.filter(
-          (booking: Booking) => booking.bookingStatus === "Check-in"
-        );
         const confirmedBookingsUser = response.data.filter(
-          (booking: Booking) => booking.bookingStatus === "Cancelled"
+          (booking: Booking) => booking.bookingStatus === "Money-transferred"
         );
-        serUser(confirmedBookingsUser);
-        setBusinesses(confirmedBookingsBusiness);
+        setUser(confirmedBookingsUser);
       } catch (err) {
         setError("Failed to load businesses");
       } finally {
@@ -115,7 +102,11 @@ const BookingBusiness = () => {
     };
 
     fetchBusinesses();
-  }, [businesses]);
+  }, []);
+
+  const filteredUsers = user.filter((booking) =>
+    booking._id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return <p>Loading...</p>;
@@ -127,51 +118,27 @@ const BookingBusiness = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="flex items-center justify-center w-full shadow-lg rounded-[10px] ">
-        <button
-          id="button-homestaySearch-Select"
-          className={
-            !isBusiness
-              ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
-              : "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-          }
-          onClick={clickToHome}
-        >
-          ผู้ใช้ ( {user.length} )
-        </button>
-        <button
-          id="button-homestaySearch-noSelect"
-          className={
-            !isBusiness
-              ? "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-              : "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-          }
-          onClick={clickToPackage}
-        >
-          ผู้ขาย ( {businesses.length} )
-        </button>
+      <div className="p-4 mb-4 flex justify-between">
+        <h1 className="text-2xl font-bold shadow-text">
+          รายชื่อผู้ที่ได้รับเงินแล้ว
+        </h1>
+        <input
+          type="text"
+          placeholder="ค้นหาโดย ID..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="input input-bordered w-full max-w-xs shadow-primaryAdmin shadow-boxShadow"
+        />
       </div>
       <div className="grid grid-cols-1 gap-6 p-4 mb-10">
-        {!isBusiness ? (
-          user.length === 0 ? (
-            <div className="min-h-screen flex items-center justify-center">
-              ไม่มีข้อมูล
-            </div>
-          ) : (
-            user.map((user) => (
-              <div key={user?._id} className="w-full">
-                <CardUser item={user} />
-              </div>
-            ))
-          )
-        ) : businesses.length === 0 ? (
+        {filteredUsers.length === 0 ? (
           <div className="min-h-screen flex items-center justify-center">
             ไม่มีข้อมูล
           </div>
         ) : (
-          businesses.map((business) => (
-            <div key={business?._id} className="w-full">
-              <CardBusiness item={business} />
+          filteredUsers.map((user) => (
+            <div key={user?._id} className="w-full">
+              <CardHistory item={user} />
             </div>
           ))
         )}
@@ -180,4 +147,4 @@ const BookingBusiness = () => {
   );
 };
 
-export default BookingBusiness;
+export default BookingHistory;

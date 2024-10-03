@@ -28,7 +28,8 @@ import HistoryReview from "../pages/user/historyReview";
 import MyAccountBusiness from "../pages/business/myAccountBusiness";
 import MyBusiness from "../pages/business/myBusiness";
 import BookingList from "../pages/business/bookingList";
-import BookingBusiness from "../pages/admin/Booking-Business";
+import BookingBusiness from "../pages/admin/Booking-Payment";
+import BookingHistory from "../pages/admin/Booking-History";
 
 const router = createBrowserRouter([
   {
@@ -143,6 +144,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard-admin/Payment",
             element: <BookingBusiness />,
+          },
+          {
+            path: "/dashboard-admin/BookingHistory",
+            element: <BookingHistory />,
           },
         ],
       },

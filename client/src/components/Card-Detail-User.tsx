@@ -226,7 +226,7 @@ const Card: React.FC<{ item: Booking }> = ({ item }) => {
     if (file) {
       try {
         const resizedFile = await resizeImage(file, 500, 500);
-        const pathImage = `imagesPaymentUser/${item?._id}`;
+        const pathImage = `imagesPayment/${item?._id}`;
         setLoading(true)
         await handleUpload(resizedFile, pathImage);
         const status = "Money-transferred"
