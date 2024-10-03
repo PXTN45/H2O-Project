@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
+// import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import { CiImageOn } from "react-icons/ci";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
@@ -89,22 +89,22 @@ const createHomeStay: React.FC = () => {
     bedroom_homeStay: 0,
     sizeBedroom_homeStay: "",
   });
-  const [offer, setOffer] = useState<Offer>({
-    price_homeStay: 0,
-    max_people: {
-      adult: 0,
-      child: 0,
-    },
-    discount: 0,
-    facilitiesRoom: {
-      facilitiesName: "",
-    },
-    roomCount: 0,
-    quantityRoom: 0,
-  });
+  // const [offer, setOffer] = useState<Offer>({
+  //   price_homeStay: 0,
+  //   max_people: {
+  //     adult: 0,
+  //     child: 0,
+  //   },
+  //   discount: 0,
+  //   facilitiesRoom: {
+  //     facilitiesName: "",
+  //   },
+  //   roomCount: 0,
+  //   quantityRoom: 0,
+  // });
   const [isPolicyAccepted, setIsPolicyAccepted] = useState<boolean>(false);
-  const [checkInTime, setCheckInTime] = useState("15:00");
-  const [checkOutTime, setCheckOutTime] = useState("12:00");
+  // const [checkInTime, setCheckInTime] = useState("15:00");
+  // const [checkOutTime, setCheckOutTime] = useState("12:00");
   const [cancellationPolicy, setCancellationPolicy] = useState("คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก");
   const [selected, setSelected] = useState<string | null>("homestay");
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -113,25 +113,25 @@ const createHomeStay: React.FC = () => {
   const [hasDiscount, setHasDiscount] = useState<boolean>(false);
   const [hasBank, setHasHasBank] = useState<boolean>(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isPolicyAccepted) {
-      alert("กรุณยากดยอมรับ");
-      return;
-    }
-    try {
-      const response = await axiosPrivateBusiness.post(`/homestay`);
-      setFormData(response.data);
-      if (response.data) {
-        alert("ที่พักของท่านสร้างเรียบร้อยแล้ว");
-      } else {
-        alert("เกิดข้อผิดพลาดในการบันทึก");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
-    }
-  };
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!isPolicyAccepted) {
+  //     alert("กรุณยากดยอมรับ");
+  //     return;
+  //   }
+  //   try {
+  //     const response = await axiosPrivateBusiness.post(`/homestay`);
+  //     setFormData(response.data);
+  //     if (response.data) {
+  //       alert("ที่พักของท่านสร้างเรียบร้อยแล้ว");
+  //     } else {
+  //       alert("เกิดข้อผิดพลาดในการบันทึก");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+  //   }
+  // };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
