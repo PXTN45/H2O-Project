@@ -42,6 +42,15 @@ const BusinessHomeStay = () => {
     fetchData();
   }, [toggleStates]);
 
+  useEffect(() => {
+    // ตั้งค่าเริ่มต้น toggleStates ตาม status_sell_homeStay ของ homestay
+    const initialStates = myHomestay.reduce((acc, homestay, index) => {
+      acc[index] = homestay.status_sell_homeStay === "Ready"; // ถ้าเปิดจอง
+      return acc;
+    }, {} as { [key: number]: boolean });
+    setToggleStates(initialStates);
+  }, [myHomestay]);
+
   const [currentIndices, setCurrentIndices] = useState<number[]>(
     myHomestay.map(() => 0)
   );
@@ -147,18 +156,16 @@ const BusinessHomeStay = () => {
 
   const toggle = async (index: number, id: string) => {
     // สลับสถานะก่อน
-    const newState = !toggleStates[index];  
-    console.log(newState);
-      
+    const newState = !toggleStates[index];
     try {
       if (newState) {
         // ส่ง request สำหรับเปิดการจอง
         await axiosPrivateBusiness.post(`/changeStatus/${id}`, {
-          status_sell_homeStay: "Ready", 
+          status_sell_homeStay: "Ready",
         });
       } else {
         await axiosPrivateBusiness.post(`/changeStatus/${id}`, {
-          status_sell_homeStay: "NotReady", 
+          status_sell_homeStay: "NotReady",
         });
       }
       // อัปเดตสถานะของ toggle
@@ -317,8 +324,8 @@ const BusinessHomeStay = () => {
                     <div className="flex flex-col justify-between h-full w-full gap-2">
                       <div className="w-full flex flex-col items-end justify-end">
                         <button
-                          key={homestay?._id}
-                          onClick={() => toggle(index, homestay?._id)}
+                          key={homestay._id}
+                          onClick={() => toggle(index, homestay._id)}
                           className={`w-[115px] text-xs font-bold text-white px-4 py-2 rounded-full flex items-center gap-2 transition-colors duration-300 ease-in-out ${
                             toggleStates[index]
                               ? "bg-blue-500 flex-row-reverse"
@@ -332,7 +339,7 @@ const BusinessHomeStay = () => {
                                 : "translate-x-0"
                             }`}
                           ></div>
-                          {toggleStates[index] ? "เปิดให้จอง" : "ปิดให้จอง"}
+                          {toggleStates[index] ? "เปิดจอง" : "ปิดจอง"}
                         </button>
 
                         <div>

@@ -86,7 +86,7 @@ export interface HomeStay {
   business_user: string[]; // Assuming you use ObjectId as string
   review_rating_homeStay: number;
   facilities: Facility[];
-  status_sell_homeStay: boolean;
+  status_sell_homeStay: string;
   discount: number;
   createdAt: Date;
   updatedAt: Date;
