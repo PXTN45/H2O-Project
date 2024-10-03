@@ -66,44 +66,53 @@ const Card: React.FC<CardProps> = ({ item }) => {
   };
 
   return (
-    <div
-      className="card-box max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
-    >
-      <div onClick={handleCardClick}>
-        <img
-          id="imageCard-Home"
-          src={item.image[0].image_upload}
-          alt="images to cards"
-          className="w-full h-[15rem] object-cover"
-        />
-
-        <div id="detailCard-Home" className="px-6 py-4">
-          <div className="font-bold text-xl mb-2">
-            {truncateText(item.name_homeStay || "", 15)}
-          </div>
-          <p id="Province-HomeStay" className="text-base">
-            {truncateText(item.location[0].province_location || "", 30)}
-          </p>
-        </div>
-        <div className="flex items-center justify-center mt-5">
-          <div
-            id="Stars-HomeStay"
-            className="absolute left-0 font-bold px-6 py-4 text-primaryUser"
+    <div>
+      {item ? (
+            <div
+            className="card-box max-w-full rounded overflow-hidden shadow relative mx-6 my-6 h-full hover:scale-105 transform transition duration-300"
           >
-            <div className="flex">
-              {renderStars(item.review_rating_homeStay || 0)}
+            <div onClick={handleCardClick}>
+              <img
+                id="imageCard-Home"
+                src={item?.image[0].image_upload}
+                alt="images to cards"
+                className="w-full h-[15rem] object-cover"
+              />
+      
+              <div id="detailCard-Home" className="px-6 py-4">
+                <div className="font-bold text-xl mb-2">
+                  {truncateText(item.name_homeStay || "", 15)}
+                </div>
+                <p id="Province-HomeStay" className="text-base">
+                  {truncateText(item?.location[0].province_location || "", 30)}
+                </p>
+              </div>
+              <div className="flex items-center justify-center mt-5">
+                <div
+                  id="Stars-HomeStay"
+                  className="absolute left-0 font-bold px-6 py-4 text-primaryUser"
+                >
+                  <div className="flex">
+                    {renderStars(item?.review_rating_homeStay || 0)}
+                  </div>
+                </div>
+                <div
+                  id="Price-HomeStay"
+                  className="absolute right-0 font-bold px-6 py-4"
+                >
+                  <span className="mx-1">฿</span>
+                  {item?.room_type[0].offer[0].price_homeStay || 0}
+                </div>
+              </div>
             </div>
           </div>
-          <div
-            id="Price-HomeStay"
-            className="absolute right-0 font-bold px-6 py-4"
-          >
-            <span className="mx-1">฿</span>
-            {item.room_type[0].offer[0].price_homeStay}
-          </div>
+      ): (
+        <div>
+
         </div>
-      </div>
+      )}
     </div>
+
   );
 };
 

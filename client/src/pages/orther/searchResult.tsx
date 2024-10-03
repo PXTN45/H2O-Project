@@ -112,9 +112,9 @@ const SearchResult: React.FC = () => {
   const { mapData, drawerData, setDrawerData, setMapData } = authContext;
 
   const [isPackage, setIsPackage] = useState<boolean>(
-    dataSearch.searchType === "Homestay"
+    dataSearch?.searchType === "Homestay"
       ? false
-      : dataSearch.searchType === "Package"
+      : dataSearch?.searchType === "Package"
       ? true
       : false
   );
@@ -140,38 +140,18 @@ const SearchResult: React.FC = () => {
     useState<Item[]>([]);
   const [dataPackage, setDataPackage] = useState<Item[]>([]);
   const [homeStayCount, setHomeStayCount] = useState<number>(0);
-  const [packageCount, setPackageCount] = useState<number>(0);
   const [sortOption, setSortOption] = useState<string | null>(null);
+  const [sortText, setSortText] = useState<string | null>("กรองข้อมูล");
+  const [packageCount, setPackageCount] = useState<number>(0);
+  const PackageCount = React.useRef(0);
 
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-  console.log(dataPackageForPriceFilter);
 
   //Filter Price
   useEffect(() => {
     if (drawerData?.drawerPrice.endPrice !== 0) {
-      const minPrices = dataHomeStays.map((location) => {
-        const offers = location.room_type.flatMap((roomType) => roomType.offer);
-        const minPrice = Math.min(
-          ...offers.map((offer) => offer.price_homeStay)
-        );
-        return offers.find((offer) => offer.price_homeStay === minPrice);
-      });
-
-      const filteredDataHomestays = minPrices.filter((offer) => {
-        if (offer === undefined || offer.price_homeStay === undefined) {
-          return false;
-        }
-
-        const startPrice = drawerData?.drawerPrice?.startPrice ?? 0;
-        const endPrice = drawerData?.drawerPrice?.endPrice ?? Number.MAX_VALUE;
-
-        return (
-          offer.price_homeStay > startPrice && offer.price_homeStay <= endPrice
-        );
-      });
-
       const filteredDataPackage = dataPackage.filter((offer) => {
         if (offer === undefined || offer.price_package === undefined) {
           return false;
@@ -185,19 +165,9 @@ const SearchResult: React.FC = () => {
         );
       });
 
-      const validDataHomestays = filteredDataHomestays.filter(
-        (item) => item !== undefined
-      );
       const validDataPackage = filteredDataPackage.filter(
         (item) => item !== undefined
       );
-
-      const sortedDataHomestays = validDataHomestays.sort((a, b) => {
-        const priceA = a?.price_homeStay ?? Infinity;
-        const priceB = b?.price_homeStay ?? Infinity;
-
-        return priceA - priceB;
-      });
 
       const sortedDataPackage = validDataPackage.sort((a, b) => {
         const priceA = a.price_package ?? Infinity;
@@ -207,13 +177,24 @@ const SearchResult: React.FC = () => {
       });
 
       const formattedData = dataHomeStays
-        ?.map((location) => {
-          const offers = location.room_type.flatMap(
+        .map((location) => {
+          const allOffers = location.room_type.flatMap(
             (roomType) => roomType.offer
           );
-          const filteredOffers = offers.filter((offer) =>
-            sortedDataHomestays.includes(offer)
-          );
+
+          const filteredOffers = allOffers.filter((offer) => {
+            if (!offer || offer.price_homeStay === undefined) return false;
+
+            const startPrice = drawerData?.drawerPrice?.startPrice ?? 0;
+            const endPrice =
+              drawerData?.drawerPrice?.endPrice ?? Number.MAX_VALUE;
+
+            return (
+              offer.price_homeStay >= startPrice &&
+              offer.price_homeStay <= endPrice
+            );
+          });
+
           if (filteredOffers.length > 0) {
             return {
               ...location,
@@ -225,11 +206,20 @@ const SearchResult: React.FC = () => {
               })),
             };
           }
+
           return null;
         })
         .filter((location) => location !== null);
 
-      setDataHomeStaysdataHomeStaysForPriceFilter(formattedData);
+      const nonNullFormattedData = formattedData.filter(
+        (item): item is Item => item !== null
+      );
+
+      if (Array.isArray(nonNullFormattedData)) {
+        setDataHomeStaysdataHomeStaysForPriceFilter(nonNullFormattedData);
+      } else {
+        console.error("Formatted data contains null values or is not an array");
+      }
       setDataPackagedataHomeStaysForPriceFilter(sortedDataPackage);
     } else {
       setDataHomeStaysdataHomeStaysForPriceFilter([]);
@@ -331,7 +321,6 @@ const SearchResult: React.FC = () => {
         setDataHomeStays(HomeStayData);
         setDataPackage(PackageData);
         setHomeStayCount(HomeStayData.length);
-        setPackageCount(PackageData.length);
       } catch (error) {
         console.log("Error fetching data:", error);
       }
@@ -425,7 +414,7 @@ const SearchResult: React.FC = () => {
     const sortedData = [...data];
 
     switch (sortOption) {
-      case "เรียงตามราคาสูงไปน้อย":
+      case "ราคามากไปน้อย":
         return sortedData.sort((a, b) => {
           const offersA = a.room_type?.[0]?.offer || [];
           const offersB = b.room_type?.[0]?.offer || [];
@@ -443,7 +432,7 @@ const SearchResult: React.FC = () => {
 
           return minPriceB - minPriceA || packagePriceB - packagePriceA;
         });
-      case "เรียงตามราคาน้อยไปสูง":
+      case "ราคาน้อยไปมาก":
         return sortedData.sort((a, b) => {
           const offersA = a.room_type?.[0]?.offer || [];
           const offersB = b.room_type?.[0]?.offer || [];
@@ -462,13 +451,13 @@ const SearchResult: React.FC = () => {
           return minPriceA - minPriceB || packagePriceA - packagePriceB;
         });
 
-      case "เรียงตามดาวสูงไปน้อย":
+      case "คะแนนมากไปน้อย":
         return sortedData.sort(
           (a, b) =>
             (b.review_rating_homeStay ?? b.review_rating_package ?? 0) -
             (a.review_rating_homeStay ?? a.review_rating_package ?? 0)
         );
-      case "เรียงตามดาวน้อยไปสูง":
+      case "คะแนนน้อยไปมาก":
         return sortedData.sort(
           (a, b) =>
             (a.review_rating_homeStay ?? a.review_rating_package ?? 0) -
@@ -481,8 +470,28 @@ const SearchResult: React.FC = () => {
 
   const handleFilterClick = (filter: string) => {
     setSortOption(filter);
+    setSortText(filter);
     setShowFilterMenu(false);
   };
+
+  const filterByDate = (items:Item[]) => {
+    const filteredItems = items.filter((item) => {
+      const startDate = new Date(item.time_start_package);
+      if (!item.isChildren && numChildren > 0) {
+        return false;
+      } else if (item.max_people && numPeople > item.max_people) {
+        return false;
+      } else {
+        return startDate >= dateRange[0] && startDate <= dateRange[1];
+      }
+    });
+    PackageCount.current = filteredItems.length;
+    return filteredItems;
+  };
+
+  useEffect(() => {
+    setPackageCount(PackageCount.current);
+  }, [numPeople, numChildren, dataPackage, dataPackageForPriceFilter]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-10">
@@ -497,7 +506,11 @@ const SearchResult: React.FC = () => {
             }
             onClick={clickToHome}
           >
-            ที่พัก ({homeStayCount})
+            ที่พัก (
+            {(drawerData?.drawerPrice?.endPrice ?? 0) > 0
+              ? dataHomeStaysForPriceFilter.length
+              : homeStayCount}
+            )
           </button>
           <button
             id="button-homestaySearch-noSelect"
@@ -627,7 +640,7 @@ const SearchResult: React.FC = () => {
               >
                 <span className="flex items-center justify-center font-bold">
                   <MdFilterList className="w-4 h-4 mr-2 sm:mr-3" />
-                  <span>Sort</span>
+                  <span>{sortText}</span>
                 </span>
               </button>
               {showFilterMenu && (
@@ -637,38 +650,30 @@ const SearchResult: React.FC = () => {
                       <button
                         id="PriceHightToLow"
                         className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
-                        onClick={() =>
-                          handleFilterClick("เรียงตามราคาสูงไปน้อย")
-                        }
+                        onClick={() => handleFilterClick("ราคามากไปน้อย")}
                       >
-                        เรียงตามราคาสูงไปน้อย
+                        ราคามากไปน้อย
                       </button>
                       <button
                         id="PriceLowToHight"
                         className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
-                        onClick={() =>
-                          handleFilterClick("เรียงตามราคาน้อยไปสูง")
-                        }
+                        onClick={() => handleFilterClick("ราคาน้อยไปมาก")}
                       >
-                        เรียงตามราคาน้อยไปสูง
+                        ราคาน้อยไปมาก
                       </button>
                       <button
                         id="StarHightToLow"
                         className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
-                        onClick={() =>
-                          handleFilterClick("เรียงตามดาวสูงไปน้อย")
-                        }
+                        onClick={() => handleFilterClick("คะแนนมากไปน้อย")}
                       >
-                        เรียงตามดาวสูงไปน้อย
+                        คะแนนมากไปน้อย
                       </button>
                       <button
                         id="StarLowToHight"
                         className="w-full text-left p-2 hover:bg-gradient-to-r from-primaryNoRole to-secondNoRole rounded"
-                        onClick={() =>
-                          handleFilterClick("เรียงตามดาวน้อยไปสูง")
-                        }
+                        onClick={() => handleFilterClick("คะแนนน้อยไปมาก")}
                       >
-                        เรียงตามดาวน้อยไปสูง
+                        คะแนนน้อยไปมาก
                       </button>
                     </div>
                   </div>
@@ -684,7 +689,7 @@ const SearchResult: React.FC = () => {
                 <>
                   {(drawerData?.drawerPrice?.endPrice ?? 0) > 0 ? (
                     <>
-                      {sortData(dataPackageForPriceFilter).map(
+                      {sortData(filterByDate(dataPackageForPriceFilter)).map(
                         (item, index) => (
                           <div key={index} className="w-full">
                             <CardPackage
@@ -699,16 +704,18 @@ const SearchResult: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      {sortData(dataPackage).map((item, index) => (
-                        <div key={index} className="w-full">
-                          <CardPackage
-                            item={item}
-                            numPeople={numPeople}
-                            numChildren={numChildren}
-                            dateRange={dateRange}
-                          />
-                        </div>
-                      ))}
+                      {sortData(filterByDate(dataPackage)).map(
+                        (item, index) => (
+                          <div key={index} className="w-full">
+                            <CardPackage
+                              item={item}
+                              numPeople={numPeople}
+                              numChildren={numChildren}
+                              dateRange={dateRange}
+                            />
+                          </div>
+                        )
+                      )}
                     </>
                   )}
                 </>

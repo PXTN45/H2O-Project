@@ -6,17 +6,29 @@ import PrivateRouterAdmin from "../PrivateRouter/PrivateRouterAdmin";
 import PrivateVerifyEmail from "../PrivateRouter/PrivateVerifyEmail";
 import Home from "../pages/home/homepage";
 import VerifyEmailSuccess from "../pages/orther/emailIsVerify";
-import ProfileUser from "../pages/user/profile";
-import ProfileBusiness from "../pages/business/profile";
+import ProfileUser from "../pages/user/myAccount";
+import MyAccountAdmin from "../pages/admin/myAccountAdmin";
 import SelectionCreate from "../pages/business/selectionCreate";
 import DrawerDashBoard from "../layout/DrawerDashBoard";
 import DrawerSearch from "../layout/DrawerSearch";
-import BookingDetail from "../pages/orther/bookingDetail";
+import BookingDetail from "../pages/homeStay/bookingDetail";
+import DetailPayment from "../pages/orther/detailPayment";
 import SearchResult from "../pages/orther/searchResult";
-import HomeStayDetail from "../pages/detail/homeStayDetail";
-import PackageDetail from "../pages/detail/packageDetail";
+import HomeStayDetail from "../pages/homeStay/homeStayDetail";
+import PackageDetail from "../pages/package/packageDetail";
 import { PaymentProvider } from "../AuthContext/paymentContext";
 import CreateHomeStay from "../pages/business/createHomeStay";
+import PaymentSuccess from "../pages/homeStay/paymentSuccess";
+import PaymentFailure from "../pages/homeStay/paymentFailure";
+import Contact from "../pages/orther/Contact";
+import ContactOnlyAdmin from "../pages/orther/Contact.OnlyAdmin";
+import Booking from "../pages/user/Booking";
+import HistoryBooking from "../pages/user/historyBooking";
+import HistoryReview from "../pages/user/historyReview";
+import MyAccountBusiness from "../pages/business/myAccountBusiness";
+import MyBusiness from "../pages/business/myBusiness";
+import BookingList from "../pages/business/bookingList";
+import BookingBusiness from "../pages/admin/Booking-Business";
 
 const router = createBrowserRouter([
   {
@@ -28,13 +40,19 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "/detailPayment",
+        element: (
+          <PaymentProvider>
+            <DetailPayment />
+          </PaymentProvider>
+        ),
+      },
+      {
         path: "/homeStayDetail/:id",
         element: (
-          <PrivateRouterUser>
-            <PaymentProvider>
-              <HomeStayDetail />
-            </PaymentProvider>
-          </PrivateRouterUser>
+          <PaymentProvider>
+            <HomeStayDetail />
+          </PaymentProvider>
         ),
       },
       {
@@ -45,7 +63,6 @@ const router = createBrowserRouter([
           </PaymentProvider>
         ),
       },
-
       {
         path: "/packageDetail/:id",
         element: <PackageDetail />,
@@ -60,6 +77,7 @@ const router = createBrowserRouter([
           },
         ],
       },
+
       {
         path: "/dashboard-user",
         element: (
@@ -72,8 +90,21 @@ const router = createBrowserRouter([
             path: "/dashboard-user/Profile-user",
             element: <ProfileUser />,
           },
+          {
+            path: "/dashboard-user/Booking-user",
+            element: <Booking />,
+          },
+          {
+            path: "/dashboard-user/HistiryBooking-user",
+            element: <HistoryBooking />,
+          },
+          {
+            path: "/dashboard-user/HistiryReview-user",
+            element: <HistoryReview />,
+          },
         ],
       },
+
       {
         path: "/dashboard-business",
         element: (
@@ -84,10 +115,19 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard-business/Profile-business",
-            element: <ProfileBusiness />,
+            element: <MyAccountBusiness />,
+          },
+          {
+            path: "/dashboard-business/MyBusiness-business",
+            element: <MyBusiness />,
+          },
+          {
+            path: "/dashboard-business/BookingList-business",
+            element: <BookingList />,
           },
         ],
       },
+
       {
         path: "/dashboard-admin",
         element: (
@@ -98,18 +138,30 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard-admin/Profile-admin",
-            element: <ProfileBusiness />,
+            element: <MyAccountAdmin />,
+          },
+          {
+            path: "/dashboard-admin/Payment",
+            element: <BookingBusiness />,
           },
         ],
       },
       {
         path: "/createHomeStay",
-        element:(
+        element: (
           <PrivateRouterBusiness>
-            <CreateHomeStay/>
+            <CreateHomeStay />
           </PrivateRouterBusiness>
-        )
-      }
+        ),
+      },
+      {
+        path: "/help",
+        element: <Contact />,
+      },
+      {
+        path: "/helpOnlyAdmin",
+        element: <ContactOnlyAdmin />,
+      },
     ],
   },
   {
@@ -126,6 +178,22 @@ const router = createBrowserRouter([
       <PrivateRouterBusiness>
         <SelectionCreate />
       </PrivateRouterBusiness>
+    ),
+  },
+  {
+    path: "/paymentSuccess",
+    element: (
+      <PaymentProvider>
+        <PaymentSuccess />
+      </PaymentProvider>
+    ),
+  },
+  {
+    path: "/paymentFailure",
+    element: (
+      <PaymentProvider>
+        <PaymentFailure />
+      </PaymentProvider>
     ),
   },
 ]);

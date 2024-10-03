@@ -1,5 +1,36 @@
 @import url("https://fonts.googleapis.com/css2?family=K2D:wght@100&family=Kanit:ital@1&family=Noto+Sans+Cypro+Minoan&family=Open+Sans:ital,wght@0,300;0,400;1,400;1,500&display=swap");
 
+/* สำหรับเบราว์เซอร์ Chrome, Safari, Edge และ Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* สำหรับ Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* CSS to target the date input's calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: white url('https://icon-library.com/images/date-icon-png/date-icon-png-5.jpg') no-repeat right 10px center; /* Add your icon */
+  background-size: 30px 30px; /* Size of the icon */
+  padding-right: 30px; /* Adjust padding to fit the icon */
+  color: black; /* Text color */
+}
+
+input[type="date"] {
+  color: black; /* Change text color to black */
+}
+
+/* For Firefox */
+input[type="date"]::-moz-inner-spin-button,
+input[type="date"]::-moz-calendar-picker-indicator {
+  background: black;
+}
+
+
 body {
   font: "K2D";
   background-color: white;
@@ -164,6 +195,16 @@ body.dark .otp{
   background-position: center;
 }
 
+.bg-custom-bg3 {
+  background-image: url('https://images.pexels.com/photos/7319198/pexels-photo-7319198.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 0;
+}
+
 .bg-custom-bg2 {
   background-image: url('https://www.matichon.co.th/wp-content/uploads/2020/09/%E0%B8%A0%E0%B8%9B-%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%88%E0%B8%B1%E0%B8%94%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%97%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B9%80%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B8%A7%E0%B9%80%E0%B8%8A%E0%B8%B4%E0%B8%87%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%A7%E0%B8%B1%E0%B8%95%E0%B8%B4%E0%B8%A8%E0%B8%B2%E0%B8%AA%E0%B8%95%E0%B8%A3%E0%B9%8C.jpg');
   background-size: cover;
@@ -182,6 +223,10 @@ body.dark .otp{
   opacity: 0.5;
   transition: opacity 0.3s ease-in-out;
   z-index: 0;
+}
+
+.group:hover .bg-custom-bg3 {
+  opacity: 1;
 }
 
 .group:hover .bg-custom-bg2 {
@@ -414,3 +459,41 @@ body.dark .tooltip-text {
 .shadow-b-md {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
+
+/* spin */
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-reverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 8s linear infinite;
+}
+
+/* dot */
+.dot {
+  position: absolute;
+  width: 10px; /* ขนาดจุด */
+  height: 10px; /* ขนาดจุด */
+  background-color: #8A7BE5; /* สีจุด */
+  border-radius: 50%; /* ทำให้จุดกลม */
+  transition: transform 0.2s; /* เพิ่มการเปลี่ยนแปลง */
+}
+

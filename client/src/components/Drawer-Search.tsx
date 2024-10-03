@@ -17,7 +17,8 @@ const truncateText = (text: string, maxLength: number) => {
 };
 
 const Drawer: React.FC = () => {
-  const [rangeValue, setRangeValue] = useState(0);
+  const [minValue, setMinValue] = useState(0);
+  const [rangeValue, setRangeValue] = useState(25000);
   const [searchText, setSearchText] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 3;
@@ -31,13 +32,50 @@ const Drawer: React.FC = () => {
 
   const { mapData, setDrawerData } = authContext;
 
-  const handleRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = Number(event.target.value);
-    setRangeValue(newValue);
+  const handleMinBlur = () => {
+    if (isNaN(minValue)) {
+      setMinValue(0);
+    }
+    handleSearch();
+  };
+  
+  const handleRangeBlur = () => {
+    if (isNaN(rangeValue)) {
+      setRangeValue(minValue);
+    }else if(rangeValue < minValue){
+      setRangeValue(minValue);
+    }
+    handleSearch();
   };
 
+  
+  const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    if (value === '') {
+      setMinValue(NaN);
+    } else {
+      setMinValue(parseInt(value, 10));
+      
+
+      if (rangeValue < parseInt(value, 10)) {
+        setRangeValue(parseInt(value, 10));
+      }
+    }
+  };
+  
+  const handleRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    if (value === '') {
+      setRangeValue(NaN);
+    }else{
+      setRangeValue(parseInt(value, 10));
+    }
+  };
+  
   const handleRangeMouseUp = () => {
-    handleSearch(); // ส่งข้อมูลเมื่อหยุดเลื่อน
+    handleSearch();
   };
   const [data, setData] = useState<string[]>([]);
 
@@ -51,13 +89,13 @@ const Drawer: React.FC = () => {
     const dataSearch = {
       drawerTextSearch: searchText,
       drawerPrice: {
-        startPrice: 0,
+        startPrice: minValue,
         endPrice: rangeValue,
       },
     };
 
     setDrawerData(dataSearch);
-  }, [searchText, rangeValue, setDrawerData]);
+  }, [searchText, rangeValue, minValue, setDrawerData]);
 
   useEffect(() => {
     handleSearch();
@@ -141,10 +179,31 @@ const Drawer: React.FC = () => {
                       ช่วงราคา (ห้อง / คืน)
                     </span>
                     <div className="w-[100%] flex flex-col items-center justify-center my-5">
+                      <div className="w-[80%] mb-3 flex items-center">
+                        <span className="flex justify-start">
+                          เริ่มต้น: {isNaN(minValue) ? 0 : minValue}
+                        </span>
+                      </div>
                       <input
                         type="range"
-                        id="rangePrice"
-                        name="rangePrice"
+                        id="MinrangePrice"
+                        name="MinrangePrice"
+                        min="0"
+                        max="25000"
+                        value={minValue}
+                        onChange={handleMinChange}
+                        onMouseUp={handleRangeMouseUp}
+                        className="w-[80%] accent-primaryBusiness"
+                      />
+                      <div className="w-[80%] my-3 flex items-center">
+                        <span className="flex justify-end">
+                          สูงสุด: {isNaN(rangeValue) ? 0 : rangeValue}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        id="MaxrangePrice"
+                        name="MaxrangePrice"
                         min="0"
                         max="25000"
                         value={rangeValue}
@@ -152,11 +211,57 @@ const Drawer: React.FC = () => {
                         onMouseUp={handleRangeMouseUp}
                         className="w-[80%] accent-primaryBusiness"
                       />
-                      <div className="w-[80%] mt-2 flex items-center justify-between">
-                        <span className="flex justify-start">เริ่มต้น: 0</span>
-                        <span className="flex justify-end">
-                          สูงสุด: {rangeValue}
-                        </span>
+                      <div className="w-[80%] my-5 mx-3 flex items-center justify-between relative">
+                      
+                        <div className="relative w-32 z-10">
+                          <input
+                            id="minInput"
+                            type="number"
+                            min="0"
+                            max="25000"
+                            value={minValue}
+                            onChange={handleMinChange}
+                            onBlur={handleMinBlur}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleSearch(); // Call your submit function here
+                              }
+                            }}
+                            className="w-full h-8 px-3 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-400 text-gray-700 text-sm transition-colors peer no-arrows"
+                          />
+                          <label
+                            htmlFor="minInput"
+                            className="absolute left-3 -top-2 bg-white px-1 text-gray-500 text-xs transition-all peer-focus:-top-3 peer-focus:text-blue-400"
+                          >
+                            Min
+                          </label>
+                        </div>
+
+                        <div className="absolute inset-x-0 top-1/2 -translate-y-1 h-px border-t-2 border-dashed border-gray-300 z-0"></div>
+
+                        <div className="relative w-32">
+                          <input
+                            id="maxInput"
+                            type="number"
+                            min="0"
+                            max="25000"
+                            value={rangeValue}
+                            onChange={handleRangeChange}
+                            onBlur={handleRangeBlur}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleSearch(); // Call your submit function here
+                              }
+                            }}
+                            className="w-full h-8 px-3 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-400 text-gray-700 text-sm transition-colors peer no-arrows"
+                          />
+                          <label
+                            htmlFor="maxInput"
+                            className="absolute left-3 -top-2 bg-white px-1 text-gray-500 text-xs transition-all peer-focus:-top-3 peer-focus:text-blue-400"
+                          >
+                            Max
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>

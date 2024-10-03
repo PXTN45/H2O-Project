@@ -93,7 +93,7 @@ const Card: React.FC<CardProps> = ({
       year: "numeric",
     });
   };
-  
+
   const navigate = useNavigate();
   const seeDetail = (id: string) => {
     const startDate = dateRange[0] ? formatDate(dateRange[0]) : "Not selected";
@@ -168,21 +168,11 @@ const Card: React.FC<CardProps> = ({
     return { remainingAdults, remainingChildren, requiredTickets };
   };
 
-  const { remainingAdults, remainingChildren, requiredTickets } =
-    calculateRequiredTicket([item], numPeople, numChildren);
-
-  const startDate = new Date(item.time_start_package);
-  const isWithinDateRange =
-    startDate >= dateRange[0] && startDate <= dateRange[1];
-
-  if (
-    remainingAdults > 0 ||
-    remainingChildren > 0 ||
-    !isWithinDateRange ||
-    (!item.isChildren && numChildren > 0)
-  ) {
-    return null;
-  }
+  const { requiredTickets } = calculateRequiredTicket(
+    [item],
+    numPeople,
+    numChildren
+  );
 
   return (
     <div
@@ -334,7 +324,7 @@ const Card: React.FC<CardProps> = ({
           <div className="card-semiBox w-[75%] rounded-br-[10px]">
             <span className="mx-1">
               <div className="w-full mx-5">
-                ใช้ทั้งหมด: {requiredTickets} ที่นั่ง
+                ใช้ทั้งหมด: {requiredTickets} ตั๋ว
               </div>
             </span>
           </div>
