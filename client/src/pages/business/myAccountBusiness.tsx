@@ -173,6 +173,7 @@ const myAccountBusiness = () => {
           confirmPass: "",
         });
         setUpdatedUserInfo(response.data);
+        setUserInfo(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -187,6 +188,7 @@ const myAccountBusiness = () => {
     openUpdateBanking,
     openUpdatePhone,
     openUpdateBirthday,
+    openUpdateBname,
   ]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -384,7 +386,11 @@ const myAccountBusiness = () => {
     try {
       const updateData = await axiosPrivateBusiness.put(
         `/user/updateUser/${userInfo?._id}`,
-        updatedUserInfo
+        {
+          name: updatedUserInfo?.name,
+          lastName: updatedUserInfo?.lastName,
+          role: updatedUserInfo?.role,
+        }
       );
       // setUserInfo(userData)
       if (updateData.status === 200) {
@@ -623,7 +629,7 @@ const myAccountBusiness = () => {
             role: userInfo?.role,
             businessName: bName,
           });
-          setOpenUpdatePhone(false);
+          setOpenUpdateBname(false);
 
           // แจ้งเตือนว่าการอัปเดตสำเร็จ
           Swal.fire({

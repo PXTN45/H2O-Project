@@ -80,6 +80,7 @@ const myAccount = () => {
           confirmPass: "",
         });
         setUpdatedUserInfo(response.data);
+        setUserInfo(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -330,7 +331,11 @@ const myAccount = () => {
     try {
       await axiosPrivateUser.put(
         `/user/updateUser/${userInfo?._id}`,
-        updatedUserInfo
+        {
+          name: updatedUserInfo?.name,
+          lastName: updatedUserInfo?.lastName,
+          role: updatedUserInfo?.role,
+        }
       );
       // setUserInfo(updatedUserInfo)
       Swal.fire({
