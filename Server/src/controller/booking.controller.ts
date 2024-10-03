@@ -309,6 +309,32 @@ const getAllBookingForAdmin = async (req: Request, res: Response): Promise<void>
   }
 };
 
+const changeStatus = async (req: Request, res: Response): Promise<Response> => {
+  const id = req.params.id;
+  const { bookingStatus } = req.body; // รับค่าใหม่จาก body
+
+  try {
+    if (!bookingStatus) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    const data = await Booking.findByIdAndUpdate(
+      id,
+      { bookingStatus },
+      { new: true, runValidators: true }
+    );
+    console.log(data?.bookingStatus);
+
+    if (!data) {
+      return res.status(404).json({ message: "Package Not Found" });
+    }
+
+    return res.status(200).json(data.bookingStatus);
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export {
   confirmBooking,
   createBook,
@@ -322,5 +348,6 @@ export {
   getBookingByCheckIn,
   getBookingByConfirm,
   sendMoneyToBusiness,
-  getAllBookingForAdmin
+  getAllBookingForAdmin,
+  changeStatus
 };
