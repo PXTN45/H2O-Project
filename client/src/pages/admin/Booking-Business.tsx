@@ -127,7 +127,7 @@ const BookingBusiness = () => {
             id="button-homestaySearch-Select"
             className={
               !isPackage
-                ? "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
+                ? "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tl-[10px] rounded-bl-[10px] w-full"
                 : "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
             }
             onClick={clickToHome}
@@ -139,7 +139,7 @@ const BookingBusiness = () => {
             className={
               !isPackage
                 ? "card-box p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
-                : "bg-gradient-to-r from-primaryNoRole to-secondNoRole text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
+                : "bg-gradient-to-r from-primaryAdmin to-secondAdmin text-white p-2 rounded-tr-[10px] rounded-br-[10px] w-full"
             }
             onClick={clickToPackage}
           >
