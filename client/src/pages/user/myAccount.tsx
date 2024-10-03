@@ -286,6 +286,7 @@ const myAccount = () => {
           text: "รหัสผ่านของคุณได้ถูกเปลี่ยนเรียบร้อยแล้ว.",
           icon: "success",
         });
+        setOpenUpdatePassword(false)
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -372,6 +373,7 @@ const myAccount = () => {
             const storageRef = ref(storage, pathImage);
             const imageURL = await getDownloadURL(storageRef);
             await apiUpdateImage(imageURL);
+            setOpenUpdateUser(false)
             // setLoadPage(true);
           } catch (error) {
             Swal.fire({
