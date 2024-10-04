@@ -19,15 +19,11 @@ jobs:
         
   deploy:
     needs: build
-    runs-on: aws-ec2 # เปลี่ยนจาก aws-ec2 เป็น ubuntu-latest หรือใช้ runner อื่นตามต้องการ
+    runs-on: aws-ec2
     steps:
       - name: Pull image from docker hub
         run: docker pull PXTN45/h2o-app:latest
       - name: Delete old container
-        run: docker rm -f nodejs-app-container || true # เพิ่ม || true เพื่อไม่ให้ล้มเหลวถ้าไม่มี container
+        run: docker rm -f nodejs-app-container || true 
       - name: Run docker container
-<<<<<<< HEAD
         run: docker run -d -p 3000:3000 --name nodejs-app-container PXTN45/h2o-app
-=======
-        run: docker run -d -p 3000:3000 --name nodejs-app-container PXTN45/h2o-app
->>>>>>> d35a84a172488289d65e94d217dd478a92f250ef
