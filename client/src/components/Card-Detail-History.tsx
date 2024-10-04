@@ -1,9 +1,6 @@
 import React from "react";
-import Swal from "sweetalert2";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref , getDownloadURL } from "firebase/storage";
 import { storage } from "../Firebase/firebase.config";
-import axiosPublic from "../hook/axiosPublic";
-import LoaddingTravel from "../assets/loadingAPI/loaddingTravel";
 
 // ที่อยู่ของ business user
 interface Address {

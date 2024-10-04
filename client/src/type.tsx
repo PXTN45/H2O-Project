@@ -215,6 +215,7 @@ export interface Business {
   password: string;
   phone: string | undefined;
   image: string;
+  idcard: string;
   address: Address[];
   birthday: Date;
   BankingName: string;

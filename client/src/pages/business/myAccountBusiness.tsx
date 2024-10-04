@@ -51,6 +51,7 @@ const myAccountBusiness = () => {
   const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
   const [userData, setUserData] = useState<Business>();
   const [openUpdateBname, setOpenUpdateBname] = useState<boolean>(false);
+  const [openUpdateIdCard, setOpenUpdateIdCard] = useState<boolean>(false);
   const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
   const [openUpdateAddress, setOpenUpdateAddress] = useState<boolean>(false);
   const [openUpdateBirthday, setOpenUpdateBirthday] = useState<boolean>(false);
@@ -148,6 +149,7 @@ const myAccountBusiness = () => {
   const [dob, setDob] = useState(formatDate(userData?.birthday));
   const [phone, setPhone] = useState(userData?.phone);
   const [bName, setBName] = useState(userData?.businessName);
+  const [idCard, setIdCard] = useState(userData?.idcard);
 
   // Update dob when userData changes
   useEffect(() => {
@@ -189,6 +191,7 @@ const myAccountBusiness = () => {
     openUpdatePhone,
     openUpdateBirthday,
     openUpdateBname,
+    openUpdateIdCard,
   ]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -612,6 +615,7 @@ const myAccountBusiness = () => {
       }
     });
   };
+
   const handleSubmitBname = (e: React.FormEvent) => {
     e.preventDefault();
     Swal.fire({
@@ -630,6 +634,43 @@ const myAccountBusiness = () => {
             businessName: bName,
           });
           setOpenUpdateBname(false);
+
+          // แจ้งเตือนว่าการอัปเดตสำเร็จ
+          Swal.fire({
+            title: "อัปเดตแล้ว!",
+            text: "ที่อยู่ของคุณได้รับการอัปเดตแล้ว.",
+            icon: "success",
+          });
+        } catch (error) {
+          // แจ้งเตือนหากเกิดข้อผิดพลาด
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "เกิดปัญหาในการอัปเดตที่อยู่ของคุณ.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  const handleSubmitIdCard = (e: React.FormEvent) => {
+    e.preventDefault();
+    Swal.fire({
+      title: "คุณแน่ใจหรือไม่?",
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ใช่, อัปเดตเลย!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, {
+            role: userInfo?.role,
+            idcard: idCard,
+          });
+          setOpenUpdateIdCard(false);
 
           // แจ้งเตือนว่าการอัปเดตสำเร็จ
           Swal.fire({
@@ -1051,6 +1092,57 @@ const myAccountBusiness = () => {
                 </div>
               </div>
             ) : null}
+
+            {openUpdateIdCard === false ? (
+              <div className="hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out flex justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm">รหัสบัตรประชาชน</span>
+                  <span className="text-md">{userData?.idcard || "ยังไม่ได้ตั้งค่า"}</span>
+                </div>
+                <div
+                  className="flex items-center justify-center"
+                  onClick={() => setOpenUpdateIdCard(true)}
+                >
+                  <button>
+                    <FaEdit size={24} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-5 transition-all duration-700 ease-in-out">
+                <div className="flex justify-between shadow-boxShadow p-5 rounded-lg">
+                  <form
+                    className="flex justify-between w-full"
+                    onSubmit={handleSubmitIdCard}
+                  >
+                    <div>
+                      <span className="text-sm">เปลี่ยนรหัสบัตรประชาชน</span>
+                      <input
+                        type="number"
+                        placeholder="กรุณากรอกชื่อธุรกิจ"
+                        onChange={(e) => setIdCard(e.target.value)}
+                        className="input input-bordered w-full mt-2"
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-end items-center">
+                      <button
+                        onClick={() => setOpenUpdateIdCard(false)}
+                        className="bg-red-500 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-red-700 w-32 h-10 my-2"
+                      >
+                        ยกเลิก
+                      </button>
+                      <button
+                        type="submit"
+                        className="bg-green-400 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-green-600 w-32 h-10 my-2"
+                      >
+                        แก้ไข
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
 
             {openUpdateAddress === false ? (
               <div className="flex justify-between items-center hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out">
