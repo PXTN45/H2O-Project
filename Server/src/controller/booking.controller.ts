@@ -261,7 +261,7 @@ const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    bookingData.bookingStatus = "Money-transferred";
+    bookingData.bookingStatus = "Money-transferredBusiness";
     await bookingData.save(); 
     
     await sendEmailPayment(bookingData , imageUrl);
