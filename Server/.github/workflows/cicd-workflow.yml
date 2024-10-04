@@ -13,7 +13,7 @@ jobs:
       - name: Login to docker hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Build docker image
-        run: docker build -t PXTN45/h2o-app -f ./Server/Dockerfile ./Server
+        run: docker build -t PXTN45/h2o-app -f ./Server/src/Dockerfile ./Server/src
       - name: Publish image to docker hub
         run: docker push PXTN45/h2o-app:latest
         
