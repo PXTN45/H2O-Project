@@ -1,38 +1,29 @@
 # syntax=docker/dockerfile:1
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
-
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
+# ใช้ Node.js เวอร์ชัน 20.16.0 บน Alpine Linux (มีขนาดเล็ก)
 ARG NODE_VERSION=20.16.0
-
 FROM node:${NODE_VERSION}-alpine
 
-# Use production node environment by default.
+# กำหนดให้ใช้ environment แบบ production โดย default
 ENV NODE_ENV production
 
-
+# ตั้งค่าโฟลเดอร์ทำงานภายใน container
 WORKDIR /usr/src/app
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.npm to speed up subsequent builds.
-# Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
-# into this layer.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
+# คัดลอก package.json และ package-lock.json ไปยัง container
+COPY package*.json ./
 
-# Run the application as a non-root user.
-USER node
+# ติดตั้ง dependencies โดยไม่รวม devDependencies (เพราะเราอยู่ในโหมด production)
+RUN npm install --omit=dev
 
-# Copy the rest of the source files into the image.
+# คัดลอก source code ที่เหลือทั้งหมดไปยัง container
 COPY . .
 
-# Expose the port that the application listens on.
+# สร้างไฟล์ JavaScript จาก TypeScript
+RUN npm run build
+
+# เปิดพอร์ต 3001 สำหรับการเข้าถึงแอปพลิเคชัน
 EXPOSE 3001
 
-# Run the application.
-CMD npm run start
+# สั่งรันแอปพลิเคชันในโหมด production โดยใช้ไฟล์ JavaScript ที่ build แล้ว
+CMD ["npm", "run", "start:prod"]
