@@ -1,23 +1,21 @@
-# ใช้ Node.js image
 FROM node:20-alpine
 
-# ตั้ง working directory
 WORKDIR /usr/src/app/Server
 
-# คัดลอก package.json และ package-lock.json
 COPY package*.json ./
 
-# ติดตั้ง dependencies
-RUN npm install 
+RUN npm install
 
-# คัดลอก source code
 COPY . .
 
-# สร้างไฟล์ JavaScript จาก TypeScript
 RUN npm run build
 
-# เปิดพอร์ต 3000 สำหรับการเข้าถึงแอปพลิเคชัน
+# ติดตั้ง MongoDB
+RUN apt-get update && apt-get install mongodb-server -y
+
+# เริ่มบริการ MongoDB (อาจต้องปรับแต่งตามความต้องการ)
+RUN systemctl start mongodb
+
 EXPOSE 3000
 
-# รันแอปพลิเคชัน
 CMD ["node", "dist/server.js"]
