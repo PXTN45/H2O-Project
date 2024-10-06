@@ -1,8 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { VerifyErrors } from "jsonwebtoken";
+import jwt from "jsonwebtoken"; // ไม่จำเป็นต้อง import JwtPayload
+
+interface DecodedToken {
+  userId: string;
+  email: string;
+  role: string;
+  iat?: number; // issued at (optional, JWT standard field)
+  exp?: number; // expiration time (optional, JWT standard field)
+}
 
 interface CustomRequest extends Request {
-  decoded?: any; // or type according to your decoded object structure
+  decoded?: DecodedToken; 
 }
 
 const verifyToken = (req: CustomRequest, res: Response, next: NextFunction): void => {
@@ -14,13 +22,12 @@ const verifyToken = (req: CustomRequest, res: Response, next: NextFunction): voi
     return;
   }
 
-  jwt.verify(token, secret, (err: VerifyErrors | null, decoded: any) => {
+  jwt.verify(token, secret, (err: Error | null, decoded: any) => {
     if (err) {
       console.error("Error verifying token:", err);
       res.status(401).json("Unauthorized");
     } else {
-      req.decoded = decoded;
-      // console.log(req.decoded);
+      req.decoded = decoded as DecodedToken; // แปลงประเภทของ decoded ให้เป็น DecodedToken
       next();
     }
   });

@@ -1,22 +1,27 @@
 # syntax=docker/dockerfile:1
 
-# ใช้ Node.js เวอร์ชัน 20.16.0 บน Alpine Linux (มีขนาดเล็ก)
+# กำหนด NODE_VERSION
 ARG NODE_VERSION=20.16.0
+
+# ใช้ Node.js image
 FROM node:${NODE_VERSION}-alpine
 
-# กำหนดให้ใช้ environment แบบ production โดย default
-ENV NODE_ENV production
+# ใช้ production environment โดย default
+ENV NODE_ENV=production
 
-# ตั้งค่าโฟลเดอร์ทำงานภายใน container
+# กำหนด working directory
 WORKDIR /usr/src/app
 
-# คัดลอก package.json และ package-lock.json ไปยัง container
+# ติดตั้ง build tools
+RUN apk add --no-cache python3 make g++
+
+# คัดลอก package.json และ package-lock.json
 COPY package*.json ./
 
-# ติดตั้ง dependencies โดยไม่รวม devDependencies (เพราะเราอยู่ในโหมด production)
-RUN npm install --omit=dev
+# ติดตั้ง dependencies รวมทั้ง devDependencies
+RUN npm install
 
-# คัดลอก source code ที่เหลือทั้งหมดไปยัง container
+# คัดลอกไฟล์ source code
 COPY . .
 
 # สร้างไฟล์ JavaScript จาก TypeScript
@@ -25,5 +30,5 @@ RUN npm run build
 # เปิดพอร์ต 3001 สำหรับการเข้าถึงแอปพลิเคชัน
 EXPOSE 3001
 
-# สั่งรันแอปพลิเคชันในโหมด production โดยใช้ไฟล์ JavaScript ที่ build แล้ว
+# รันแอปพลิเคชัน
 CMD ["npm", "run", "start:prod"]
