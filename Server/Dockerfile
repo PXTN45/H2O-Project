@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20.16.0
 
 WORKDIR /usr/src/app/Server
 
@@ -8,14 +8,11 @@ RUN npm install
 
 COPY . .
 
+# สร้างไฟล์ JavaScript จาก TypeScript
 RUN npm run build
 
-# ติดตั้ง MongoDB
-RUN apt-get update && apt-get install mongodb-server -y
-
-# เริ่มบริการ MongoDB (อาจต้องปรับแต่งตามความต้องการ)
-RUN systemctl start mongodb
-
+# เปิดพอร์ต 3000 สำหรับการเข้าถึงแอปพลิเคชัน
 EXPOSE 3000
 
+# รันแอปพลิเคชัน
 CMD ["node", "dist/server.js"]
