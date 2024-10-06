@@ -24,6 +24,6 @@ jobs:
       - name: Pull image from docker hub
         run: docker pull pxtn/h2o-app:latest
       - name: Delete old container
-        run: docker rm -f nodejs-app-container
+        run: docker rm -f h2o-app-container || true
       - name: Run docker container
-        run: docker run -d -p 3001:3000 --name nodejs-app-container pxtn/h2o-app
+        run: docker run -d -p 3001:3000 --name h2o-app-container pxtn/h2o-app
