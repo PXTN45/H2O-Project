@@ -6,6 +6,8 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "target": "ES6",
-    "module": "commonjs"
+    "module": "commonjs",
+    "rootDir": "./src",        // โฟลเดอร์ที่มีไฟล์ TypeScript
+    "outDir": "./dist"        // โฟลเดอร์ที่เก็บไฟล์ JavaScript ที่คอมไพล์
   }
 }

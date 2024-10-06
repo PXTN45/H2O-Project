@@ -2,13 +2,13 @@
 FROM node:20-alpine
 
 # ตั้ง working directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/Server
 
 # คัดลอก package.json และ package-lock.json
 COPY package*.json ./
 
 # ติดตั้ง dependencies
-RUN npm install --production
+RUN npm install 
 
 # คัดลอก source code
 COPY . .
@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE 3000
 
 # รันแอปพลิเคชัน
-CMD ["npm", "start"]
+CMD ["node", "dist/server.js"]
