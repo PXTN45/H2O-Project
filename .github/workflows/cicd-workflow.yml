@@ -13,7 +13,12 @@ jobs:
       - name: Login to docker hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Build docker image
-        run: docker build -t pxtn/h2o-app -f ./Server/Dockerfile ./Server
+        run: |
+          docker build -t pxtn/h2o-app \
+          --build-arg MONGODB_URL="${{ secrets.MONGODB_URL }}" \
+          --build-arg CLIENT_URL="${{ secrets.CLIENT_URL }}" \
+          --build-arg PORT="${{ secrets.PORT }}" \
+          -f ./Server/Dockerfile ./Server
       - name: Publish image to docker hub
         run: docker push pxtn/h2o-app:latest
         
@@ -33,4 +38,9 @@ jobs:
       - name: Delete old container
         run: docker rm -f h2o-app-container || true
       - name: Run docker container
-        run: docker run -d -p 3001:3000 --name h2o-app-container pxtn/h2o-app
+        run: |
+          docker run -d -p 3001:3000 --name h2o-app-container \
+          -e MONGODB_URL="${{ secrets.MONGODB_URL }}" \
+          -e CLIENT_URL="${{ secrets.CLIENT_URL }}" \
+          -e PORT="${{ secrets.PORT }}" \
+          pxtn/h2o-app
