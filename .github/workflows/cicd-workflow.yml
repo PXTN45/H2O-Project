@@ -21,6 +21,13 @@ jobs:
     needs: build
     runs-on: [aws-h2o]
     steps:
+      - name: Set up Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo service docker start
+      - name: Check Docker version
+        run: docker --version
       - name: Pull image from docker hub
         run: docker pull pxtn/h2o-app:latest
       - name: Delete old container
