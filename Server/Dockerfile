@@ -18,8 +18,8 @@ RUN apk add --no-cache python3 make g++
 # คัดลอก package.json และ package-lock.json
 COPY package*.json ./
 
-# ติดตั้ง dependencies รวมทั้ง devDependencies
-RUN npm install
+# ติดตั้ง dependencies
+RUN npm install --production  
 
 # คัดลอกไฟล์ source code
 COPY . .
@@ -31,4 +31,4 @@ RUN npm run build
 EXPOSE 3001
 
 # รันแอปพลิเคชัน
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/server.js"]
