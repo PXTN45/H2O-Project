@@ -10,16 +10,16 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-      - name: Build Docker image
+      - name: Login to docker hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build docker image
         run: docker build -t pxtn/h2o-app -f ./Server/Dockerfile ./Server
-      - name: Publish image to Docker Hub
+      - name: Publish image to docker hub
         run: docker push pxtn/h2o-app:latest
         
   deploy:
     needs: build
-    runs-on: aws-h2o
+    runs-on: [aws-h2o]
     steps:
       - name: Set up Docker
         run: |
@@ -28,14 +28,29 @@ jobs:
           sudo service docker start
       - name: Check Docker version
         run: docker --version
-      - name: Pull image from Docker Hub
+      - name: Pull image from docker hub
         run: docker pull pxtn/h2o-app:latest
       - name: Delete old container
         run: docker rm -f h2o-app-container || true
-      - name: Run Docker container
+      - name: Run docker container
+              - name: Run Docker container
         run: |
           docker run -d \
           -p 3001:3000 \
           --name h2o-app-container \
-          -e MONGODB_URL="${{ secrets.MONGODB_URL }}" \
+          -e MONGODB_URL="mongodb+srv://patnattapong1:sIsEdapY3eBIo9Qj@cluster0.1qyztlj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" \
+          -e CLIENT_URL="http://localhost:5174" \
+          -e PORT="3000" \
+          -e SECRET="H2O-Project" \
+          -e ACCESS_TOKEN_SECRET="879a8c742a4091c29ca1c749a4ff61eedd5e1626d1ed6810e93eb496892ae57591b62ecdd8433c8f0d9a765b69614643d94ceb086256654dcc5647adadbe1533" \
+          -e HOST="smtp.gmail.com" \
+          -e SERVICE="gmail" \
+          -e EMAIL_PORT="587" \
+          -e SECURE="true" \
+          -e USER="644259012@webmail.npru.ac.th" \
+          -e PASS="Pns21092545" \
+          -e STRIPE_SECRET_KEY="sk_test_51PpB0zDTXPppEslSifpqM4p70gblHZDHt6mGBJKmAlZ5GoCt0zQ8ldFHpFug00j0qARjdoGstEuyqXTKrMDBaACh006nlNNVEK" \
           pxtn/h2o-app
+
+
+
