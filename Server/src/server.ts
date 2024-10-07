@@ -114,6 +114,12 @@ if (process.env.NODE_ENV === "development") {
     res.send(swaggerSpec);
   });
 }
+if (process.env.NODE_ENV === "production") {
+  app.get("/", (req: Request, res: Response) => {
+    res.send("<h1>Welcome to H2O Project</h1>");
+  });
+}
+// Swagger setup
 
 // Routes
 app.use("/", packgeRouter);
