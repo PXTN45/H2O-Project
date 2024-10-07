@@ -31,7 +31,7 @@ const swaggerDefinition = {
     },
     contact: {
       name: "H2O Project",
-      url: "http://localhost:3000",
+      url: "http://47.128.233.168:3001",
     },
   },
   externalDocs: {
@@ -40,7 +40,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "http://localhost:3000",
+      url: "http://47.128.233.168:3001",
       description: "Development server",
     },
   ],
@@ -75,18 +75,20 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://47.128.233.168:3001",
     methods: ["GET", "POST"],
   },
 });
 
 // Middleware setup
+
 app.use(cors({
   credentials: true,
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: ["http://localhost:5173", "http://localhost:5174"], // เพิ่มทั้งสอง origin ที่อนุญาต
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
