@@ -84,5 +84,5 @@ jobs:
           docker run -d \
           -p 5174:80 \
           --name h2o-frontend-container \
-          -e VITE_H2O_URL="http://47.128.233.168:3001/" \
+          -e VITE_H2O_URL="http://localhost:3001/" \
           pxtn/h2o-frontend
