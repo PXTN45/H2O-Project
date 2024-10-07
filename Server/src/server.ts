@@ -81,7 +81,6 @@ const io = new Server(server, {
 });
 
 // Middleware setup
-const cors = require('cors');
 
 app.use(cors({
   credentials: true,
