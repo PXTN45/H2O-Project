@@ -116,7 +116,7 @@ if (process.env.NODE_ENV === "development") {
 }
 if (process.env.NODE_ENV === "production") {
   app.get("/", (req: Request, res: Response) => {
-    res.send("<h1>Welcome to H2O Project</h1>");
+    res.send("<h1>production</h1>");
   });
 }
 // Swagger setup
