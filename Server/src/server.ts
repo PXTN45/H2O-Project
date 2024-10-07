@@ -82,12 +82,14 @@ const io = new Server(server, {
 
 // Middleware setup
 
-app.use(cors({
-  credentials: true,
-  origin: ["http://localhost:5173", "http://localhost:5174"], // เพิ่มทั้งสอง origin ที่อนุญาต
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(
+  cors({
+    credentials: true,
+    origin: ["http://localhost:5173", "http://localhost:5174"], // เพิ่มทั้งสอง origin ที่อนุญาต
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -97,23 +99,21 @@ app.use(cookieParser());
 
 const MONGODB_URL = process.env.MONGODB_URL || "";
 
-
-mongoose.connect(MONGODB_URL)
+mongoose
+  .connect(MONGODB_URL)
   .then(() => {
     console.log("Connected to MongoDB");
   })
   .catch((error) => {
     console.error("Error connecting to MongoDB", error);
   });
-  if (process.env.NODE_ENV === 'development') {
-    app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.get("/swagger.json", (req: Request, res: Response) => {
-  res.header("Content-Type", "application/json");
-  res.send(swaggerSpec);
-});
-  }
-
-
+if (process.env.NODE_ENV === "development") {
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.get("/swagger.json", (req: Request, res: Response) => {
+    res.header("Content-Type", "application/json");
+    res.send(swaggerSpec);
+  });
+}
 
 // Routes
 app.use("/", packgeRouter);
@@ -129,15 +129,15 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Socket.IO setup
-io.on('connection', (socket) => {
-  console.log('New client connected');
+io.on("connection", (socket) => {
+  console.log("New client connected");
 
-  socket.on('joinChat', (chatId) => {
+  socket.on("joinChat", (chatId) => {
     socket.join(chatId);
     console.log(`Client joined chat: ${chatId}`);
   });
 
-  socket.on('sendMessage', async ({ chatId, sender, content }) => {
+  socket.on("sendMessage", async ({ chatId, sender, content }) => {
     const timestamp = new Date();
     try {
       const chat = await ChatModel.findById(chatId);
@@ -145,15 +145,15 @@ io.on('connection', (socket) => {
         chat.messages.push({ sender, content, timestamp });
         await chat.save();
         // ส่งข้อความใหม่ไปยังห้องที่เกี่ยวข้อง
-        io.to(chatId).emit('message', { sender, content, timestamp });
+        io.to(chatId).emit("message", { sender, content, timestamp });
       }
     } catch (error) {
-      console.error('Error saving message:', error);
+      console.error("Error saving message:", error);
     }
   });
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
   });
 });
 
