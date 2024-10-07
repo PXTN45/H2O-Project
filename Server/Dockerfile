@@ -16,3 +16,4 @@ EXPOSE 3000
 
 # รันแอปพลิเคชัน
 CMD ["node", "dist/server.js"]
+
