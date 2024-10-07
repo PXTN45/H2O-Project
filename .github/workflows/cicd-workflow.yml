@@ -10,13 +10,26 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-      - name: Login to docker hub
+      
+      - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build docker image
-        run: docker build -t pxtn/h2o-app -f ./Server/Dockerfile ./Server
-      - name: Publish image to docker hub
-        run: docker push pxtn/h2o-app:latest
-        
+
+      # Build backend image
+      - name: Build backend Docker image
+        run: docker build -t pxtn/h2o-backend -f ./Server/Dockerfile ./Server
+
+      # Build frontend image
+      - name: Build frontend Docker image
+        run: docker build -t pxtn/h2o-frontend -f ./client/Dockerfile ./client
+
+      # Push backend image to Docker Hub
+      - name: Push backend image to Docker Hub
+        run: docker push pxtn/h2o-backend:latest
+
+      # Push frontend image to Docker Hub
+      - name: Push frontend image to Docker Hub
+        run: docker push pxtn/h2o-frontend:latest
+
   deploy:
     needs: build
     runs-on: [aws-h2o]
@@ -26,15 +39,24 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker.io
           sudo service docker start
+
       - name: Check Docker version
         run: docker --version
-      # - name: Delete Image olded.
-      #   run: docker rmi h2o-app-container
-      - name: Pull image from docker hub
-        run: docker pull pxtn/h2o-app:latest
-      - name: Delete old container
-        run: docker rm -f h2o-app-container || true
-      - name: Run Docker container
+
+      - name: Pull backend image from Docker Hub
+        run: docker pull pxtn/h2o-backend:latest
+
+      - name: Pull frontend image from Docker Hub
+        run: docker pull pxtn/h2o-frontend:latest
+
+      - name: Delete old backend container
+        run: docker rm -f h2o-backend-container || true
+
+      - name: Delete old frontend container
+        run: docker rm -f h2o-frontend-container || true
+
+      # Run backend container
+      - name: Run backend Docker container
         run: |
           docker run -d \
           -p 3001:3000 \
@@ -52,3 +74,12 @@ jobs:
           -e PASS="Pns21092545" \
           -e STRIPE_SECRET_KEY="sk_test_51PpB0zDTXPppEslSifpqM4p70gblHZDHt6mGBJKmAlZ5GoCt0zQ8ldFHpFug00j0qARjdoGstEuyqXTKrMDBaACh006nlNNVEK" \
           pxtn/h2o-app
+
+      # Run frontend container
+      - name: Run frontend Docker container
+        run: |
+          docker run -d \
+          -p 5174:80 \
+          --name h2o-frontend-container \
+          -e BACKEND_URL="http://localhost:3001" \
+          pxtn/h2o-frontend
