@@ -10,9 +10,10 @@ services:
       context: .
     environment:
       NODE_ENV: production
-      MONGODB_URL: ${MONGODB_URL} # ใช้ตัวแปรจาก .env
-      JWT_SECRET: ${JWT_SECRET}   # ใช้ตัวแปรจาก .env
+      MONGODB_URL: ${MONGODB_URL}  # ใช้ตัวแปรจาก .env
     ports:
       - 3001:3000
     depends_on:
       - mongo
+    env_file:
+      - .env  # ใช้เส้นทางที่ถูกต้องในการโหลด .env
