@@ -43,7 +43,7 @@ const UserChat: React.FC = () => {
   const fetchMessages = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/help/messages?chatId=${chatId}`
+        `http://47.128.233.168:3001/help/messages?chatId=${chatId}`
       );
       setMessages(response.data);
     } catch (error) {
@@ -54,7 +54,7 @@ const UserChat: React.FC = () => {
   const fetchChats = async () => {
     try {
       const response = await axios.get<Chat[]>(
-        `http://localhost:3000/help/chats`
+        `http://47.128.233.168:3001/help/chats`
       );
       const filteredChats = response.data.filter((chat) => {
         return (
@@ -74,7 +74,7 @@ const UserChat: React.FC = () => {
         }
 
         const createResponse = await axios.post(
-          `http://localhost:3000/help/create`,
+          `http://47.128.233.168:3001/help/create`,
           id
         );
         setChatId(createResponse.data._id);
@@ -95,7 +95,7 @@ const UserChat: React.FC = () => {
   }, [chatId]);
 
   useEffect(() => {
-    const socket: Socket = io("http://localhost:3000");
+    const socket: Socket = io("http://47.128.233.168:3001");
     socketRef.current = socket;
   
     console.log("Socket connected:", chatId);

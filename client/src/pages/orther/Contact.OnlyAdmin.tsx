@@ -39,7 +39,7 @@ const AdminChat: React.FC = () => {
   const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3000");
+    const newSocket = io("");
     setSocket(newSocket);
 
     return () => {
@@ -85,7 +85,7 @@ const AdminChat: React.FC = () => {
 
   const fetchChats = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/help/chats");
+      const response = await axios.get("http://47.128.233.168:3001/help/chats");
       const chats = response.data;
 
       const updatedChats = chats.map((chat: Chat) => {
@@ -109,7 +109,7 @@ const AdminChat: React.FC = () => {
   const fetchMessages = async () => {
     try {
       const response = await axios.get<Message[]>(
-        "http://localhost:3000/help/messages",
+        "http://47.128.233.168:3001/help/messages",
         {
           params: { chatId: activeChat?._id },
         }
@@ -153,7 +153,7 @@ const AdminChat: React.FC = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:3000/help/chats");
+      const response = await axios.get("http://47.128.233.168:3001/help/chats");
       const assignedChats = response.data;
 
       const assignedCount = assignedChats.filter(
@@ -171,7 +171,7 @@ const AdminChat: React.FC = () => {
         return;
       }
 
-      await axios.post("http://localhost:3000/help/assign", {
+      await axios.post("http://47.128.233.168:3001/help/assign", {
         chatId: chat._id,
         adminId: "668f0a1531ff843f51f1855b",
       });

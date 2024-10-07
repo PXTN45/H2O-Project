@@ -11,7 +11,7 @@ const QRcode: React.FC = () => {
 
     const generateQR = async () => {
         try {
-            const response = await axios.post('http://localhost:3000/payment/generateQR', { amount });
+            const response = await axios.post('http://47.128.233.168:3001/payment/generateQR', { amount });
             setQrCodeUrl(response.data.Result);
         } catch (err) {
             console.error('Error generating QR code:', err);

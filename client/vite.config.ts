@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // URL ของ backend server ของคุณ
+        target: 'http://47.128.233.168:3001', // URL ของ backend server ของคุณ
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
