@@ -113,9 +113,8 @@ if (process.env.NODE_ENV === "development") {
     res.header("Content-Type", "application/json");
     res.send(swaggerSpec);
   });
-}
-if (process.env.NODE_ENV === "production") {
-  app.get("/", (req: Request, res: Response) => {
+} else if (process.env.NODE_ENV === "production") {
+  app.get("/docs", (req: Request, res: Response) => {
     res.send("<h1>production</h1>");
   });
 }
