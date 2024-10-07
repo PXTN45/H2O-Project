@@ -1,0 +1,38 @@
+name: CICD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Login to docker hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build docker image
+        run: docker build -t pxtn/h2o-app -f ./Server/Dockerfile ./Server
+      - name: Publish image to docker hub
+        run: docker push pxtn/h2o-app:latest
+        
+  deploy:
+    needs: build
+    runs-on: [aws-h2o]
+    steps:
+      - name: Set up Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo service docker start
+      - name: Check Docker version
+        run: docker --version
+      - name: Pull image from docker hub
+        run: docker pull pxtn/h2o-app:latest
+      - name: Delete old container
+        run: docker rm -f h2o-app-container || true
+      - name: Run docker container
+        run: docker run -d -p 3001:3000 --name h2o-app-container -e MONGODB_URL="mongodb+srv://patnattapong1:sIsEdapY3eBIo9Qj@cluster0.1qyztlj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" pxtn/h2o-app
+
+

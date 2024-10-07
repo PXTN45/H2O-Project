@@ -175,8 +175,14 @@ const editHomeStayBooking = async (
       res.status(404).json({ message: "HomeStay Not Found" });
     }
     res.status(201).json(data);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error) {
+    if (error instanceof Error) {
+      // Handle Mongoose errors specifically
+      res.status(500).json({ message: error.message });
+    } else {
+      // Handle other types of errors
+      res.status(500).json({ message: "An unexpected error occurred." });
+    }
   }
 };
 

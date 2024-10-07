@@ -6,14 +6,19 @@ const verifyUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const role = req.decoded.role;
-  const isUser = role === "user";
+  // ตรวจสอบว่ามี decoded อยู่ใน request หรือไม่
+  if (!req.decoded) {
+    return res.status(401).send({ message: "Unauthorized Access" });
+  }
+
+  const role = req.decoded.role; // เข้าถึง role
+  const isUser = role === "user"; // ตรวจสอบว่าเป็น user หรือไม่
 
   if (!isUser) {
     return res.status(403).send({ message: "Forbidden Access" });
   }
 
-  next();
+  next(); // ถ้าผ่านการตรวจสอบ ให้ดำเนินการต่อ
 };
 
 export default verifyUser;

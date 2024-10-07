@@ -6,6 +6,11 @@ const verifyAdmin = async (
   res: Response,
   next: NextFunction
 ) => {
+  // ตรวจสอบว่ามี decoded อยู่ใน request หรือไม่
+  if (!req.decoded) {
+    return res.status(401).send({ message: "Unauthorized Access" });
+  }
+
   const role = req.decoded.role;
   const isAdmin = role === "admin";
 

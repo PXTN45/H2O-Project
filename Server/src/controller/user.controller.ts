@@ -215,9 +215,6 @@ const updateUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
   const updateData = req.body;
   const salt = bcrypt.genSaltSync(10);
-  console.log(updateData);
-  
-
   if (updateData.password) {
     updateData.password = bcrypt.hashSync(updateData.password, salt);
   }
@@ -329,7 +326,7 @@ const Login = async (req: Request, res: Response): Promise<void> => {
     }
 
     if (userData) {
-      jwt.sign({ email, id: userData._id, role }, secret, {}, (err, token) => {
+      jwt.sign({ email, id: userData._id, role }, secret, {}, (err: Error | null, token: string | undefined) => {
         if (err) throw err;
         res.cookie("token", token);
         const { password, ...userWithOutPassword } = userData.toObject();
@@ -358,7 +355,7 @@ const Login = async (req: Request, res: Response): Promise<void> => {
     }
 
     if (!userData.password) {
-      jwt.sign({ email, id: userData._id, role }, secret, {}, (err, token) => {
+      jwt.sign({ email, id: userData._id, role }, secret, {}, (err: Error | null, token: string | undefined) => {
         if (err) throw err;
         res.cookie("token", token);
         res.status(200).json(userData);
