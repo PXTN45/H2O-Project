@@ -81,12 +81,15 @@ const io = new Server(server, {
 });
 
 // Middleware setup
+const cors = require('cors');
+
 app.use(cors({
   credentials: true,
-  origin: "http://localhost:5173" || "http://localhost:5174" || "http://47.128.233.168:3001",
+  origin: ["http://localhost:5173", "http://localhost:5174"], // เพิ่มทั้งสอง origin ที่อนุญาต
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
