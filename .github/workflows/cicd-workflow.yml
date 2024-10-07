@@ -49,6 +49,9 @@ jobs:
       - name: Pull frontend image from Docker Hub
         run: docker pull pxtn/h2o-frontend:latest
 
+      - name: Delete old container
+        run: docker rm -f h2o-app-container || true
+
       - name: Delete old backend container
         run: docker rm -f h2o-backend-container || true
 
