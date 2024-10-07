@@ -1,6 +1,7 @@
 FROM node:20.16.0
 
 WORKDIR /usr/src/app/Server
+ENV NODE_ENV=production
 
 COPY package*.json ./
 

@@ -48,6 +48,5 @@ jobs:
           -e SECURE="true" \
           -e USER="644259012@webmail.npru.ac.th" \
           -e PASS="Pns21092545" \
-          -e NODE_ENV="production" \
           -e STRIPE_SECRET_KEY="sk_test_51PpB0zDTXPppEslSifpqM4p70gblHZDHt6mGBJKmAlZ5GoCt0zQ8ldFHpFug00j0qARjdoGstEuyqXTKrMDBaACh006nlNNVEK" \
           pxtn/h2o-app
