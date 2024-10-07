@@ -75,7 +75,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173" || "http://47.128.233.168:3001",
+    origin: process.env.CLIENT_URL || "http://47.128.233.168:3001",
     methods: ["GET", "POST"],
   },
 });
@@ -83,7 +83,7 @@ const io = new Server(server, {
 // Middleware setup
 app.use(cors({
   credentials: true,
-  origin: process.env.CLIENT_URL || "http://47.128.233.168:3001",
+  origin: "http://localhost:5173" || "http://localhost:5174" || "http://47.128.233.168:3001",
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
