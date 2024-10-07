@@ -28,6 +28,8 @@ jobs:
           sudo service docker start
       - name: Check Docker version
         run: docker --version
+      # - name: Delete Image olded.
+      #   run: docker rmi h2o-app-container
       - name: Pull image from docker hub
         run: docker pull pxtn/h2o-app:latest
       - name: Delete old container
