@@ -58,6 +58,9 @@ jobs:
       - name: Delete old frontend container
         run: docker rm -f h2o-frontend-container || true
 
+      - name: Delete old container
+        run: docker rm -f h2o-app-container || true
+
       # Run backend container
       - name: Run backend Docker container
         run: |
