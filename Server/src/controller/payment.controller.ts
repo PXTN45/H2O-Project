@@ -8,7 +8,6 @@ import { getBookingNights, isDateValid } from "../utils";
 import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
 
-const YOUR_DOMAIN = "http://47.128.233.168";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-06-20",
 });
@@ -63,8 +62,8 @@ const payment = async (req: Request, res: Response) => {
         },
       ],
       mode: "payment",
-      success_url: `${YOUR_DOMAIN}/paymentSuccess`,
-      cancel_url: `${YOUR_DOMAIN}/paymentFailure`,
+      success_url: `${process.env.CLIENT_URL}/paymentSuccess`,
+      cancel_url: `${process.env.CLIENT_URL}/paymentFailure`,
       customer_email: email,
     });
 
