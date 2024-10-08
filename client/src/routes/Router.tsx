@@ -52,7 +52,9 @@ const router = createBrowserRouter([
         path: "/homeStayDetail/:id",
         element: (
           <PrivateRouterUserAndBusiness>
-            <HomeStayDetail />
+            <PaymentProvider>
+              <HomeStayDetail />
+            </PaymentProvider>
           </PrivateRouterUserAndBusiness>
         ),
       },
@@ -179,9 +181,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/create-business",
-    element: (
-        <SelectionCreate />
-    ),
+    element: <SelectionCreate />,
   },
   {
     path: "/paymentSuccess",
