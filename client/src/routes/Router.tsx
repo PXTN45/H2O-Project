@@ -43,9 +43,11 @@ const router = createBrowserRouter([
       {
         path: "/detailPayment",
         element: (
-          <PaymentProvider>
-            <DetailPayment />
-          </PaymentProvider>
+          <PrivateRouterUser>
+            <PaymentProvider>
+              <DetailPayment />
+            </PaymentProvider>
+          </PrivateRouterUser>
         ),
       },
       {
