@@ -8,15 +8,13 @@ import { getBookingNights, isDateValid } from "../utils";
 import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
 
-const YOUR_DOMAIN = "http://47.128.233.168/";
+const YOUR_DOMAIN = "http://47.128.233.168";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-06-20",
 });
 
 const checkBooking = async (req: Request, res: Response) => {
   const { homestay, bookingStart, bookingEnd, booker, packageId } = req.body;
-  console.log(req.body);
-  
   const bookingStartDate = new Date(bookingStart);
   const bookingEndDate = new Date(bookingEnd);
   try {
