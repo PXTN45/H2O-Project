@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 import Main from "../layout/Main";
-import PrivateRouterUser from "../PrivateRouter/PrivateRouterUser";
 import PrivateRouterUserAndBusiness from "../PrivateRouter/PrivateRouterUserAndBusiness";
 import PrivateRouterBusiness from "../PrivateRouter/PrivateRouterBusiness";
 import PrivateRouterAdmin from "../PrivateRouter/PrivateRouterAdmin";
