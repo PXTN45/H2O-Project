@@ -93,4 +93,4 @@ jobs:
           pxtn/h2o-frontend
 
       - name: Delete old Imges
-        run: docker rmi $(docker images -f "dangling=true" -q)
+        run: docker rmi $(docker images -f "dangling=true" -q) || true
