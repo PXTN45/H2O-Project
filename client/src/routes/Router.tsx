@@ -180,9 +180,7 @@ const router = createBrowserRouter([
   {
     path: "/create-business",
     element: (
-      <PrivateRouterBusiness>
         <SelectionCreate />
-      </PrivateRouterBusiness>
     ),
   },
   {
