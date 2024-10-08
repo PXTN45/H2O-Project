@@ -52,9 +52,6 @@ jobs:
       - name: Pull frontend image from Docker Hub
         run: docker pull pxtn/h2o-frontend:latest
 
-      - name: Delete old Imges
-        run: docker rmi $(docker images -f "dangling=true" -q)
-
       - name: Delete old backend container
         run: docker rm -f h2o-backend-container || true
 
@@ -94,3 +91,6 @@ jobs:
           --name h2o-frontend-container \
           -e VITE_H2O_URL="http://h2o-backend-container:3000/" \
           pxtn/h2o-frontend
+
+      - name: Delete old Imges
+        run: docker rmi $(docker images -f "dangling=true" -q)
