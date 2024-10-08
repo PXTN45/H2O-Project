@@ -6,7 +6,7 @@
   "homepage": "http://47.128.233.168:3001/checkout",
   "proxy": "http://47.128.233.168:3001",
   "scripts": {
-    "start": "ts-node-dev ./src/server.ts",
+    "start": "node ./src/server.ts",
     "start:prod": "npm run build && node ./dist/server.js",
     "build": "tsc"
   },
