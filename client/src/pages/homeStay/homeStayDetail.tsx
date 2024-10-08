@@ -501,7 +501,6 @@ const homeStayDetail = () => {
       </div>
     );
   });
-  console.log(userInfo?.role);
 
   return (
     <div>
@@ -530,7 +529,7 @@ const homeStayDetail = () => {
                         d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span>เงื่อนไขไม่ผ่าน กรุณาใส่ข้อมูลให้ครบ</span>
+                    <span>กรุณาเพิ่มวันเช็คอิน-เช็คเอ้าท์</span>
                   </div>
                 )}
               </div>
