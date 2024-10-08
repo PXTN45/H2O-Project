@@ -81,11 +81,10 @@ const io = new Server(server, {
 });
 
 // Middleware setup
-
 app.use(
   cors({
     credentials: true,
-    origin: "http://47.128.233.168",
+    origin: process.env.CLIENT_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
