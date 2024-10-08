@@ -87,7 +87,7 @@ jobs:
         run: |
           docker run -d \
           --network h2o-network \
-          -p 5174:80 \
+          -p 80:80 \
           --name h2o-frontend-container \
           -e VITE_H2O_URL="http://h2o-backend-container:3000/" \
           pxtn/h2o-frontend
