@@ -84,7 +84,7 @@ const io = new Server(server, {
 app.use(
   cors({
     credentials: true,
-    origin: ["http://47.128.233.168", "http://47.128.233.168:3001"],
+    origin: ["http://18.140.2.235", "http://47.128.233.168:3001"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
