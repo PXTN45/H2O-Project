@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Main from "../layout/Main";
 import PrivateRouterUser from "../PrivateRouter/PrivateRouterUser";
-import PrivateRouterUserAndBusiness from "../PrivateRouter/PrivateRouterUserAndBusiness";
 import PrivateRouterBusiness from "../PrivateRouter/PrivateRouterBusiness";
 import PrivateRouterAdmin from "../PrivateRouter/PrivateRouterAdmin";
 import PrivateVerifyEmail from "../PrivateRouter/PrivateVerifyEmail";
@@ -53,28 +52,24 @@ const router = createBrowserRouter([
       {
         path: "/homeStayDetail/:id",
         element: (
-          <PrivateRouterUserAndBusiness>
-            <PaymentProvider>
-              <HomeStayDetail />
-            </PaymentProvider>
-          </PrivateRouterUserAndBusiness>
+          <PaymentProvider>
+            <HomeStayDetail />
+          </PaymentProvider>
         ),
       },
       {
         path: "/bookingDetail",
         element: (
-          <PaymentProvider>
-            <BookingDetail />
-          </PaymentProvider>
+          <PrivateRouterUser>
+            <PaymentProvider>
+              <BookingDetail />
+            </PaymentProvider>
+          </PrivateRouterUser>
         ),
       },
       {
         path: "/packageDetail/:id",
-        element: (
-          <PrivateRouterUserAndBusiness>
-            <PackageDetail />
-          </PrivateRouterUserAndBusiness>
-        ),
+        element: <PackageDetail />,
       },
       {
         path: "/search",
