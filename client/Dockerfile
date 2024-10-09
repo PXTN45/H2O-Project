@@ -6,7 +6,6 @@ COPY package-lock.json ./
 RUN npm install
 COPY . ./
 
-# Set environment variable for VITE_H2O_URL
 ENV VITE_H2O_URL=http://18.140.2.235:3001
 
 RUN npm run build
