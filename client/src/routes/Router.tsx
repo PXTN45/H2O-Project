@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Main from "../layout/Main";
 import PrivateRouterUser from "../PrivateRouter/PrivateRouterUser";
-import PrivateRouterUserAndBusiness from "../PrivateRouter/PrivateRouterUserAndBusiness";
 import PrivateRouterBusiness from "../PrivateRouter/PrivateRouterBusiness";
 import PrivateRouterAdmin from "../PrivateRouter/PrivateRouterAdmin";
 import PrivateVerifyEmail from "../PrivateRouter/PrivateVerifyEmail";
@@ -29,7 +28,8 @@ import HistoryReview from "../pages/user/historyReview";
 import MyAccountBusiness from "../pages/business/myAccountBusiness";
 import MyBusiness from "../pages/business/myBusiness";
 import BookingList from "../pages/business/bookingList";
-import BookingBusiness from "../pages/admin/Booking-Business";
+import BookingBusiness from "../pages/admin/Booking-Payment";
+import BookingHistory from "../pages/admin/Booking-History";
 
 const router = createBrowserRouter([
   {
@@ -51,27 +51,23 @@ const router = createBrowserRouter([
       {
         path: "/homeStayDetail/:id",
         element: (
-          <PrivateRouterUserAndBusiness>
-            <PaymentProvider>
-              <HomeStayDetail />
-            </PaymentProvider>
-          </PrivateRouterUserAndBusiness>
+          <HomeStayDetail />
         ),
       },
       {
         path: "/bookingDetail",
         element: (
           <PaymentProvider>
-            <BookingDetail />
+            <PrivateRouterUser>
+              <BookingDetail />
+            </PrivateRouterUser>
           </PaymentProvider>
         ),
       },
       {
         path: "/packageDetail/:id",
         element: (
-          <PrivateRouterUserAndBusiness>
-            <PackageDetail />
-          </PrivateRouterUserAndBusiness>
+          <PackageDetail />
         ),
       },
       {
@@ -88,9 +84,7 @@ const router = createBrowserRouter([
       {
         path: "/dashboard-user",
         element: (
-          <PrivateRouterUser>
             <DrawerDashBoard />
-          </PrivateRouterUser>
         ),
         children: [
           {
@@ -151,6 +145,10 @@ const router = createBrowserRouter([
             path: "/dashboard-admin/Payment",
             element: <BookingBusiness />,
           },
+          {
+            path: "/dashboard-admin/BookingHistory",
+            element: <BookingHistory />,
+          },
         ],
       },
       {
@@ -181,7 +179,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/create-business",
-    element: <SelectionCreate />,
+    element: (
+      <PrivateRouterBusiness>
+        <SelectionCreate />
+      </PrivateRouterBusiness>
+    ),
   },
   {
     path: "/paymentSuccess",

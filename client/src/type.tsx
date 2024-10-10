@@ -221,6 +221,7 @@ export interface Business {
   BankingUsername: string;
   BankingUserlastname: string;
   BankingCode: string;
+  idcard: string;
   role: string;
 }
 

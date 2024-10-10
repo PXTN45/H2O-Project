@@ -10,6 +10,7 @@ import { BsCamera } from "react-icons/bs";
 import { FaEdit } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
+import bcrypt from "bcryptjs";
 import { Address, Business, Password } from "../../type";
 
 const banks = [
@@ -23,6 +24,21 @@ const banks = [
   // เพิ่มธนาคารอื่น ๆ ตามต้องการ
 ];
 
+const validatePassword = (password: string) => {
+  const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+  return regex.test(password);
+};
+
+const getCurrentDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // +1 เพราะเดือนเริ่มต้นที่ 0
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const currentDate = getCurrentDate();
+
 const myAccountBusiness = () => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -34,8 +50,12 @@ const myAccountBusiness = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [openUpdateUser, setOpenUpdateUser] = useState<boolean>(false);
   const [userData, setUserData] = useState<Business>();
+  const [openUpdateBname, setOpenUpdateBname] = useState<boolean>(false);
+  const [openUpdateIdCard, setOpenUpdateIdCard] = useState<boolean>(false);
   const [openUpdatePassword, setOpenUpdatePassword] = useState<boolean>(false);
   const [openUpdateAddress, setOpenUpdateAddress] = useState<boolean>(false);
+  const [openUpdateBirthday, setOpenUpdateBirthday] = useState<boolean>(false);
+  const [openUpdatePhone, setOpenUpdatePhone] = useState<boolean>(false);
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
@@ -70,7 +90,9 @@ const myAccountBusiness = () => {
     role: userInfo?.role,
   });
 
-  const handleBankingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBankingChange = (
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
     setUpdatedBankingInfo((prev) => ({
       ...prev,
@@ -118,6 +140,22 @@ const myAccountBusiness = () => {
     });
   };
 
+  const formatDate = (date: Date | string | undefined): string => {
+    if (!date) return ""; // Return empty string if date is undefined or falsy
+    const d = new Date(date);
+    return d.toISOString().split("T")[0]; // Return YYYY-MM-DD
+  };
+
+  const [dob, setDob] = useState(formatDate(userData?.birthday));
+  const [phone, setPhone] = useState(userData?.phone);
+  const [bName, setBName] = useState(userData?.businessName);
+  const [idCard, setIdCard] = useState(userData?.idcard);
+
+  // Update dob when userData changes
+  useEffect(() => {
+    setDob(formatDate(userData?.birthday));
+  }, [userData]);
+
   const navigate = useNavigate();
 
   // console.log(userData);
@@ -137,6 +175,7 @@ const myAccountBusiness = () => {
           confirmPass: "",
         });
         setUpdatedUserInfo(response.data);
+        setUserInfo(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -144,7 +183,16 @@ const myAccountBusiness = () => {
     // console.log(userInfo?.role);
 
     fetchUserData();
-  }, [userInfo?._id, openUpdateAddress, openUpdateUser, openUpdateBanking]);
+  }, [
+    userInfo?._id,
+    openUpdateAddress,
+    openUpdateUser,
+    openUpdateBanking,
+    openUpdatePhone,
+    openUpdateBirthday,
+    openUpdateBname,
+    openUpdateIdCard,
+  ]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -247,15 +295,56 @@ const myAccountBusiness = () => {
 
   const changePassword = async () => {
     try {
-      const change = await axiosPrivateBusiness.put(
-        "/user/update-password",
-        passwords
-      );
-      if (change.status === 200) {
+      const userInputPassword = passwords.password;
+      const hashedPassword = updatedUserInfo?.password;
+      const isMatch = bcrypt.compareSync(userInputPassword, hashedPassword);
+      if (isMatch) {
+        if (!validatePassword(passwords.newPass)) {
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร, รวมทั้งตัวพิมพ์ใหญ่, ตัวพิมพ์เล็ก, ตัวเลข และอักขระพิเศษ",
+            icon: "error",
+          });
+          return;
+        }
+
+        if (!validatePassword(passwords.confirmPass)) {
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร, รวมทั้งตัวพิมพ์ใหญ่, ตัวพิมพ์เล็ก, ตัวเลข และอักขระพิเศษ",
+            icon: "error",
+          });
+          return;
+        }
+
+        if (passwords.newPass === passwords.confirmPass) {
+          const change = await axiosPrivateBusiness.put(
+            `/user/updateUser/${updatedUserInfo?._id}`,
+            {
+              password: passwords.newPass,
+              role: updatedUserInfo?.role,
+            }
+          );
+          if (change.status === 200) {
+            Swal.fire({
+              title: "สำเร็จ!",
+              text: "รหัสผ่านของคุณได้ถูกเปลี่ยนเรียบร้อยแล้ว.",
+              icon: "success",
+            });
+            setOpenUpdatePassword(false);
+          }
+        } else {
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "รหัสผ่านใหม่ไม่ตรงกัน",
+            icon: "error",
+          });
+        }
+      } else {
         Swal.fire({
-          title: "สำเร็จ!",
-          text: "รหัสผ่านของคุณได้ถูกเปลี่ยนเรียบร้อยแล้ว.",
-          icon: "success",
+          title: "ข้อผิดพลาด!",
+          text: "รหัสเก่าไม่ถูกต้อง",
+          icon: "error",
         });
       }
     } catch (error) {
@@ -300,7 +389,11 @@ const myAccountBusiness = () => {
     try {
       const updateData = await axiosPrivateBusiness.put(
         `/user/updateUser/${userInfo?._id}`,
-        updatedUserInfo
+        {
+          name: updatedUserInfo?.name,
+          lastName: updatedUserInfo?.lastName,
+          role: updatedUserInfo?.role,
+        }
       );
       // setUserInfo(userData)
       if (updateData.status === 200) {
@@ -440,6 +533,163 @@ const myAccountBusiness = () => {
     }
   };
 
+  const handleSubmitBirthday = (e: React.FormEvent) => {
+    e.preventDefault();
+    Swal.fire({
+      title: "คุณแน่ใจหรือไม่?",
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ใช่, อัปเดตเลย!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, {
+            role: userInfo?.role,
+            birthday: dob,
+          });
+          setOpenUpdateBirthday(false);
+
+          // แจ้งเตือนว่าการอัปเดตสำเร็จ
+          Swal.fire({
+            title: "อัปเดตแล้ว!",
+            text: "ที่อยู่ของคุณได้รับการอัปเดตแล้ว.",
+            icon: "success",
+          });
+        } catch (error) {
+          // แจ้งเตือนหากเกิดข้อผิดพลาด
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "เกิดปัญหาในการอัปเดตที่อยู่ของคุณ.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  const handleSubmitPhone = (e: React.FormEvent) => {
+    e.preventDefault();
+    Swal.fire({
+      title: "คุณแน่ใจหรือไม่?",
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ใช่, อัปเดตเลย!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          let formattedPhone = phone;
+
+          // ถ้า phone เริ่มต้นด้วย '0' ให้ตัดออก
+          if (formattedPhone) {
+            if (formattedPhone.startsWith("0")) {
+              formattedPhone = formattedPhone.slice(1);
+            }
+          }
+
+          await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, {
+            role: userInfo?.role,
+            phone: `+66${formattedPhone}`,
+          });
+          setOpenUpdatePhone(false);
+
+          // แจ้งเตือนว่าการอัปเดตสำเร็จ
+          Swal.fire({
+            title: "อัปเดตแล้ว!",
+            text: "ที่อยู่ของคุณได้รับการอัปเดตแล้ว.",
+            icon: "success",
+          });
+        } catch (error) {
+          // แจ้งเตือนหากเกิดข้อผิดพลาด
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "เกิดปัญหาในการอัปเดตที่อยู่ของคุณ.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  const handleSubmitBname = (e: React.FormEvent) => {
+    e.preventDefault();
+    Swal.fire({
+      title: "คุณแน่ใจหรือไม่?",
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ใช่, อัปเดตเลย!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, {
+            role: userInfo?.role,
+            businessName: bName,
+          });
+          setOpenUpdateBname(false);
+
+          // แจ้งเตือนว่าการอัปเดตสำเร็จ
+          Swal.fire({
+            title: "อัปเดตแล้ว!",
+            text: "ที่อยู่ของคุณได้รับการอัปเดตแล้ว.",
+            icon: "success",
+          });
+        } catch (error) {
+          // แจ้งเตือนหากเกิดข้อผิดพลาด
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "เกิดปัญหาในการอัปเดตที่อยู่ของคุณ.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  const handleSubmitIdCard = (e: React.FormEvent) => {
+    e.preventDefault();
+    Swal.fire({
+      title: "คุณแน่ใจหรือไม่?",
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ใช่, อัปเดตเลย!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, {
+            role: userInfo?.role,
+            idcard: idCard,
+          });
+          setOpenUpdateIdCard(false);
+
+          // แจ้งเตือนว่าการอัปเดตสำเร็จ
+          Swal.fire({
+            title: "อัปเดตแล้ว!",
+            text: "ที่อยู่ของคุณได้รับการอัปเดตแล้ว.",
+            icon: "success",
+          });
+        } catch (error) {
+          // แจ้งเตือนหากเกิดข้อผิดพลาด
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: "เกิดปัญหาในการอัปเดตที่อยู่ของคุณ.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
   return (
     <div className="my-5 w-full">
       <div className="mb-5">
@@ -448,15 +698,6 @@ const myAccountBusiness = () => {
       {userInfo && userData ? (
         <div>
           <div className="shadow-boxShadow p-10  rounded-lg">
-            {/* <div className="hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out">
-              <div>
-                <span className="text-sm">ชื่อธุรกิจ</span>
-              </div>
-              <div>
-                <span className="text-md">{userData?.businessName}</span>
-              </div>
-            </div> */}
-
             {openUpdateUser === false ? (
               <div className="flex justify-between items-center rounded-lg hover:bg-gray-300 pr-5 transition-all duration-700 ease-in-out">
                 <div className="flex gap-5 items-center p-5">
@@ -550,6 +791,57 @@ const myAccountBusiness = () => {
                   >
                     บันทึก
                   </button>
+                </div>
+              </div>
+            )}
+
+            {openUpdateBname === false ? (
+              <div className="hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out flex justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm">ชื่อธุรกิจ</span>
+                  <span className="text-md">{userData?.businessName}</span>
+                </div>
+                <div
+                  className="flex items-center justify-center"
+                  onClick={() => setOpenUpdateBname(true)}
+                >
+                  <button>
+                    <FaEdit size={24} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-5 transition-all duration-700 ease-in-out">
+                <div className="flex justify-between shadow-boxShadow p-5 rounded-lg">
+                  <form
+                    className="flex justify-between w-full"
+                    onSubmit={handleSubmitBname}
+                  >
+                    <div>
+                      <span className="text-sm">เปลี่ยนชื่อธุรกิจ</span>
+                      <input
+                        type="text"
+                        placeholder="กรุณากรอกชื่อธุรกิจ"
+                        onChange={(e) => setBName(e.target.value)}
+                        className="input input-bordered w-full mt-2"
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-end items-center">
+                      <button
+                        onClick={() => setOpenUpdateBname(false)}
+                        className="bg-red-500 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-red-700 w-32 h-10 my-2"
+                      >
+                        ยกเลิก
+                      </button>
+                      <button
+                        type="submit"
+                        className="bg-green-400 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-green-600 w-32 h-10 my-2"
+                      >
+                        แก้ไข
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}
@@ -688,6 +980,168 @@ const myAccountBusiness = () => {
               </div>
             ) : (
               <div></div>
+            )}
+
+            {openUpdateBirthday === false && openUpdatePhone === false ? (
+              <div className="flex flex-row">
+                <div className="w-1/2 flex justify-between items-center hover:bg-gray-300 p-5 transition-all duration-700 ease-in-out">
+                  <div className="flex justify-between w-[50%] gap-5 items-center">
+                    <div className="flex flex-col">
+                      <span className="text-sm">วันเดือนปีเกิด</span>
+                      <div className="mt-3">
+                        <span>
+                          {userData?.birthday
+                            ? new Date(userData.birthday).toLocaleDateString(
+                                "th-TH"
+                              )
+                            : "ยังไม่มีข้อมูล"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div onClick={() => setOpenUpdateBirthday(true)}>
+                    <button>
+                      <FaEdit size={24} />
+                    </button>
+                  </div>
+                </div>
+                <div className="w-1/2 flex justify-between items-center hover:bg-gray-300 p-5 transition-all duration-700 ease-in-out">
+                  <div className="flex justify-between w-[50%] gap-5 items-center">
+                    <div className="flex flex-col">
+                      <span className="text-sm">เบอร์โทร</span>
+                      <div className="mt-3">
+                        <span>
+                          {userData?.phone ? userData?.phone : "ยังไม่มีข้อมูล"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div onClick={() => setOpenUpdatePhone(true)}>
+                    <button>
+                      <FaEdit size={24} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : openUpdateBirthday === true ? (
+              <div className="p-5 transition-all duration-700 ease-in-out">
+                <div className="flex justify-between shadow-boxShadow p-5 rounded-lg">
+                  <div>
+                    <span className="text-sm">
+                      วันเดือนปีเกิด (เลือกจากปฎิทิน)
+                    </span>
+                    <input
+                      type="date"
+                      id="dob"
+                      value={dob}
+                      onChange={(e) => setDob(e.target.value)}
+                      max={currentDate} // กำหนดวันที่สูงสุด
+                      className="input input-bordered w-full mt-2"
+                    />
+                  </div>
+                  <div className="flex flex-col sm:flex-row justify-end items-center">
+                    <button
+                      onClick={() => setOpenUpdateBirthday(false)}
+                      className="bg-red-500 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-red-700 w-32 h-10 my-2"
+                    >
+                      ยกเลิก
+                    </button>
+                    <button
+                      onClick={handleSubmitBirthday}
+                      className="bg-green-400 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-green-600 w-32 h-10 my-2"
+                    >
+                      แก้ไข
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : openUpdatePhone === true ? (
+              <div className="p-5 transition-all duration-700 ease-in-out">
+                <div className="flex justify-between shadow-boxShadow p-5 rounded-lg">
+                  <form
+                    className="flex justify-between w-full"
+                    onSubmit={handleSubmitPhone}
+                  >
+                    <div>
+                      <span className="text-sm">
+                        เบอร์โทร (กรุณากรอกเบอร์ที่ถูกต้อง)
+                      </span>
+                      <input
+                        type="number"
+                        placeholder="กรุณากรอกเบอร์มือถือ"
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="input input-bordered w-full mt-2"
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-end items-center">
+                      <button
+                        onClick={() => setOpenUpdatePhone(false)}
+                        className="bg-red-500 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-red-700 w-32 h-10 my-2"
+                      >
+                        ยกเลิก
+                      </button>
+                      <button
+                        type="submit"
+                        className="bg-green-400 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-green-600 w-32 h-10 my-2"
+                      >
+                        แก้ไข
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            ) : null}
+
+            {openUpdateIdCard === false ? (
+              <div className="hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out flex justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm">รหัสบัตรประชาชน</span>
+                  <span className="text-md">{userData?.idcard || "ยังไม่ได้ตั้งค่า"}</span>
+                </div>
+                <div
+                  className="flex items-center justify-center"
+                  onClick={() => setOpenUpdateIdCard(true)}
+                >
+                  <button>
+                    <FaEdit size={24} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-5 transition-all duration-700 ease-in-out">
+                <div className="flex justify-between shadow-boxShadow p-5 rounded-lg">
+                  <form
+                    className="flex justify-between w-full"
+                    onSubmit={handleSubmitIdCard}
+                  >
+                    <div>
+                      <span className="text-sm">เปลี่ยนรหัสบัตรประชาชน</span>
+                      <input
+                        type="number"
+                        placeholder="กรุณากรอกชื่อธุรกิจ"
+                        onChange={(e) => setIdCard(e.target.value)}
+                        className="input input-bordered w-full mt-2"
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-end items-center">
+                      <button
+                        onClick={() => setOpenUpdateIdCard(false)}
+                        className="bg-red-500 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-red-700 w-32 h-10 my-2"
+                      >
+                        ยกเลิก
+                      </button>
+                      <button
+                        type="submit"
+                        className="bg-green-400 mx-2 px-3 w-18 py-1 rounded-full text-white hover:bg-green-600 w-32 h-10 my-2"
+                      >
+                        แก้ไข
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             )}
 
             {openUpdateAddress === false ? (
@@ -902,7 +1356,7 @@ const myAccountBusiness = () => {
                           <select
                             name="BankingName"
                             value={updatedBankingInfo.BankingName}
-                            onChange={() => handleBankingChange}
+                            onChange={(e) => handleBankingChange(e)}
                             className="input input-bordered w-full"
                             required
                           >

@@ -95,7 +95,6 @@ const Drawer: React.FC = () => {
                   </span>
                 </div> */}
               </div>
-              <hr className="h-px bg-primaryUser border-0"></hr>
               {/* Sidebar content here */}
               <div className="mt-5">
                 {userInfo?.role === "user" ? (
@@ -164,7 +163,7 @@ const Drawer: React.FC = () => {
                       </li>
                     </Link>
                     <Link to={"/dashboard-business/BookingList-business"}>
-                    <li
+                      <li
                         onClick={() => handleClick("BookingList")}
                         className={`cursor-pointer rounded-md ${
                           activeItem === "BookingList"
@@ -195,7 +194,17 @@ const Drawer: React.FC = () => {
                     </Link>
                   </div>
                 ) : null}
-                <hr className="h-px my-4 bg-primaryUser border-0"></hr>
+                <hr
+                  className={
+                    userInfo?.role === "user"
+                      ? "h-px bg-gradient-to-b from-primaryUser to-secondUser border-0"
+                      : userInfo?.role === "business"
+                      ? "h-px bg-gradient-to-b from-primaryBusiness to-secondBusiness border-0"
+                      : userInfo?.role === "admin"
+                      ? "h-px bg-gradient-to-b from-primaryAdmin to-secondAdmin border-0"
+                      : "h-px bg-gradient-to-b from-primaryNoRole to-secondNoRole border-0"
+                  }
+                />
                 {userInfo?.role === "user" ? (
                   <div>
                     <Link to={"/dashboard-user/HistiryBooking-user"}>
@@ -215,16 +224,24 @@ const Drawer: React.FC = () => {
                   <div>
                     <Link to={"#"}>
                       <li>
-                        <a>ประวัติการจอง (UC8)</a>
+                        <a>ประวัติการจอง</a>
                       </li>
                     </Link>
                     <Link to={"#"}>
                       <li>
-                        <a>วิธีรับเงิน (UC17)</a>
+                        <a>วิธีรับเงิน</a>
                       </li>
                     </Link>
                   </div>
-                ) : null}
+                ) : (
+                  <div>
+                    <Link to={"/dashboard-admin/BookingHistory"}>
+                      <li>
+                        <a>ประวัติผู้รับเงิน</a>
+                      </li>
+                    </Link>
+                  </div>
+                )}
                 <li onClick={handleLogout}>
                   <a>Log out</a>
                 </li>

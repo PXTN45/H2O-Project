@@ -474,7 +474,7 @@ const SearchResult: React.FC = () => {
     setShowFilterMenu(false);
   };
 
-  const filterByDate = (items:Item[]) => {
+  const filterByDate = (items: Item[]) => {
     const filteredItems = items.filter((item) => {
       const startDate = new Date(item.time_start_package);
       if (!item.isChildren && numChildren > 0) {
@@ -491,7 +491,13 @@ const SearchResult: React.FC = () => {
 
   useEffect(() => {
     setPackageCount(PackageCount.current);
-  }, [numPeople, numChildren, dataPackage, dataPackageForPriceFilter]);
+  }, [
+    numPeople,
+    numChildren,
+    dataPackage,
+    dataPackageForPriceFilter,
+    isPackage,
+  ]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-10">
@@ -506,11 +512,13 @@ const SearchResult: React.FC = () => {
             }
             onClick={clickToHome}
           >
-            ที่พัก (
-            {(drawerData?.drawerPrice?.endPrice ?? 0) > 0
-              ? dataHomeStaysForPriceFilter.length
-              : homeStayCount}
-            )
+            ที่พัก
+            {!isPackage &&
+              ((drawerData?.drawerPrice?.endPrice ?? 0) > 0
+                ? ` (${dataHomeStaysForPriceFilter.length})`
+                : ` (${homeStayCount})`
+              )
+            }
           </button>
           <button
             id="button-homestaySearch-noSelect"
@@ -521,7 +529,7 @@ const SearchResult: React.FC = () => {
             }
             onClick={clickToPackage}
           >
-            แพ็คเกจ ({packageCount})
+            แพ็คเกจ {isPackage ? `(${packageCount})` : ""}
           </button>
         </div>
         <div id="header">

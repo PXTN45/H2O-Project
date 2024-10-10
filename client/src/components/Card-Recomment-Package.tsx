@@ -78,7 +78,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
           className="absolute right-0 font-bold px-6 py-4"
         >
           <span className="mx-1">฿</span>
-          {item?.price_package || 0}
+          {item.price_package}
         </div>
       </div>
     </div>

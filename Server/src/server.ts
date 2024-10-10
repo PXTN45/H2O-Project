@@ -17,7 +17,6 @@ import { Server } from "socket.io";
 import ChatModel from "./model/chat.model";
 
 dotenv.config();
-
 // Swagger definition
 const swaggerDefinition = {
   openapi: "3.0.0",
@@ -69,13 +68,20 @@ const options = {
 
 // Generate Swagger specification
 const swaggerSpec = swaggerJSDoc(options);
+const allowedOrigins = process.env.CLIENT_URL?.split(',');
 
 // Create Express app
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://47.128.233.168:3001",
+    origin: (origin, callback) => {
+      if (!origin || (allowedOrigins && allowedOrigins.includes(origin))) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST"],
   },
 });
@@ -84,7 +90,13 @@ const io = new Server(server, {
 app.use(
   cors({
     credentials: true,
-    origin: ["http://18.140.2.235", "http://47.128.233.168:3001"],
+    origin: (origin, callback) => {
+      if (!origin || (allowedOrigins && allowedOrigins.includes(origin))) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
