@@ -69,7 +69,7 @@ jobs:
           -p 3001:3000 \
           --name h2o-backend-container \
           -e MONGODB_URL="mongodb+srv://patnattapong1:sIsEdapY3eBIo9Qj@cluster0.1qyztlj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" \
-          -e CLIENT_URL="http://h2o-frontend-container:80/" \
+          -e CLIENT_URL="http://18.140.2.235,http://47.128.233.168:3001,http://localhost:5173,http://localhost:5174" \
           -e PORT="3000" \
           -e SECRET="H2O-Project" \
           -e ACCESS_TOKEN_SECRET="879a8c742a4091c29ca1c749a4ff61eedd5e1626d1ed6810e93eb496892ae57591b62ecdd8433c8f0d9a765b69614643d94ceb086256654dcc5647adadbe1533" \
@@ -89,7 +89,7 @@ jobs:
           --network h2o-network \
           -p 80:80 \
           --name h2o-frontend-container \
-          -e VITE_H2O_URL="http://h2o-backend-container:3000/" \
+          -e VITE_H2O_URL="http://18.140.2.235:3001/" \
           pxtn/h2o-frontend
 
       - name: Delete old Imges
