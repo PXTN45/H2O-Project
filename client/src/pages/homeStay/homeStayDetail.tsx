@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
 import { useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar-data";
+import axiosPublic from "../../hook/axiosPublic";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
 import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import { AuthContext } from "../../AuthContext/auth.provider";
@@ -17,8 +18,13 @@ import { IoMdTime } from "react-icons/io";
 import { MdOutlinePolicy } from "react-icons/md";
 import { TbRuler3 } from "react-icons/tb";
 import { LuBedSingle, LuBedDouble } from "react-icons/lu";
-import { Facilities_Room, HomeStay, Offer, PaymentData, Review } from "../../type";
-
+import {
+  Facilities_Room,
+  HomeStay,
+  Offer,
+  PaymentData,
+  Review,
+} from "../../type";
 
 const homeStayDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +52,11 @@ const homeStayDetail = () => {
           }
         } else if (userInfo?.role == "business") {
           const res = await axiosPrivateBusiness.get(`/homestay/${id}`);
+          if (res.data) {
+            setItem(res.data);
+          }
+        } else {
+          const res = await axiosPublic.get(`/homestay/${id}`);
           if (res.data) {
             setItem(res.data);
           }
@@ -285,7 +296,7 @@ const homeStayDetail = () => {
             dataNav.dateRange.startDate !== "Not selected"
           ) {
             // ทำบางสิ่งที่ต้องการ
-            if (item && userInfo && id) {
+            if (item && id) {
               // Set payment data
               const roomTypeIndex =
                 Array.isArray(item.room_type) && item.room_type.length > 0
@@ -301,7 +312,19 @@ const homeStayDetail = () => {
                 location: item?.location,
                 roomType: item.room_type[roomTypeIndex],
                 offer: roomType.offer[i],
-                bookingUser: userInfo,
+                bookingUser: userInfo ?? {
+                  _id: "",
+                  name: "",
+                  lastName: "",
+                  businessName: "",
+                  email: "",
+                  password: "",
+                  phone: "",
+                  image: "",
+                  address: [],
+                  birthday: new Date(),
+                  role: "",
+                },
                 rating: averageRating,
                 time_checkIn_homeStay: item.time_checkIn_homeStay,
                 time_checkOut_homeStay: item.time_checkOut_homeStay,
@@ -381,7 +404,7 @@ const homeStayDetail = () => {
                 (ก่อนรวมภาษีและค่าธรรมเนียม)
               </p>
             </div>
-            {userInfo?.role == "user" && (
+            {(userInfo?.role === "user" || userInfo?.role === undefined) && (
               <div className="w-1/6 flex flex-col items-center pl-3">
                 <button
                   className=" bg-primaryUser shadow-boxShadow px-8 lg:px-6 lg:ml-4 h-10 rounded-3xl hover:scale-110 
@@ -513,7 +536,9 @@ const homeStayDetail = () => {
             className="container-xl mx-6 md:mx-8 lg:mx-24 xl:mx-40"
           >
             <div className="mt-5 ">
-              {userInfo?.role == "user" && <Navbar />}
+              {(userInfo?.role === "user" || userInfo?.role === undefined) && (
+                <Navbar />
+              )}
               <div className="mt-2  flex  justify-end">
                 {showAlert && (
                   <div className="alert alert-error text-white w-1/3">

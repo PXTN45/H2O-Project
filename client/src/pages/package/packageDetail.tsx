@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axiosPrivateUser from "../../hook/axiosPrivateUser";
+import axiosPublic from "../../hook/axiosPublic";
 import axios from "axios";
 import Loader from "../../assets/loadingAPI/loaddingTravel";
 import OpenStreetMapShoData from "../../components/OpenStreetMapShowData";
@@ -15,6 +16,7 @@ import PackageHomeStay from "../../components/PackageHomeStay";
 import { Image_upload , Review } from "../../type";
 import { MdPeopleAlt } from "react-icons/md";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
+import Swal from "sweetalert2";
 
 const PackageDetail = () => {
   const [item, setItem] = useState<any>();
@@ -31,7 +33,7 @@ const PackageDetail = () => {
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
-  const { userInfo } = authContext;
+  const { userInfo , handleLogout } = authContext;
 
   useEffect(() => {
     if (!id) {
@@ -43,6 +45,9 @@ const PackageDetail = () => {
       axiosPrivate = axiosPrivateUser;
     } else if (userInfo?.role == "business") {
       axiosPrivate = axiosPrivateBusiness;
+    }else{
+      axiosPrivate = axiosPublic;
+
     }
 
     const fetchData = async () => {
@@ -349,7 +354,35 @@ const PackageDetail = () => {
         localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
 
         // เปลี่ยนไปยังหน้าการชำระเงิน
-        window.location.href = sessionUrl;
+        if(userInfo?.role === "user"){
+          window.location.href = sessionUrl;
+        }else{
+          if (!userInfo) {
+            Swal.fire({
+              title: "Please log in",
+              text: "You must log in first!",
+              icon: "warning",
+              confirmButtonText: "OK",
+            }).then(() => {
+              (
+                document.getElementById("Get-Started") as HTMLDialogElement
+              )?.showModal();
+            });
+          } else if (userInfo.role !== "user") {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Your role is not user!",
+              footer: '<a href="#" id="logout-link">Logout now!</a>',
+              willOpen: () => {
+                const logoutLink = document.getElementById("logout-link");
+                if (logoutLink) {
+                  logoutLink.addEventListener("click", handleLogout);
+                }
+              },
+            });
+          }
+        }
       } else {
         throw new Error("Invalid response format");
       }
@@ -677,7 +710,7 @@ const PackageDetail = () => {
                     </div>
                   </div>
                   <div className="flex items-center p-5"></div>
-                  {userInfo?.role == "user" && (
+                  {(userInfo?.role == "user" || userInfo?.role == undefined) && (
                     <div className="flex items-end justify-end p-5">
                       <button
                         id="btn-makePayment"

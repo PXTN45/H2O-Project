@@ -51,7 +51,9 @@ const router = createBrowserRouter([
       {
         path: "/homeStayDetail/:id",
         element: (
-          <HomeStayDetail />
+          <PaymentProvider>
+            <HomeStayDetail />
+          </PaymentProvider>
         ),
       },
       {
