@@ -6,7 +6,8 @@
   "homepage": "http://18.140.2.235:3001/checkout",
   "proxy": "http://18.140.2.235:3001/",
   "scripts": {
-    "start": "node ./src/server.ts",
+    "start": "ts-node ./src/server.ts",
+    "start:dev": "ts-node-dev ./src/server.ts",
     "start:prod": "npm run build && node ./dist/server.js",
     "build": "tsc"
   },
