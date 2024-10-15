@@ -63,6 +63,11 @@ interface User {
   address: Address[];
   birthday: Date;
   role: string;
+  idcard: string;
+  BankingName: string;
+  BankingUsername: string;
+  BankingUserlastname: string;
+  BankingCode: string;
 }
 
 interface UserRegister {

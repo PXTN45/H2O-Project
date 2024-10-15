@@ -43,7 +43,6 @@ const BusinessHomeStay = () => {
   }, [toggleStates]);
 
   useEffect(() => {
-    // ตั้งค่าเริ่มต้น toggleStates ตาม status_sell_homeStay ของ homestay
     const initialStates = myHomestay.reduce((acc, homestay, index) => {
       acc[index] = homestay.status_sell_homeStay === "Ready"; // ถ้าเปิดจอง
       return acc;
@@ -51,14 +50,13 @@ const BusinessHomeStay = () => {
     setToggleStates(initialStates);
   }, [myHomestay]);
 
-  const [currentIndices, setCurrentIndices] = useState<number[]>(
-    myHomestay.map(() => 0)
-  );
+  const [currentIndices, setCurrentIndices] = useState<number[]>([]);
 
-  // ใช้ useEffect เพื่อตั้งค่า currentIndices เมื่อ myHomestay เปลี่ยนแปลง
   useEffect(() => {
-    setCurrentIndices(myHomestay.map(() => 0));
-  }, [myHomestay]);
+    if (myHomestay.length > 0 && currentIndices.length === 0) {
+      setCurrentIndices(myHomestay.map(() => 0));
+    }
+  }, [myHomestay, currentIndices]);
 
   const handlePrev = (index: number) => {
     setCurrentIndices((prevIndices) =>

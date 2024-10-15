@@ -13,7 +13,7 @@ import { BiSolidDiscount } from "react-icons/bi";
 import { GrSync } from "react-icons/gr";
 import axiosPrivateBusiness from "../../hook/axiosPrivateBusiness";
 import PackageHomeStay from "../../components/PackageHomeStay";
-import { Image_upload , Review } from "../../type";
+import { Image_upload, Review } from "../../type";
 import { MdPeopleAlt } from "react-icons/md";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 import Swal from "sweetalert2";
@@ -33,7 +33,7 @@ const PackageDetail = () => {
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
-  const { userInfo , handleLogout } = authContext;
+  const { userInfo, handleLogout } = authContext;
 
   useEffect(() => {
     if (!id) {
@@ -45,9 +45,8 @@ const PackageDetail = () => {
       axiosPrivate = axiosPrivateUser;
     } else if (userInfo?.role == "business") {
       axiosPrivate = axiosPrivateBusiness;
-    }else{
+    } else {
       axiosPrivate = axiosPublic;
-
     }
 
     const fetchData = async () => {
@@ -90,17 +89,21 @@ const PackageDetail = () => {
   useEffect(() => {
     const priceDiscount = () => {
       if (item) {
-        // ตรวจสอบว่ามี `item` ก่อน
         const price = item.price_package;
         const discount = item.discount;
         const totalPrice =
           discount > 0 ? price * ((100 - discount) / 100) : price;
-        setTotalPricePackage(totalPrice * adult);
+        const taxRate = 0.03;
+        const feeRate = 0.05;
+        const tax = totalPrice * taxRate;
+        const fee = totalPrice * feeRate;
+        const totalPriceWithTaxAndFee = totalPrice + tax + fee;
+        setTotalPricePackage(totalPriceWithTaxAndFee * adult);
       }
     };
 
     priceDiscount();
-  }, [item, adult]);
+  }, [item, adult]); 
 
   // ฟังก์ชันคำนวณค่าเฉลี่ยของ rating
   const calculateAverageRating = (reviews: Review[]): number => {
@@ -354,9 +357,9 @@ const PackageDetail = () => {
         localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
 
         // เปลี่ยนไปยังหน้าการชำระเงิน
-        if(userInfo?.role === "user"){
+        if (userInfo?.role === "user") {
           window.location.href = sessionUrl;
-        }else{
+        } else {
           if (!userInfo) {
             Swal.fire({
               title: "Please log in",
@@ -391,8 +394,6 @@ const PackageDetail = () => {
     }
   };
   const discount = item.discount;
-  console.log(item.isChildren);
-
   const handleAdultChange = (value: number) => {
     setAdult((prev) => Math.min(item.max_people, Math.max(1, prev + value)));
   };
@@ -710,7 +711,8 @@ const PackageDetail = () => {
                     </div>
                   </div>
                   <div className="flex items-center p-5"></div>
-                  {(userInfo?.role == "user" || userInfo?.role == undefined) && (
+                  {(userInfo?.role == "user" ||
+                    userInfo?.role == undefined) && (
                     <div className="flex items-end justify-end p-5">
                       <button
                         id="btn-makePayment"

@@ -524,7 +524,7 @@ const homeStayDetail = () => {
       </div>
     );
   });
-  console.log(userInfo?.role);
+
 
   return (
     <div>

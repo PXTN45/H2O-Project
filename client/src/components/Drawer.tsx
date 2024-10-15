@@ -57,43 +57,6 @@ const Drawer: React.FC = () => {
             />
             <ul className="menu bg-white text-black min-h-full w-80 p-4 text-xl">
               <div className="flex items-center justify-start my-5 rounded-full">
-                {/* <div className="relative group ">
-                  <div className="rounded-full h-14 w-14 object-cover bg-dark">
-                    <img
-                      src={userInfo?.image}
-                      alt="Profile"
-                      className="object-cover w-full h-full transition-opacity duration-300 group-hover:opacity-30 rounded-full"
-                    />
-                  </div>
-                  <label
-                    className="absolute inset-0 bg-opacity-50 text-white text-lg cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{ textAlign: "center" }}
-                  >
-                    <div className="absolute inset-0 flex items-center justify-center text-xs">
-                      <div className="flex flex-col items-center justify-center">
-                        <p>
-                          <BsCamera />
-                        </p>
-                        <p>เปลี่ยนรูป</p>
-                      </div>
-                    </div>
-                    <input
-                      type="file"
-                      className="hidden"
-                      ref={fileInputRef}
-                      onChange={handleChange}
-                    />
-                  </label>
-                </div> */}
-                {/* <div className=" w-full flex items-center justify-center">
-                  <span className="truncate max-w-44">
-                    {userInfo?.role === "user" || userInfo?.role === "admin"
-                      ? `${userInfo?.name} ${userInfo?.lastName}`
-                      : userInfo?.role === "business"
-                      ? `${userInfo?.businessName}`
-                      : null}
-                  </span>
-                </div> */}
               </div>
               {/* Sidebar content here */}
               <div className="mt-5">

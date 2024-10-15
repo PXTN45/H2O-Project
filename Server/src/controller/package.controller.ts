@@ -65,9 +65,10 @@ const getByIdBusiness = async (req: Request, res: Response): Promise<void> => {
 const createPackage = async (req: Request, res: Response): Promise<void> => {
   const packageData = req.body;
   const newPackage = new PackageModel(packageData);
-  console.log(packageData);
+  
   try {
     const savedPackage = await newPackage.save();
+    console.log(savedPackage);
     res.status(201).json(savedPackage);
   } catch (error: any) {
     res.status(500).json({ message: error.message });

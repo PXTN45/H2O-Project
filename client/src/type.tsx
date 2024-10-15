@@ -56,7 +56,7 @@ export interface Image_upload {
   _id: string;
   image_upload: string;
 }
-interface Location {
+export interface Location {
   name_location: string;
   province_location: string;
   house_no: string;
@@ -91,8 +91,6 @@ export interface HomeStay {
   createdAt: Date;
   updatedAt: Date;
 }
-
-
 
 export interface BookingHomeStayBusinessProps {
   bookingData: Booking[];
@@ -191,12 +189,24 @@ export interface IPackage {
     longitude_location: string;
     radius_location: number;
   }[];
-  image: { image_upload: string }[];
+  image: PackageImage[];
   price_package: number;
   discount: number;
   homestay?: HomeStay;
   business_user: string;
   review_rating_package: number;
+}
+export interface PackageImage {
+  image_upload: string;
+}
+[];
+
+export interface Bank {
+  idcard: string;
+  BankingName: string;
+  BankingUsername: string;
+  BankingUserlastname: string;
+  BankingCode: string;
 }
 
 export interface Password {
@@ -240,7 +250,8 @@ export interface Activity {
   activity_days: {
     activity_name: string;
   }[];
-}[];
+}
+[];
 
 export interface Booking {
   _id: string;

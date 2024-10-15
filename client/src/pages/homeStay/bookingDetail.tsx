@@ -50,7 +50,6 @@ const BookingDetail: React.FC = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { userInfo } = authContext;
-console.log(dataNav);
 
 
   useEffect(() => {
@@ -78,30 +77,24 @@ console.log(dataNav);
   // การจัดการวันที่เริ่มต้น (start date)
   const startStr = dataNav?.dateRange.startDate_Time;
   let bookingStart: string;
-  console.log(startStr);
   
 
   if (startStr) {
     const dateStart = new Date(startStr);
-    console.log(dateStart);
     
     const offset = dateStart.getTimezoneOffset() * 60000; // Offset เป็น milliseconds
     const localDate = new Date(dateStart.getTime() - offset);
     bookingStart = localDate.toISOString().split("T")[0];
   } else {
-    console.log("Start date is not defined");
     bookingStart = "default-start-date";
   }
   const endStr = dataNav?.dateRange.endDate_Time;
   let bookingEnd: string;
-  console.log(endStr);
   
-
   if (endStr) {
     const dateEnd = new Date(endStr);
     bookingEnd = dateEnd.toISOString().split("T")[0];
   } else {
-    console.log("End date is not defined");
     bookingEnd = "default-end-date"; // หรือกำหนดค่าเริ่มต้นที่คุณต้องการ
   }
   

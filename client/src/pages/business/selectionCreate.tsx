@@ -5,7 +5,7 @@ const LeftSide = () => {
   return (
     <div className="w-full md:w-[70%] xl:w-[70%] h-full md:h-screen flex flex-col items-center justify-center relative">
       <a
-        href="http://localhost:5173/createHomeStay"
+        href="/createHomeStay"
         className="relative group w-full text-center mb-6"
       >
         <div className="text-overlay text-[24px] md:text-[25px] xl:text-[40px] font-bold relative z-10">
@@ -14,7 +14,7 @@ const LeftSide = () => {
         <div className="bg-custom-bg1 absolute inset-0 transition duration-300 ease-in-out transform group-hover:scale-105 rounded-br-lg rounded-tr-lg shadow-lg"></div>
       </a>
       <a
-        href="https://www.youtube.com/"
+        href="/create-package"
         className="relative group mt-6 w-full text-center"
       >
         <div className="text-overlay text-[24px] md:text-[25px] xl:text-[40px] font-bold relative z-10">

@@ -30,6 +30,15 @@ import MyBusiness from "../pages/business/myBusiness";
 import BookingList from "../pages/business/bookingList";
 import BookingBusiness from "../pages/admin/Booking-Payment";
 import BookingHistory from "../pages/admin/Booking-History";
+import CreatePackage from "../pages/business/createPackage";
+import BasicInformationPackage from "../pages/business/Package/BasicInformationPackage";
+import AddImages from "../pages/business/Package/AddImages";
+import Location from "../pages/business/Package/Location";
+import DetailPackages from "../pages/business/Package/DetailPackages";
+import PaymentMethod from "../pages/business/Package/PaymentMethod";
+import Policies from "../pages/business/Package/Policies";
+import Price from "../pages/business/Package/PriceAndPayment";
+import { PackageDataProvider } from "../AuthContext/packageData";
 
 const router = createBrowserRouter([
   {
@@ -68,9 +77,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/packageDetail/:id",
-        element: (
-          <PackageDetail />
-        ),
+        element: <PackageDetail />,
       },
       {
         path: "/search",
@@ -85,9 +92,7 @@ const router = createBrowserRouter([
 
       {
         path: "/dashboard-user",
-        element: (
-            <DrawerDashBoard />
-        ),
+        element: <DrawerDashBoard />,
         children: [
           {
             path: "/dashboard-user/Profile-user",
@@ -162,12 +167,56 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/createPackage",
+        element: (
+          <PrivateRouterBusiness>
+            <CreatePackage />
+          </PrivateRouterBusiness>
+        ),
+      },
+      {
         path: "/help",
         element: <Contact />,
       },
       {
         path: "/helpOnlyAdmin",
         element: <ContactOnlyAdmin />,
+      },
+      {
+        path: "/create-package",
+        element: (
+          <PrivateRouterBusiness>
+            <PackageDataProvider>
+              <CreatePackage />
+            </PackageDataProvider>
+          </PrivateRouterBusiness>
+        ),
+        children: [
+          {
+            path: "basic-information-package",
+            element: <BasicInformationPackage />,
+          },
+          {
+            path: "location",
+            element: <Location />,
+          },
+          {
+            path: "images",
+            element: <AddImages />,
+          },
+          {
+            path: "pricAndPayment",
+            element: <Price />,
+          },
+          {
+            path: "payment-method",
+            element: <PaymentMethod />,
+          },
+          {
+            path: "policies",
+            element: <Policies />,
+          },
+        ],
       },
     ],
   },
