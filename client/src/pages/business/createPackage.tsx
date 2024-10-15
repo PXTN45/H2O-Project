@@ -86,11 +86,17 @@ const CreatePackage = () => {
         business_user: userInfo?._id
       };
       
-      console.log(packageData);
+      const updateData = {
+        ...userInfo,
+        ...bank,   
+      };
+      
+      console.log(updateData);
   
       const response = await axiosPrivateBusiness.post("/package", packageData);
+      const responseUser = await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, updateData);
       
-      if (response.status === 201) {
+      if (response.status === 201 && responseUser.status === 200) {
         Swal.fire({
           title: 'สำเร็จ!',
           text: 'สร้างแพคเกจสำเร็จ',
