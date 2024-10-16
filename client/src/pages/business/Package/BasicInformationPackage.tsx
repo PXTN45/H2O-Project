@@ -3,7 +3,7 @@ import { IoIosAddCircleOutline, IoMdClose } from "react-icons/io";
 import { IoTrashBin } from "react-icons/io5";
 import { usePackageData } from "../../../AuthContext/packageData";
 import DetailPackages from "./DetailPackages";
-import { values } from "lodash";
+
 
 interface Activity {
   activity_name: string;

@@ -25,12 +25,12 @@ const CreatePackage = () => {
   const navigate = useNavigate();
 
   console.log(newPackageData);
-  console.log(location);
-  console.log(image);
-  console.log(homestayID);
-  console.log(bank);
-  console.log(discount);
-  console.log(price);
+  // console.log(location);
+  // console.log(image);
+  // console.log(homestayID);
+  // console.log(bank);
+  // console.log(discount);
+  // console.log(price);
 
   // รายการของขั้นตอนและเส้นทางที่สอดคล้อง
   const steps = [
@@ -52,18 +52,21 @@ const CreatePackage = () => {
       const nextStep = currentStep + 1;
       setCurrentStep(nextStep);
       localStorage.setItem("currentStep", nextStep.toString());
+      console.log("Current step saved to localStorage:", nextStep); // ตรวจสอบว่าค่าถูกบันทึกหรือไม่
       navigate(steps[nextStep - 1].path);
     }
   };
-
+  
   const handlePrevStep = () => {
     if (currentStep > 1) {
       const prevStep = currentStep - 1;
       setCurrentStep(prevStep);
-      localStorage.setItem("currentStep", prevStep.toString()); // บันทึกสถานะ
+      localStorage.setItem("currentStep", prevStep.toString());
+      console.log("Previous step saved to localStorage:", prevStep); // ตรวจสอบว่าค่าถูกบันทึกหรือไม่
       navigate(steps[prevStep - 1].path);
     }
   };
+  
 
 
   const handleStepChange = (step: number) => {
@@ -77,28 +80,25 @@ const CreatePackage = () => {
       const packageData = {
         ...newPackageData,
         location,
-        image: image?.map(img => ({ image_upload: img })),
+        image,
         homestay: homestayID,
         discount,
         price_package: price,
         review_rating_package: 0,
-        business_user: userInfo?._id,
+        business_user: userInfo?._id
       };
-      
       
       const updateData = {
         ...userInfo,
         ...bank,   
       };
-
-      console.log(packageData);
       
        
       const response = await axiosPrivateBusiness.post("/package", packageData);
       const responseUser = await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, updateData);
       
       if (response.status === 201 && responseUser.status === 200) {
-        localStorage.clear();
+        // localStorage.clear();
         Swal.fire({
           title: 'สำเร็จ!',
           text: 'สร้างแพคเกจสำเร็จ',

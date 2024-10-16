@@ -39,6 +39,7 @@ const AddImages: React.FC = () => {
       image_upload: image,
     }));
     setImage(packageImages);
+    localStorage.setItem("images" , JSON.stringify(packageImages))
   }, [images]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
