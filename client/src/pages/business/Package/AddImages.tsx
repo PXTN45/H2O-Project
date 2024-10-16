@@ -14,74 +14,91 @@ const AddImages: React.FC = () => {
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
+
+  // localStorage.removeItem("selectedImages")
+
   const { userInfo } = authContext;
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
-    const packageImages: PackageImage[] = images.map((image) => ({ image_upload: image }));
+    const storedImage = localStorage.getItem("image");
+    const storedSelectedImages = localStorage.getItem("selectedImages");
+
+    if (storedImage) {
+      setImages(JSON.parse(storedImage));
+    }
+    if (storedSelectedImages) {
+      const parsedSelectedImages = JSON.parse(storedSelectedImages);
+      setSelectedImages(parsedSelectedImages);
+    }
+  }, []);
+
+  useEffect(() => {
+    const packageImages: PackageImage[] = images.map((image) => ({
+      image_upload: image,
+    }));
     setImage(packageImages);
   }, [images]);
-  
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
 
     if (files) {
-      const filesArray = Array.from(files);
-      setSelectedImages(filesArray);
+        const filesArray = Array.from(files);
+        const updatedSelectedImages = [...selectedImages, ...filesArray];
+        setSelectedImages(updatedSelectedImages);
+        localStorage.setItem("selectedImages", JSON.stringify(updatedSelectedImages));
+
+        const urls = await uploadImages(filesArray);
+        setImages((prevImages) => [...prevImages, ...urls]); 
+        localStorage.setItem("image", JSON.stringify([...images, ...urls])); 
     }
-  };
+};
 
   const removeImage = (index: number) => {
-    setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setSelectedImages((prevSelectedImages) => {
+      const updatedSelectedImages = prevSelectedImages.filter((_, i) => i !== index);
+      localStorage.setItem("selectedImages", JSON.stringify(updatedSelectedImages)); // Update localStorage
+      return updatedSelectedImages;
+    });
+  
+    setImages((prevImages) => {
+      const updatedImages = prevImages.filter((_, i) => i !== index); // ลบจาก images
+      localStorage.setItem("image", JSON.stringify(updatedImages)); // Update localStorage
+      return updatedImages;
+    });
   };
 
-  const uploadImages = async () => {
-    if (selectedImages.length < 7) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'กรุณาเลือกอย่างน้อย 7 รูปภาพ',
-      });
-      return;
+  const uploadImages = async (filesArray: File[]) => {
+    const storageRef = ref(storage, "imagePackage/");
+    const existingFiles = await listAll(storageRef);
+    const existingNames = existingFiles.items.map((item) => item.name);
+    let nextIndex = 1;
+
+    while (existingNames.includes(`${userInfo?._id}[${nextIndex}]`)) {
+      nextIndex++;
     }
-  
+
+    const uploadPromises = filesArray.map(async (file, index) => {
+      const newFileName = `${userInfo?._id}[${nextIndex + index}]`;
+      const fileRef = ref(storage, `imagePackage/${newFileName}`);
+      await uploadBytes(fileRef, file);
+      const downloadURL = await getDownloadURL(fileRef);
+      return downloadURL; // ส่งกลับ URL
+    });
+
     try {
-      const storageRef = ref(storage, 'imagePackage/');
-      const existingFiles = await listAll(storageRef);
-      const existingNames = existingFiles.items.map(item => item.name);
-      let nextIndex = 1;
-      while (existingNames.includes(`${userInfo?._id}[${nextIndex}]`)) {
-        nextIndex++;
-      }
-  
-      const uploadPromises = selectedImages.map(async (file, index) => {
-        const newFileName = `${userInfo?._id}[${nextIndex + index}]`;
-        const storageRef = ref(storage, `imagePackage/${newFileName}`);
-        await uploadBytes(storageRef, file);
-  
-        // รับ URL ของไฟล์ที่อัปโหลด
-        const downloadURL = await getDownloadURL(storageRef);
-        return downloadURL; // ส่งกลับ URL
-      });
-      
-  
-      const urlsArray = await Promise.all(uploadPromises);
-      setImages(urlsArray);
-      Swal.fire({
-        icon: 'success',
-        title: 'อัปโหลดรูปภาพเรียบร้อยแล้ว!',
-      });
+      return await Promise.all(uploadPromises);
     } catch (error) {
       console.error("Error uploading images: ", error);
       Swal.fire({
-        icon: 'error',
-        title: 'เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ',
+        icon: "error",
+        title: "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ",
       });
+      return [];
     }
   };
-  
-
 
   return (
     <div className="w-full flex justify-center items-center">
@@ -115,28 +132,23 @@ const AddImages: React.FC = () => {
               >
                 เลือกรูปภาพ
               </button>
-              <button
-                className="shadow-boxShadow ml-2 px-3 py-2 rounded-lg"
-                onClick={uploadImages} // เรียกใช้งานฟังก์ชันอัปโหลด
-              >
-                อัปโหลดรูปภาพ
-              </button>
             </div>
           </div>
           <div className="mt-4 w-full p-5">
             {selectedImages.length > 0 && (
               <div className="grid grid-cols-3 gap-2 items-center justify-center">
-                {selectedImages.map((file, index) => (
+                {images.map((file, index) => (
                   <div
                     key={index}
                     className="relative border rounded-lg hover:scale-105 flex flex-col p-2"
                   >
                     <img
-                      src={URL.createObjectURL(file)}
+                      src={file} // ใช้ createObjectURL
                       alt={`Selected ${index + 1}`}
                       style={{ maxWidth: "300px", height: "200px" }}
                       className="mx-2 rounded object-cover transition-transform duration-200"
                     />
+
                     <button
                       onClick={() => removeImage(index)}
                       className="absolute top-0 right-0 text-red-500 hover:underline"

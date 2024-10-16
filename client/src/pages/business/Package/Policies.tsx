@@ -3,7 +3,6 @@ import { usePackageData } from "../../../AuthContext/packageData";
 
 const Policies = () => {
   const {statusAccept, setStatusAccept } = usePackageData();
-  // const [accept, setAccept] = useState<boolean>(false);
 
   const acceptStatus = () => {
 

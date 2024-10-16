@@ -3,6 +3,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { usePackageData } from "../../../AuthContext/packageData";
 import { AuthContext } from "../../../AuthContext/auth.provider";
 import { Bank } from "../../../type";
+import CryptoJS from "crypto-js";
 
 const Price = () => {
   const authContext = useContext(AuthContext);
@@ -19,18 +20,70 @@ const Price = () => {
   const [bankingUserlastname, setBankingUserlastname] = useState<string>("");
 
   const [openDiscount, setOpenDiscount] = useState<boolean>(false);
-  const [openBank, setOpenBank] = useState<boolean>(true);
+  const [openBank, setOpenBank] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
-  const [discount, setDiscounts] = useState<number>(10);
+  const [discount, setDiscounts] = useState<number>(0);
   const [selectedBank, setSelectedBank] = useState({
     name: "",
     logo: "",
   });
 
+  useEffect(() => {
+    const storedPackagePrice = localStorage.getItem("packagePrice");
+    if (storedPackagePrice) {
+      setPackagePrice(JSON.parse(storedPackagePrice));
+    }
+
+    const storedOpenDiscount = localStorage.getItem("openDiscount");
+    if (storedOpenDiscount) {
+      setOpenDiscount(JSON.parse(storedOpenDiscount));
+    }
+    const storedBankingUsername = localStorage.getItem("bankingUsername");
+    if (storedBankingUsername) {
+      setBankingUsername(JSON.parse(storedBankingUsername));
+    }
+    const storedBankingUserlastname = localStorage.getItem(
+      "bankingUserlastname"
+    );
+    if (storedBankingUserlastname) {
+      setBankingUserlastname(JSON.parse(storedBankingUserlastname));
+    }
+
+    const storedDiscounts = localStorage.getItem("discounts");
+    if (storedDiscounts) {
+      setDiscounts(JSON.parse(storedDiscounts));
+    }
+
+    const storedSelectedBank = localStorage.getItem("SelectedBank");
+    if (storedSelectedBank) {
+      setSelectedBank(JSON.parse(storedSelectedBank));
+    }
+
+    const storedOpenBank = localStorage.getItem("OpenBank");
+    if (storedOpenBank) {
+      setOpenBank(JSON.parse(storedOpenBank));
+    }
+
+    const storedIdCard = localStorage.getItem("idCard");
+    if (storedIdCard) {
+      const secretKey = import.meta.env.VITE_SECRET_KEY;
+      const bytes = CryptoJS.AES.decrypt(storedIdCard, secretKey);
+      const decryptedIdCard = bytes.toString(CryptoJS.enc.Utf8);
+      setIdCard(decryptedIdCard);
+    }
+
+    const storedBankingCode = localStorage.getItem("bankingCode");
+    if (storedBankingCode) {
+      const secretKey = import.meta.env.VITE_SECRET_KEY;
+      const bytes = CryptoJS.AES.decrypt(storedBankingCode, secretKey);
+      const decryptedIdCard = bytes.toString(CryptoJS.enc.Utf8);
+      setBankingCode(decryptedIdCard);
+    }
+  }, []);
+
   const OpenDropdownBank = () => {
     setOpenDropdown(!openDropdown);
   };
-
 
   const banks = [
     {
@@ -59,11 +112,11 @@ const Price = () => {
       bankingCode
     ) {
       banking = {
-        idcard: idCard,
+        idcard: encryptData(idCard),
         BankingName: selectedBank.name,
         BankingUsername: bankingUsername,
         BankingUserlastname: bankingUserlastname,
-        BankingCode: bankingCode,
+        BankingCode: encryptData(bankingCode),
       };
     } else if (
       openBank === false &&
@@ -83,6 +136,7 @@ const Price = () => {
     }
 
     setBank(banking);
+    localStorage.setItem("Bank" , JSON.stringify(banking))
   }, [
     idCard,
     selectedBank,
@@ -101,6 +155,37 @@ const Price = () => {
     setDiscount(discount);
   }, [discount]);
 
+  const encryptData = (data: string) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+
+    if (!secretKey) {
+      throw new Error(
+        "Secret key is not defined in the environment variables."
+      );
+    }
+
+    return CryptoJS.AES.encrypt(data, secretKey).toString();
+  };
+
+  useEffect(() => {
+    if (idCard.length === 13) {
+      const encryptedIdCard = encryptData(idCard);
+      localStorage.setItem("idCard", encryptedIdCard);
+    }
+  }, [idCard, openBank]);
+
+  useEffect(() => {
+    if (bankingCode.length === 10) {
+      const encryptedBankingCode = encryptData(bankingCode);
+      localStorage.setItem("bankingCode", encryptedBankingCode);
+    }
+  }, [bankingCode, openBank]);
+
+  const openBanking = () => {
+    setOpenBank(!openBank);
+    localStorage.setItem("OpenBank" , JSON.stringify(!openBank))
+  };
+
   return (
     <div className="mt-10 w-full flex justify-center items-center flex-col gap-10">
       <div id="price" className="w-full">
@@ -117,17 +202,21 @@ const Price = () => {
               <div className="w-1/2">
                 <label className="form-control w-full">
                   <div className="label">
-                    <span className="label-text">
-                      ตั้งชื่อที่แพ็คเกจของท่าน
-                    </span>
+                    <span className="label-text">กำหนดราคาแพคเกจของท่าน</span>
                   </div>
                   <div className="flex justify-start items-center">
                     <input
-                      type="text"
-                      placeholder="ตั้งชื่อที่แพ็คเกจของท่าน"
+                      type="number"
+                      placeholder="กำหนดราคาแพคเกจของท่าน"
                       className="input input-bordered w-full"
                       value={packagePrice}
-                      onChange={(e) => setPackagePrice(Number(e.target.value))}
+                      onChange={(e) => {
+                        setPackagePrice(Number(e.target.value));
+                        localStorage.setItem(
+                          "packagePrice",
+                          JSON.stringify(Number(e.target.value))
+                        );
+                      }}
                     />
 
                     <span className="p-3 bg-primaryBusiness rounded-r-lg border">
@@ -144,6 +233,10 @@ const Price = () => {
                     className="radio radio-primary"
                     onChange={() => {
                       setOpenDiscount(true);
+                      localStorage.setItem(
+                        "openDiscount",
+                        JSON.stringify(true)
+                      );
                     }}
                     checked={openDiscount === true}
                   />
@@ -158,6 +251,14 @@ const Price = () => {
                     onChange={(e) => {
                       setDiscounts(Number(e.target.value));
                       setOpenDiscount(false);
+                      localStorage.setItem(
+                        "openDiscount",
+                        JSON.stringify(false)
+                      );
+                      localStorage.setItem(
+                        "discounts",
+                        JSON.stringify(Number(e.target.value))
+                      );
                     }}
                     checked={openDiscount === false}
                   />
@@ -181,15 +282,23 @@ const Price = () => {
                         placeholder="ส่วนลด"
                         className="input input-bordered w-full"
                         value={discount}
-                        min={1}
+                        min={0}
                         max={100}
-                        step={1} // กำหนดการเพิ่มขึ้นหรือลดลงเป็น 1
+                        step={1}
                         onChange={(e) => {
                           const value = Number(e.target.value);
                           if (value >= 1 && value <= 100) {
                             setDiscounts(value);
+                            localStorage.setItem(
+                              "discounts",
+                              JSON.stringify(Number(value))
+                            );
                           } else if (e.target.value === "") {
                             setDiscounts(0);
+                            localStorage.setItem(
+                              "discounts",
+                              JSON.stringify(Number(0))
+                            );
                           }
                         }}
                       />
@@ -223,9 +332,7 @@ const Price = () => {
                     type="radio"
                     name="Bank"
                     className="radio radio-primary"
-                    onChange={() => {
-                      setOpenBank(false);
-                    }}
+                    onChange={openBanking}
                     checked={openBank === false}
                     disabled={
                       !(
@@ -235,7 +342,7 @@ const Price = () => {
                         userInfo?.BankingUsername &&
                         userInfo?.BankingUserlastname
                       )
-                    } // ปุ่มจะ disable ถ้าข้อมูลไม่ครบ
+                    }
                   />
                   <span className="ml-2">บัญชีธนาคารที่ผูกไว้</span>
                 </div>
@@ -246,17 +353,14 @@ const Price = () => {
                     name="Bank"
                     value={0}
                     className="radio radio-primary"
-                    onChange={(e) => {
-                      setDiscounts(Number(e.target.value));
-                      setOpenBank(true);
-                    }}
-                    checked={openBank === true} // ตรวจสอบว่าค่าของ discount ตรงกับ 0 หรือไม่
+                    onChange={openBanking}
+                    checked={openBank === true}
                   />
                   <span className="ml-2">ไม่ได้ผูกบัญชีธนาคาร</span>
                 </div>
               </div>
             </div>
-            {openBank === true && (
+            {openBank === true ? (
               <div className="w-full">
                 <div className="my-4">
                   <div className="w-full">
@@ -293,6 +397,7 @@ const Price = () => {
                               onClick={() => {
                                 setSelectedBank(bank);
                                 setOpenDropdown(false);
+                                localStorage.setItem("SelectedBank" , JSON.stringify(bank))
                               }}
                             >
                               <img
@@ -309,29 +414,27 @@ const Price = () => {
                   </div>
                 </div>
                 <div className="w-full">
-                  <label className="form-control w-full">
-                    <div className="label">
-                      <span className="label-text">บัตรประจำตัวประชาชน</span>
-                    </div>
-                    <div className="flex justify-start items-center">
-                      <input
-                        id="idCard"
-                        type="text"
-                        placeholder="กรอกบัตรประจำตัวประชาชน"
-                        className="input input-bordered w-full"
-                        value={idCard}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (/^[0-9]*$/.test(value)) {
-                            setIdCard(value);
-                          }
-                        }}
-                        maxLength={13}
-                      />
-                    </div>
-                    {idCard.length > 0 && idCard.length !== 13 && (
+                  <label className="form-control w-full mt-3">
+                    <span className="label-text">
+                      กรุณากรอกหมายเลขบัตรประชาชน
+                    </span>
+                    <input
+                      id="idCard"
+                      type="text"
+                      placeholder="กรอกบัตรประจำตัวประชาชน"
+                      className="input input-bordered w-full"
+                      value={idCard}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^[0-9]*$/.test(value) && value.length <= 13) {
+                          setIdCard(value);
+                        }
+                      }}
+                      maxLength={13}
+                    />
+                    {idCard.length < 13 && (
                       <p className="text-red-500">
-                        เลขบัตรประจำตัวประชาชนต้องมีความยาว 13 ตัว
+                        กรุณากรอกบัตรประจำตัวประชาชนให้ถูกต้อง
                       </p>
                     )}
                   </label>
@@ -354,13 +457,13 @@ const Price = () => {
                             setBankingCode(value);
                           }
                         }}
-                        maxLength={12}
+                        maxLength={10}
                       />
                     </div>
                     {/* แสดงข้อความแจ้งเตือนถ้าไม่ครบ 12 ตัว */}
-                    {bankingCode.length > 0 && bankingCode.length !== 12 && (
+                    {bankingCode.length > 0 && bankingCode.length !== 10 && (
                       <p className="text-red-500">
-                        เลขบัญชีต้องมีความยาว 12 ตัว
+                        เลขบัญชีต้องมีความยาว 10 ตัว
                       </p>
                     )}
                   </label>
@@ -381,8 +484,13 @@ const Price = () => {
                         value={bankingUsername}
                         onChange={(e) => {
                           const value = e.target.value;
-                          if (/^[A-Za-zก-ฮ\s]*$/.test(value)) {
+                          // อนุญาตให้กรอกตัวอักษรภาษาไทย, อังกฤษ และสระ
+                          if (/^[A-Za-zก-ฮะ-์\s]*$/.test(value)) {
                             setBankingUsername(value);
+                            localStorage.setItem(
+                              "bankingUsername",
+                              JSON.stringify(value)
+                            );
                           }
                         }}
                       />
@@ -401,8 +509,12 @@ const Price = () => {
                         value={bankingUserlastname}
                         onChange={(e) => {
                           const value = e.target.value;
-                          if (/^[A-Za-zก-ฮ\s]*$/.test(value)) {
+                          if (/^[A-Za-zก-ฮะ-์\s]*$/.test(value)) {
                             setBankingUserlastname(value);
+                            localStorage.setItem(
+                              "bankingUserlastname",
+                              JSON.stringify(value)
+                            );
                           }
                         }}
                       />
@@ -410,6 +522,99 @@ const Price = () => {
                   </label>
                 </div>
               </div>
+            ) : (
+              openBank === false && (
+                <div className="w-full">
+                  <div className="my-4">
+                    <div className="w-full">
+                      <div
+                        tabIndex={0}
+                        role="button"
+                        onClick={OpenDropdownBank}
+                        className="min-w-full m-1 bg-white shadow-boxShadow py-2 px-3 rounded-lg flex justify-between items-center cursor-pointer"
+                      >
+                        <div className="flex items-center">
+                          {banks.map(
+                            (bank) =>
+                              bank.name === userInfo?.BankingName && (
+                                <img
+                                  key={bank.name}
+                                  src={bank.logo}
+                                  alt={bank.name}
+                                  className="w-10 h-10 mr-2 rounded-full"
+                                />
+                              )
+                          )}
+
+                          <span>{userInfo?.BankingName}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <label className="form-control w-full mt-3">
+                      <span className="label-text">
+                        กรุณากรอกหมายเลขบัตรประชาชน
+                      </span>
+                      <input
+                        id="idCard"
+                        type="text"
+                        placeholder="กรอกบัตรประจำตัวประชาชน"
+                        className="input input-bordered w-full"
+                        value={userInfo?.idcard}
+                      />
+                    </label>
+                  </div>
+                  <div className="w-full">
+                    <label className="form-control w-full">
+                      <div className="label">
+                        <span className="label-text">เลขบัญชี</span>
+                      </div>
+                      <div className="flex justify-start items-center">
+                        <input
+                          id="bankingCode"
+                          type="text"
+                          placeholder="กรอกหมายเลขบัญชี"
+                          className="input input-bordered w-full"
+                          value={userInfo?.BankingCode}
+                        />
+                      </div>
+                    </label>
+                  </div>
+                  <div
+                    id="userNameBank"
+                    className="w-full flex justify-between gap-5"
+                  >
+                    <label className="form-control w-1/2">
+                      <div className="label">
+                        <span className="label-text">ชื่อ</span>
+                      </div>
+                      <div className="flex justify-start items-center">
+                        <input
+                          type="text"
+                          placeholder="กรอกชื่อ"
+                          className="input input-bordered w-full"
+                          value={userInfo?.BankingUsername}
+                        />
+                      </div>
+                    </label>
+
+                    <label className="form-control w-1/2">
+                      <div className="label">
+                        <span className="label-text">กรอกนามสกุล</span>
+                      </div>
+                      <div className="flex justify-start items-center">
+                        <input
+                          type="text"
+                          placeholder="กรอกนามสกุล"
+                          className="input input-bordered w-full"
+                          value={userInfo?.BankingUserlastname}
+                        />
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              )
             )}
           </div>
         </div>

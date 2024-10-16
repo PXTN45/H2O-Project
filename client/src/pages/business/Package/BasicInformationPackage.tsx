@@ -3,6 +3,7 @@ import { IoIosAddCircleOutline, IoMdClose } from "react-icons/io";
 import { IoTrashBin } from "react-icons/io5";
 import { usePackageData } from "../../../AuthContext/packageData";
 import DetailPackages from "./DetailPackages";
+import { values } from "lodash";
 
 interface Activity {
   activity_name: string;
@@ -22,90 +23,144 @@ const BasicInformationPackage = () => {
   const [packageName, setPackageName] = useState<string>("");
   const [maxTourists, setMaxTourists] = useState<number>(1);
   const [description, setDescription] = useState<string>("");
-  const [startDate, setStartDate] = useState<Date>(new Date()); 
-  const [endDate, setEndDate] = useState<Date>(new Date()); 
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
   const [cancellationPolicy, setCancellationPolicy] = useState<string>(
     "ยกเลิกมากกว่า 7 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 100% ของจำนวนเงินที่ชำระ"
   );
   const [isChildren, setIsChildren] = useState<boolean>(true);
   const [isFood, setIsFood] = useState<boolean>(true);
 
+  useEffect(() => {
+    const storedSelectedId = localStorage.getItem("selectedId");
+    const storedPackageName = localStorage.getItem("packageName");
+    const storedMaxTourists = localStorage.getItem("maxTourists");
+    const storedIsChildren = localStorage.getItem("isChildren");
+    const storedIsFood = localStorage.getItem("isFood");
+    const storedStartDate = localStorage.getItem("startDate");
+    const storedEndDate = localStorage.getItem("endDate");
+    const storedDescription = localStorage.getItem("description");
+    const storedPackages = localStorage.getItem("activityPackages");
+    const storedActivities = localStorage.getItem("newActivities");
+    const storedCancellationPolicy = localStorage.getItem("cancellationPolicy");
+
+    if (storedSelectedId) {
+      setSelectedId(JSON.parse(storedSelectedId));
+    }
+    if (storedPackageName) {
+      setPackageName(JSON.parse(storedPackageName));
+    }
+    if (storedMaxTourists) {
+      setMaxTourists(JSON.parse(storedMaxTourists));
+    }
+    if (storedIsChildren) {
+      setIsChildren(JSON.parse(storedIsChildren));
+    }
+    if (storedIsFood) {
+      setIsFood(JSON.parse(storedIsFood));
+    }
+    if (storedStartDate) {
+      const date = new Date(JSON.parse(storedStartDate));
+      setStartDate(date);
+    }
+    if (storedEndDate) {
+      const date = new Date(JSON.parse(storedEndDate));
+      setEndDate(date);
+    }
+    if (storedDescription) {
+      setDescription(JSON.parse(storedDescription));
+    }
+
+    if (storedPackages) {
+      setActivityPackages(JSON.parse(storedPackages));
+    }
+
+    if (storedActivities) {
+      setNewActivities(JSON.parse(storedActivities));
+    }
+
+    if (storedCancellationPolicy) {
+      setCancellationPolicy(JSON.parse(storedCancellationPolicy));
+    }
+  }, []);
+
   const handleCancellationChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setCancellationPolicy(event.target.value);
+    const value = event.target.value;
+    setCancellationPolicy(value);
+    localStorage.setItem("cancellationPolicy", JSON.stringify(value));
   };
 
   const handleSelect = (id: string) => {
     setSelectedId(id);
+    localStorage.setItem("selectedId", JSON.stringify(id));
   };
 
   const addDay = () => {
+    // เพิ่มวันใหม่
     setActivityPackages([...activityPackages, { activity_days: [] }]);
     setNewActivities([...newActivities, ""]);
   };
 
-  const addActivity = (dayIndex: number) => {
-    const updatedPackages = activityPackages.map((packageItem, index) => {
-      if (index === dayIndex) {
-        return {
-          ...packageItem,
-          activity_days: [
-            ...packageItem.activity_days,
-            { activity_name: newActivities[dayIndex] },
-          ],
-        };
-      }
-      return packageItem;
-    });
+  const removeDay = (index: number) => {
+    // ลบวัน
+    const updatedPackages = activityPackages.filter((_, i) => i !== index);
+    const updatedActivities = newActivities.filter((_, i) => i !== index);
     setActivityPackages(updatedPackages);
-    const updatedNewActivities = [...newActivities];
-    updatedNewActivities[dayIndex] = "";
-    setNewActivities(updatedNewActivities);
-  };
-
-  const removeActivity = (dayIndex: number, activityIndex: number) => {
-    const updatedPackages = activityPackages.map((packageItem, index) => {
-      if (index === dayIndex) {
-        const updatedActivities = packageItem.activity_days.filter(
-          (_, actIndex) => actIndex !== activityIndex
-        );
-        return { ...packageItem, activity_days: updatedActivities };
-      }
-      return packageItem;
-    });
-    setActivityPackages(updatedPackages);
-  };
-
-  const removeDay = (dayIndex: number) => {
-    const updatedPackages = activityPackages.filter(
-      (_, index) => index !== dayIndex
-    );
-    setActivityPackages(updatedPackages);
-    const updatedNewActivities = newActivities.filter(
-      (_, index) => index !== dayIndex
-    );
-    setNewActivities(updatedNewActivities);
+    setNewActivities(updatedActivities);
   };
 
   const handleActivityChange = (
-    dayIndex: number,
-    e: React.ChangeEvent<HTMLInputElement>
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const { value } = e.target;
-    const updatedNewActivities = [...newActivities];
-    updatedNewActivities[dayIndex] = value;
-    setNewActivities(updatedNewActivities);
+    // อัปเดตกิจกรรมใหม่ที่กำลังจะเพิ่ม
+    const updatedActivities = [...newActivities];
+    updatedActivities[index] = event.target.value;
+    setNewActivities(updatedActivities);
   };
+
+  const addActivity = (index: number) => {
+    // เพิ่มกิจกรรมใหม่ในวันนั้น ๆ
+    if (newActivities[index].trim()) {
+      const updatedPackages = [...activityPackages];
+      updatedPackages[index].activity_days.push({
+        activity_name: newActivities[index],
+      });
+      setActivityPackages(updatedPackages);
+      setNewActivities((prev) => {
+        const newActivitiesCopy = [...prev];
+        newActivitiesCopy[index] = ""; // เคลียร์ input หลังเพิ่มกิจกรรม
+        return newActivitiesCopy;
+      });
+    }
+  };
+
+  const removeActivity = (dayIndex: number, activityIndex: number) => {
+    // ลบกิจกรรมในวันนั้น
+    const updatedPackages = [...activityPackages];
+    updatedPackages[dayIndex].activity_days.splice(activityIndex, 1);
+    setActivityPackages(updatedPackages);
+  };
+
+  useEffect(() => {
+    localStorage.setItem("activityPackages", JSON.stringify(activityPackages));
+    localStorage.setItem("newActivities", JSON.stringify(newActivities));
+  }, [activityPackages, newActivities]);
 
   const handleStartDateChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setStartDate(new Date(event.target.value)); // แปลงค่าจาก string เป็น Date
+    const selectedDate = new Date(event.target.value);
+    setStartDate(selectedDate);
+    localStorage.setItem("startDate", JSON.stringify(selectedDate));
   };
 
   const handleEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEndDate(new Date(event.target.value)); // แปลงค่าจาก string เป็น Date
+    const selectedDate = new Date(event.target.value);
+    setEndDate(selectedDate);
+    localStorage.setItem("endDate", JSON.stringify(selectedDate));
   };
 
   useEffect(() => {
@@ -123,6 +178,7 @@ const BasicInformationPackage = () => {
     };
 
     setPackageData(packageData);
+    localStorage.setItem("packageData", JSON.stringify(packageData))
   }, [
     packageName,
     selectedId,
@@ -148,7 +204,13 @@ const BasicInformationPackage = () => {
             placeholder="ตั้งชื่อที่แพ็คเกจของท่าน"
             className="input input-bordered w-full"
             value={packageName}
-            onChange={(e) => setPackageName(e.target.value)}
+            onChange={(e) => {
+              setPackageName(e.target.value);
+              localStorage.setItem(
+                "packageName",
+                JSON.stringify(e.target.value)
+              );
+            }}
           />
         </label>
       </div>
@@ -224,7 +286,13 @@ const BasicInformationPackage = () => {
                   placeholder="ระบุจำนวน"
                   className="border p-2 border-gray-300 rounded-md"
                   value={maxTourists}
-                  onChange={(e) => setMaxTourists(Number(e.target.value))}
+                  onChange={(e) => {
+                    setMaxTourists(Number(e.target.value));
+                    localStorage.setItem(
+                      "maxTourists",
+                      JSON.stringify(Number(e.target.value))
+                    );
+                  }}
                 />
                 <div className="flex gap-5 mt-4">
                   <div>
@@ -232,7 +300,14 @@ const BasicInformationPackage = () => {
                       type="checkbox"
                       name="isChildren"
                       className="checkbox checkbox-primary"
-                      onChange={(e) => setIsChildren(e.target.checked)}
+                      checked={isChildren === true}
+                      onChange={(e) => {
+                        setIsChildren(e.target.checked);
+                        localStorage.setItem(
+                          "isChildren",
+                          JSON.stringify(e.target.checked)
+                        );
+                      }}
                     />
                     <span> เด็กไม่เสียค่าใช้จ่าย </span>
                   </div>
@@ -243,7 +318,14 @@ const BasicInformationPackage = () => {
                       type="checkbox"
                       name="isFood"
                       className="checkbox checkbox-primary"
-                      onChange={(e) => setIsFood(e.target.checked)}
+                      checked={isFood === true}
+                      onChange={(e) => {
+                        setIsFood(e.target.checked);
+                        localStorage.setItem(
+                          "isFood",
+                          JSON.stringify(e.target.checked)
+                        );
+                      }}
                     />
                     <span> อาหารฟรีตลอดการเดินทาง </span>
                   </div>
@@ -259,6 +341,9 @@ const BasicInformationPackage = () => {
                     <input
                       type="date"
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={
+                        startDate ? startDate.toISOString().split("T")[0] : ""
+                      }
                       onChange={handleStartDateChange}
                     />
                   </div>
@@ -270,6 +355,7 @@ const BasicInformationPackage = () => {
                     </label>
                     <input
                       type="date"
+                      value={endDate ? endDate.toISOString().split("T")[0] : ""}
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={handleEndDateChange}
                     />
@@ -289,7 +375,13 @@ const BasicInformationPackage = () => {
             className="w-full h-[200px] border-none rounded-lg"
             placeholder="กรอกคำอธิบายเกี่ยวกับที่แพ็คเกจ"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              localStorage.setItem(
+                "description",
+                JSON.stringify(e.target.value)
+              );
+            }}
           ></textarea>
         </div>
       </div>
@@ -370,7 +462,7 @@ const BasicInformationPackage = () => {
                   value="ยกเลิกมากกว่า 7 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 100% ของจำนวนเงินที่ชำระ"
                   className="radio radio-primary"
                   onChange={handleCancellationChange}
-                  defaultChecked
+                  checked={cancellationPolicy === "ยกเลิกมากกว่า 7 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 100% ของจำนวนเงินที่ชำระ"}
                 />
                 <span>
                   {" "}
@@ -385,6 +477,7 @@ const BasicInformationPackage = () => {
                   value="ยกเลิกมากกว่า 5 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 50% ของจำนวนเงินที่ชำระ"
                   className="radio radio-primary"
                   onChange={handleCancellationChange}
+                  checked={cancellationPolicy === "ยกเลิกมากกว่า 5 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 50% ของจำนวนเงินที่ชำระ"}
                 />
                 <span>
                   {" "}
@@ -399,6 +492,7 @@ const BasicInformationPackage = () => {
                   value="ยกเลิกมากกว่า 3 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 30% ของจำนวนเงินที่ชำระ"
                   className="radio radio-primary"
                   onChange={handleCancellationChange}
+                  checked={cancellationPolicy === "ยกเลิกมากกว่า 3 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 30% ของจำนวนเงินที่ชำระ"}
                 />
                 <span>
                   {" "}
@@ -413,7 +507,6 @@ const BasicInformationPackage = () => {
       <div className="w-full">
         <DetailPackages />
       </div>
-      
     </div>
   );
 };

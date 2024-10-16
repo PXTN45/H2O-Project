@@ -24,13 +24,13 @@ const CreatePackage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
 
-  // console.log(packageData);
-  // console.log(location);
-  // console.log(image);
-  // console.log(homestayID);
-  // console.log(bank);
-  // console.log(discount);
-  // console.log(price);
+  console.log(newPackageData);
+  console.log(location);
+  console.log(image);
+  console.log(homestayID);
+  console.log(bank);
+  console.log(discount);
+  console.log(price);
 
   // รายการของขั้นตอนและเส้นทางที่สอดคล้อง
   const steps = [
@@ -56,7 +56,6 @@ const CreatePackage = () => {
     }
   };
 
-  // ฟังก์ชันกลับไปขั้นตอนก่อนหน้า
   const handlePrevStep = () => {
     if (currentStep > 1) {
       const prevStep = currentStep - 1;
@@ -78,25 +77,28 @@ const CreatePackage = () => {
       const packageData = {
         ...newPackageData,
         location,
-        image,
+        image: image?.map(img => ({ image_upload: img })),
         homestay: homestayID,
         discount,
         price_package: price,
         review_rating_package: 0,
-        business_user: userInfo?._id
+        business_user: userInfo?._id,
       };
+      
       
       const updateData = {
         ...userInfo,
         ...bank,   
       };
+
+      console.log(packageData);
       
-      console.log(updateData);
-  
+       
       const response = await axiosPrivateBusiness.post("/package", packageData);
       const responseUser = await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, updateData);
       
       if (response.status === 201 && responseUser.status === 200) {
+        localStorage.clear();
         Swal.fire({
           title: 'สำเร็จ!',
           text: 'สร้างแพคเกจสำเร็จ',

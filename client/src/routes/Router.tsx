@@ -34,8 +34,6 @@ import CreatePackage from "../pages/business/createPackage";
 import BasicInformationPackage from "../pages/business/Package/BasicInformationPackage";
 import AddImages from "../pages/business/Package/AddImages";
 import Location from "../pages/business/Package/Location";
-import DetailPackages from "../pages/business/Package/DetailPackages";
-import PaymentMethod from "../pages/business/Package/PaymentMethod";
 import Policies from "../pages/business/Package/Policies";
 import Price from "../pages/business/Package/PriceAndPayment";
 import { PackageDataProvider } from "../AuthContext/packageData";
@@ -207,10 +205,6 @@ const router = createBrowserRouter([
           {
             path: "pricAndPayment",
             element: <Price />,
-          },
-          {
-            path: "payment-method",
-            element: <PaymentMethod />,
           },
           {
             path: "policies",

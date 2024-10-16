@@ -18,6 +18,23 @@ const DetailPackages = () => {
   const [homestay, setHomestay] = useState<string>("");
   const [indexHomesaty, setIndex] = useState<number>(0);
   const [myHomestay, setMyHomestay] = useState<HomeStay[]>([]);
+  const [checkStatus, setCheckStatus] = useState<string>("ไม่มีที่พัก");
+
+  useEffect(() => {
+    const storedHomestay = localStorage.getItem("homestay");
+    const storedIndex = localStorage.getItem("indexHomesaty");
+    const storedcheckStatus = localStorage.getItem("checkStatus");
+
+    if (storedHomestay) {
+      setHomestay(JSON.parse(storedHomestay));
+    }
+    if (storedIndex) {
+      setIndex(JSON.parse(storedIndex));
+    }
+    if (storedcheckStatus) {
+      setCheckStatus(JSON.parse(storedcheckStatus));
+    }
+  }, []); 
 
   const fetchData = async () => {
     try {
@@ -33,13 +50,7 @@ const DetailPackages = () => {
   };
   useEffect(() => {
     fetchData();
-  }, [homestay]);
-
-  const handleCancellationChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setHomestay(event.target.value);
-  };
+  }, [homestay, checkStatus]);
 
   const [currentIndices, setCurrentIndices] = useState<number[]>([]);
 
@@ -109,7 +120,16 @@ const DetailPackages = () => {
   const selectHomeStay = (index: number) => {
     setHomestay(myHomestay[index]?.business_user[0]);
     setIndex(index);
-    setHomestayID(myHomestay[index]?.business_user[0])
+    setCheckStatus("มีที่พัก")
+    setHomestayID(myHomestay[index]?.business_user[0]);
+    localStorage.setItem("indexHomesaty", JSON.stringify(index));
+    localStorage.setItem(
+      "homestay",
+      JSON.stringify(myHomestay[index]?.business_user[0])
+    );
+
+    localStorage.setItem("checkStatus", JSON.stringify("มีที่พัก"));
+
     const modal = document.getElementById("my_homestay") as HTMLDialogElement;
     if (modal) {
       modal.close();
@@ -314,8 +334,13 @@ const DetailPackages = () => {
                 name="selectHomestay"
                 value=""
                 className="radio radio-primary my-2"
-                onChange={handleCancellationChange}
-                defaultChecked
+                onClick={() => {
+                  setCheckStatus("ไม่มีที่พัก");
+                  setHomestay("");
+                  localStorage.setItem("checkStatus", JSON.stringify("ไม่มีที่พัก"));
+                  localStorage.setItem("homestay", JSON.stringify(""));
+                }}
+                checked={checkStatus === "ไม่มีที่พัก"}
               />
               <span> ฉันไม่มีที่พักให้ลูกค้า</span>
             </div>
@@ -325,11 +350,12 @@ const DetailPackages = () => {
                 name="selectHomestay"
                 className="radio radio-primary"
                 onClick={OpenModal}
+                checked={checkStatus === "มีที่พัก"}
               />
               <span> ฉันมีที่พักให้ลูกค้า</span>
             </div>
           </div>
-          {homestay !== "" && (
+          {checkStatus === "มีที่พัก" && homestay !== "" && (
             <div>
               <div className="px-0 xl:px-10 hover:scale-101">
                 <div className="w-full my-5 shadow-boxShadow rounded-xl flex gap-2 flex-wrap xl:flex-nowrap">
@@ -340,7 +366,7 @@ const DetailPackages = () => {
                       data-carousel="slide"
                     >
                       <div className="relative h-60 rounded-lg">
-                        {myHomestay[indexHomesaty].image.map(
+                        {myHomestay[indexHomesaty]?.image.map(
                           (image: any, imageIndex: number) => (
                             <div
                               key={imageIndex}
@@ -419,8 +445,14 @@ const DetailPackages = () => {
                           <span className="text-md font-bold flex items-start justify-between w-full gap-3">
                             {myHomestay[indexHomesaty]?.name_homeStay}
                             <div className="flex items-center text-yellow-300">
-                              {renderStars(myHomestay[indexHomesaty]?.review_rating_homeStay)}
-                              {myHomestay[indexHomesaty]?.review_rating_homeStay}
+                              {renderStars(
+                                myHomestay[indexHomesaty]
+                                  ?.review_rating_homeStay
+                              )}
+                              {
+                                myHomestay[indexHomesaty]
+                                  ?.review_rating_homeStay
+                              }
                             </div>
                           </span>
                           <div className="flex flex-col">
@@ -432,7 +464,7 @@ const DetailPackages = () => {
                               {myHomestay[indexHomesaty]?.room_type.map(
                                 (roomType: any, i: number) => (
                                   <span key={i}>
-                                    - {roomType.name_type_room}
+                                    - {roomType?.name_type_room}
                                   </span>
                                 )
                               )}
@@ -444,21 +476,46 @@ const DetailPackages = () => {
                           >
                             <FaLocationDot className="text-red-600" />
                             <div className="flex flex-wrap text-sm gap-1">
-                              <div>{myHomestay[indexHomesaty].location[0].house_no}</div>
-                              <div>ม.{myHomestay[indexHomesaty].location[0].village_no}</div>
+                              <div>
+                                {
+                                  myHomestay[indexHomesaty]?.location[0]
+                                    .house_no
+                                }
+                              </div>
+                              <div>
+                                ม.
+                                {
+                                  myHomestay[indexHomesaty]?.location[0]
+                                    .village_no
+                                }
+                              </div>
                               <div>
                                 ต.
-                                {myHomestay[indexHomesaty].location[0].subdistrict_location}
+                                {
+                                  myHomestay[indexHomesaty]?.location[0]
+                                    .subdistrict_location
+                                }
                               </div>
                               <div>
                                 อ.
-                                {myHomestay[indexHomesaty].location[0].district_location}
+                                {
+                                  myHomestay[indexHomesaty]?.location[0]
+                                    .district_location
+                                }
                               </div>
                               <div>
                                 จ.
-                                {myHomestay[indexHomesaty].location[0].province_location}
+                                {
+                                  myHomestay[indexHomesaty]?.location[0]
+                                    .province_location
+                                }
                               </div>
-                              <div>{myHomestay[indexHomesaty].location[0].zipcode_location}</div>
+                              <div>
+                                {
+                                  myHomestay[indexHomesaty]?.location[0]
+                                    .zipcode_location
+                                }
+                              </div>
                             </div>
                           </div>
                           <div id="policy">
@@ -466,7 +523,10 @@ const DetailPackages = () => {
                               <div className="pt-2">
                                 <GoShieldCheck className="text-lg" />
                               </div>
-                              {myHomestay[indexHomesaty]?.policy_cancel_homeStay}
+                              {
+                                myHomestay[indexHomesaty]
+                                  ?.policy_cancel_homeStay
+                              }
                             </span>
                           </div>
                         </div>
@@ -477,11 +537,17 @@ const DetailPackages = () => {
                         <div className="w-full text-xs flex justify-end opacity-50">
                           {myHomestay[indexHomesaty]?.updatedAt ? (
                             <span>
-                              อัปเดตเมื่อ {formatThaiDate(myHomestay[indexHomesaty]?.updatedAt)}
+                              อัปเดตเมื่อ{" "}
+                              {formatThaiDate(
+                                myHomestay[indexHomesaty]?.updatedAt
+                              )}
                             </span>
                           ) : myHomestay[indexHomesaty]?.createdAt ? (
                             <span>
-                              สร้างเมื่อ {formatThaiDate(myHomestay[indexHomesaty]?.createdAt)}
+                              สร้างเมื่อ{" "}
+                              {formatThaiDate(
+                                myHomestay[indexHomesaty]?.createdAt
+                              )}
                             </span>
                           ) : (
                             <div></div>

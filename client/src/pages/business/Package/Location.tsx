@@ -1,28 +1,34 @@
 import { useEffect, useState } from "react";
 import { usePackageData } from "../../../AuthContext/packageData";
 import type { Location } from "../../../type";
-import Maps from "../../../components/maps";
+import Maps from "../../../components/Maps";
 
 const Location = () => {
   const { setLocation } = usePackageData();
 
-  const [locationPackage, setLocationPackage] = useState<Location[]>([
-    {
-      name_location: "",
-      province_location: "",
-      house_no: "",
-      village: "",
-      village_no: "",
-      alley: "",
-      street: "",
-      district_location: "",
-      subdistrict_location: "",
-      zipcode_location: 0,
-      latitude_location: 0,
-      longitude_location: 0,
-      radius_location: 0,
-    },
-  ]);
+  const [locationPackage, setLocationPackage] = useState<Location[]>(() => {
+    const savedLocation = localStorage.getItem("locationPackage");
+    return savedLocation
+      ? JSON.parse(savedLocation)
+      : [
+          {
+            name_location: "",
+            province_location: "",
+            house_no: "",
+            village: "",
+            village_no: "",
+            alley: "",
+            street: "",
+            district_location: "",
+            subdistrict_location: "",
+            zipcode_location: 0,
+            latitude_location: 0,
+            longitude_location: 0,
+            radius_location: 0,
+          },
+        ];
+  });
+
   const [errors, setErrors] = useState({
     latitude: "",
     longitude: "",
@@ -30,6 +36,7 @@ const Location = () => {
 
   useEffect(() => {
     setLocation(locationPackage);
+    localStorage.setItem("locationPackage", JSON.stringify(locationPackage));
   }, [locationPackage]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,6 +115,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="ชื่อสถานที่"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].name_location}
                     />
                   </label>
 
@@ -122,6 +130,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="จังหวัด"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].province_location}
                     />
                   </label>
 
@@ -136,6 +145,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="บ้านเลขที่"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].house_no}
                     />
                   </label>
 
@@ -150,6 +160,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="หมู่บ้าน (ถ้ามี)"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].village}
                     />
                   </label>
 
@@ -164,6 +175,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="หมู่ที่"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].village_no}
                     />
                   </label>
 
@@ -178,6 +190,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="ซอย (ถ้ามี)"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].alley}
                     />
                   </label>
 
@@ -192,6 +205,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="ถนน (ถ้ามี)"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].street}
                     />
                   </label>
 
@@ -206,6 +220,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="อำเภอ/เขต"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].district_location}
                     />
                   </label>
 
@@ -220,6 +235,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="ตำบล/แขวง"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].subdistrict_location}
                     />
                   </label>
 
@@ -234,6 +250,7 @@ const Location = () => {
                       onChange={handleChange}
                       placeholder="รหัสไปรษณีย์"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].zipcode_location || ""}
                     />
                   </label>
 
@@ -247,11 +264,11 @@ const Location = () => {
                       name="latitude_location"
                       onChange={handleChange}
                       placeholder="ละติจูด"
-                      value={locationPackage[0].latitude_location} // ให้ค่าเริ่มต้นจากสถานะ
                       className="input input-bordered w-full"
+                      value={locationPackage[0].latitude_location}
                     />
                     {errors.latitude && (
-                      <p style={{ color: "red" }}>{errors.latitude}</p>
+                      <span className="text-error">{errors.latitude}</span>
                     )}
                   </label>
 
@@ -265,35 +282,34 @@ const Location = () => {
                       name="longitude_location"
                       onChange={handleChange}
                       placeholder="ลองจิจูด"
-                      value={locationPackage[0].longitude_location} // ให้ค่าเริ่มต้นจากสถานะ
                       className="input input-bordered w-full"
+                      value={locationPackage[0].longitude_location}
                     />
                     {errors.longitude && (
-                      <p style={{ color: "red" }}>{errors.longitude}</p>
+                      <span className="text-error">{errors.longitude}</span>
                     )}
                   </label>
 
-                  {/* ระยะทาง */}
+                  {/* รัศมี */}
                   <label className="form-control w-full max-w-xs">
                     <div className="label">
-                      <span className="label-text">ระยะทาง</span>
+                      <span className="label-text">รัศมี (กม.)</span>
                     </div>
                     <input
                       type="number"
                       name="radius_location"
                       onChange={handleChange}
-                      placeholder="ระยะทาง (กิโลเมตร)"
+                      placeholder="ระบุรัศมี"
                       className="input input-bordered w-full"
+                      value={locationPackage[0].radius_location || ""}
                     />
                   </label>
                 </div>
               </div>
-            </div>
-            <div>
-              <Maps
-                lat={locationPackage[0].latitude_location}
-                lng={locationPackage[0].longitude_location}
-              />
+              <div className="divider"></div>
+              <div>
+                <Maps />
+              </div>
             </div>
           </div>
         </div>

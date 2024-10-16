@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Bank, Location, PackageImage } from "../type";
 
 // สร้าง interface สำหรับข้อมูลแพ็คเกจ
@@ -49,6 +49,8 @@ const PackageDataContext = createContext<PackageDataContextType | undefined>(
 export const PackageDataProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+
+
   const [packageData, setPackageData] = useState<PackageData | undefined>(
     undefined
   );
@@ -59,7 +61,37 @@ export const PackageDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [discount, setDiscount] = useState<number | undefined>();
   const [bank, setBank] = useState<Bank | undefined>();
   const [statusAccept, setStatusAccept] = useState<boolean>(false);
+  useEffect(() => {
+    const storedPackageData = localStorage.getItem("packageData")
+    if (storedPackageData) {
+      setPackageData(JSON.parse(storedPackageData))
+    }
+    const storedLocation = localStorage.getItem("locationPackage")
+    if (storedLocation) {
+      setLocation(JSON.parse(storedLocation))
+    }
+    const storedImage = localStorage.getItem("image")
+    if (storedImage) {
+      setImage(JSON.parse(storedImage))
+    }
+    const storedHomestay = localStorage.getItem("homestay")
+    if (storedHomestay) {
+      setHomestayID(JSON.parse(storedHomestay))
+    }
+    const storedPrice = localStorage.getItem("packagePrice")
+    if (storedPrice) {
+      setPrice(JSON.parse(storedPrice))
+    }
+    const storedDiscount = localStorage.getItem("discounts")
+    if (storedDiscount) {
+      setDiscount(JSON.parse(storedDiscount))
+    }
+    const storedBank = localStorage.getItem("Bank")
+    if (storedBank) {
+      setBank(JSON.parse(storedBank))
+    }
 
+  } ,[])
   return (
     <PackageDataContext.Provider
       value={{
