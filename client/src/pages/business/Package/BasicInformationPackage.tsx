@@ -3,6 +3,8 @@ import { IoIosAddCircleOutline, IoMdClose } from "react-icons/io";
 import { IoTrashBin } from "react-icons/io5";
 import { usePackageData } from "../../../AuthContext/packageData";
 import DetailPackages from "./DetailPackages";
+import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 
 interface Activity {
@@ -14,10 +16,11 @@ interface ActivityDays {
 }
 
 const BasicInformationPackage = () => {
-  const { setPackageData } = usePackageData();
+  const { setPackageData, setCurrentStep } = usePackageData();
   const [selectedId, setSelectedId] = useState<string | null>(
     "การท่องเที่ยวธรรมชาติ"
   );
+  const navigate = useNavigate();
   const [activityPackages, setActivityPackages] = useState<ActivityDays[]>([]);
   const [newActivities, setNewActivities] = useState<string[]>([]);
   const [packageName, setPackageName] = useState<string>("");
@@ -178,7 +181,7 @@ const BasicInformationPackage = () => {
     };
 
     setPackageData(packageData);
-    localStorage.setItem("packageData", JSON.stringify(packageData))
+    localStorage.setItem("packageData", JSON.stringify(packageData));
   }, [
     packageName,
     selectedId,
@@ -191,6 +194,44 @@ const BasicInformationPackage = () => {
     isChildren,
     isFood,
   ]);
+
+  const nextStep = () => {
+    if (
+      packageName !== "" &&
+      description !== "" &&
+      activityPackages.length > 0 &&
+      newActivities.length > 0
+    ) {
+      navigate("/create-package/location");
+      setCurrentStep(2);
+      localStorage.setItem("currentStep", JSON.stringify(2));
+    } else if (packageName === "") {
+      Swal.fire({
+        icon: 'warning',
+        title: 'กรุณาตั้งชื่อแพ็คเกจของท่าน',
+        confirmButtonText: 'ตกลง'
+      });
+    } else if (description === "") {
+      Swal.fire({
+        icon: 'warning',
+        title: 'กรุณากรอกคำอธิบายเกี่ยวกับที่แพ็คเกจ',
+        confirmButtonText: 'ตกลง'
+      });
+    }
+    if (activityPackages.length <= 0 && newActivities.length <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'กรุณาเพิ่มกิจกรรม',
+        confirmButtonText: 'ตกลง'
+      });
+    }
+  };
+  
+
+  useEffect(() => {
+    setCurrentStep(1);
+    localStorage.setItem("currentStep", JSON.stringify(1));
+  }, []);
 
   return (
     <div className="flex flex-col items-center ">
@@ -462,7 +503,10 @@ const BasicInformationPackage = () => {
                   value="ยกเลิกมากกว่า 7 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 100% ของจำนวนเงินที่ชำระ"
                   className="radio radio-primary"
                   onChange={handleCancellationChange}
-                  checked={cancellationPolicy === "ยกเลิกมากกว่า 7 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 100% ของจำนวนเงินที่ชำระ"}
+                  checked={
+                    cancellationPolicy ===
+                    "ยกเลิกมากกว่า 7 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 100% ของจำนวนเงินที่ชำระ"
+                  }
                 />
                 <span>
                   {" "}
@@ -477,7 +521,10 @@ const BasicInformationPackage = () => {
                   value="ยกเลิกมากกว่า 5 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 50% ของจำนวนเงินที่ชำระ"
                   className="radio radio-primary"
                   onChange={handleCancellationChange}
-                  checked={cancellationPolicy === "ยกเลิกมากกว่า 5 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 50% ของจำนวนเงินที่ชำระ"}
+                  checked={
+                    cancellationPolicy ===
+                    "ยกเลิกมากกว่า 5 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 50% ของจำนวนเงินที่ชำระ"
+                  }
                 />
                 <span>
                   {" "}
@@ -492,7 +539,10 @@ const BasicInformationPackage = () => {
                   value="ยกเลิกมากกว่า 3 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 30% ของจำนวนเงินที่ชำระ"
                   className="radio radio-primary"
                   onChange={handleCancellationChange}
-                  checked={cancellationPolicy === "ยกเลิกมากกว่า 3 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 30% ของจำนวนเงินที่ชำระ"}
+                  checked={
+                    cancellationPolicy ===
+                    "ยกเลิกมากกว่า 3 วันล่วงหน้า ลูกค้าจะได้รับ คืนเงิน 30% ของจำนวนเงินที่ชำระ"
+                  }
                 />
                 <span>
                   {" "}
@@ -506,6 +556,17 @@ const BasicInformationPackage = () => {
       </div>
       <div className="w-full">
         <DetailPackages />
+      </div>
+      <div className="w-full my-5">
+        <div className="flex justify-end">
+          <button
+            className="shadow-boxShadow px-3 py-2 rounded-lg hover:bg-secondBusiness
+             bg-primaryBusiness text-white w-20 h-12"
+            onClick={nextStep}
+          >
+            ต่อไป
+          </button>
+        </div>
       </div>
     </div>
   );

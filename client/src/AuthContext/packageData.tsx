@@ -38,6 +38,8 @@ interface PackageDataContextType {
   setBank: React.Dispatch<React.SetStateAction<Bank | undefined>>;
   statusAccept: boolean;
   setStatusAccept: React.Dispatch<React.SetStateAction<boolean>>;
+  currentStep: number;
+  setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const PackageDataContext = createContext<PackageDataContextType | undefined>(
@@ -57,6 +59,8 @@ export const PackageDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [discount, setDiscount] = useState<number | undefined>();
   const [bank, setBank] = useState<Bank | undefined>();
   const [statusAccept, setStatusAccept] = useState<boolean>(false);
+  const [currentStep, setCurrentStep] = useState<number>(1);
+
   useEffect(() => {
     const storedPackageData = localStorage.getItem("packageData");
     if (storedPackageData && storedPackageData !== "undefined") {
@@ -92,6 +96,10 @@ export const PackageDataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (storedBank && storedBank !== "undefined") {
       setBank(JSON.parse(storedBank));
     }
+    const storedStep = localStorage.getItem("currentStep");
+    if (storedStep && storedStep !== "undefined") {
+      setCurrentStep(JSON.parse(storedStep));
+    }
   }, []);
 
   return (
@@ -113,6 +121,8 @@ export const PackageDataProvider: React.FC<{ children: React.ReactNode }> = ({
         setBank,
         statusAccept,
         setStatusAccept,
+        currentStep,
+        setCurrentStep
       }}
     >
       {children}

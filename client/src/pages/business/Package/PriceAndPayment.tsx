@@ -4,6 +4,8 @@ import { usePackageData } from "../../../AuthContext/packageData";
 import { AuthContext } from "../../../AuthContext/auth.provider";
 import { Bank } from "../../../type";
 import CryptoJS from "crypto-js";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Price = () => {
   const authContext = useContext(AuthContext);
@@ -11,22 +13,22 @@ const Price = () => {
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { userInfo } = authContext;
-  const { setBank, setDiscount, setPrice } = usePackageData();
+  const { setBank, setDiscount, setPrice, setCurrentStep } = usePackageData();
+  const navigate = useNavigate();
   const [packagePrice, setPackagePrice] = useState<number>(1000);
-
+  const [discount, setDiscounts] = useState<number>(0);
   const [idCard, setIdCard] = useState<string>("");
   const [bankingCode, setBankingCode] = useState<string>("");
   const [bankingUsername, setBankingUsername] = useState<string>("");
   const [bankingUserlastname, setBankingUserlastname] = useState<string>("");
-
-  const [openDiscount, setOpenDiscount] = useState<boolean>(false);
-  const [openBank, setOpenBank] = useState<boolean>(false);
-  const [openDropdown, setOpenDropdown] = useState<boolean>(false);
-  const [discount, setDiscounts] = useState<number>(0);
   const [selectedBank, setSelectedBank] = useState({
     name: "",
     logo: "",
   });
+
+  const [openDiscount, setOpenDiscount] = useState<boolean>(false);
+  const [openBank, setOpenBank] = useState<boolean>(false);
+  const [openDropdown, setOpenDropdown] = useState<boolean>(false);
 
   useEffect(() => {
     const storedPackagePrice = localStorage.getItem("packagePrice");
@@ -198,6 +200,70 @@ const Price = () => {
     const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
     return bytes.toString(CryptoJS.enc.Utf8);
   };
+
+  const prevStep = () => {
+    navigate("/create-package/images");
+    setCurrentStep(3);
+    localStorage.setItem("currentStep", JSON.stringify(3));
+  };
+
+  useEffect(() => {
+    setCurrentStep(4);
+    localStorage.setItem("currentStep", JSON.stringify(4));
+  }, []);
+
+  const nextStep = () => {
+    if (openBank === false) {
+      navigate("/create-package/policies");
+      setCurrentStep(5);
+      localStorage.setItem("currentStep", JSON.stringify(5));
+    } else if (openBank === true) {
+      if (idCard === "") {
+        Swal.fire({
+          icon: 'warning',
+          title: 'กรุณากรอกหมายเลขบัตรประชาชน',
+          confirmButtonText: 'ตกลง'
+        });
+      } else if (idCard.length !== 13) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'หมายเลขบัตรประชาชนต้องมีความยาว 13 หลัก',
+          confirmButtonText: 'ตกลง'
+        });
+      } else if (bankingCode === "") {
+        Swal.fire({
+          icon: 'warning',
+          title: 'กรุณากรอกรหัสธนาคาร',
+          confirmButtonText: 'ตกลง'
+        });
+      } else if (bankingCode.length !== 10) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'รหัสธนาคารต้องมีความยาว 10 หลัก',
+          confirmButtonText: 'ตกลง'
+        });
+      } else if (bankingUsername === "" || bankingUserlastname === "") {
+        Swal.fire({
+          icon: 'warning',
+          title: 'กรุณากรอกชื่อและนามสกุลของผู้ใช้งาน',
+          confirmButtonText: 'ตกลง'
+        });
+      } else if (selectedBank.name === "") {
+        Swal.fire({
+          icon: 'warning',
+          title: 'กรุณาเลือกชื่อธนาคาร',
+          confirmButtonText: 'ตกลง'
+        });
+      } else {
+        // ถ้าข้อมูลครบถ้วนแล้ว นำทางไปยังหน้าถัดไป
+        navigate("/create-package/policies");
+        setCurrentStep(5);
+        localStorage.setItem("currentStep", JSON.stringify(5));
+      }
+    }
+  };
+  
+  
 
   return (
     <div className="mt-10 w-full flex justify-center items-center flex-col gap-10">
@@ -639,6 +705,24 @@ const Price = () => {
               )
             )}
           </div>
+        </div>
+      </div>
+      <div className="w-full my-5">
+        <div className="flex justify-between">
+          <button
+            className="shadow-boxShadow px-3 py-2 rounded-lg hover:bg-secondBusiness
+             bg-primaryBusiness text-white w-24 h-12"
+            onClick={prevStep}
+          >
+            ก่อนหน้า
+          </button>
+          <button
+            className="shadow-boxShadow px-3 py-2 rounded-lg hover:bg-secondBusiness
+             bg-primaryBusiness text-white w-20 h-12"
+            onClick={nextStep}
+          >
+            ต่อไป
+          </button>
         </div>
       </div>
     </div>

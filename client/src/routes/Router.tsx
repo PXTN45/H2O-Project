@@ -181,7 +181,7 @@ const router = createBrowserRouter([
         element: <ContactOnlyAdmin />,
       },
       {
-        path: "/create-package",
+        path: "/create-package/",
         element: (
           <PrivateRouterBusiness>
             <PackageDataProvider>

@@ -6,10 +6,12 @@ import Swal from "sweetalert2";
 import { AuthContext } from "../../../AuthContext/auth.provider";
 import { usePackageData } from "../../../AuthContext/packageData";
 import { PackageImage } from "../../../type";
+import { useNavigate } from "react-router-dom";
 
 const AddImages: React.FC = () => {
   const authContext = useContext(AuthContext);
-  const { setImage } = usePackageData();
+  const { setImage ,setCurrentStep } = usePackageData();
+  const navigate = useNavigate()
 
   if (!authContext) {
     throw new Error("AuthContext must be used within an AuthProvider");
@@ -101,8 +103,37 @@ const AddImages: React.FC = () => {
     }
   };
 
+
+  const prevStep = () => {
+    navigate("/create-package/location");
+    setCurrentStep(2)
+    localStorage.setItem("currentStep" , JSON.stringify(2))
+  };
+
+  useEffect(() => {
+    setCurrentStep(3)
+    localStorage.setItem("currentStep" , JSON.stringify(3))
+  } , [])
+
+  const nextStep = () => {
+    if (images.length >= 7) {
+      navigate("/create-package/pricAndPayment");
+      setCurrentStep(4);
+      localStorage.setItem("currentStep", JSON.stringify(4));
+    } else {
+      // แจ้งเตือนถ้าจำนวนรูปภาพไม่เพียงพอ
+      Swal.fire({
+        icon: 'warning',
+        title: 'กรุณาเพิ่มรูปภาพ',
+        text: 'คุณต้องอัปโหลดอย่างน้อย 7 รูปภาพ',
+        confirmButtonText: 'ตกลง'
+      });
+    }
+  };
+  
+
   return (
-    <div className="w-full flex justify-center items-center">
+    <div className="w-full flex flex-col justify-center items-center">
       <div className="w-full pt-10">
         <div className="flex flex-col">
           <span className="text-xl">อัปโหลดรูปภาพ</span>
@@ -161,6 +192,24 @@ const AddImages: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+      </div>
+      <div className="w-full my-5">
+        <div className="flex justify-between">
+          <button
+            className="shadow-boxShadow px-3 py-2 rounded-lg hover:bg-secondBusiness
+             bg-primaryBusiness text-white w-24 h-12"
+            onClick={prevStep}
+          >
+            ก่อนหน้า
+          </button>
+          <button
+            className="shadow-boxShadow px-3 py-2 rounded-lg hover:bg-secondBusiness
+             bg-primaryBusiness text-white w-20 h-12"
+            onClick={nextStep}
+          >
+            ต่อไป
+          </button>
         </div>
       </div>
     </div>
