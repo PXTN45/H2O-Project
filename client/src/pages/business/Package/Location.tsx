@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { usePackageData } from "../../../AuthContext/packageData";
 import type { Location } from "../../../type";
-import Maps from "../../../components/Maps";
+// import Maps from "../../../components/Maps";
+import { Maps } from "../../../components/Maps";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const Location = () => {
   const { setLocation, setCurrentStep } = usePackageData();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [locationPackage, setLocationPackage] = useState<Location[]>(() => {
     const savedLocation = localStorage.getItem("locationPackage");
@@ -41,8 +42,6 @@ const Location = () => {
     setLocation(locationPackage);
     localStorage.setItem("locationPackage", JSON.stringify(locationPackage));
   }, [locationPackage]);
-
-  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -98,12 +97,13 @@ const Location = () => {
 
   const nextStep = () => {
     // เช็คว่า locationPackage มีข้อมูลที่จำเป็น
-    const isLocationValid = locationPackage.every(location => 
-      location.name_location !== "" &&
-      location.province_location !== "" &&
-      location.zipcode_location !== 0
+    const isLocationValid = locationPackage.every(
+      (location) =>
+        location.name_location !== "" &&
+        location.province_location !== "" &&
+        location.zipcode_location !== 0
     );
-  
+
     if (isLocationValid) {
       navigate("/create-package/images");
       setCurrentStep(3);
@@ -111,25 +111,24 @@ const Location = () => {
     } else {
       // แจ้งเตือนถ้าข้อมูลไม่ครบถ้วน
       Swal.fire({
-        icon: 'warning',
-        title: 'กรุณากรอกข้อมูลสถานที่ให้ครบถ้วน',
-        text: 'ชื่อสถานที่, จังหวัด, และรหัสไปรษณีย์ เป็นข้อมูลที่จำเป็น',
-        confirmButtonText: 'ตกลง'
+        icon: "warning",
+        title: "กรุณากรอกข้อมูลสถานที่ให้ครบถ้วน",
+        text: "ชื่อสถานที่, จังหวัด, และรหัสไปรษณีย์ เป็นข้อมูลที่จำเป็น",
+        confirmButtonText: "ตกลง",
       });
     }
   };
-  
 
   const prevStep = () => {
     navigate("/create-package/basic-information-package");
-    setCurrentStep(1)
-    localStorage.setItem("currentStep" , JSON.stringify(1))
+    setCurrentStep(1);
+    localStorage.setItem("currentStep", JSON.stringify(1));
   };
 
   useEffect(() => {
-    setCurrentStep(2)
-    localStorage.setItem("currentStep" , JSON.stringify(2))
-  } , [])
+    setCurrentStep(2);
+    localStorage.setItem("currentStep", JSON.stringify(2));
+  }, []);
 
   return (
     <div>
@@ -348,7 +347,10 @@ const Location = () => {
               </div>
               <div className="divider"></div>
               <div>
-                <Maps />
+                <Maps
+                  lat={locationPackage[0].latitude_location}
+                  lng={locationPackage[0].longitude_location}
+                />
               </div>
             </div>
           </div>

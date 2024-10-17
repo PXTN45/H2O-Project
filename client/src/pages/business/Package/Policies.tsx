@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { usePackageData } from "../../../AuthContext/packageData";
 
 const Policies = () => {
