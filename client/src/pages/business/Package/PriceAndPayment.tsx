@@ -136,7 +136,7 @@ const Price = () => {
     }
 
     setBank(banking);
-    localStorage.setItem("Bank" , JSON.stringify(banking))
+    localStorage.setItem("Bank", JSON.stringify(banking));
   }, [
     idCard,
     selectedBank,
@@ -183,7 +183,20 @@ const Price = () => {
 
   const openBanking = () => {
     setOpenBank(!openBank);
-    localStorage.setItem("OpenBank" , JSON.stringify(!openBank))
+    localStorage.setItem("OpenBank", JSON.stringify(!openBank));
+  };
+
+  const decryptData = (encryptedData: string) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+
+    if (!secretKey) {
+      throw new Error(
+        "Secret key is not defined in the environment variables."
+      );
+    }
+
+    const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
   };
 
   return (
@@ -397,7 +410,10 @@ const Price = () => {
                               onClick={() => {
                                 setSelectedBank(bank);
                                 setOpenDropdown(false);
-                                localStorage.setItem("SelectedBank" , JSON.stringify(bank))
+                                localStorage.setItem(
+                                  "SelectedBank",
+                                  JSON.stringify(bank)
+                                );
                               }}
                             >
                               <img
@@ -561,7 +577,9 @@ const Price = () => {
                         type="text"
                         placeholder="กรอกบัตรประจำตัวประชาชน"
                         className="input input-bordered w-full"
-                        value={userInfo?.idcard}
+                        value={
+                          userInfo?.idcard ? decryptData(userInfo.idcard) : ""
+                        }
                       />
                     </label>
                   </div>
@@ -576,7 +594,11 @@ const Price = () => {
                           type="text"
                           placeholder="กรอกหมายเลขบัญชี"
                           className="input input-bordered w-full"
-                          value={userInfo?.BankingCode}
+                          value={
+                            userInfo?.BankingCode
+                              ? decryptData(userInfo.BankingCode)
+                              : ""
+                          }
                         />
                       </div>
                     </label>

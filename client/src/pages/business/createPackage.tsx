@@ -98,7 +98,8 @@ const CreatePackage = () => {
       const responseUser = await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, updateData);
       
       if (response.status === 201 && responseUser.status === 200) {
-        // localStorage.clear();
+        localStorage.clear();
+        navigate("/")
         Swal.fire({
           title: 'สำเร็จ!',
           text: 'สร้างแพคเกจสำเร็จ',
@@ -139,7 +140,7 @@ const CreatePackage = () => {
         </div>
         <div className="w-full  md:w-full ">
           <div className="w-full flex flex-col justify-center items-center">
-            <div className="w-3/5">
+            <div className="w-4/5">
             <Outlet />
 
             </div>
