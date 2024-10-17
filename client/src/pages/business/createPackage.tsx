@@ -41,10 +41,12 @@ const CreatePackage = () => {
     { step: 4, path: "pricAndPayment", label: "ราคาและช่องทางการชำระเงิน" },
     { step: 5, path: "policies", label: "นโยบาย" },
   ];
+  
   useEffect(() => {
     const storedStep = localStorage.getItem("currentStep");
     const initialStep = storedStep ? parseInt(storedStep) : 1;
     setCurrentStep(initialStep);
+    
   }, [currentStep]);
 
 

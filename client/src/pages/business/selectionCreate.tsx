@@ -14,7 +14,7 @@ const LeftSide = () => {
         <div className="bg-custom-bg1 absolute inset-0 transition duration-300 ease-in-out transform group-hover:scale-105 rounded-br-lg rounded-tr-lg shadow-lg"></div>
       </a>
       <a
-        href="/create-package"
+        href="/create-package/basic-information-package"
         className="relative group mt-6 w-full text-center"
       >
         <div className="text-overlay text-[24px] md:text-[25px] xl:text-[40px] font-bold relative z-10">

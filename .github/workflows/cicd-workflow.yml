@@ -73,18 +73,18 @@ jobs:
           --network h2o-network \
           -p 3001:3000 \
           --name h2o-backend-container \
-          -e MONGODB_URL="mongodb+srv://patnattapong1:sIsEdapY3eBIo9Qj@cluster0.1qyztlj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" \
-          -e CLIENT_URL="http://18.140.2.235,http://47.128.233.168:3001,http://localhost:5173,http://localhost:5174" \
+          -e MONGODB_URL="${{ secrets.MONGODB_URL }}" \
+          -e CLIENT_URL="${{ secrets.CLIENT_URL }}" \
           -e PORT="3000" \
-          -e SECRET="H2O-Project" \
-          -e ACCESS_TOKEN_SECRET="879a8c742a4091c29ca1c749a4ff61eedd5e1626d1ed6810e93eb496892ae57591b62ecdd8433c8f0d9a765b69614643d94ceb086256654dcc5647adadbe1533" \
-          -e HOST="smtp.gmail.com" \
-          -e SERVICE="gmail" \
-          -e EMAIL_PORT="587" \
-          -e SECURE="true" \
-          -e USER="644259012@webmail.npru.ac.th" \
-          -e PASS="Pns21092545" \
-          -e STRIPE_SECRET_KEY="sk_test_51PpB0zDTXPppEslSifpqM4p70gblHZDHt6mGBJKmAlZ5GoCt0zQ8ldFHpFug00j0qARjdoGstEuyqXTKrMDBaACh006nlNNVEK" \
+          -e SECRET="${{ secrets.SECRET }}" \
+          -e ACCESS_TOKEN_SECRET="${{ secrets.ACCESS_TOKEN_SECRET }}" \
+          -e HOST="${{ secrets.HOST }}" \
+          -e SERVICE="${{ secrets.SERVICE }}" \
+          -e EMAIL_PORT="${{ secrets.EMAIL_PORT }}" \
+          -e SECURE="${{ secrets.SECURE }}" \
+          -e USER="${{ secrets.USER }}" \
+          -e PASS="${{ secrets.PASS }}" \
+          -e STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}" \
           pxtn/h2o-backend
 
       # Run frontend container
@@ -95,6 +95,7 @@ jobs:
           -p 80:80 \
           --name h2o-frontend-container \
           -e VITE_H2O_URL="http://18.140.2.235:3001/" \
+          -e VITE_SECRET_KEY="${{ secrets.VITE_SECRET_KEY }}" \
           pxtn/h2o-frontend
 
       - name: Delete old Imges
