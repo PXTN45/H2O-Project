@@ -63,7 +63,7 @@ const createHomeStay: React.FC = () => {
     detail_homeStay: "",
     time_checkIn_homeStay: "",
     time_checkOut_homeStay: "",
-    policy_cancel_homeStay: "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก",
+    policy_cancel_homeStay: "คืนเงิน 100% หากทำการยกเลิกภายใน 7 วันก่อนการเข้าพัก",
     business_user: "",
     status_sell_homeStay: "",
   });
@@ -105,7 +105,7 @@ const createHomeStay: React.FC = () => {
   const [isPolicyAccepted, setIsPolicyAccepted] = useState<boolean>(false);
   // const [checkInTime, setCheckInTime] = useState("15:00");
   // const [checkOutTime, setCheckOutTime] = useState("12:00");
-  const [cancellationPolicy, setCancellationPolicy] = useState("คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก");
+  const [cancellationPolicy, setCancellationPolicy] = useState("คืนเงิน 100% หากทำการยกเลิกภายใน 7 วันก่อนการเข้าพัก");
   const [selected, setSelected] = useState<string | null>("homestay");
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [amenities, setAmenities] = useState<string[]>([]);
@@ -139,10 +139,10 @@ const createHomeStay: React.FC = () => {
 
     // ตรวจสอบว่า e.target เป็น HTMLInputElement
     if (type === "radio" || type === "checkbox") {      
-      let displayText = "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก";
+      let displayText = "คืนเงิน 100% หากทำการยกเลิกภายใน 7 วันก่อนการเข้าพัก";
       switch (value) {
         case "option1":
-          displayText = "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก";
+          displayText = "คืนเงิน 100% หากทำการยกเลิกภายใน 7 วันก่อนการเข้าพัก";
           setCancellationPolicy(displayText)
           break;
         case "option2":
@@ -150,7 +150,7 @@ const createHomeStay: React.FC = () => {
           setCancellationPolicy(displayText)
           break;
         case "option3":
-          displayText = "คืนเงิน 50% หากทำการยกเลิกภายใน 7 วันหลังการเข้าพัก";
+          displayText = "คืนเงิน 30% หากทำการยกเลิกภายใน 1 วันหลังการเข้าพัก";
           setCancellationPolicy(displayText)
           break;
         
@@ -355,12 +355,12 @@ const createHomeStay: React.FC = () => {
                       id="option1"
                       name="policy_cancel_homeStay"
                       value="option1"
-                      checked={cancellationPolicy === "คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก"}
+                      checked={cancellationPolicy === "คืนเงิน 100% หากทำการยกเลิกภายใน 7 วันก่อนการเข้าพัก"}
                       onChange={handleChange}
                       className="mr-2"
                     />
                     <label htmlFor="option1">
-                      คืนเงิน 100% หากทำการยกเลิกภายใน 1 วันก่อนการเข้าพัก
+                    คืนเงิน 100% หากทำการยกเลิกภายใน 7 วันก่อนการเข้าพัก
                     </label>
                   </div>
                   <div className="flex items-center mb-2">
@@ -374,7 +374,7 @@ const createHomeStay: React.FC = () => {
                       className="mr-2"
                     />
                     <label htmlFor="option2">
-                      คืนเงิน 50% หากทำการยกเลิกภายใน 3 วันก่อนการเข้าพัก
+                    คืนเงิน 50% หากทำการยกเลิกภายใน 3 วันก่อนการเข้าพัก
                     </label>
                   </div>
                   <div className="flex items-center">
@@ -383,12 +383,12 @@ const createHomeStay: React.FC = () => {
                       id="option3"
                       name="policy_cancel_homeStay"
                       value="option3"
-                      checked={cancellationPolicy === "คืนเงิน 50% หากทำการยกเลิกภายใน 7 วันหลังการเข้าพัก"}
+                      checked={cancellationPolicy === "คืนเงิน 30% หากทำการยกเลิกภายใน 1 วันหลังการเข้าพัก"}
                       onChange={handleChange}
                       className="mr-2"
                     />
                     <label htmlFor="option3">
-                      คืนเงิน 50% หากทำการยกเลิกภายใน 7 วันหลังการเข้าพัก
+                    คืนเงิน 30% หากทำการยกเลิกภายใน 1 วันหลังการเข้าพัก
                     </label>
                   </div>
                 </div>
