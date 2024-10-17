@@ -39,6 +39,8 @@ const Location = () => {
     localStorage.setItem("locationPackage", JSON.stringify(locationPackage));
   }, [locationPackage]);
 
+  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 

@@ -75,6 +75,34 @@ const CreatePackage = () => {
     navigate(steps[step - 1].path);
   };
 
+  const clearLocalStorage = () => {
+    localStorage.removeItem("selectedId");
+    localStorage.removeItem("packageName");
+    localStorage.removeItem("maxTourists");
+    localStorage.removeItem("isChildren");
+    localStorage.removeItem("isFood");
+    localStorage.removeItem("startDate");
+    localStorage.removeItem("endDate");
+    localStorage.removeItem("description");
+    localStorage.removeItem("activityPackages");
+    localStorage.removeItem("newActivities");
+    localStorage.removeItem("cancellationPolicy");
+    localStorage.removeItem("image");
+    localStorage.removeItem("selectedImages");
+    localStorage.removeItem("Bank");
+    localStorage.removeItem("homestay");
+    localStorage.removeItem("indexHomesaty");
+    localStorage.removeItem("checkStatus");
+    localStorage.removeItem("locationPackage");
+    localStorage.removeItem("discounts");
+    localStorage.removeItem("packagePrice");
+    localStorage.removeItem("openDiscount");
+    localStorage.removeItem("images");
+    localStorage.removeItem("currentStep");
+    localStorage.removeItem("packageData");
+    localStorage.removeItem("packageData");
+  };
+
   const createPackage = async () => {
     try {
       const packageData = {
@@ -98,7 +126,7 @@ const CreatePackage = () => {
       const responseUser = await axiosPrivateBusiness.put(`/user/updateUser/${userInfo?._id}`, updateData);
       
       if (response.status === 201 && responseUser.status === 200) {
-        localStorage.clear();
+        clearLocalStorage();
         navigate("/")
         Swal.fire({
           title: 'สำเร็จ!',
