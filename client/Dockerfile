@@ -6,13 +6,8 @@ COPY package-lock.json ./
 RUN npm install
 COPY . ./
 
-# รับค่า secret จาก build argument
-ARG VITE_SECRET_KEY
-ARG VITE_H2O_URL
-
-# ตั้ง environment variable ใน Docker build stage
-ENV VITE_SECRET_KEY=${VITE_SECRET_KEY}
-ENV VITE_H2O_URL=${VITE_H2O_URL}
+ENV VITE_H2O_URL=http://18.140.2.235:3001
+ENV VITE_SECRET_KEY=H2O-Project-Client
 
 RUN npm run build
 
