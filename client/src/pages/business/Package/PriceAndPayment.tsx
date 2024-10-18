@@ -190,7 +190,6 @@ const Price = () => {
 
   const decryptData = (encryptedData: string) => {
     const secretKey = import.meta.env.VITE_SECRET_KEY;
-
     if (!secretKey) {
       throw new Error(
         "Secret key is not defined in the environment variables."
@@ -220,39 +219,39 @@ const Price = () => {
     } else if (openBank === true) {
       if (idCard === "") {
         Swal.fire({
-          icon: 'warning',
-          title: 'กรุณากรอกหมายเลขบัตรประชาชน',
-          confirmButtonText: 'ตกลง'
+          icon: "warning",
+          title: "กรุณากรอกหมายเลขบัตรประชาชน",
+          confirmButtonText: "ตกลง",
         });
       } else if (idCard.length !== 13) {
         Swal.fire({
-          icon: 'warning',
-          title: 'หมายเลขบัตรประชาชนต้องมีความยาว 13 หลัก',
-          confirmButtonText: 'ตกลง'
+          icon: "warning",
+          title: "หมายเลขบัตรประชาชนต้องมีความยาว 13 หลัก",
+          confirmButtonText: "ตกลง",
         });
       } else if (bankingCode === "") {
         Swal.fire({
-          icon: 'warning',
-          title: 'กรุณากรอกรหัสธนาคาร',
-          confirmButtonText: 'ตกลง'
+          icon: "warning",
+          title: "กรุณากรอกรหัสธนาคาร",
+          confirmButtonText: "ตกลง",
         });
       } else if (bankingCode.length !== 10) {
         Swal.fire({
-          icon: 'warning',
-          title: 'รหัสธนาคารต้องมีความยาว 10 หลัก',
-          confirmButtonText: 'ตกลง'
+          icon: "warning",
+          title: "รหัสธนาคารต้องมีความยาว 10 หลัก",
+          confirmButtonText: "ตกลง",
         });
       } else if (bankingUsername === "" || bankingUserlastname === "") {
         Swal.fire({
-          icon: 'warning',
-          title: 'กรุณากรอกชื่อและนามสกุลของผู้ใช้งาน',
-          confirmButtonText: 'ตกลง'
+          icon: "warning",
+          title: "กรุณากรอกชื่อและนามสกุลของผู้ใช้งาน",
+          confirmButtonText: "ตกลง",
         });
       } else if (selectedBank.name === "") {
         Swal.fire({
-          icon: 'warning',
-          title: 'กรุณาเลือกชื่อธนาคาร',
-          confirmButtonText: 'ตกลง'
+          icon: "warning",
+          title: "กรุณาเลือกชื่อธนาคาร",
+          confirmButtonText: "ตกลง",
         });
       } else {
         // ถ้าข้อมูลครบถ้วนแล้ว นำทางไปยังหน้าถัดไป
@@ -262,8 +261,6 @@ const Price = () => {
       }
     }
   };
-  
-  
 
   return (
     <div className="mt-10 w-full flex justify-center items-center flex-col gap-10">
@@ -277,8 +274,8 @@ const Price = () => {
         <div className="shadow-boxShadow rounded-lg mt-5">
           <div className="p-3 rounded-t-lg bg-primaryBusiness"></div>
           <div className="p-5">
-            <div className="flex flex-row gap-5 justify-between">
-              <div className="w-1/2">
+            <div className="flex flex-row mobile:flex-col xl:flex-row lg:flex-row gap-5 justify-between">
+              <div className="w-1/2 mobile:w-full xl:w-1/2 lg:w-1/2">
                 <label className="form-control w-full">
                   <div className="label">
                     <span className="label-text">กำหนดราคาแพคเกจของท่าน</span>
@@ -347,7 +344,7 @@ const Price = () => {
             </div>
 
             {openDiscount === true && (
-              <div className="w-1/2">
+              <div className="w-1/2 mobile:w-full sm:w-full xl:w-1/2 lg:w-1/2">
                 <div>
                   <label className="form-control w-full">
                     <div className="label">
@@ -423,7 +420,9 @@ const Price = () => {
                       )
                     }
                   />
-                  <span className="ml-2">บัญชีธนาคารที่ผูกไว้</span>
+                  <span className="ml-2 mobile:text-sm">
+                    บัญชีธนาคารที่ผูกไว้
+                  </span>
                 </div>
 
                 <div>
@@ -435,7 +434,9 @@ const Price = () => {
                     onChange={openBanking}
                     checked={openBank === true}
                   />
-                  <span className="ml-2">ไม่ได้ผูกบัญชีธนาคาร</span>
+                  <span className="ml-2 mobile:text-sm">
+                    ไม่ได้ผูกบัญชีธนาคาร
+                  </span>
                 </div>
               </div>
             </div>

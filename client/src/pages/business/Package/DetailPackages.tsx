@@ -235,7 +235,7 @@ const DetailPackages = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="pl-10 pt-5 md:pr-5 xl:p-2 flex flex-col xl:flex-row w-full xl:w-2/3">
+                    <div className=" pl-10 pt-5 mobile:p-0 md:pr-5   xl:p-2 flex flex-col xl:flex-row w-full xl:w-2/3">
                       <div className=" xl:w-4/6 pr-2 flex flex-col gap-5">
                         <div className="flex justify-between ">
                           <div className="flex flex-col w-full gap-2">
@@ -438,7 +438,7 @@ const DetailPackages = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="pl-10 pt-5 md:pr-5 xl:p-2 flex flex-col xl:flex-row w-full xl:w-2/3">
+                  <div className="mobile:p-3 pl-10 pt-5 md:pr-5 xl:p-2 flex flex-col xl:flex-row w-full xl:w-2/3">
                     <div className=" xl:w-4/6 pr-2 flex flex-col gap-5">
                       <div className="flex justify-between ">
                         <div className="flex flex-col w-full gap-2">

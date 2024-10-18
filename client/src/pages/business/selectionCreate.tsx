@@ -165,7 +165,7 @@ const SelectionCreate = () => {
           <BsPersonWalking className="w-5 h-5 md:w-10 md:h-10 xl:w-12 xl:h-12" />
           <span className="md:inline">H2O</span>
         </div>
-        <div className="absolute w-[70%] top-20 md:top-40 xl:top-40 flex items-center space-x-2 py-2 px-4 text-[6px] shadow-text md:text-[14px] xl:text-[18px]">
+        <div className="absolute w-[70%] top-20 md:top-40 xl:top-40 mobile:top-30 flex items-center space-x-2 py-2 px-4 text-[6px] shadow-text md:text-[14px] xl:text-[18px]">
           <span className="md:inline">
             หากคุณมองหาโอกาสในการร่วมธุรกิจที่เติบโตไปด้วยกัน
             เราขอเชิญคุณมาร่วมเป็นส่วนหนึ่งกับเรา!

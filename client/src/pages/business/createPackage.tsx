@@ -131,7 +131,7 @@ const CreatePackage = () => {
 
   return (
     <div className="h-screen overflow-auto">
-      <div className="flex flex-wrap  lg:flex-nowrap w-full ">
+      <div className="flex flex-wrap  xl:flex-nowrap w-full ">
         <div className="flex lg:justify-center w-full md:w-full lg:w-full xl:w-1/5 xl:h-[500px]">
           <div className="bg-white mx-6 flex rounded-md shadow-md p-4">
             <ul className="steps steps-horizontal md:steps-horizontal lg:steps-horizontal xl:steps-vertical">

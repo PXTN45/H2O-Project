@@ -142,9 +142,9 @@ const Location = () => {
                   <span>ที่อยู่</span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 mobile:grid-cols-1 lg:grid-cols-2 gap-4">
                   {/* ชื่อสถานที่ */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">ชื่อสถานที่</span>
                     </div>
@@ -159,7 +159,7 @@ const Location = () => {
                   </label>
 
                   {/* จังหวัด */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">จังหวัด</span>
                     </div>
@@ -174,7 +174,7 @@ const Location = () => {
                   </label>
 
                   {/* บ้านเลขที่ */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">บ้านเลขที่</span>
                     </div>
@@ -189,7 +189,7 @@ const Location = () => {
                   </label>
 
                   {/* หมู่บ้าน */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">หมู่บ้าน</span>
                     </div>
@@ -204,7 +204,7 @@ const Location = () => {
                   </label>
 
                   {/* หมู่ที่ */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">หมู่ที่</span>
                     </div>
@@ -219,7 +219,7 @@ const Location = () => {
                   </label>
 
                   {/* ซอย */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">ซอย</span>
                     </div>
@@ -234,7 +234,7 @@ const Location = () => {
                   </label>
 
                   {/* ถนน */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">ถนน</span>
                     </div>
@@ -249,7 +249,7 @@ const Location = () => {
                   </label>
 
                   {/* อำเภอ/เขต */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">อำเภอ/เขต</span>
                     </div>
@@ -264,7 +264,7 @@ const Location = () => {
                   </label>
 
                   {/* ตำบล/แขวง */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">ตำบล/แขวง</span>
                     </div>
@@ -279,7 +279,7 @@ const Location = () => {
                   </label>
 
                   {/* รหัสไปรษณีย์ */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">รหัสไปรษณีย์</span>
                     </div>
@@ -294,7 +294,7 @@ const Location = () => {
                   </label>
 
                   {/* ละติจูด */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">ละติจูด</span>
                     </div>
@@ -312,7 +312,7 @@ const Location = () => {
                   </label>
 
                   {/* ลองจิจูด */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">ลองจิจูด</span>
                     </div>
@@ -330,7 +330,7 @@ const Location = () => {
                   </label>
 
                   {/* รัศมี */}
-                  <label className="form-control w-full max-w-xs">
+                  <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text">รัศมี (กม.)</span>
                     </div>

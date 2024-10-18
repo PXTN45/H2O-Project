@@ -31,6 +31,9 @@ export default {
       'buttonShadow': '0 0px 10px 0px rgba(0, 0, 0, 0.3)',
     },
     extend: {
+      screens: {
+        'mobile': '375px', // ขนาดหน้าจอมือถือที่คุณต้องการ
+      },
       scale: {
         '101': '1.01',
         '102': '1.02',

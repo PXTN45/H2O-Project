@@ -142,7 +142,7 @@ const AddImages: React.FC = () => {
             อัปโหลดภาพคุณภาพสูงได้มากเท่าที่คุณมีสามารถเพิ่มมากขึ้นในภายหลัง
           </span>
         </div>
-        <div className="my-10 border-2 border-dashed border-gray-500 rounded-lg h-full p-20 flex flex-col justify-center items-center">
+        <div className="my-10 border-2 border-dashed border-gray-500 rounded-lg h-full p-20 mobile:p-0 mobile:py-5 flex flex-col justify-center items-center">
           <div className="flex flex-col items-center gap-4">
             <img
               src="https://firebasestorage.googleapis.com/v0/b/h2o-project-ts.appspot.com/o/Icon%2Fphoto.png?alt=media&token=f50722f9-5f8c-4e64-aedb-5e815492679a"
@@ -168,7 +168,7 @@ const AddImages: React.FC = () => {
           </div>
           <div className="mt-4 w-full p-5">
             {selectedImages.length > 0 && (
-              <div className="grid grid-cols-3 gap-2 items-center justify-center">
+              <div className="grid grid-cols-3 mobile:grid-cols-1 sm:grid-cols-2 gap-2 items-center justify-center">
                 {images.map((file, index) => (
                   <div
                     key={index}

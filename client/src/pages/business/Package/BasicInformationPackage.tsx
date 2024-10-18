@@ -263,7 +263,7 @@ const BasicInformationPackage = () => {
             <div className="my-3 px-5">
               <span className="text-lg">ประเภทที่พัก</span>
             </div>
-            <div className="flex items-center justify-center gap-5 p-5">
+            <div className="flex items-center mobile:flex-col sm:flex-row justify-center gap-5 p-5">
               {[
                 "การท่องเที่ยวธรรมชาติ",
                 "การท่องเที่ยวทางน้ำ",
@@ -272,13 +272,13 @@ const BasicInformationPackage = () => {
                 <div
                   key={type}
                   onClick={() => handleSelect(type)}
-                  className={`p-5 flex flex-col items-center shadow-boxShadow w-[200px] h-[200px] rounded-lg transition-all duration-300 ease-in-out cursor-pointer ${
+                  className={`p-5 flex flex-col items-center shadow-boxShadow  w-[200px] h-[200px] mobile:h-[230px] rounded-lg transition-all duration-300 ease-in-out cursor-pointer ${
                     selectedId === type ? "border-4 border-blue-500" : ""
                   }`}
                 >
                   <div>
                     <img
-                      className="object-cover w-[120px] h-[120px] hover:scale-110 transition-all duration-300 ease-in-out"
+                      className="object-cover w-[120px] h-[120px] sm:h-[120px] hover:scale-110 transition-all duration-300 ease-in-out"
                       src={
                         type === "การท่องเที่ยวธรรมชาติ"
                           ? "https://firebasestorage.googleapis.com/v0/b/h2o-project-ts.appspot.com/o/Icon%2Fforest.gif?alt=media&token=aee73937-b5c8-42c1-8c52-c6edb8995260"
@@ -295,7 +295,7 @@ const BasicInformationPackage = () => {
                       }
                     />
                   </div>
-                  <div className="mt-5 text-sm">
+                  <div className="mt-5 text-sm ">
                     <span>
                       {type === "การท่องเที่ยวธรรมชาติ"
                         ? "การท่องเที่ยวธรรมชาติ"
@@ -315,10 +315,10 @@ const BasicInformationPackage = () => {
           <span>รายละเอียดของแพ็กเกจ</span>
         </div>
         <div className="shadow-boxShadow w-full h-full mt-2 rounded-lg">
-          <div className="">
+          <div>
             <div className="bg-primaryBusiness p-2 rounded-t-lg"></div>
-            <div className="flex p-5 gap-4">
-              <div id="numberOfTourists" className="w-1/2 flex flex-col ">
+            <div className="flex mobile:flex-col sm:flex-row  p-5 gap-4">
+              <div id="numberOfTourists" className="w-1/2 mobile:w-full flex flex-col ">
                 <label className="block text-gray-700 font-bold mb-2">
                   โปรดระบุจำนวน
                 </label>
@@ -372,7 +372,7 @@ const BasicInformationPackage = () => {
                   </div>
                 </div>
               </div>
-              <div id="reservationTime" className="w-1/2">
+              <div id="reservationTime" className="w-1/2 mobile:w-full">
                 <div className="flex flex-col gap-4">
                   {/* Start Date */}
                   <div>
@@ -439,7 +439,7 @@ const BasicInformationPackage = () => {
                 <IoIosAddCircleOutline className="text-lg" /> วัน
               </button>
             </div>
-            <div className="grid grid-cols-2 w-full">
+            <div className="grid grid-cols-2 mobile:grid-cols-1 w-full">
               {activityPackages.map((dayPackage, index) => (
                 <div key={index} className="mt-5">
                   <div className="shadow-lg p-5 rounded-lg shadow-boxShadow m-2 hover:scale-101 transition-all duration-300 ease-in-out">
