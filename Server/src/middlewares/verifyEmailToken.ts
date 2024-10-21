@@ -7,7 +7,6 @@ import jwt from "jsonwebtoken";
 const verifyEmailToken = async (req: Request, res: Response) => {
   const { token } = req.query;
   const secret = process.env.SECRET as string;
-  const client = process.env.CLIENT_URL as string;
 
   try {
     const decode: any = jwt.verify(token as string, secret);
@@ -29,7 +28,7 @@ const verifyEmailToken = async (req: Request, res: Response) => {
 
     verify.isVerified = true;
     await verify.save();
-    res.redirect(`${client}/verifySuccess/${token}`);
+    res.redirect(`http://47.129.247.9/verifySuccess/${token}`);
   } catch (error) {
     res.status(400).json({ error: "Token verification failed" });
   }
