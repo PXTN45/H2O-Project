@@ -6,7 +6,7 @@ COPY package-lock.json ./
 RUN npm install
 COPY . ./
 
-ENV VITE_H2O_URL=http://18.140.2.235:3001
+ENV VITE_H2O_URL=http://47.129.247.9:3001
 ENV VITE_SECRET_KEY=H2O-Project-Client
 
 RUN npm run build
