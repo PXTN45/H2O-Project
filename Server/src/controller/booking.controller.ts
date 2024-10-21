@@ -186,19 +186,25 @@ const editHomeStayBooking = async (
   }
 };
 
-const deleteBooking = async (req: Request, res: Response): Promise<void> => {
+const deleteBooking = async (req: Request, res: Response) => {
   const bookingId = req.params.id;
   try {
+    // ตรวจสอบว่า booking นั้นมีอยู่หรือไม่
     const data = await Booking.findById(bookingId);
     if (!data) {
-      res.status(404).json({ message: "Booking Not Found" });
+      return res.status(404).json({ message: "Booking Not Found" }); // แจ้งว่าไม่พบ booking
     }
+
+    // ลบ booking
     await Booking.findByIdAndDelete(bookingId);
-    res.status(201).json({ message: "Booking deleted !" });
+    res.status(200).json({ message: "Booking deleted successfully!" });
+    
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    console.error("Error deleting booking:", error.message); // log error ไว้ใน server log เพื่อ debug
+    res.status(500).json({ message: "Server Error. Could not delete booking.", error: error.message }); // แจ้งข้อผิดพลาดไปยัง client
   }
 };
+
 
 const cancelBooking = async (req: Request, res: Response): Promise<void> => {
   const bookingId = req.params.id;
