@@ -68,7 +68,6 @@ const options = {
 
 // Generate Swagger specification
 const swaggerSpec = swaggerJSDoc(options);
-const allowedOrigins = process.env.CLIENT_URL?.split(',');
 
 // Create Express app
 const app = express();
@@ -86,21 +85,23 @@ const io = new Server(server, {
   },
 });
 
-// Middleware setup
-app.use(
-  cors({
-    credentials: true,
-    origin: (origin, callback) => {
-      if (!origin || (allowedOrigins && allowedOrigins.includes(origin))) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    const allowedOrigins = ['http://47.129.247.9']; // Add your frontend URL here
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
