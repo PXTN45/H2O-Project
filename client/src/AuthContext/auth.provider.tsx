@@ -664,7 +664,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setLoadPage(false);
     await axiosPublic.post("/user/logout");
     setUserInfo(null);
-    localStorage.removeItem("user");
+    localStorage.clear()
     setLoadPage(true);
     window.location.href = "/";
   };

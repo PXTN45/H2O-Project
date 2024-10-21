@@ -17,7 +17,7 @@ const sendEmail = async (email: string , token: string): Promise<void> => {
 			from: process.env.USER,
 			to: email,
 			subject: 'Email Verification',
-			text: `Please verify your email by clicking the following link: http://18.140.2.235:3001/user/verify?token=${token}}`,
+			text: `Please verify your email by clicking the following link: http://47.129.247.9:3001/user/verify?token=${token}}`,
 		});
 		console.log("Email sent successfully");
 	} catch (error) {

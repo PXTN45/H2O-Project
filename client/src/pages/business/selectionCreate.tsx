@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { BsPersonWalking } from "react-icons/bs";
 
 const LeftSide = () => {
   return (
@@ -24,7 +23,7 @@ const LeftSide = () => {
       </a>
       <hr className="my-6 border-primaryNoRole w-full" />
       <a
-        href="http://localhost:5173"
+        href="/"
         className="relative group w-full text-center"
       >
         <div className="text-overlay text-[24px] md:text-[25px] xl:text-[40px] font-bold relative z-10">
@@ -161,16 +160,6 @@ const SelectionCreate = () => {
   return (
     <div className="flex flex-col md:flex-row items-center justify-between h-screen w-full overflow-hidden relative z-1">
       <div className="w-full md:w-1/2 h-1/2 md:h-full relative">
-        <div className="absolute top-10 md:top-20 xl:top-20 flex items-center space-x-2 py-2 px-4 text-[20px] shadow-text md:text-[40px] xl:text-[50px]">
-          <BsPersonWalking className="w-5 h-5 md:w-10 md:h-10 xl:w-12 xl:h-12" />
-          <span className="md:inline">H2O</span>
-        </div>
-        <div className="absolute w-[70%] top-20 md:top-40 xl:top-40 mobile:top-30 flex items-center space-x-2 py-2 px-4 text-[6px] shadow-text md:text-[14px] xl:text-[18px]">
-          <span className="md:inline">
-            หากคุณมองหาโอกาสในการร่วมธุรกิจที่เติบโตไปด้วยกัน
-            เราขอเชิญคุณมาร่วมเป็นส่วนหนึ่งกับเรา!
-          </span>
-        </div>
         <LeftSide />
       </div>
       <div

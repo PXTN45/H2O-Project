@@ -13,11 +13,10 @@ import {
   FaRegStar,
   FaStarHalfAlt,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { LuActivity } from "react-icons/lu";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { GrNext, GrPrevious } from "react-icons/gr";
-import { Activity, IPackage } from "../type";
+import { IPackage } from "../type";
 
 const BusinessPackage = () => {
   const authContext = useContext(AuthContext);
@@ -28,6 +27,7 @@ const BusinessPackage = () => {
   const [myPackage, setMyPackage] = useState<IPackage[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 2;
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
@@ -148,6 +148,9 @@ const BusinessPackage = () => {
   const currentItems = myPackage.slice(indexOfFirstItem, indexOfLastItem);
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  const createPackage = () => {
+    navigate("/create-package/basic-information-package");
+  };
   return (
     <div>
       {myPackage?.length > 0 ? (
@@ -249,43 +252,6 @@ const BusinessPackage = () => {
                             {formatThaiDate(item?.time_start_package)} ถึง{" "}
                             {formatThaiDate(item?.time_end_package)}
                           </span>
-                        </div>
-                        <div className="flex gap-3 items-start">
-                          <div className="pt-1">
-                            <LuActivity />
-                          </div>
-                          <div>
-                            {item?.activity_package.map(
-                              (day: Activity, i: number) => {
-                                const activityIndex =
-                                  item?.activity_package[i].activity_days
-                                    .length;
-                                const activity = day.activity_days.map(
-                                  (activity: any, index: number) => {
-                                    return (
-                                      <div key={index} className="flex gap-2">
-                                        <span>{activity.activity_name}</span>
-                                        {activityIndex == index + 1 ? (
-                                          <div></div>
-                                        ) : (
-                                          <span>,</span>
-                                        )}
-                                      </div>
-                                    );
-                                  }
-                                );
-
-                                return (
-                                  <div key={i}>
-                                    <div className="flex gap-2">
-                                      <span>วันที่ {i + 1})</span>
-                                      {activity}
-                                    </div>
-                                  </div>
-                                );
-                              }
-                            )}
-                          </div>
                         </div>
 
                         <div
@@ -424,11 +390,11 @@ const BusinessPackage = () => {
       ) : (
         <div className="flex flex-col justify-center items-center h-full p-20 w-full">
           <span className="text-2xl flex items-center gap-5">
-            ยังไม่มีที่พักของคุณในขณะนี้
+            ยังไม่มีแพ็คเกจของคุณในขณะนี้
           </span>
-          <button className="flex items-center gap-3 text-lg bg-green-500 p-2 rounded-lg text-white my-2">
+          <button onClick={createPackage} className="flex items-center gap-3 text-lg bg-green-500 p-2 rounded-lg text-white my-2">
             <MdAddHomeWork className="text-3xl" />
-            สร้างที่พักใหม่เลยตอนนี้
+            สร้างแพ็คเกจใหม่เลยตอนนี้
           </button>
         </div>
       )}

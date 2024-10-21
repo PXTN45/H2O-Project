@@ -28,6 +28,7 @@ const PackageDetail = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [adult, setAdult] = useState(1);
   const [child, setChild] = useState(0);
+  const [price, setPrice] = useState<number>(0);
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
@@ -98,6 +99,7 @@ const PackageDetail = () => {
         const tax = totalPrice * taxRate;
         const fee = totalPrice * feeRate;
         const totalPriceWithTaxAndFee = totalPrice + tax + fee;
+        setPrice(totalPrice)
         setTotalPricePackage(totalPriceWithTaxAndFee * adult);
       }
     };
@@ -705,7 +707,7 @@ const PackageDetail = () => {
                     </div>
                     <div className="flex justify-end items-end gap-2">
                       <span className="text-2xl font-bold text-red-500">
-                        {totalPricePackage?.toLocaleString()}
+                        {price?.toLocaleString()}
                       </span>{" "}
                       บาท
                     </div>
