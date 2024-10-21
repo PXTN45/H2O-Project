@@ -94,7 +94,7 @@ jobs:
           --network h2o-network \
           -p 80:80 \
           --name h2o-frontend-container \
-          -e VITE_H2O_URL="http://18.140.2.235:3001/" \
+          -e VITE_H2O_URL="http://47.129.247.9:3001/" \
           -e VITE_SECRET_KEY="${{ secrets.VITE_SECRET_KEY }}" \
           pxtn/h2o-frontend
 
