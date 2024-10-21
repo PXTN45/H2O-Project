@@ -3,7 +3,7 @@ FROM node:20.16.0
 WORKDIR /usr/src/app/Server
 
 ENV NODE_ENV=production
-ENV CLIENT_URL=http://18.140.2.235
+ENV CLIENT_URL=http://47.129.247.9
 
 COPY package*.json ./
 
