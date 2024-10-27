@@ -115,9 +115,6 @@ const getBookingPackageByUser = async (
 
 const createBook = async (req: Request, res: Response) => {
   const { bookingData } = req.body;
-
-  console.log(req.body);
-
   try {
     const { bookingStart, bookingEnd, booker, homestayId, offer, packageId } =
       bookingData;
@@ -137,7 +134,7 @@ const createBook = async (req: Request, res: Response) => {
 
     const newBookingPackage = new Booking({
       booker,
-      homestay: homestayId || undefined, // ใช้ trim() เพื่อลบช่องว่างที่ไม่ต้องการ
+      homestay: homestayId.trim() || undefined, // ใช้ trim() เพื่อลบช่องว่างที่ไม่ต้องการ
       detail_offer: offer,
       package: packageId || undefined,
       bookingStart,
