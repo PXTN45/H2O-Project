@@ -13,7 +13,8 @@ import {
   getBookingByCheckIn,
   sendMoneyToBusiness,
   getAllBookingForAdmin,
-  changeStatus
+  changeStatus,
+  checkInBooking
 } from "../controller/booking.controller";
 import { verifyToken } from "../middlewares/verifyToken";
 import verifyUser from "../middlewares/verifyUser";
@@ -35,7 +36,7 @@ router.get(
   verifyUser,
   verifyToken
 );
-router.post("/bookingPackage", createBook, verifyUser, verifyToken);
+router.post("/create-booking", createBook, verifyUser, verifyToken);
 router.put(
   "/editPackageBooking/:userId",
   editPackageBooking,
@@ -51,6 +52,7 @@ router.put(
 router.put("/change-status/:id", changeStatus);
 router.put("/confirmBooking/:id", confirmBooking, verifyBusiness, verifyToken);
 router.put("/cancelBooking/:id", cancelBooking, verifyToken, verifyUser);
+router.put("/checkInBooking/:id", checkInBooking);
 router.delete("/deleteBooking/:id", deleteBooking, verifyToken, verifyAdmin);
 
 router.get("/getBookingForAdmin", getAllBookingForAdmin);

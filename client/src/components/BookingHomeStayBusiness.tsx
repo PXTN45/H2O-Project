@@ -103,6 +103,32 @@ const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({ booki
       console.error("Error cancelling booking:", error);
     }
   };
+  const checkInBooking = async (id: string) => {
+    try {
+      const result = await Swal.fire({
+        title: "คุณแน่ใจหรือไม่?",
+        text: "คุณต้องการยืนยันการเข้าร่วมโฮมสเตย์นี้หรือไม่?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      });
+
+      if (result.isConfirmed) {
+        await axiosPrivateBusiness.put(`/checkInBooking/${id}`);
+        fetchData();
+        await Swal.fire({
+          title: "ยืนยันเข้าพักสำเร็จ!",
+          text: "การเช็คอินเรียบร้อยแล้ว.",
+          icon: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+    }
+  };
 
   return (
     <div>
@@ -193,7 +219,7 @@ const BookingHomeStayBusiness: React.FC<BookingHomeStayBusinessProps> = ({ booki
                       <FaRegTrashCan className="w-5 h-5" />
                     </button>
                     <button
-                      // onClick={() => cancelBooking(myBooking[index]?._id)}
+                      onClick={() => checkInBooking(booking?._id)}
                       className="hover:scale-110 transition-transform duration-200 hover:text-blue-500"
                     >
                       <FaRegCheckCircle className="w-5 h-5" />

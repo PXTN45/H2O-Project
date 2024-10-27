@@ -62,8 +62,8 @@ const payment = async (req: Request, res: Response) => {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/paymentSuccess`,
-      cancel_url: `${process.env.CLIENT_URL}/paymentFailure`,
+      success_url: `http://47.129.247.9/paymentSuccess`,
+      cancel_url: `http://47.129.247.9/paymentFailure`,
       customer_email: email,
     });
 

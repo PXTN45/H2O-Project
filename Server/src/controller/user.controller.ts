@@ -18,6 +18,7 @@ const getUserById = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: error.message });
   }
 };
+
 const getBusinessById = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
   try {
@@ -223,20 +224,15 @@ const updateUser = async (req: Request, res: Response) => {
     let updateResult;
     switch (updateData.role) {
       case "user":
-        console.log(updateData.role);
         updateResult = await UserModel.findByIdAndUpdate(userId, updateData, {
           new: true,
         });
-        console.log(updateResult?.name);
         break;
       case "business":
         console.log(updateData.role);
         updateResult = await BusinessModel.findByIdAndUpdate(userId, updateData, {
           new: true,
         });
-        console.log(updateResult?.name);
-
-        
         break;
       case "admin":
         updateResult = await AdminModel.findByIdAndUpdate(userId, updateData, {
@@ -405,8 +401,6 @@ const ChangePassword = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
     const isPasswordMatch = bcrypt.compareSync(password, userData.password);
-    console.log(isPasswordMatch);
-
     if (!isPasswordMatch) {
       return res.status(401).json({ message: "รหัสผ่านปัจจุบันไม่ถูกต้อง" });
     }

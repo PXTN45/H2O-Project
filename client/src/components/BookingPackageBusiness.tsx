@@ -24,12 +24,15 @@ const BookingPackageBusiness: React.FC<BookingHomeStayBusinessProps> = ({
     throw new Error("AuthContext must be used within an AuthProvider");
   }
   const { userInfo } = authContext;
+  console.log(bookingData);
+  
 
   const fetchData = async () => {
     try {
       if (bookingData) {
         const filterPackage = bookingData.filter(
-          (booking: any) => booking.package
+          (booking: any) =>
+            booking?.package && booking?.bookingStatus === "Confirmed"
         );
         setMyBooking(filterPackage);
       }
@@ -105,16 +108,40 @@ const BookingPackageBusiness: React.FC<BookingHomeStayBusinessProps> = ({
     }
   };
 
-  console.log(myBooking[0]?.detail_offer[0].totalPrice);
-
   const discountPrice = (i: number) => {
     const discount: number = myBooking[i]?.package.discount;
     const price: number = myBooking[i]?.detail_offer[0].totalPrice;
     if (discount > 0) {
       const totalPrice = ((100 - discount) / 100) * price;
       return totalPrice;
-    } 
+    }
     return price;
+  };
+  const checkInBooking = async (id: string) => {
+    try {
+      const result = await Swal.fire({
+        title: "คุณแน่ใจหรือไม่?",
+        text: "คุณต้องการยืนยันการเข้าร่วมโฮมสเตย์นี้หรือไม่?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      });
+
+      if (result.isConfirmed) {
+        await axiosPrivateBusiness.put(`/checkInBooking/${id}`);
+        fetchData();
+        await Swal.fire({
+          title: "ยืนยันเข้าพักสำเร็จ!",
+          text: "การเช็คอินเรียบร้อยแล้ว.",
+          icon: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+    }
   };
 
   return (
@@ -145,11 +172,11 @@ const BookingPackageBusiness: React.FC<BookingHomeStayBusinessProps> = ({
                   </div>
                   <div className="flex flex-col">
                     <span className="flex items-center gap-2">
-                      <MdOutlineEmail /> {booking?.booker.email}
+                      <MdOutlineEmail /> {booking?.booker?.email}
                     </span>
                     <span className="flex items-center gap-2">
-                      <FaRegUser /> {booking?.booker.name}{" "}
-                      {booking?.booker.lastName}
+                      <FaRegUser /> {booking?.booker?.name}{" "}
+                      {booking?.booker?.lastName}
                     </span>
                   </div>
 
@@ -216,7 +243,7 @@ const BookingPackageBusiness: React.FC<BookingHomeStayBusinessProps> = ({
                       <FaRegTrashCan className="w-5 h-5" />
                     </button>
                     <button
-                      // onClick={() => cancelBooking(myBooking[index]?._id)}
+                      onClick={() => checkInBooking(booking?._id)}
                       className="hover:scale-110 transition-transform duration-200 hover:text-blue-500"
                     >
                       <FaRegCheckCircle className="w-5 h-5" />

@@ -86,18 +86,6 @@ const Drawer: React.FC = () => {
                         <a>การจอง</a>
                       </li>
                     </Link>
-                    <Link to="/dashboard-user/HistiryReview-user">
-                      <li
-                        onClick={() => handleClick("My review")}
-                        className={`cursor-pointer rounded-md ${
-                          activeItem === "My review"
-                            ? "bg-primaryUser text-white"
-                            : ""
-                        }`}
-                      >
-                        <a>ประวัติรีวิว</a>
-                      </li>
-                    </Link>
                   </div>
                 ) : userInfo?.role === "business" ? (
                   <div>
@@ -135,11 +123,6 @@ const Drawer: React.FC = () => {
                         }`}
                       >
                         <a>รายการจอง</a>
-                      </li>
-                    </Link>
-                    <Link to={"#"}>
-                      <li>
-                        <a>รีวิว</a>
                       </li>
                     </Link>
                   </div>
@@ -188,11 +171,6 @@ const Drawer: React.FC = () => {
                     <Link to={"#"}>
                       <li>
                         <a>ประวัติการจอง</a>
-                      </li>
-                    </Link>
-                    <Link to={"#"}>
-                      <li>
-                        <a>วิธีรับเงิน</a>
                       </li>
                     </Link>
                   </div>

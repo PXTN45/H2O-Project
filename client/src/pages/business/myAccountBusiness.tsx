@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import bcrypt from "bcryptjs";
 import { Address, Business, Password } from "../../type";
+import CryptoJS from "crypto-js";
 
 const banks = [
   "ธนาคารกรุงเทพ",
@@ -690,6 +691,18 @@ const myAccountBusiness = () => {
     });
   };
 
+  const decryptData = (encryptedData: string) => {
+    const secretKey = import.meta.env.VITE_SECRET_KEY;
+    if (!secretKey) {
+      throw new Error(
+        "Secret key is not defined in the environment variables."
+      );
+    }
+
+    const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  };
+
   return (
     <div className="my-5 w-full">
       <div className="mb-5">
@@ -1097,7 +1110,7 @@ const myAccountBusiness = () => {
               <div className="hover:bg-gray-300 rounded-lg p-5 transition-all duration-700 ease-in-out flex justify-between">
                 <div className="flex flex-col">
                   <span className="text-sm">รหัสบัตรประชาชน</span>
-                  <span className="text-md">{userData?.idcard || "ยังไม่ได้ตั้งค่า"}</span>
+                  <span className="text-md">{decryptData(userInfo.idcard)|| "ยังไม่ได้ตั้งค่า"}</span>
                 </div>
                 <div
                   className="flex items-center justify-center"
@@ -1333,7 +1346,7 @@ const myAccountBusiness = () => {
                   </span>
                   <span className="text-sm">เลขบัญชี</span>
                   <span className="text-lg">
-                    {userData?.BankingCode || "ไม่มีข้อมูล"}
+                    {decryptData(userData?.BankingCode) || "ไม่มีข้อมูล"}
                   </span>
                 </div>
                 <div onClick={() => setOpenUpdateBanking(true)}>

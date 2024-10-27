@@ -292,18 +292,16 @@ const BusinessPackage = () => {
                   <div className="xl:w-2/6 flex flex-col w-full xl:border-l p-1">
                     <div className="flex flex-col justify-between h-full w-full gap-2">
                       <div className="w-full flex flex-col items-end justify-end">
-                        {new Date() < new Date(item?.time_start_package) ? (
-                          <div className="text-sm bg-green-400 px-2 rounded-xl text-white">
-                            ยังไม่พร้อมให้จอง
-                          </div>
-                        ) : new Date() > new Date(item?.time_end_package) ? (
+                        {new Date() >= new Date(item?.time_start_package) ? (
                           <div className="text-sm bg-red-600 px-2 rounded-xl text-white">
-                            แพ็กเกจหมดเขตแล้ว
+                            หมดเขตแล้ว
                           </div>
                         ) : (
-                          <div className="text-sm bg-green-400 px-2 rounded-xl text-white">
-                            พร้อมให้จอง
-                          </div>
+                          new Date() < new Date(item?.time_start_package) && (
+                            <div className="text-sm bg-green-400 px-2 rounded-xl text-white">
+                              พร้อมให้จอง
+                            </div>
+                          )
                         )}
 
                         <div>
@@ -392,7 +390,10 @@ const BusinessPackage = () => {
           <span className="text-2xl flex items-center gap-5">
             ยังไม่มีแพ็คเกจของคุณในขณะนี้
           </span>
-          <button onClick={createPackage} className="flex items-center gap-3 text-lg bg-green-500 p-2 rounded-lg text-white my-2">
+          <button
+            onClick={createPackage}
+            className="flex items-center gap-3 text-lg bg-green-500 p-2 rounded-lg text-white my-2"
+          >
             <MdAddHomeWork className="text-3xl" />
             สร้างแพ็คเกจใหม่เลยตอนนี้
           </button>

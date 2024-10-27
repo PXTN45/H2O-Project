@@ -3,34 +3,28 @@ import axiosPrivateUser from "../../hook/axiosPrivateUser";
 
 const paymentSuccess = () => {
 
-  const createBooking = async () => {
-    const Data = localStorage.getItem("bookingDetails");
-  
-    if (Data) {
-      try {
-        const bookingData = JSON.parse(Data);
-        console.log("Parsed booking data:", bookingData);
-  
-        // ส่งข้อมูลการจองแพ็คเกจ
-        const packageResponse = await axiosPrivateUser.post("/bookingPackage", {
-          bookingData: bookingData  // ส่งข้อมูลการจองใน bookingData
-        });
-        console.log("Package booking response:", packageResponse.data);
-  
-        // ลบข้อมูลการจองจาก localStorage
-        localStorage.removeItem("bookingDetails");
-      } catch (error: any) {
-        console.error("Error creating booking:", error.response?.data || error.message);
-      }
-    } else {
-      console.log("No booking data found in localStorage.");
-    }
-  };
-  
-
-
   // เรียกใช้ฟังก์ชันใน useEffect
   useEffect(() => {
+    const createBooking = async () => {
+      const Data = localStorage.getItem("bookingDetails");
+    
+      if (Data) {
+        try {
+          const bookingData = JSON.parse(Data);
+          const packageResponse = await axiosPrivateUser.post("/create-booking", {
+            bookingData: bookingData  // ส่งข้อมูลการจองใน bookingData
+          });
+          console.log("Package booking response:", packageResponse.data);
+    
+          // ลบข้อมูลการจองจาก localStorage
+          localStorage.removeItem("bookingDetails");
+        } catch (error: any) {
+          console.error("Error creating booking:", error.response?.data || error.message);
+        }
+      } else {
+        console.log("No booking data found in localStorage.");
+      }
+    };
     createBooking();
   }, []);
 

@@ -175,6 +175,7 @@ const BookingDetail: React.FC = () => {
       console.error("Error making payment:", error.response.data.message);
     }
   };
+  
   return (
     <div>
       {paymentData && dataNav ? (

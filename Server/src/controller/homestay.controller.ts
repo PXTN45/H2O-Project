@@ -150,7 +150,6 @@ const changeStatus = async (req: Request, res: Response): Promise<Response> => {
       { status_sell_homeStay },
       { new: true, runValidators: true }
     );
-    console.log(data?.status_sell_homeStay);
 
     if (!data) {
       return res.status(404).json({ message: "Package Not Found" });

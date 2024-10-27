@@ -31,8 +31,6 @@ const bookingList = () => {
               booking?.package?.business_user === userInfo?._id) &&
             booking?.bookingStatus === "Confirmed"
         );
-        console.log(filterData);
-
         setBooking(filterData);
         setFilteredGuests(filterData);
       }
@@ -45,7 +43,7 @@ const bookingList = () => {
     fetchData();
   }, []);
 
-  console.log(filteredGuests);
+
 
   const search = () => {
     const results = booking.filter((booking) =>

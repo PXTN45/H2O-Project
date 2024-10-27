@@ -7,7 +7,6 @@ import BadRequestError from "../error/badrequest";
 import isBookingAvailable from "../utils/date/isBookingAvailable";
 import { sendEmailPayment } from "../utils/sendEmail";
 
-
 const getAllBooking = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await Booking.find().populate([
@@ -55,7 +54,10 @@ const getBookingByConfirm = async (
 ): Promise<void> => {
   const userId = req.params.id; // รับ userId จาก params
   try {
-    const bookingData = await Booking.find({booker: userId,bookingStatus: "Confirmed",}).populate([
+    const bookingData = await Booking.find({
+      booker: userId,
+      bookingStatus: "Confirmed",
+    }).populate([
       { path: "booker", select: "email name lastName" },
       { path: "homestay" },
       { path: "package" },
@@ -114,24 +116,28 @@ const getBookingPackageByUser = async (
 const createBook = async (req: Request, res: Response) => {
   const { bookingData } = req.body;
 
-  console.log("Received booking package data:", bookingData);
+  console.log(req.body);
 
   try {
     const { bookingStart, bookingEnd, booker, homestayId, offer, packageId } =
       bookingData;
 
     if (!bookingStart || !bookingEnd || !booker) {
-      return res.status(400).json({ message: "Please provide all required fields: bookingStart!" });
+      return res
+        .status(400)
+        .json({ message: "Please provide all required fields: bookingStart!" });
     }
 
     const night = getBookingNights(bookingStart, bookingEnd);
     if (night <= 0) {
-      return res.status(400).json({ message: "Booking duration must be at least 1 night." });
+      return res
+        .status(400)
+        .json({ message: "Booking duration must be at least 1 night." });
     }
 
     const newBookingPackage = new Booking({
       booker,
-      homestay: homestayId.trim() || undefined,  // ใช้ trim() เพื่อลบช่องว่างที่ไม่ต้องการ
+      homestay: homestayId || undefined, // ใช้ trim() เพื่อลบช่องว่างที่ไม่ต้องการ
       detail_offer: offer,
       package: packageId || undefined,
       bookingStart,
@@ -198,13 +204,16 @@ const deleteBooking = async (req: Request, res: Response) => {
     // ลบ booking
     await Booking.findByIdAndDelete(bookingId);
     res.status(200).json({ message: "Booking deleted successfully!" });
-    
   } catch (error: any) {
     console.error("Error deleting booking:", error.message); // log error ไว้ใน server log เพื่อ debug
-    res.status(500).json({ message: "Server Error. Could not delete booking.", error: error.message }); // แจ้งข้อผิดพลาดไปยัง client
+    res
+      .status(500)
+      .json({
+        message: "Server Error. Could not delete booking.",
+        error: error.message,
+      }); // แจ้งข้อผิดพลาดไปยัง client
   }
 };
-
 
 const cancelBooking = async (req: Request, res: Response): Promise<void> => {
   const bookingId = req.params.id;
@@ -247,73 +256,100 @@ const confirmBooking = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const sendMoneyToBusiness = async (req: Request, res: Response): Promise<void> => {
-  const { bookingId , imageUrl } = req.body;
+const checkInBooking = async (req: Request, res: Response): Promise<void> => {
+  const bookingId = req.params.id;
+  try {
+    const booking = await Booking.findByIdAndUpdate(
+      bookingId,
+      { bookingStatus: "Check-in" },
+      { new: true }
+    );
+
+    if (!booking) {
+      res.status(404).send({ message: "Booking not found" });
+      return;
+    }
+
+    res.status(200).send(booking);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+const sendMoneyToBusiness = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { bookingId, imageUrl } = req.body;
 
   try {
-    const bookingData = await Booking.findOne({ '_id': bookingId }).populate([
-      { 
+    const bookingData = await Booking.findOne({ _id: bookingId }).populate([
+      {
         path: "homestay",
         select: "business_user",
         populate: {
-          path: "business_user"
-        }
+          path: "business_user",
+        },
       },
-      { 
+      {
         path: "package",
         select: "business_user",
         populate: {
-          path: "business_user"
-        }
-      }
-    ]);    
+          path: "business_user",
+        },
+      },
+    ]);
 
     if (!bookingData) {
-      res.status(404).json("Can't send money. because I don't have bookingData!");
+      res
+        .status(404)
+        .json("Can't send money. because I don't have bookingData!");
       return;
     }
 
     bookingData.bookingStatus = "Money-transferredBusiness";
-    await bookingData.save(); 
-    
-    await sendEmailPayment(bookingData , imageUrl);
+    await bookingData.save();
+
+    await sendEmailPayment(bookingData, imageUrl);
 
     res.status(200).json({
-      message: 'Success send money to business'
+      message: "Success send money to business",
     });
-
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({
-        message: 'An error occurred while processing the request',
-        error: error.message, 
+        message: "An error occurred while processing the request",
+        error: error.message,
       });
     } else {
       res.status(500).json({
-        message: 'An unknown error occurred',
+        message: "An unknown error occurred",
         error: error,
       });
     }
   }
 };
 
-const getAllBookingForAdmin = async (req: Request, res: Response): Promise<void> => {
+const getAllBookingForAdmin = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const data = await Booking.find().populate([
-      { 
+      {
         path: "homestay",
         select: "business_user",
         populate: {
-          path: "business_user"
-        }
+          path: "business_user",
+        },
       },
-      { 
+      {
         path: "package",
         select: "business_user",
         populate: {
-          path: "business_user"
-        }
-      }
+          path: "business_user",
+        },
+      },
     ]);
     res.status(201).json(data);
   } catch (error: any) {
@@ -335,7 +371,6 @@ const changeStatus = async (req: Request, res: Response): Promise<Response> => {
       { bookingStatus },
       { new: true, runValidators: true }
     );
-    console.log(data?.bookingStatus);
 
     if (!data) {
       return res.status(404).json({ message: "Package Not Found" });
@@ -361,5 +396,6 @@ export {
   getBookingByConfirm,
   sendMoneyToBusiness,
   getAllBookingForAdmin,
-  changeStatus
+  changeStatus,
+  checkInBooking,
 };
